@@ -1,0 +1,1 @@
+[11-Sep-2013 03:02:47 CST6CDT] PHP Fatal error:  Call to undefined function connect_to_db() in /home/c1rotary/public_html/backend/forms/form_quote_entry.php on line 3
