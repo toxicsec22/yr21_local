@@ -39,17 +39,24 @@ div.rightsign{ font-size:80%;float:right;margin-right:15%;}
 <body>
 <?php
 $path=$_SERVER['DOCUMENT_ROOT']; include_once $path.'/acrossyrs/logincodes/checkifloggedon.php';
+date_default_timezone_set('Asia/Manila'); 
 include_once $path.'/acrossyrs/dbinit/userinit.php';
-$link=!isset($link)?connect_db($currentyr.'_1rtc',0):$link;
+$link=!isset($link)?connect_db(''.$currentyr.'_1rtc',0):$link; 
 if (!allowedToOpen(6901,'1rtc')) {   echo 'No permission'; exit;} 
- 
+if (!isset($_GET['TxnID'])) { 
+    $sql='SELECT LAST_DAY(CURDATE()) AS `StartDate`, LAST_DAY(CURDATE()) AS `EndDate`, \'Training Title\' AS `TrainingTitle`, \'Venue\' AS `Venue`, \'Trainee Name\' AS `FullName`, \'Trainor Name\' AS `Trainor`, \'Trainor Title\' AS  `TrainorTitle`, \'Training Lead name\' AS `TrainingLead`, \'Training Lead position\' AS `TrainingLeadPosition`;';
+    
+} else {
 $sql='SELECT StartDate,EndDate,TrainingTitle,Venue, CONCAT(e.FirstName, " ",LEFT(e.MiddleName,1),". ",e.SurName) AS FullName, Trainor, TrainorTitle, CONCAT(e1.FirstName, " ",LEFT(e1.MiddleName,1),". ", e1.Surname) AS TrainingLead, Position AS TrainingLeadPosition FROM `hr_2traintrack` ts
 JOIN `hr_2trainsched` tm ON tm.TxnID=ts.TxnID JOIN `hr_1trainings` t ON t.TrainingID=tm.TrainingID
 JOIN `1employees` e ON e.IDNo=ts.IDNo
    LEFT JOIN `1employees` e1 ON e1.IDNo=tm.LeadIDNo
 	       LEFT JOIN `attend_0positions` p ON p.PositionID=tm.LeadPositionID
 WHERE Completed=1 AND tm.TxnID='.$_GET['TxnID']; 
+}
+
 $stmt=$link->query($sql); $result=$stmt->fetchAll();
+
 
 $cert='';$colcount=0;
 foreach ($result as $row){
