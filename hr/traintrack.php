@@ -1,6 +1,7 @@
 <?php
 $path=$_SERVER['DOCUMENT_ROOT']; include_once $path.'/acrossyrs/logincodes/checkifloggedon.php';
 if (!allowedToOpen(690,'1rtc')) {   echo 'No permission'; exit;} 
+$showbranches=false;
 include_once('../switchboard/contents.php');
 
  
@@ -48,7 +49,7 @@ switch ($which){
    case 'List':
 		?><form method="post" action="traintrack.php" enctype="multipart/form-data">
 		Choose Month (1 - 12):  <input type="text" name="Month" value="<?php echo date('m'); ?>"></input>
-		<input type="submit" name="lookup" value="Lookup"> </form>
+		<input type="submit" name="lookup" value="Lookup"> </form> <br><br> <a href='certificates.php'>See sample certificate</a>
 		<?php
          $title='Trainings'; $method='POST'; 
          $columnnames=array(
