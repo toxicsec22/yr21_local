@@ -150,7 +150,7 @@ if (in_array($whichqry,array('summary_for_payroll','my_attendance'))){
             break;
 	   case 'PerCompanyList':
             include_once $path.'/acrossyrs/commonfunctions/listoptions.php';
-            $title='Employee List From '.companyandbranchValue($link,'1companies','CompanyNo', $_GET['RCompanyNo'],'ShortName') . ' Company';
+            $title='Employee List From '.companyandbranchValue($link,'1companies','CompanyNo', $_GET['RCompanyNo'],'Company') . ' Company';
             $sql='SELECT e.IDNo, CONCAT(e.FirstName, " ", e.MiddleName, " ", e.SurName) as EmployeeName from 1employees e
                 join 1companies c on e.RCompanyNo = c.CompanyNo where e.RCompanyNo= '.intval($_GET['RCompanyNo']).' AND Resigned=0 AND DirectOrAgency=0';
             $columnnames=array('IDNo','EmployeeName'); 
@@ -267,7 +267,7 @@ if (in_array($whichqry,array('summary_for_payroll','my_attendance'))){
 			echo '<br><br><H3>In Positions</H3>';
 			$editprocess='tocheckattendance.php?qry=InPositionList&PositionID=';
             $editprocesslabel='Lookup';
-           $sql='SELECT PositionID AS TxnID,Position, COUNT(*) AS EmployeeCount FROM `attend_30currentpositions` GROUP BY PositionID ORDER BY EmployeeCount DESC, Rank;';  
+           $sql='SELECT PositionID AS TxnID,Position, COUNT(*) AS EmployeeCount FROM `attend_30currentpositions` GROUP BY PositionID ORDER BY EmployeeCount DESC, JLID;';  
            $columnnames=array('Position', 'EmployeeCount');
            include('../backendphp/layout/displayastable.php');
    break;
