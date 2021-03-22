@@ -1225,19 +1225,20 @@ case 'Traction':
 	echo '<div class="tabs">
 		';
 	
-	$sqlmain='select *,CONCAT(Nickname,\' \',SurName) as Fullname from eos_2vtoqtrsub vqs left join 1employees e on e.IDNo=vqs.Who  WHERE '.$mancomordeptcondi.' IsRock='.$isrock.' AND `Stat`=0';
+	$sqlmain='select vqs.*,CONCAT(Nickname,\' \',SurName) as Fullname, IF(ManComOrdept=-1,"Mancom",Dept) AS Dept from eos_2vtoqtrsub vqs left join 1employees e on e.IDNo=vqs.Who LEFT JOIN 1departments d ON d.deptid=vqs.ManComOrdept WHERE  IsRock='.$isrock.' AND `Stat`=0 '; //'.$mancomordeptcondi.'
+
 	echo '<br><h3>Who: '.$who.'</h3>';
 	echo '<div class="tab-content">';
 	
 	echo '<div id="tab1" class="tab active">';
-	$sql=$sqlmain.' '.$addlcond.' AND (RIGHT(RIStatPerWeek,1)=0 OR RIGHT(RIStatPerWeek,1) IS NULL)';
-	// echo $sql;
+	$sql=$sqlmain.' '.$addlcond.' AND (RIGHT(RIStatPerWeek,1)=0 OR RIGHT(RIStatPerWeek,1) IS NULL) ORDER BY Dept';
+	//if ($_SESSION['(ak0)']==1002) {echo $sql;}
 	$stmt=$link->query($sql); $result=$stmt->fetchAll();
 	
 	echo '<table border="1px solid black" style="border-collapse:collapse;">';
-	echo '<tr style="background-color:skyblue;"><th>'.$subtitle.' - Pending/UnDone</th><th></th></tr>';
+	echo '<tr style="background-color:skyblue;"><th>Department</th><th>'.$subtitle.' - Pending/UnDone</th><th></th></tr>';
 		foreach($result as $ress){
-			echo'<tr><td style="padding:3px;">'.$ress['RockOrIssues'].'</td><td style="padding:3px;">'.(($idno==$_SESSION['(ak0)'] or allowedToOpen(1614,'1rtc'))?'<a href="vto.php?subtitle='.$subtitle.'&w=EditQtr&VTOQtrSubId='.$ress['VTOQtrSubId'].'">'.$imgedit.'</a> <a href="vto.php?go='.$isrock.'&w=DeleteQtr&VTOQtrSubId='.$ress['VTOQtrSubId'].'" OnClick="return confirm(\'Are you sure you want to Delete?\');">'.$imgdel.'</a> <a href="vto.php?go='.$isrock.'&w=CancelQtr&VTOQtrSubId='.$ress['VTOQtrSubId'].'" OnClick="return confirm(\'Are you sure you want to Cancel?\');">'.$imgcancel.'</a>':'').'</td></tr>';
+			echo'<tr><td style="padding:3px;">'.$ress['Dept'].'</td><td style="padding:3px;">'.$ress['RockOrIssues'].'</td><td style="padding:3px;">'.(($idno==$_SESSION['(ak0)'] or allowedToOpen(1614,'1rtc'))?'<a href="vto.php?subtitle='.$subtitle.'&w=EditQtr&VTOQtrSubId='.$ress['VTOQtrSubId'].'">'.$imgedit.'</a> <a href="vto.php?go='.$isrock.'&w=DeleteQtr&VTOQtrSubId='.$ress['VTOQtrSubId'].'" OnClick="return confirm(\'Are you sure you want to Delete?\');">'.$imgdel.'</a> <a href="vto.php?go='.$isrock.'&w=CancelQtr&VTOQtrSubId='.$ress['VTOQtrSubId'].'" OnClick="return confirm(\'Are you sure you want to Cancel?\');">'.$imgcancel.'</a>':'').'</td></tr>';
 		}
 		
 	echo'</table>';
