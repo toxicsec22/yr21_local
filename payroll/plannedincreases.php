@@ -41,8 +41,8 @@ $title='Set Annual Increase';
 if (allowedToOpen(1500,'1rtc')) { $cond=''; } else {$cond=' WHERE p.IDNo<>'.$_SESSION['(ak0)'].' AND deptheadpositionid='.$_SESSION['&pos'].' ';}
 
 $table='payroll_61plannedincrease'; $txnid='IDNo'; $txnidname='IDNo'; 
-$sql='SELECT p.*, FirstName, SurName, Position AS CurrentPosition, cp.deptid, FORMAT(CurrentRate,0) AS CurrentRate, FORMAT(CalculatedRate,0) AS CalculatedRate FROM payroll_61plannedincrease p JOIN 1employees e ON e.IDNo=p.IDNo JOIN attend_0positions cp ON p.CurrentPosID=cp.PositionID JOIN 1departments d ON d.deptid=cp.deptid '.$cond;
-$columnnames=array('CurrentAssignment','IDNo', 'FirstName', 'SurName', 'CurrentPosition', 'CurrentRate','CalculatedRate', 'Remarks', 'LatesMarchToFeb', 'AbsencesMarchToFeb', 'MeritsMarchToFeb', 'DemeritsMarchToFeb','NTEMarchToFeb', 'PerfScoreLastYr', 'DateofLastIncrease'); 
+$sql='SELECT p.*, FullName, Position AS CurrentPosition, cp.deptid, FORMAT(CurrentRate,0) AS CurrentRate, FORMAT(CalculatedRate,0) AS CalculatedRate FROM payroll_61plannedincrease p JOIN attend_30currentpositions cp ON p.IDNo=cp.IDNo '.$cond;
+$columnnames=array('CurrentAssignment','IDNo', 'FullName', 'CurrentPosition', 'CurrentRate','CalculatedRate', 'Remarks', 'LatesMarchToFeb', 'AbsencesMarchToFeb', 'MeritsMarchToFeb', 'DemeritsMarchToFeb','NTEMarchToFeb', 'PerfScoreLastYr', 'DateofLastIncrease'); 
 
 $sql1='SELECT IDNo, FullName FROM attend_30currentpositions p  '.$cond.' ';
 include_once $path.'/acrossyrs/commonfunctions/listoptions.php';
