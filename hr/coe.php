@@ -35,6 +35,7 @@ switch ($which)
 	$stmt=$link->query($sql); $row=$stmt->fetch();
 	
       echo comboBox($link,'SELECT IDNo, FullName FROM attend_30currentpositions WHERE PositionID IN ('.$row['AllowedPos'].')','FullName','IDNo','approver');
+	  echo comboBox($link,'SELECT BranchNo, Branch FROM 1branches WHERE Active<>0 AND Pseudobranch IN (0,2)','Branch','BranchNo','branches');
 	   
 	   
 	   
@@ -47,45 +48,39 @@ echo '<br><br>';
 
 	 	$radionamefield='Radio'; 
 		echo '<h3 style="margin-left:33%;">'.$title.'</h3><br>';
-	 echo'<div style="border:1px solid black; padding:10px; width:350px;margin-left:33%;"><form id="form-id">
+	 echo'<div style="border:1px solid black; padding:10px; width:450px;margin-left:33%;"><form id="form-id">
 		
-
-			<b>*For clearance:*</b> <input type="radio" id="watch-me1" name="'.$radionamefield.'" value="Type"><br><br>
-			<b>*For loan purposes:*</b> <input type="radio" id="watch-me2" name="'.$radionamefield.'" value="Type"><br>
+			<h4>PURPOSE:</h4><br>'.str_repeat('&nbsp ',3).'
+			<b>Final clearance </b> <input type="radio" id="watch-me1" name="'.$radionamefield.'" value=1>'.str_repeat('&nbsp ',3).'
+			<b>Loan application </b> <input type="radio" id="watch-me2" name="'.$radionamefield.'" value=2>'.str_repeat('&nbsp ',3).'
+			<b>Travel pass </b> <input type="radio" id="watch-me3" name="'.$radionamefield.'" value=3>'.str_repeat('&nbsp ',3).'<br>
 		  </form></div></br>';
 	include $path.'/acrossyrs/commonfunctions/enablebasedonradio.php';
 	
-	 
+	$divandformfirst='<form method="post" action="coe.php?w=PrintPreview&coetype='; 
+	$divandformsecond='" autocomplete="off">
+	<div style="background-color:white;border:1px solid black;padding:6px;width:450px;">'.str_repeat('&nbsp ',3).'
+	IDNo: <input type="text" name="IDNo" list="';
+	$divandformthird='" size="10">'.str_repeat('&nbsp ',3);
 	$approver='Approver: <input type="text" name="ApproveByNo" list="approver" size="10">';
 	$submit='<input type="submit" name="submit" value="Print Preview">';	
 
-	
-	echo '<div  style="margin-left:33%;">';	  
 	// clearance
-	 	echo'<div style="display:none" id="show-me1">
-	 <form method="post" action="coe.php?w=PrintPreview&coetype=1" autocomplete="off">
-	 <div style="background-color:white;border:1px solid black;padding:6px;width:350px;">
-	 
-		<h3 align="center" style="color:blue;"></h3><br>
-		IDNo: <input type="text" name="IDNo" list="empclearance" size="10"><br>';
-		echo $approver;
-		echo '<br>
-		'.$submit.'
-		</div>
-		  </form></div>';
-		  
-	
+
+		echo '<div  style="margin-left:33%;"><div style="display:none" id="show-me1"> '.$divandformfirst.'1'.$divandformsecond.'empclearance'.$divandformthird.$approver.str_repeat('&nbsp ',3).$submit.'
+		</div></form></div></div>';
+
 	// loans
-	 	echo'<div style="display:none" id="show-me2">
-	 <form method="post" action="coe.php?w=PrintPreview&coetype=2" autocomplete="off"> 
-	 <div style="background-color:white;border:1px solid black;padding:6px;width:350px;">
-	 <h3 align="center" style="color:maroon;"></h3><br>
-	 IDNo: <input type="text" name="IDNo" list="emploans" size="10"><br>'.$approver.'<br>
-		'.$submit.'
-		</div>
-		  </form></div>';		
-		 echo '</div>'; 
-		  
+
+	echo '<div  style="margin-left:33%;"><div style="display:none" id="show-me2"> '.$divandformfirst.'2'.$divandformsecond.'emploans'.$divandformthird.$approver.str_repeat('&nbsp ',3).$submit.'
+	</div></form></div></div>';
+
+	// travel pass
+
+	echo '<div  style="margin-left:33%;"><div style="display:none" id="show-me3"> '.$divandformfirst.'3'.$divandformsecond.'emploans'.$divandformthird.
+	'Branch: <input type="text" name="BranchNo" list="branches" size="10"><br><br>'.str_repeat('&nbsp ',3).$approver.str_repeat('&nbsp ',3).$submit.'
+	</div></form></div></div>';
+
 		  
 break;
 
@@ -104,10 +99,16 @@ echo '<style>@media screen {
   }
 }</style>';
 $cert='<center><font style="font-size:25pt;letter-spacing: 5px;font-weight:bold;">CERTIFICATION</font></center><br><br><br><br>To whom it may concern:<br><br>';
-if($_GET['coetype']==1){
-	$sql='SELECT Gender,id.IDNo,DateResigned,Company,CompanyName,`Position`,CONCAT(id.FirstName," ",LEFT(id.MiddleName,1),". ",id.SurName) AS Name,if(p.deptid IN (1,2,3,4),"Supply Chain",if(p.deptid=10,"Operations",department)) AS department,id.DateHired FROM attend_30latestpositionsinclresigned cp JOIN 1_gamit.0idinfo id ON cp.IDNo=id.IDNo JOIN 1employees e ON e.IDNo=cp.IDNo JOIN 1companies c ON e.RCompanyNo=c.CompanyNo JOIN attend_0positions p ON cp.PositionID=p.PositionID JOIN 1departments d ON p.deptid=d.deptid WHERE e.Resigned=1 AND cp.IDNo='.$_POST['IDNo'];
-	$stmt=$link->query($sql); $row=$stmt->fetch();
-	echo '<center><img src="../generalinfo/logo/'.$row['Company'].'.png"></center><br><br><br><br>'.$cert.'';
+
+switch($_GET['coetype']){
+	case 1: // final clearance
+
+		$sql='SELECT Gender,id.IDNo,DateResigned,Company,CompanyName,`Position`,CONCAT(id.FirstName," ",LEFT(id.MiddleName,1),". ",id.SurName) AS Name,if(p.deptid IN (1,2,3,4),"Supply Chain",if(p.deptid=10,"Operations",department)) AS department,id.DateHired FROM attend_30latestpositionsinclresigned cp JOIN 1_gamit.0idinfo id ON cp.IDNo=id.IDNo JOIN 1employees e ON e.IDNo=cp.IDNo JOIN 1companies c ON e.RCompanyNo=c.CompanyNo JOIN attend_0positions p ON cp.PositionID=p.PositionID JOIN 1departments d ON p.deptid=d.deptid WHERE e.Resigned=1 AND cp.IDNo='.$_POST['IDNo'];
+
+		$stmt=$link->query($sql); $row=$stmt->fetch();
+
+		echo '<center><img src="../generalinfo/logo/'.$row['Company'].'.png"></center><br><br><br><br>'.$cert.'';
+
 	echo 'This is to certify that <b>'.($row['Gender']==1?'MR.':'MS.').' '.strtoupper($row['Name']).'</b> was employed by '.$row['CompanyName'].' from '.date('F d, Y', strtotime($row['DateHired'])).'
 to '.date('F d, Y', strtotime($row['DateResigned'])).', with the last position as '.$row['Position'].' under the '.$row['department'].'
 Department.
@@ -115,13 +116,18 @@ Department.
 The aforementioned has no standing obligations or accountability to settle
 with the company, and is cleared of all accountabilities from the company.
 <br><br>
-This Certificate of Clearance is issued for whatever purpose it may serve
+This Certificate of Clearance is issued for whatever legal purpose it may serve
 best.';
-} else {
-	$sql='SELECT Gender,Position,Company,if(cp.deptid IN (1,2,3,4),"Supply Chain",if(cp.deptid=10,"Operations",department)) AS department,id.DateHired,IF(LatestDorM=1,LatestBasicRate*2,LatestBasicRate*26.08) AS BasicRate, CONCAT(id.FirstName," ",LEFT(id.MiddleName,1),". ",id.SurName) AS Name,CompanyName FROM attend_30currentpositions cp JOIN 1_gamit.0idinfo id ON cp.IDNo=id.IDNo JOIN 1employees e ON e.IDNo=cp.IDNo JOIN 1companies c ON e.RCompanyNo=c.CompanyNo JOIN payroll_20latestrates lr ON cp.IDNo=lr.IDNo WHERE cp.IDNo='.$_POST['IDNo'];
+break;
+
+case 2: // loans
+
+	$sql='SELECT Gender,Position,Company,if(cp.deptid=10,"Operations",department) AS department,id.DateHired,IF(LatestDorM=1,LatestBasicRate*2,LatestBasicRate*26.08) AS BasicRate, CONCAT(id.FirstName," ",LEFT(id.MiddleName,1),". ",id.SurName) AS Name,CompanyName FROM attend_30currentpositions cp JOIN 1_gamit.0idinfo id ON cp.IDNo=id.IDNo JOIN 1employees e ON e.IDNo=cp.IDNo JOIN 1companies c ON e.RCompanyNo=c.CompanyNo JOIN payroll_20latestrates lr ON cp.IDNo=lr.IDNo WHERE cp.IDNo='.$_POST['IDNo'];
+
 	$stmt=$link->query($sql); $row=$stmt->fetch();
-	
+
 	echo '<center><img src="../generalinfo/logo/'.$row['Company'].'.png"></center><br><br><br><br>'.$cert.'';
+
 	
 	echo 'This is to certify that <b>'.($row['Gender']==1?'MR.':'MS.').' '.strtoupper($row['Name']).'</b> has been an employee of '.$row['CompanyName'].' from '.date('F d, Y', strtotime($row['DateHired'])).' up to present. Currently, '.($row['Gender']==1?'he':'she').' holds the position of '.($row['Position']).' under the '.$row['department'].' Department, and receives a monthly gross salary amounting to Php '.(number_format($row['BasicRate'],2)).'.
 <br><br>
@@ -131,7 +137,22 @@ employee for the purpose of acquiring a loan.
 The information herewith is for reference only. The company does not accept
 responsibility or liability from any transaction arising from this
 certification.';
+break;
 
+case 3: // travel pass
+
+	$sql='SELECT Gender,Position,Company,REPLACE(b.RegisteredAddress,"<br>",", ") AS RegisteredAddress,if(cp.deptid=10,"Operations",department) AS department, CONCAT(e.FirstName," ",LEFT(e.MiddleName,1),". ",e.SurName) AS Name, e.SurName,CompanyName, b.Branch FROM attend_30currentpositions cp JOIN 1employees e ON e.IDNo=cp.IDNo JOIN 1branches b ON b.BranchNo='.$_POST['BranchNo'].' JOIN 1companies c ON c.CompanyNo=b.CompanyNo WHERE cp.IDNo='.$_POST['IDNo'];
+
+	$stmt=$link->query($sql); $row=$stmt->fetch();
+
+	echo '<center><img src="../generalinfo/logo/'.$row['Company'].'.png"></center><br><br><br><br>'.$cert.'';
+
+	
+	echo 'This is to certify that <b>'.($row['Gender']==1?'MR.':'MS.').' '.strtoupper($row['Name']).'</b> is currently employed at '.$row['CompanyName'].' located at '.$row['RegisteredAddress'].'.<br><br> '.$row['CompanyName'].' is engaged in the  supply of parts and consummables for refrigeration and air-conditioning units of the essential sectors such as but not limited to hospitals, supermarkets, cold storages, hotels, ambulances, etc.
+<br><br>Due to the nature of work, '.($row['Gender']==1?'he':'she').' is required to travel to different areas serviced by our company.';
+	break;
+default:
+	break;
 }
 
 
