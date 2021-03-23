@@ -2,20 +2,28 @@
 $path=$_SERVER['DOCUMENT_ROOT']; include_once $path.'/acrossyrs/logincodes/checkifloggedon.php';
 $showbranches=true; include_once('../switchboard/contents.php');
 $method='POST';
+// permissions
+$lookupallow=592;
+$addallow=5921;
+$editallow=5921;
+$delallow=20009;
+$unpost=405;
+$co='1rtc';
   
-if (!allowedToOpen(5921,'1rtc')) { echo 'No permission'; exit;} 
+if (!allowedToOpen($lookupallow,'1rtc')) { echo 'No permission'; exit;} 
 
 ?><br><div id="section" style="display: block;"><?php
 $file=basename($_SERVER['SCRIPT_FILENAME']);
 $w=(!isset($_GET['w'])?'List':$_GET['w']);
-$txnid='JVNo'; $txnidname='JVNo'; $form='JV';
+$txnid='JVNo'; $txnidname='JVNo'; $form='JV'; $postfield='Posted';
 include_once $path.'/acrossyrs/commonfunctions/listoptions.php';
 
 echo comboBox($link,'SELECT AccountID, ShortAcctID FROM `acctg_1chartofaccounts` ORDER BY ShortAcctID;','AccountID','ShortAcctID','accounts');
 $columnnamesmain=array('JVDate',$txnidname,'Remarks','Posted');
 $columnstoaddmain=array_diff($columnnamesmain,array($txnidname,'Posted'));
 $showforex=!isset($showforex)?0:$showforex;
-$columnsub=array('Date','Particulars','DebitAccount','CreditAccount','Amount');
+$columnsub=array('Date','Particulars','DebitAccount','CreditAccount','Amount','Forex');
+$table='acctg_2jvmain'; $subtable='acctg_2jvsub'; 
 
 // not sure if this is to be used
 if($showforex==1){
@@ -25,33 +33,39 @@ if($showforex==1){
 		array_splice( $columnsub, 5, 0, $TotalAmount );
 	 }
 	 
-$columnstoaddsub=array('Particulars');
+
 
 if (isset($_GET[$txnidname])){
    $txnid=intval($_GET[$txnidname]); 
-   $sqlmain='Select m.*, e.Nickname AS EncodedBy FROM `acctg_2adjustmain` m 
+   $sqlmain='Select m.*, e.Nickname AS EncodedBy FROM `'.$table.'` m 
 	       JOIN `1employees` e ON e.IDNo=m.EncodedByNo WHERE m.JVNo='.$txnid;
    $sqlsub='Select s.*, ca.ShortAcctID AS DebitAccount, ca1.ShortAcctID AS CreditAccount, FORMAT(Amount,2) AS Amount, FORMAT(Amount*Forex,2) AS TotalAmount, e.Nickname AS EncodedBy
-	       FROM `acctg_2adjustmain` m JOIN `acctg_2adjustsub` s ON m.JVNo=s.JVNo JOIN `acctg_1chartofaccounts` ca ON ca.AccountID=s.DebitAccountID
+	       FROM `'.$table.'` m JOIN `'.$subtable.'` s ON m.JVNo=s.JVNo JOIN `acctg_1chartofaccounts` ca ON ca.AccountID=s.DebitAccountID
 	       JOIN `acctg_1chartofaccounts` ca1 ON ca1.AccountID=s.CreditAccountID LEFT JOIN `1employees` e ON e.IDNo=s.EncodedByNo
 	       WHERE m.JVNo='.$txnid;
 }
 
-if (in_array($w,array('Add',$form,$form.'MainEdit','EditMain'))){
-        $table='acctg_2'.strtolower($form).'main'; $subtable='acctg_2'.strtolower($form).'sub'; 
-}
 
 if (in_array($w,array($form,$form.'MainEdit','EditMain','AddSub','EditSub'))){
         include_once('../backendphp/functions/editok.php');
 }
 
-if (in_array($w,array('EditMain'))){
+if (in_array($w,array('EditMain','EditSub'))){
         include_once 'trailacctg.php';
+}
+
+if (in_array($w,array('AddSub','EditSub'))){
+        $columnstoaddsub=array('Date','Particulars');
+
+}
+
+if (in_array($w,array('Edit'.$form.'Sub','EditSub'))){
+        $txnsubid=intval($_GET['TxnSubId']); 
 }
 
 switch ($w){
    case 'List':
-	if (!allowedToOpen(592,'1rtc')) { echo 'No permission'; exit;}
+	if (!allowedToOpen($lookupallow,'1rtc')) { echo 'No permission'; exit;}
         $title='Journal Vouchers';
         include_once 'acctglayout/txnslistheader.php';
 $columnnames=array('JVDate','JVNo','Remarks','Total','Posted');  
@@ -67,7 +81,7 @@ include_once('../backendphp/layout/displayastable.php');
 
 
   case 'AddMain':
-        if (!allowedToOpen(5921,'1rtc')) { echo 'No permission'; exit;} 
+        if (!allowedToOpen($addallow,'1rtc')) { echo 'No permission'; exit;} 
    
         $title='Add Journal Voucher'; $adjdate=strtotime((date('Y')==$currentyr?"today":''.$currentyr.'-01-01'));
         include_once $path.'/acrossyrs/commonfunctions/lastnum.php'; 
@@ -85,8 +99,8 @@ include_once('../backendphp/layout/displayastable.php');
      break;      
 		
     case 'Add':
-        if (!allowedToOpen(5921,'1rtc')) { echo 'No permission'; exit;}
-	
+        if (!allowedToOpen($addallow,'1rtc')) { echo 'No permission'; exit;}
+	require_once $path.'/acrossyrs/logincodes/confirmtoken.php';
         
 	//to check if editable
 	$date='JVDate';
@@ -100,61 +114,37 @@ include_once('../backendphp/layout/displayastable.php');
 		$sql=$sql.' `' . $field. '`=\''.$_POST[$field].'\', '; 
 	}
 	$sql=$sqlinsert.$sql.' EncodedByNo=\''.$_SESSION['(ak0)'].'\', PostedByNo=\''.$_SESSION['(ak0)'].'\',TimeStamp=Now();'; 
-	// echo $sql; break;
+	
         $stmt=$link->prepare($sql);
 	$stmt->execute();	
 
-	header('Location:form'.strtolower($form).'.php?w=JV&'.$txnidname.'='.$_POST[$txnidname]);
+	header('Location:formjv.php?w=JV&'.$txnidname.'='.$_POST[$txnidname]);
         break;    
     
    case $form:
-        if (!allowedToOpen(592,'1rtc')) { echo 'No permission'; exit;}
+        if (!allowedToOpen($lookupallow,'1rtc')) { echo 'No permission'; exit;}
         
         include_once('../backendphp/layout/showencodedbybutton.php');
         $listcondition=' WHERE AccountID IN (SELECT AccountID FROM `acctg_1begbal` WHERE BranchNo='.$_SESSION['bnum'].') ';
         $txnid=intval($_REQUEST[$txnidname]);
-           $title='Add/Edit '.$form; $coltototal='Amount'; $amttoedit='Amount';
+        $title='Add/Edit '.$form; $coltototal='Amount';         
         
-        
-            $sqlmain='SELECT m.*, e.Nickname as EncodedBy FROM `'.$table.'` m left join `1employees` as e on e.IDNo=m.EncodedByNo WHERE m.JVNo='.$txnid;
-            $stmt=$link->query($sqlmain);    $result=$stmt->fetch();
+            $sqlmain='SELECT m.*, CONCAT(e.Nickname," ",e.SurName) as EncodedBy FROM `'.$table.'` m left join `1employees` as e on e.IDNo=m.EncodedByNo WHERE m.JVNo='.$txnid;
+            $columnstoeditmain=array('Date','Particulars','Branch','FromBudgetOf','DebitAccount','CreditAccount','Amount','Forex');
            
-            $columnsub=array('Date','Particulars','Branch','FromBudgetOf','DebitAccount','CreditAccount',$amttoedit,'Forex','PHPAmount');
-            if ($w=='Forex'){array_push($columnsub,'Forex',$coltototal);}
+            $columnsub=array('Date','Particulars','Branch','FromBudgetOf','DebitAccount','CreditAccount','Amount','Forex','PHPAmount');
+            //if ($w=='Forex'){array_push($columnsub,'Forex',$coltototal);}
             $columnnamesmain=array('JVDate',$txnidname,'Remarks','Posted');
             if ($showenc==1) {
               array_push($columnnamesmain,'EncodedBy','TimeStamp','PostedByNo');
               array_push($columnsub,'EncodedBy','TimeStamp');
               } else { $columnnamesmain=$columnnamesmain; $columnsub=$columnsub;}
             
+            $left='60%'; $leftmargin='65%'; $right='30%'; 
             
-            if ($result['Posted']==0){
-                 $columnstoedit=array('Date','Particulars','Branch','FromBudgetOf','DebitAccount','CreditAccount',$amttoedit,'Forex');
-                 
-                $left='65%'; $leftmargin='69%'; $right='30%'; 
-                $topmargin='10%';
-            } else {
+            $editprocessmainlabel='Edit'; $editprocessmain='formjv.php?w='.$form.'MainEdit&edit=2&'.$txnidname.'='.$txnid;
+            $delprocessmain='..\backendphp\functions\delrecords.php?TxnID='.$txnid.'&action_token='.$_SESSION['action_token'].'&w='.$table.'&l=acctg';
             
-            $columnstoedit=array(); 
-            $left='65%'; $leftmargin='69%'; $right='30%'; $topmargin='0%';
-            }
-            
-            
-            $main='';
-                
-            if (editOk($table,$txnid,$link,$w) and allowedToOpen(5921,'1rtc')){
-                $editmain='<td><a href="form'.strtolower($form).'.php?w='.$form.'MainEdit&edit=2&'.$txnidname.'='.$txnid.'">Edit</a>'.str_repeat('&nbsp',8).'<a href=..\backendphp\functions\delrecords.php?TxnID='.$txnid.'&action_token='.$_SESSION['action_token'].'&w='.$table.'&l=acctg OnClick="return confirm(\'Really delete this?\');">Delete</a></td>';
-                $editok=true; $editsub=true;
-            } else {
-                $editmain=''; $editok=false; $editsub=false; 
-            }
-            
-            $colno=0;
-            foreach ($columnnamesmain as $rowmain){
-                $colno=$colno+1;
-                $main=$main.'<td><font face="arial" size="2">'.$rowmain.'</font>: '.$result[$rowmain].str_repeat('&nbsp',5).'</td>'.($colno%4==0?'</tr><tr>':'');
-            }
-            $main='<table><tr>'.$main.$editmain.'</tr></table>';
             $sortfield=(isset($_POST['sortfield'])?$_POST['sortfield']:'s.TimeStamp'); 
             $sqlsub='Select s.*, (Amount*Forex) AS PHPVal, FORMAT(Amount*Forex,2) AS PHPAmount, b.Branch, ca.ShortAcctID as DebitAccount, ca1.ShortAcctID as CreditAccount, e.Nickname as EncodedBy,Entity as FromBudgetOf from '.$subtable.' s join acctg_1chartofaccounts ca on ca.AccountID=s.DebitAccountID join acctg_1chartofaccounts ca1 on ca1.AccountID=s.CreditAccountID left join `1employees` as e on s.EncodedByNo=e.IDNo LEFT JOIN `acctg_1budgetentities` be on be.EntityID=s.FromBudgetOf
             join `1branches` b on b.BranchNo=s.BranchNo join '.$table.' m on m.JVNo=s.JVNo
@@ -162,31 +152,34 @@ include_once('../backendphp/layout/displayastable.php');
             
             $sqlsum='SELECT sum('.$coltototal.') as Total FROM  `'.$subtable.'` s JOIN `'.$table.'` m ON m.JVNo=s.JVNo WHERE m.JVNo='.$txnid;
             $stmt=$link->query($sqlsum); $result=$stmt->fetch();
-            $addlinfo='Total:  '.number_format($result['Total'],2).str_repeat('&nbsp',10).'<a href="form'.strtolower($form).'.php?w=AddMain">Add '. $w.'</a>'.'<br><br>';
+            $addlinfo='Total:  '.number_format($result['Total'],2).str_repeat('&nbsp',10).'<a href="formjv.php?w=AddMain">Add '. $w.'</a>'.'<br><br>';
         
             
             $columnnames=array(
-                             array('field'=>'Date', 'type'=>'date','size'=>20,'required'=>true, 'autofocus'=>true ),
+                             array('field'=>'Date', 'type'=>'date','size'=>15,'required'=>true, 'autofocus'=>true ),
                              array('field'=>'Particulars', 'type'=>'text','size'=>20,'required'=>false ),
                             array('field'=>'Branch', 'type'=>'text','size'=>15,'required'=>true,'list'=>'branchnames', 'value'=>$_SESSION['@brn']),
                                                 array('field'=>'FromBudgetOf', 'type'=>'text','size'=>15,'required'=>true,'list'=>'entities','value'=>$_SESSION['@brn']),
                              array('field'=>'DebitAccount', 'type'=>'text','size'=>15,'required'=>true,'list'=>'accounts'),
                              array('field'=>'CreditAccount', 'type'=>'text','size'=>15,'required'=>true,'list'=>'accounts'),
-                             array('field'=>'Amount', 'type'=>'text','size'=>15,'required'=>true),
-                             array('field'=>'Forex', 'type'=>'text','size'=>7,'value'=>1,'required'=>true),
+                             array('field'=>'Amount', 'type'=>'text','size'=>10,'required'=>true),
+                             array('field'=>'Forex', 'type'=>'text','size'=>5,'value'=>1,'required'=>true),
                             array('field'=>$txnidname, 'type'=>'hidden', 'size'=>0,'value'=>$txnid)
                             );
            
-            $action='praddsub.php?w='.$w.'SubAdd&JVNo='.$txnid;
+            $addsub='formjv.php?w=AddSub&'.$txnidname.'='.$txnid;
             $liststoshow=array('branchnames','companies');
             $whichotherlist='acctg'; $otherlist=array('accounts');
             // info for posting: $table has been defined
             $post='1';
-              $fieldsinrow=2;
-            $editprocesslabel='Enter'; $editprocess='preditsupplyside.php?w='.$w.'SubEdit&JVNo='.$txnid.'&TxnSubId=';$txnsubid='TxnSubId';
-            $delprocess='..\backendphp\functions\delrecordssub.php?TxnID='.$txnid.'&w='.$subtable.'&l=acctg'.'&TxnSubId=';
-            $withsub=true; 
-            include('../backendphp/layout/inputsubform.php');
+              $fieldsinrow=4;
+            $editprocesssublabel='Edit'; $editprocesssub='formjv.php?w=Edit'.$form.'Sub&'.$txnidname.'='.$txnid.'&TxnSubId=';
+            
+            //$editprocess='preditsupplyside.php?w='.$w.'SubEdit&'.$txnidname.'='.$txnid.'&TxnSubId=';$txnsubid='TxnSubId';
+            $delprocesssub='..\backendphp\functions\delrecordssub.php?TxnID='.$txnid.'&w='.$subtable.'&l=acctg'.'&TxnSubId=';
+            
+            include('../backendphp/layout/addeditformseparateedit.php');
+            //include('../backendphp/layout/inputsubform.php');
             // to show totals
             $colamt=$coltototal;
             unset($textfordisplay,$sql,$columnnames,$editprocess,$delprocess,$coltototal,$addlprocess,$addlprocesslabel,$sortfield);
@@ -218,18 +211,17 @@ include_once('../backendphp/layout/displayastable.php');
         $listsname=array();
         $liststoshow=array();
         $method='POST';
-        $action=$file.'?w=EditMain&JVNo='.$txnid;
+        $action=$file.'?w=EditMain&'.$txnidname.'='.$txnid;
 
-        $sql='Select m.* from `'.$table.'` m where JVNo='.$txnid;
+        $sql='Select m.* from `'.$table.'` m where '.$txnidname.'='.$txnid;
 
         include('../backendphp/layout/rendersubform.php');
 	 break;
       
    case 'EditMain':
        require_once $path.'/acrossyrs/logincodes/confirmtoken.php';
-        if (!allowedToOpen(5921,'1rtc')) { echo 'No permission'; exit;}
-	$txnid=intval($_GET[$txnidname]);
-        $title='Add/Edit '.$form; 
+        if (!allowedToOpen($editallow,'1rtc')) { echo 'No permission'; exit;}
+	$title='Add/Edit '.$form; 
     
 	//to check if editable
 	if (editOk($table,$txnid,$link,$w)){
@@ -242,57 +234,50 @@ include_once('../backendphp/layout/displayastable.php');
 		$sql=$sql.' `' . $field. '`=\''.$_POST[$field].'\', '; 
 	}
 	$sql=$sqlupdate.$sql.' EncodedByNo=\''.$_SESSION['(ak0)'].'\', PostedByNo=\''.$_SESSION['(ak0)'].'\',TimeStamp=Now() where Posted=0 and '.$txnidname.'='.$txnid; 
-	//echo $sql; exit();
-        $stmt=$link->prepare($sql);	$stmt->execute();
+	$stmt=$link->prepare($sql);	$stmt->execute();
 	} 
-	header('Location:form'.strtolower($form).'.php?w='.$form.'&'.$txnidname.'='.$_POST[$txnidname]);
+	header('Location:formjv.php?w='.$form.'&'.$txnidname.'='.$_POST[$txnidname]);
         break;
    
    case 'AddSub':
-       if (allowedToOpen(12,$co)){
-        $path=$_SERVER['DOCUMENT_ROOT']; require_once $path.'/acrossyrs/logincodes/confirmtoken.php';
+       if (allowedToOpen($addallow,$co)){
+        require_once $path.'/acrossyrs/logincodes/confirmtoken.php';
 	$acctiddr=comboBoxValue($link,'`acctg_1chartofaccounts`','ShortAcctID',addslashes($_POST['DebitAccount']),'AccountID');
 	$acctidcr=comboBoxValue($link,'`acctg_1chartofaccounts`','ShortAcctID',addslashes($_POST['CreditAccount']),'AccountID');
+        $budgetof=comboBoxValue($link,'`1branches`','Branch',addslashes($_POST['FromBudgetOf']),'BranchNo');
         $sql='';
         foreach ($columnstoaddsub as $field) {$sql=$sql.' `' . $field. '`=\''.addslashes($_POST[$field]).'\', '; }
-        $sql='INSERT INTO `acctg_2adjustsub` SET JVNo='.$_GET[$txnidname].', EncodedByNo='.$_SESSION['(ak0)'].', '.$sql.' Forex="'.$_POST['Forex'].'",Amount='.(!is_numeric($_POST['Amount'])?str_replace(',', '',$_POST['Amount']):$_POST['Amount']).', DebitAccountID='.$acctiddr.',
+        $sql='INSERT INTO `'.$subtable.'` SET JVNo='.$_GET[$txnidname].', EncodedByNo='.$_SESSION['(ak0)'].', '.$sql.' FromBudgetOf='.$budgetof.',Amount='.(!is_numeric($_POST['Amount'])?str_replace(',', '',$_POST['Amount']):$_POST['Amount']).', DebitAccountID='.$acctiddr.',
        CreditAccountID='.$acctidcr.', TimeStamp=Now()'; 
 	   // echo $sql; exit();
 	   $stmt=$link->prepare($sql); $stmt->execute();
 	   
 	   }
-        header("Location:adjust.php?w=Adjust&JVNo=".$_GET[$txnidname]);
-        break;
-      
-   case 'DeleteSub':
-       if (allowedToOpen(12,$co)){
-        $path=$_SERVER['DOCUMENT_ROOT']; require_once $path.'/acrossyrs/logincodes/confirmtoken.php';
-        $sql='DELETE FROM `acctg_2adjustsub` WHERE TxnSubId='.$_REQUEST['TxnSubId'];
-       $stmt=$link->prepare($sql); $stmt->execute();}
-        header("Location:adjust.php?w=Adjust&JVNo=".$_REQUEST[$txnidname]);
+        header('Location:formjv.php?w='.$form.'&'.$txnidname.'='.$_GET[$txnidname]);
         break;
    
-   case 'EditAdjustSub':
-	 $title='Edit Adjustment Details';
-	 $txnid=intval($_GET[$txnidname]); $txnsubid=intval($_GET['TxnSubId']); $main='acctg_2adjustmain';
-	 $sql=$sqlsub.' AND TxnSubId='.$txnsubid; $columnsub = array_diff($columnsub,array('TotalAmount')); $columnnames=$columnsub; 
-         if (allowedToOpen(12,$co)){
+   case 'Edit'.$form.'Sub':
+	 $title='Edit Journal Voucher Details';
+	 $main=$table;
+	 $sql=$sqlsub.' AND TxnSubId='.$txnsubid; $columnsub = array_diff($columnsub,array('PHPAmount')); $columnnames=$columnsub; 
+         if (allowedToOpen($editallow,$co)){
          $columnstoedit=$columnsub;
 	 $columnswithlists=array('DebitAccount','CreditAccount'); $listsname=array('CreditAccount'=>'accounts','DebitAccount'=>'accounts');
-         $editprocess='adjust.php?w=EditSub&JVNo='.$txnid.'&TxnSubId='.$txnsubid;}
-	 include('../backend/layout/editspecifics.php');
+         $editprocess='formjv.php?w=EditSub&'.$txnidname.'='.$txnid.'&TxnSubId='.$txnsubid;}
+	 include('../backendphp/layout/editspecifics.php');
 	 break;
       
    case 'EditSub':
-       if (allowedToOpen(12,$co)){
-        $path=$_SERVER['DOCUMENT_ROOT']; require_once $path.'/acrossyrs/logincodes/confirmtoken.php';
+       if (allowedToOpen($editallow,$co)){
+        require_once $path.'/acrossyrs/logincodes/confirmtoken.php';
 		$acctiddr=comboBoxValue($link,'`acctg_1chartofaccounts`','ShortAcctID',addslashes($_POST['DebitAccount']),'AccountID');
                 $acctidcr=comboBoxValue($link,'`acctg_1chartofaccounts`','ShortAcctID',addslashes($_POST['CreditAccount']),'AccountID');
 		$sql='';
         foreach ($columnstoaddsub as $field) {$sql=$sql.' `' . $field. '`=\''.addslashes($_POST[$field]).'\', '; }
-        $sql='UPDATE `acctg_2adjustsub` SET EncodedByNo='.$_SESSION['(ak0)'].', '.$sql.' Forex="'.$_POST['Forex'].'", Amount='.(!is_numeric($_POST['Amount'])?str_replace(',', '',$_POST['Amount']):$_POST['Amount']).', DebitAccountID='.$acctiddr.', CreditAccountID='.$acctidcr.', TimeStamp=Now() WHERE TxnSubId='.$_GET['TxnSubId']; 
+        recordtrail($txnsubid,$subtable,$link,0);
+        $sql='UPDATE `'.$subtable.'` SET EncodedByNo='.$_SESSION['(ak0)'].', '.$sql.' Forex="'.$_POST['Forex'].'", Amount='.(!is_numeric($_POST['Amount'])?str_replace(',', '',$_POST['Amount']):$_POST['Amount']).', DebitAccountID='.$acctiddr.', CreditAccountID='.$acctidcr.', TimeStamp=Now() WHERE TxnSubId='.$_GET['TxnSubId']; 
        $stmt=$link->prepare($sql); $stmt->execute();}
-        header("Location:adjust.php?w=Adjust&JVNo=".$_GET[$txnidname]);
+        header('Location:formjv.php?w='.$form.'&'.$txnidname.'='.$_GET[$txnidname]);
         break;
 
 }
