@@ -17,7 +17,12 @@ include_once($path.'/acrossyrs/myswitch/generic/topbar.php');
         <div class="row">
     
     <?php 
-    // include_once('graphs/dashboardgraphs.php');
+    if (allowedToOpen(7133,'1rtc')){
+      echo '<div style="background:#FFF;border:2px solid black;">';
+        include_once('graphs/dashboardgraphs.php');
+      echo '</div>';
+      echo '</div><div style="clear: both; display: block; position: relative;"></div>';
+    }
     include_once('switchboard/messagesonswitch.php');
     include_once('approvals/forapprovalswitchboard.php');
     echo '<br><br>';

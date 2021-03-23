@@ -52,15 +52,16 @@ if (in_array($w,array('EditMain'))){
 switch ($w){
    case 'List':
 	if (!allowedToOpen(592,'1rtc')) { echo 'No permission'; exit;}
-        
+        $title='Journal Vouchers';
         include_once 'acctglayout/txnslistheader.php';
 $columnnames=array('JVDate','JVNo','Remarks','Total','Posted');  
 $sql='select m.JVNo, m.JVDate, m.Remarks, m.Posted, format(sum(s.Amount),2) as Total from acctg_2jvmain as m join acctg_2jvsub s on m.JVNo=s.JVNo where '.str_replace('Date','JVDate',$txndate) .' group by m.JVNo  
 union select m.JVNo, m.JVDate, m.Remarks, m.Posted, 0 as Total from acctg_2jvmain as m left join acctg_2jvsub s on m.JVNo=s.JVNo where s.JVNo is null and '. str_replace('Date','JVDate',$txndate) .' order by JVDate, JVNo';
 
-$process1=$file.'?w='.$form.'&';
-$processlabel1='Lookup';
-include_once('../backendphp/layout/clickontabletoeditbody.php');
+$editprocess=$file.'?w='.$form.'&'.$txnidname.'=';
+$editprocesslabel='Lookup';
+$opennewtab=true;
+include_once('../backendphp/layout/displayastable.php');
           
         break;
 
@@ -103,7 +104,7 @@ include_once('../backendphp/layout/clickontabletoeditbody.php');
         $stmt=$link->prepare($sql);
 	$stmt->execute();	
 
-	header('Location:form'.strtolower($form).'.php?w=JV&JVNo='.$_POST[$txnidname]);
+	header('Location:form'.strtolower($form).'.php?w=JV&'.$txnidname.'='.$_POST[$txnidname]);
         break;    
     
    case $form:
@@ -130,12 +131,12 @@ include_once('../backendphp/layout/clickontabletoeditbody.php');
             if ($result['Posted']==0){
                  $columnstoedit=array('Date','Particulars','Branch','FromBudgetOf','DebitAccount','CreditAccount',$amttoedit,'Forex');
                  
-                $left='40%'; $leftmargin='41%'; $right='50%'; 
+                $left='65%'; $leftmargin='69%'; $right='30%'; 
                 $topmargin='10%';
             } else {
             
             $columnstoedit=array(); 
-            $left='40%'; $leftmargin='40%'; $right='50%'; $topmargin='0%';
+            $left='65%'; $leftmargin='69%'; $right='30%'; $topmargin='0%';
             }
             
             
@@ -191,7 +192,7 @@ include_once('../backendphp/layout/clickontabletoeditbody.php');
             unset($textfordisplay,$sql,$columnnames,$editprocess,$delprocess,$coltototal,$addlprocess,$addlprocesslabel,$sortfield);
             
             $sql='SELECT FORMAT(SUM(`'.$colamt.'`),2) AS Total, Branch FROM '.$subtable.' s join `1branches` b on b.BranchNo=s.BranchNo WHERE s.JVNo='.$txnid.' GROUP BY s.BranchNo ORDER BY Branch';
-            $subtitle='<br/><br/>Totals Per Branch'; $columnnames=array('Branch','Total'); $width='30%';
+            $subtitle='<br/><br/>Totals Per Branch'; $columnnames=array('Branch','Total'); $width='40%';
             echo '<div id="right">';
             include('../backendphp/layout/displayastableonlynoheaders.php');
             $sql0='CREATE TEMPORARY TABLE AdjTotal AS 
@@ -200,7 +201,7 @@ include_once('../backendphp/layout/clickontabletoeditbody.php');
         SELECT CreditAccountID AS AccountID, TRUNCATE(SUM(Amount)*-1,2) AS Amount FROM acctg_2jvsub s WHERE JVNo='.$txnid.' GROUP BY CreditAccountID';
             $stmt=$link->prepare($sql0); $stmt->execute();
             $sql='SELECT FORMAT(SUM(`Amount`),2) AS NetDRLessCR, ShortAcctID AS Account FROM AdjTotal s join `acctg_1chartofaccounts` ca on ca.AccountID=s.AccountID  GROUP BY s.AccountID ORDER BY Account';
-            $subtitle='Totals Per Account'; $columnnames=array('Account','NetDRLessCR'); $width='30%';
+            $subtitle='Totals Per Account'; $columnnames=array('Account','NetDRLessCR'); $width='40%';
             include('../backendphp/layout/displayastableonlynoheaders.php');
             echo '</div id="right">'; 
 	 break;
