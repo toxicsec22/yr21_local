@@ -25,7 +25,7 @@ if (isset($addlsubmit)) { echo $addlsubmit;}
 if (!empty($sub)) { echo $sub.'<br>';}
 echo isset($rowcount)?$rowcount." record/s shown &nbsp &nbsp":"";
 echo isset($total)?$total:'';
-if (isset($withsub) and $withsub=true){include('../../../'.$url_folder.'/backendphp/layout/displayastableeditcellssub.php');}
+if (isset($withsub) and $withsub=true){include($path.'/'.$url_folder.'/backendphp/layout/displayastableeditcellssub.php');}
 ?>
 </div>
 </div>
