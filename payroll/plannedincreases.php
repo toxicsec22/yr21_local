@@ -60,7 +60,7 @@ break;
 
 case 'SetRemarks':
     require_once $path.'/acrossyrs/logincodes/confirmtoken.php';
-    $sql='UPDATE payroll_61plannedincrease SET Remarks=\''.$_POST['Remarks'].'\' WHERE IDNo=\''.$_POST['IDNo'].'\'';
+    $sql='UPDATE payroll_61plannedincrease SET Remarks=\''.$_POST['Remarks'].'\', EncodedByNo='.$_SESSION['(ak0)'].', TS=Now() WHERE IDNo=\''.$_POST['IDNo'].'\'';
     echo $sql;
     $stmt=$link->prepare($sql); $stmt->execute();
     header('Location: plannedincreases.php');
