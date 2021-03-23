@@ -6,7 +6,7 @@ global $currentyr;
 if((strpos($table,'sub') !== false) OR (strpos($table,'fromlastperiodbounced') !== false) OR ($editordel==2)){ goto sub;}
 switch($table){
     case 'acctg_2jvmain':
-        $ctlno='JVNo'; $suppclientno='""'; $suppclient='""'; $particulars='Remarks'; $acctid='""'; $drcr='1'; $txnidname='JVNo'; $datefield='JVDate';
+        $ctlno='JVNo'; $suppclientno='-1'; $suppclient='""'; $particulars='Remarks'; $acctid='-1'; $drcr='1'; $txnidname='JVNo'; $datefield='JVDate';
         break;
     case 'acctg_2collectmain':
         $ctlno='CollectNo'; $suppclientno='ClientNo'; $suppclient='CONCAT("RcvdBy ",`ReceivedBy`)'; 
