@@ -8,7 +8,7 @@ else {
 }
 
 include_once $path.'/acrossyrs/commonfunctions/editokfromposted.php';
-if (isset($skippost)){ $editok=($edit==2)?TRUE:FALSE;} else { $editok=editOkfromPosted($main,$txnid,$link); }
+if (isset($skippost)){ $editok=($edit==2)?TRUE:FALSE;} else { $editok=editOkfromPosted($link,$table,$txnidname,$txnid,$posted); }
 //to make alternating rows have different colors
         $colorcount=0;
         $rcolor[0]="EDDBFF";
