@@ -1,6 +1,6 @@
 <?php
 $path=$_SERVER['DOCUMENT_ROOT']; include_once $path.'/acrossyrs/logincodes/checkifloggedon.php'; 
-if (!allowedToOpen(59022,'1rtc')) { echo 'No permission'; exit; }
+if (!allowedToOpen(array(59022,59030),'1rtc')) { echo 'No permission'; exit; }
 
 $which=(!isset($_GET['w'])?'NewCOE':$_GET['w']);
 
@@ -48,11 +48,14 @@ echo '<br><br>';
 
 	 	$radionamefield='Radio'; 
 		echo '<h3 style="margin-left:33%;">'.$title.'</h3><br>';
-	 echo'<div style="border:1px solid black; padding:10px; width:450px;margin-left:33%;"><form id="form-id">
+	 	echo'<div style="border:1px solid black; padding:10px; width:450px;margin-left:33%;"><form id="form-id">
 		
-			<h4>PURPOSE:</h4><br>'.str_repeat('&nbsp ',3).'
+			<h4>PURPOSE:</h4><br>'.str_repeat('&nbsp ',3);
+			if (allowedToOpen(array(59022),'1rtc')) { echo '
 			<b>Final clearance </b> <input type="radio" id="watch-me1" name="'.$radionamefield.'" value=1>'.str_repeat('&nbsp ',3).'
-			<b>Loan application </b> <input type="radio" id="watch-me2" name="'.$radionamefield.'" value=2>'.str_repeat('&nbsp ',3).'
+			<b>Loan application </b> <input type="radio" id="watch-me2" name="'.$radionamefield.'" value=2>'.str_repeat('&nbsp ',3);
+			}
+			echo '
 			<b>Travel pass </b> <input type="radio" id="watch-me3" name="'.$radionamefield.'" value=3>'.str_repeat('&nbsp ',3).'<br>
 		  </form></div></br>';
 	include $path.'/acrossyrs/commonfunctions/enablebasedonradio.php';
@@ -102,7 +105,7 @@ $cert='<center><font style="font-size:25pt;letter-spacing: 5px;font-weight:bold;
 
 switch($_GET['coetype']){
 	case 1: // final clearance
-
+		if (!allowedToOpen(array(59022),'1rtc')) { echo 'No permission'; exit; }
 		$sql='SELECT Gender,id.IDNo,DateResigned,Company,CompanyName,`Position`,CONCAT(id.FirstName," ",LEFT(id.MiddleName,1),". ",id.SurName) AS Name,if(p.deptid IN (1,2,3,4),"Supply Chain",if(p.deptid=10,"Operations",department)) AS department,id.DateHired FROM attend_30latestpositionsinclresigned cp JOIN 1_gamit.0idinfo id ON cp.IDNo=id.IDNo JOIN 1employees e ON e.IDNo=cp.IDNo JOIN 1companies c ON e.RCompanyNo=c.CompanyNo JOIN attend_0positions p ON cp.PositionID=p.PositionID JOIN 1departments d ON p.deptid=d.deptid WHERE e.Resigned=1 AND cp.IDNo='.$_POST['IDNo'];
 
 		$stmt=$link->query($sql); $row=$stmt->fetch();
@@ -121,7 +124,7 @@ best.';
 break;
 
 case 2: // loans
-
+	if (!allowedToOpen(array(59022),'1rtc')) { echo 'No permission'; exit; }
 	$sql='SELECT Gender,Position,Company,if(cp.deptid=10,"Operations",department) AS department,id.DateHired,IF(LatestDorM=1,LatestBasicRate*2,LatestBasicRate*26.08) AS BasicRate, CONCAT(id.FirstName," ",LEFT(id.MiddleName,1),". ",id.SurName) AS Name,CompanyName FROM attend_30currentpositions cp JOIN 1_gamit.0idinfo id ON cp.IDNo=id.IDNo JOIN 1employees e ON e.IDNo=cp.IDNo JOIN 1companies c ON e.RCompanyNo=c.CompanyNo JOIN payroll_20latestrates lr ON cp.IDNo=lr.IDNo WHERE cp.IDNo='.$_POST['IDNo'];
 
 	$stmt=$link->query($sql); $row=$stmt->fetch();
