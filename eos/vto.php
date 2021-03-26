@@ -156,7 +156,7 @@ if(in_array($which, array('Rocks','Issues','ToDo','ScorecardList','EditMeasurabl
 $defaultwho=comboBoxValue($link, '1employees', 'IDNo', $_SESSION['(ak0)'], 'Nickname')." ".comboBoxValue($link, '1employees', 'IDNo', $_SESSION['(ak0)'], 'SurName');
 }
 
-if(in_array($which, array('EditMeasurables','ScorecardList','Traction','ToDo','Issues','Rocks'))){
+if(in_array($which, array('EditMeasurables','ScorecardList','Traction','ToDo','Issues','Rocks','RockSummary'))){
 //Encode Rocks
 	$sqlpid='SELECT AllowedPos,AllowedPerID FROM permissions_2allprocesses WHERE ProcessID=1614';
 	$stmtpid=$link->query($sqlpid); $resultpid=$stmtpid->fetch();
@@ -185,7 +185,7 @@ if(in_array($which, array('EditMeasurables','ScorecardList','Traction','ToDo','I
 	
 	
 }
-if(in_array($which, array('Traction','Rocks','Issues','WeeklyUpdates','WeeklyMeeting','WeeklyMeetingIssues'))){
+if(in_array($which, array('Traction','Rocks','RockSummary','Issues','WeeklyUpdates','WeeklyMeeting','WeeklyMeetingIssues'))){
 	$date=date('n');
 	 if($date<=3){
 		 $qtr=1;	 
@@ -202,7 +202,7 @@ if(in_array($which, array('Rocks','Issues','ToDo'))){
 		$imgdel='<img src="../generalinfo/icons/delete.png" alt="Edit" height="20px;">';
 		$imgcancel='<img src="../generalinfo/icons/cancel.png" alt="Edit" height="20px;">';
 }
-if(in_array($which, array('Traction','Rocks','Issues','ToDo','ScorecardList','ToDoSummary'))){
+if(in_array($which, array('Traction','Rocks','RockSummary','Issues','ToDo','ScorecardList','ToDoSummary'))){
 	echo '<style>
 
 		.tabs {
@@ -386,10 +386,11 @@ $tractionlink='<a id="link" href="vto.php?w=Traction"><font style="font-size:8.5
 <a id="link" href="vto.php?w=WeeklyUpdates">Meeting Updates</a>
 <a id="link" href="vto.php?w=WeeklyMeeting'.(isset($_GET['IDNo'])?'&IDNo='.$_GET['IDNo'].'':'').'">Meeting - Measurables</a>
 <a id="link" href="vto.php?w=WeeklyMeetingIssues'.(isset($_GET['IDNo'])?'&IDNo='.$_GET['IDNo'].'':'').'">Meeting - ISSUES</a>
-<a id="link" href="vto.php?w=ToDoSummary">To Do Summary</a>
+<a id="link" href="vto.php?w=ToDoSummary">To Do Summary</a> 
+<a id="link" href="vto.php?w=RockSummary">Rock Summary</a>
 &nbsp; &nbsp; &nbsp; &nbsp;<a id="link" target="_blank" href="wishlists.php"><b>Wishlist</b></a></br></br>';
 
-if(in_array($which, array('Traction','Rocks','Issues','ToDo','ScorecardList','WeeklyMeeting','WeeklyUpdates','ToDoSummary','WeeklyMeetingIssues','EditQtr','EditMeasurables'))){	
+if(in_array($which, array('Traction','Rocks','RockSummary','Issues','ToDo','ScorecardList','WeeklyMeeting','WeeklyUpdates','ToDoSummary','WeeklyMeetingIssues','EditQtr','EditMeasurables'))){	
 
 
 echo $tractionlink;
@@ -818,6 +819,83 @@ case 'Traction':
 	
     break;
 	
+
+
+	case 'RockSummary':
+
+	
+		$isrock=1; //rocks
+		$subtitle='Rocks';
+		$title='Rocks Summary';
+		echo '<title>'.$title.'</title>';
+		
+		echo '<div class="tabs">
+			';
+		
+		echo '<br>';
+		echo '<div class="tab-content">';
+		echo '<h2>'.$title.'</h2><br>';
+		echo '<div id="tab1" class="tab active">';
+
+		if(isset($_POST['qtr'])){
+			$qtr=$_POST['qtr'];
+		}
+
+		echo '<form action="vto.php?w=RockSummary" method="POST">
+		Quarter: <input type="number" min=1 max=4 name="qtr" value="'.$qtr.'"> <input type="submit" name="btnSubmit" value="Lookup">
+		</form><br>';
+
+		$sql='select IDNo,CONCAT(Nickname," ",SurName) AS FullName from eos_2vtoqtrsub vqs left join 1employees e on e.IDNo=vqs.Who WHERE e.Resigned=0 AND '.$mancomordeptcondi.' IsRock='.$isrock.' AND VTOQtrId='.$qtr.' AND `Stat`=0 AND IsRock='.$isrock.' GROUP BY IDNo ORDER BY IDNo;';
+		$stmt=$link->query($sql); $result=$stmt->fetchAll();
+		//echo $sql; //exit();
+		
+		
+		echo '<table style="width:100%;">';
+		$cnttr=1;
+		
+		foreach($result as $ress){
+			
+			$sqlw='SELECT RockOrIssues FROM eos_2vtoqtrsub WHERE '.$mancomordeptcondi.' IsRock='.$isrock.' AND VTOQtrId='.$qtr.' AND Who="'.$ress['IDNo'].'" AND Stat=0 ORDER BY TimeStamp DESC';
+			// echo $sqlw;
+			
+			if ($cnttr % 2 == 1){
+						echo '</tr><tr align="left"><td valign="top" align="left">';
+					} else {
+							
+						echo '<td valign="top" align="left">';
+					}
+				echo '
+					<table border="1px solid black;" style="background-color:#FFFACD;width:570px;margin-left:5%;border-collapse:collapse;"><tr><th align="left" style="padding:3px;">'.$ress['FullName'].'</th></tr><tr>';
+			$stmtw=$link->query($sqlw); $resultw=$stmtw->fetchAll();
+			foreach($resultw as $res){
+				echo '<td style="width:100%;padding:3px;">'.$res['RockOrIssues'].'</td></tr>';
+			}
+			echo '</table><br><br>
+				</td>';
+				
+				$cnttr++;
+				
+		}
+		
+		echo '</table>';
+		
+		
+		
+		echo '</div>';
+		
+		
+		
+		
+		
+		echo '</div>';
+		
+		echo '</div>';
+		
+		
+		
+		break;
+
+
 	
 	case 'ToDoSummary':
 
@@ -1102,6 +1180,10 @@ case 'Traction':
 	echo '</div>';
 	
 	break;
+
+
+
+	
 
 	case 'Issues':
 	
