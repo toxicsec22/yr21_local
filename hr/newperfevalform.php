@@ -27,14 +27,13 @@ $title='Performance Evaluation Form';
 </style>
 <?php
 $txnid=intval($_REQUEST['TxnID']);  
-$sql='SELECT pf.*, e.Nickname, e.FirstName, LEFT(e.MiddleName,1) AS MI, e.SurName, DATE_FORMAT(EvalDueDate,\'%Y %M %d\') AS EvalDue, '
+$sql='SELECT pf.*, e.Nickname, e.FirstName,EvalSched, LEFT(e.MiddleName,1) AS MI, e.SurName, DATE_FORMAT(EvalDueDate,\'%Y %M %d\') AS EvalDue, '
         . ' DATE_FORMAT(e.DateHired,\'%Y %M %d\') AS DateHired, Position, Branch, Department, '
-        . ' CONCAT(e1.Nickname, " ",e1.SurName) AS EvaluatedBy, FORMAT((TO_DAYS(EvalDueDate) - TO_DAYS(`e`.`DateHired`)) / 365,2) AS `InYears(as of EvalDueDate)`,'
-        . ' IF(EvalAfterDays=YEAR(EvalDueDate),"Annual Evaluation",CONCAT("Evaluation after ",FORMAT(EvalAfterDays/30,0)," months")) AS Reason '
+        . ' CONCAT(e1.Nickname, " ",e1.SurName) AS EvaluatedBy, FORMAT((TO_DAYS(EvalDueDate) - TO_DAYS(`e`.`DateHired`)) / 365,2) AS `InYears(as of EvalDueDate)`'
         . ' FROM `hr_82perfevalmain` pf '
         . ' JOIN `1employees` e ON pf.IDNo=e.IDNo '
         . ' JOIN attend_0positions p ON p.PositionID=pf.CurrentPositionID JOIN `1branches` b ON b.BranchNo=pf.CurrentBranchNo '
-        . ' JOIN `1departments` d ON d.deptid=p.deptid LEFT JOIN `1employees` e1 ON pf.SIDNo=e1.IDNo WHERE pf.TxnID='.$txnid.$printcondition;
+        . ' JOIN `1departments` d ON d.deptid=p.deptid LEFT JOIN `1employees` e1 ON pf.SIDNo=e1.IDNo LEFT JOIN `hr_80evalsched` es ON es.EvalSchedID=pf.EvalSchedID WHERE pf.TxnID='.$txnid.$printcondition;
 $stmt=$link->query($sql); $result=$stmt->fetch(); 
 
 
@@ -128,10 +127,9 @@ $sql0='SELECT DATE_FORMAT(MAX(SCommentTS),\'%Y %M %d\') AS LastEval FROM `hr_82p
         <td>Evaluated By<br><h4><?php echo $result['EvaluatedBy'];?></h4></td>
 	<?php } ?>
 
-    <td><h4><?php echo $result['Reason'];?></h4></td>
     <td>Due Date of Evaluation<br><h4><font color="red"><?php echo $result['EvalDue'];?></font></h4></td>
+	<td><h4><?php echo $result['EvalSched'];?></h4></td>
 	<?php if((allowedToOpen(array(100,685,686),'1rtc'))){ ?>
-        <td>Date of Last Evaluation<br><h4><?php echo $result0['LastEval'];?></h4></td>
         <td>Date Hired<br><h4><?php echo $result['DateHired'];?></h4></td><td>How Long With Us <br>(Years, as of Eval Due Date)?<br><h4><?php echo $result['InYears(as of EvalDueDate)'];?></h4></td>
 		<?php } ?>
     </tr>
@@ -153,42 +151,6 @@ $rcolor[1]="FFFFFF";
 $colorcount=0;
 
 
-//startfc
-echo '<br><br><b>Functional Competencies</b>';
-echo '<br><table>';
-echo '<tr><th>Statement</th><th>Weight</th>';
-$selfth='<th>Super-Score</th></tr>';
-
-echo $selfth;
-$sqlcore='SELECT pems.TxnSubId,pemm.Posted,pems.FCID,SuperScore,Statement,`Weight` FROM hr_82perfevalmonthlymain pemm JOIN hr_82perfevalmonthlysub pems ON pemm.TxnID=pems.TxnID JOIN hr_82fcsub fv ON pems.FCID=fv.FCID WHERE pemm.IDNo = '.$eidno.' AND MonthNo='.date('m',strtotime($evalduedate)).' ORDER BY OrderBy'; 
-	
-	$stmtcore=$link->query($sqlcore);
-	$rowcore = $stmtcore->fetchALL();
-	
-	
-	$totalweight=0; $superscore=0;
-	foreach($rowcore AS $rowco){
-		echo '<tr bgcolor="'. $rcolor[$colorcount%2].'"><td>'.$rowco['Statement'].'</td><td>'.$rowco['Weight'].'%</td>';
-		
-		
-		echo '<td>'.$rowco['SuperScore'].'</td>';
-	
-		
-		echo '</tr>';
-		$colorcount++;
-		$totalweight=$totalweight+$rowco['Weight'];
-		$superscore = $superscore + (($rowco['Weight']/100) * $rowco['SuperScore']);
-	}
-
-	echo '</table>';
-//end fc
-
-
-
-
-$rcolor[0]=(!isset($_REQUEST['print'])?(isset($alternatecolor)?$alternatecolor:"FFFFCC"):"FFFFFF");
-$rcolor[1]="FFFFFF";
-$colorcount=0;
 
 // echo '<h3><a href="newperfevalformmonthly.php?TxnID='.$_GET['TxnID'].'">Monthly Evaluation</a></h3>';
 echo '<br><b>Core Competencies</b>';
@@ -230,7 +192,7 @@ if($showselfaction==1 AND $showsuperfaction==1 AND $estat==1 AND $sstat==1){
 
 
 
-$sqlcore='SELECT pes.*,Competency,Interpretation,`Weight` FROM hr_82perfevalsub pes JOIN hr_81corecompetencies cv ON pes.CID=cv.CID WHERE pes.TxnID = '.$_GET['TxnID'].' ORDER BY OrderBy'; 
+$sqlcore='SELECT pes.*,Competency,Interpretation,pes.`Weight` FROM hr_82perfevalsub pes JOIN hr_81ccsub cv ON pes.CID=cv.CID WHERE COrF=0 AND pes.TxnID = '.$_GET['TxnID'].' ORDER BY OrderBy'; 
 $stmtcore=$link->query($sqlcore);
 $rowcore = $stmtcore->fetchALL();
 
@@ -278,6 +240,86 @@ if($showselfaction==0 AND $showsuperfaction==1 AND $estat==1 AND $sstat==0 AND $
 echo '</form>';
 echo '</table>';
 
+//startfc
+echo '<br><br><b>Functional Competencies</b>';
+if($estat==0 AND (allowedToOpen(100,'1rtc'))){
+	echo ' <a href="newperfeval.php?w=EditStatements&TxnID='.$_GET['TxnID'].'">Edit</a>';
+}
+echo '<br><table>';
+echo '<tr><th>Statement</th><th>Weight</th>';
+$selfth='<th>Self-Score</th>';
+$superth='<th>Supervisor-Score</th>';
+
+if($showselfaction==1 AND $showsuperfaction==0 AND $estat==0 AND $sstat==0 AND $_SESSION['(ak0)']==$eidno){
+	echo $selfth;
+}
+
+if($estat==1 AND $sstat==0 AND $_SESSION['(ak0)']==$eidno){
+	echo $selfth;
+}
+
+if($showselfaction==0 AND $showsuperfaction==1 AND $estat==1 AND $sstat==0 AND $_SESSION['(ak0)']==$sidno){
+	echo $superth;
+}
+if($showselfaction==1 AND $showsuperfaction==1 AND $estat==1 AND $sstat==1){
+	echo $selfth.$superth;
+}
+// $sqlcore='SELECT pems.TxnSubId,pemm.Posted,pems.FCID,SuperScore,Statement,`Weight` FROM hr_82perfevalmonthlymain pemm JOIN hr_82perfevalmonthlysub pems ON pemm.TxnID=pems.TxnID JOIN hr_81fcsub fv ON pems.FCID=fv.FCID WHERE pemm.IDNo = '.$eidno.' AND MonthNo='.date('m',strtotime($evalduedate)).' ORDER BY OrderBy'; 
+	
+$sqlfc='SELECT pes.*,`Statement`,pes.`Weight` FROM hr_82perfevalsub pes JOIN hr_81fcsub fc ON pes.CID=fc.FCID WHERE COrF=1 AND pes.TxnID = '.$_GET['TxnID'].' ORDER BY OrderBy';
+	$stmtfc=$link->query($sqlfc);
+	$rowfc = $stmtfc->fetchALL();
+	
+
+	$rcolor[0]=(!isset($_REQUEST['print'])?(isset($alternatecolor)?$alternatecolor:"FFFFCC"):"FFFFFF");
+$rcolor[1]="FFFFFF";
+$colorcount=0;
+
+	$totalweight=0; $superscore=0; $selfscore=0;
+	echo '<form action="newperfevalprocess.php?w=FC'.$actionprocess.'" method="POST" autocomplete=off>';
+	foreach($rowfc AS $rowf){
+		echo '<tr bgcolor="'. $rcolor[$colorcount%2].'"><td>'.$rowf['Statement'].'</td><td>'.$rowf['Weight'].'%</td>';
+		if($showselfaction==1 AND $showsuperfaction==0 AND $estat==0 AND $sstat==0 AND $_SESSION['(ak0)']==$eidno){
+	
+			echo '<input type="hidden" name="TxnSubId'.$colorcount.'" value="'.$rowf['TxnSubId'].'" />';
+			echo '<td '.($rowf['SelfScore']==''?'style="background-color:red;"':'').'><input type="number" name="SelfScore'.$colorcount.'" size="5" value="'.$rowf['SelfScore'].'" min=0 max=5 step=".1" style="width:70px;"></td>';
+		}
+		if($estat==1 AND $sstat==0 AND $_SESSION['(ak0)']==$eidno){
+			echo '<td>'.$rowf['SelfScore'].'</td>';
+		}
+		if($showselfaction==0 AND $showsuperfaction==1 AND $estat==1 AND $sstat==0 AND $_SESSION['(ak0)']==$sidno){
+			echo '<input type="hidden" name="TxnSubId'.$colorcount.'" value="'.$rowf['TxnSubId'].'" />';
+			echo '<td '.($rowf['SuperScore']==''?'style="background-color:red;"':'').'><input type="number" name="SuperScore'.$colorcount.'" size="5" value="'.$rowf['SuperScore'].'" min=0 max=5 step=".1" style="width:70px;"></td>';
+		}
+		
+		if(($showselfaction==1 AND $showsuperfaction==1 AND $estat==1 AND $sstat==1)){
+			echo '<td>'.$rowf['SelfScore'].'</td>';
+			echo '<td>'.$rowf['SuperScore'].'</td>';
+		}
+		echo '</tr>';
+		$colorcount++;
+		$totalweight=$totalweight+$rowf['Weight'];
+		$selfscore = $selfscore + (($rowf['Weight']/100) * $rowf['SelfScore']);
+		$superscore = $superscore + (($rowf['Weight']/100) * $rowf['SuperScore']);
+	}
+
+	if($showselfaction==1 AND $showsuperfaction==0 AND $estat==0 AND $sstat==0 AND $_SESSION['(ak0)']==$eidno){
+		echo '<input type="hidden" name="selfnum" value="'.($colorcount).'">';
+		
+		echo '<tr><td colspan=2 align="right"><b>Total: '.$totalweight.'%</b></td><td colspan=2 align="right"><b>Self-Score: '.$selfscore.'</b></td></tr><td colspan="5" align="right"><b>STEP 2: </b><input type="submit" name="btnEnter" value="Enter" style="background-color:blue;color:white;padding:3px;width:100px"></td></tr><input type="hidden" name="action_token" value="'.$_SESSION['action_token'].'">';
+		}
+		
+		
+		if($showselfaction==0 AND $showsuperfaction==1 AND $estat==1 AND $sstat==0 AND $_SESSION['(ak0)']==$sidno){
+			echo '<input type="hidden" name="supernum" value="'.($colorcount).'">';
+		
+			echo '<tr><td colspan=2 align="right"><b>Total: '.$totalweight.'%</b></td><td colspan=2 align="right"><b>Super-Score: '.$superscore.'</b></td></tr><td colspan="5" align="right"><b>STEP 2: </b><input type="submit" name="btnEnter" value="Enter" style="background-color:blue;color:white;padding:3px;width:100px"></td></tr><input type="hidden" name="action_token" value="'.$_SESSION['action_token'].'">';
+		}
+	
+echo '</form>';
+	echo '</table>';
+//end fc
+
 echo '<br><br>';
 
 $sqlcntscore='SELECT SUM(IF(SelfScore IS NULL,1,0)) AS MissingSelfScore,SUM(IF(SuperScore IS NULL,1,0)) AS MissingSuperScore FROM hr_82perfevalsub WHERE TxnID='.$txnid;
@@ -288,8 +330,8 @@ $stmtcntscore=$link->query($sqlcntscore); $resultscore=$stmtcntscore->fetch();
 if($estat==0 AND $sstat==0 AND $dstat==0 AND $_SESSION['(ak0)']==$eidno){
 
 	if($resultscore['MissingSelfScore']==0){
-		echo '<form action="newperfevalprocess.php?w=SelfOverAllComment&action_token='.$_SESSION['action_token'].'&TxnID='.$txnid.'" method="POST"><b>Employee Overall Comments</b><br><textarea cols=80 rows="5" name="EComment">'.$ecomment.'</textarea><br><b>Step 2: </b><input type="submit" name="btnSubmit" value="Submit Comment"></form>';
-		echo '<form action="newperfevalprocess.php?w=SelfComplete&action_token='.$_SESSION['action_token'].'&TxnID='.$txnid.'" method="POST"><br><b>Step 3: </b><input type="submit" name="btnSubmit" value="Set As Complete (POST)" onclick="return confirm(\'Are you sure? This action cannot be undone.\')"></form>';
+		echo '<form action="newperfevalprocess.php?w=SelfOverAllComment&action_token='.$_SESSION['action_token'].'&TxnID='.$txnid.'" method="POST"><b>Employee Overall Comments</b><br><textarea cols=80 rows="5" name="EComment">'.$ecomment.'</textarea><br><b>Step 3: </b><input type="submit" name="btnSubmit" value="Submit Comment"></form>';
+		echo '<form action="newperfevalprocess.php?w=SelfComplete&action_token='.$_SESSION['action_token'].'&TxnID='.$txnid.'" method="POST"><br><b>Step 4: </b><input type="submit" name="btnSubmit" value="Set As Complete (POST)" onclick="return confirm(\'Are you sure? This action cannot be undone.\')"></form>';
 	} else {
 		echo '<font color="red"><b>Incomplete Self-Score</b></font>'; exit();
 	}
@@ -315,8 +357,8 @@ echo '<div style="float:left;">';
 		<input type="radio" name="Recommendation" value=1 '.($recommendation==1?'checked':'').'> For Continous Employment<br>
 		<input type="radio" name="Recommendation" value=2 '.($recommendation==2?'checked':'').'> For Regularization<br>
 		<input type="radio" name="Recommendation" value=3 '.($recommendation==3?'checked':'').'> For Performance Improvement Plan (PIP)-(3mos.extension if employee receives below 2.00 rating)<br><br>
-		<b>Step 2: </b><input type="submit" name="btnSubmit" value="Submit Comment"></form>';
-		echo '<form action="newperfevalprocess.php?w=SuperComplete&action_token='.$_SESSION['action_token'].'&TxnID='.$txnid.'" method="POST"><br><b>Step 3: </b><input type="submit" name="btnSubmit" value="Set As Complete (POST)" onclick="return confirm(\'Are you sure? This action cannot be undone.\')"></form>';;
+		<b>Step 3: </b><input type="submit" name="btnSubmit" value="Submit Comment"></form>';
+		echo '<form action="newperfevalprocess.php?w=SuperComplete&action_token='.$_SESSION['action_token'].'&TxnID='.$txnid.'" method="POST"><br><b>Step 4: </b><input type="submit" name="btnSubmit" value="Set As Complete (POST)" onclick="return confirm(\'Are you sure? This action cannot be undone.\')"></form>';;
 		echo $superincbutton;
 	} else {
 		echo '<font color="red"><b>Incomplete Super-Score</b></font>'; 

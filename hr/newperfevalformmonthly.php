@@ -89,7 +89,7 @@ $stmtmonths=$link->query($sqlmonths); $rowmonths = $stmtmonths->fetchAll();
 // echo $sqlmonths;
 
 foreach($rowmonths AS $rowmonth){
-	if($rowmonth['MonthNo']<=date('m')){
+	if($rowmonth['MonthNo']<=(date('m')+1)){
 	echo '<br><b>'.$rowmonth['MonthName'].'</b>';
 	if($rowmonth['Posted']==0 AND (allowedToOpen(100,'1rtc'))){
 		echo ' <a href="newperfeval.php?w=EditStatements&TxnID='.$rowmonth['TxnID'].'">Edit</a>';
@@ -100,7 +100,7 @@ echo '<tr><th>Statement</th><th>Weight</th>';
 $selfth='<th>Super-Score</th></tr>';
 
 echo $selfth;
-	$sqlcore='SELECT pems.TxnSubId,pemm.Posted,pems.FCID,SuperScore,Statement,`Weight` FROM hr_82perfevalmonthlymain pemm JOIN hr_82perfevalmonthlysub pems ON pemm.TxnID=pems.TxnID JOIN hr_82fcsub fv ON pems.FCID=fv.FCID WHERE pemm.IDNo = '.intval($_GET['IDNo']).' AND MonthNo='.$rowmonth['MonthNo'].' ORDER BY OrderBy'; 
+	$sqlcore='SELECT pems.TxnSubId,pemm.Posted,pems.FCID,SuperScore,Statement,`Weight` FROM hr_82perfevalmonthlymain pemm JOIN hr_82perfevalmonthlysub pems ON pemm.TxnID=pems.TxnID JOIN hr_81fcsub fv ON pems.FCID=fv.FCID WHERE pemm.IDNo = '.intval($_GET['IDNo']).' AND MonthNo='.$rowmonth['MonthNo'].' ORDER BY OrderBy'; 
 	
 	$stmtcore=$link->query($sqlcore);
 	$rowcore = $stmtcore->fetchALL();
