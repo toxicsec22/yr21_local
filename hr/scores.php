@@ -202,9 +202,13 @@ if (in_array($which,array('ScoreDemerits','ScoreMerits','ScoreDemeritsMonth','Sc
 		
 		
 		if (($_GET['w']<>'ScoreDemeritsMonth') AND ($_GET['w']<>'ScoreMeritsMonth')){
-			$sql0 .= ' WHERE ('.$_SESSION['(ak0)'].' in (s.EncodedByNo,ReporteeNo,ReporterHeadNo,ReporteeHeadNo)) AND IF(ReporteeNo='.$_SESSION['(ak0)'].', IF(stmtcat=1,ReporteeHeadStatus=3,ReporterHeadStatus=1), 1=1)' . $datecondi . $condicat; 
+			$sql0 .= ' WHERE ('.$_SESSION['(ak0)'].' in (s.EncodedByNo,ReporteeNo,ReporterHeadNo,ReporteeHeadNo)
+			OR ReporteeNo IN (SELECT DISTINCT(IDNo) FROM attend_30currentpositions cp2 JOIN attend_1branchgroups bg ON cp2.BranchNo=bg.BranchNo WHERE OpsManager='.$_SESSION['(ak0)'].')
+			) AND IF(ReporteeNo='.$_SESSION['(ak0)'].', IF(stmtcat=1,ReporteeHeadStatus=3,ReporterHeadStatus=1), 1=1)' . $datecondi . $condicat; 
 		} else {
-			$sql01 = ' WHERE ('.$_SESSION['(ak0)'].' in (s.EncodedByNo,ReporteeNo,ReporterHeadNo,ReporteeHeadNo,DecisionByNo)) AND IF(ReporteeNo='.$_SESSION['(ak0)'].', IF(stmtcat=1,ReporteeHeadStatus=3,ReporterHeadStatus=1), 1=1)' . $datecondi . $condicat;
+			$sql01 = ' WHERE ('.$_SESSION['(ak0)'].' in (s.EncodedByNo,ReporteeNo,ReporterHeadNo,ReporteeHeadNo,DecisionByNo)
+			OR ReporteeNo IN (SELECT DISTINCT(IDNo) FROM attend_30currentpositions cp2 JOIN attend_1branchgroups bg ON cp2.BranchNo=bg.BranchNo WHERE OpsManager='.$_SESSION['(ak0)'].')
+			) AND IF(ReporteeNo='.$_SESSION['(ak0)'].', IF(stmtcat=1,ReporteeHeadStatus=3,ReporterHeadStatus=1), 1=1)' . $datecondi . $condicat;
 		}
 		
 		if (($_GET['w']=='ScoreDemerits') OR ($_GET['w']=='ScoreMerits')){
