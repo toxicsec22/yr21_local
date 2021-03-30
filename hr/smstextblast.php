@@ -297,6 +297,14 @@ $delprocess='smstextblast.php?w=DeleteCondi&TxnID=';
 	echo '</div>';
 	
 	if($sent==1){
+		include_once $path.'/acrossyrs/commonfunctions/isphone.php';
+		if(strstr($useragent,'iPhone') || strstr($useragent,'iPod')) //IOS
+		{
+			$symbol=';';
+		} else {
+			$symbol='?';
+		}
+
 		$starttr=1;
 		$startoffset=0;
 		while($starttr<=$rescnt['trcount']){
@@ -310,7 +318,7 @@ $delprocess='smstextblast.php?w=DeleteCondi&TxnID=';
 			 
 			$title='';
 			
-			$formdesc='</i><br>'.($sender==$_SESSION['(ak0)']?'<b><a href="sms:'.$numbers.'?body='.$msg.'">Send SMS</a></b> ':'').'<b> ('.($startoffset+1).' to '.($starttr==$rescnt['trcount']?$rescnt['totalidno']:($startoffset+40)).')</b><i>';
+			$formdesc='</i><br>'.($sender==$_SESSION['(ak0)']?'<b><a href="sms:'.$numbers.$symbol.'body='.$msg.'">Send SMS</a></b> ':'').'<b> ('.($startoffset+1).' to '.($starttr==$rescnt['trcount']?$rescnt['totalidno']:($startoffset+40)).')</b><i>';
 			
 			$sql=$sqlm;
 			$columnnames=array('FullName','Branch','MobileNo');
