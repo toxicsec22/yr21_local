@@ -322,7 +322,7 @@ case 'ARGrowthandSummary':
     
 $sql0='CREATE TEMPORARY TABLE `Numbers` AS SELECT '.$thisyr.' AS `Year`, COUNT(ClientNo) AS NumofARClients, SUM(CreditLimit) AS TotalCreditLimit, AVG(Terms) AS AvgTerms, 0 AS `TotalARSales` FROM `'.$thisyr.'_1rtc`.`1clients` WHERE ARClientType<>0 AND terms<>1 AND Inactive=0 AND ClientNo NOT IN (15001,15002,15003,15004,15005);'; 
 $stmt0=$link->prepare($sql0); $stmt0->execute();
-$sql1='INSERT INTO `Numbers` SELECT '.$lastyr.' AS `Year`, COUNT(ClientNo) AS NumofARClients, SUM(CreditLimit) AS TotalCreditLimit, AVG(Terms) AS AvgTerms, 0 AS `TotalARSales` FROM `'.$lastyr.'_1rtc`.`1clients` WHERE ARClient=1 AND terms<>1 AND Inactive=0;';
+$sql1='INSERT INTO `Numbers` SELECT '.$lastyr.' AS `Year`, COUNT(ClientNo) AS NumofARClients, SUM(CreditLimit) AS TotalCreditLimit, AVG(Terms) AS AvgTerms, 0 AS `TotalARSales` FROM `'.$lastyr.'_1rtc`.`1clients` WHERE ARClientType=1 AND terms<>1 AND Inactive=0;';
 $stmt1=$link->prepare($sql1); $stmt1->execute();
 
 $sql2='UPDATE `Numbers` SET `TotalARSales`=(SELECT SUM(`Amount`) FROM `acctg_2salemain` sm JOIN `acctg_2salesub` ss ON sm.TxnID=ss.TxnID WHERE DebitAccountID IN (200,202)

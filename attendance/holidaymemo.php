@@ -41,7 +41,7 @@ $link=!isset($link)?connect_db('2021_1rtc',0):$link;
 		</table></br></br>
 		
 		<u><b>Work Schedule</b></u></br></br>';
-        if(($month==12 and $day==25) or ($month==1 and $day==1) or ($month==11 and $day==1) or (strpos($result['RemarksOnDates'],'Good Friday'))) { echo 
+        if(($month==12 and $day==25) or ($month==1 and $day==1) or ($month==11 and $day==1) or (strpos($result['RemarksOnDates'],'Good Friday') !== false)) { echo 
 		
 		'
 		Branches - NO WORK</br>'; } else { echo 'Branches - With Work</br>';}
@@ -61,7 +61,7 @@ $link=!isset($link)?connect_db('2021_1rtc',0):$link;
 		</table></br></br>
 		
 		<u><b>Work Schedule</b></u></br></br>';
-		if(($month==12 and $day==25) or ($month==1 and $day==1) or ($month==11 and $day==1) or (strpos($result['RemarksOnDates'],'Good Friday'))) { echo 
+		if(($month==12 and $day==25) or ($month==1 and $day==1) or ($month==11 and $day==1) or (strpos($result['RemarksOnDates'],'Good Friday') !== false)) { echo 
 		
 		'
 		Branches - NO WORK</br>'; } else { echo 'Branches - With Work</br>'; }

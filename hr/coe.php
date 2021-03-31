@@ -112,7 +112,7 @@ switch($_GET['coetype']){
 
 		echo '<center><img src="../generalinfo/logo/'.$row['Company'].'.png"></center><br><br><br><br>'.$cert.'';
 
-	echo 'This is to certify that <b>'.($row['Gender']==1?'MR.':'MS.').' '.strtoupper($row['Name']).'</b> was employed by '.$row['CompanyName'].' from '.date('F d, Y', strtotime($row['DateHired'])).'
+	echo 'This is to certify that <b>'.($row['Gender']==1?'MR.':'MS.').' '.str_replace('ñ','Ñ',strtoupper($row['Name'])).'</b> was employed by '.$row['CompanyName'].' from '.date('F d, Y', strtotime($row['DateHired'])).'
 to '.date('F d, Y', strtotime($row['DateResigned'])).', with the last position as '.$row['Position'].' under the '.$row['department'].'
 Department.
 <br><br>
@@ -132,7 +132,7 @@ case 2: // loans
 	echo '<center><img src="../generalinfo/logo/'.$row['Company'].'.png"></center><br><br><br><br>'.$cert.'';
 
 	
-	echo 'This is to certify that <b>'.($row['Gender']==1?'MR.':'MS.').' '.strtoupper($row['Name']).'</b> has been an employee of '.$row['CompanyName'].' from '.date('F d, Y', strtotime($row['DateHired'])).' up to present. Currently, '.($row['Gender']==1?'he':'she').' holds the position of '.($row['Position']).' under the '.$row['department'].' Department, and receives a monthly gross salary amounting to Php '.(number_format($row['BasicRate'],2)).'.
+	echo 'This is to certify that <b>'.($row['Gender']==1?'MR.':'MS.').' '.str_replace('ñ','Ñ',strtoupper($row['Name'])).'</b> has been an employee of '.$row['CompanyName'].' from '.date('F d, Y', strtotime($row['DateHired'])).' up to present. Currently, '.($row['Gender']==1?'he':'she').' holds the position of '.($row['Position']).' under the '.$row['department'].' Department, and receives a monthly gross salary amounting to Php '.(number_format($row['BasicRate'],2)).'.
 <br><br>
 This certification is issued upon the request of the aforementioned
 employee for the purpose of acquiring a loan.
@@ -151,7 +151,7 @@ case 3: // travel pass
 	echo '<center><img src="../generalinfo/logo/'.$row['Company'].'.png"></center><br><br><br><br>'.$cert.'';
 
 	
-	echo 'This is to certify that <b>'.($row['Gender']==1?'MR.':'MS.').' '.strtoupper($row['Name']).'</b> is currently employed at '.$row['CompanyName'].' located at '.$row['RegisteredAddress'].'.<br><br> '.$row['CompanyName'].' is engaged in the  supply of parts and consummables for refrigeration and air-conditioning units of the essential sectors such as but not limited to hospitals, supermarkets, cold storages, hotels, ambulances, etc.
+	echo 'This is to certify that <b>'.($row['Gender']==1?'MR.':'MS.').' '.str_replace('ñ','Ñ',strtoupper($row['Name'])).'</b> is currently employed at '.$row['CompanyName'].' located at '.$row['RegisteredAddress'].'.<br><br> '.$row['CompanyName'].' is engaged in the  supply of parts and consummables for refrigeration and air-conditioning units of the essential sectors such as but not limited to hospitals, supermarkets, cold storages, hotels, ambulances, etc.
 <br><br>Due to the nature of work, '.($row['Gender']==1?'he':'she').' is required to travel to different areas serviced by our company.';
 	break;
 default:

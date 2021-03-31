@@ -13,13 +13,13 @@
    //insert main
       $sql0='SELECT e.`IDNo`, `PositionID`, `DefaultBranchAssignNo`, DATE_ADD(`e`.`DateHired`, INTERVAL ';
       $sql1=' DAY) AS `EvalDueDate`, ';
-      $sql2=' AS `EvalAfterDays`, 0 AS `EncodedByNo`, Now() AS `Timestamp`
+      $sql2=' AS `EvalSchedID`, 0 AS `EncodedByNo`, Now() AS `Timestamp`
 	    FROM `1employees` e JOIN `attend_30currentpositions` p ON e.IDNo=p.IDNo
 	    JOIN `attend_1defaultbranchassign` dba ON e.IDNo=dba.IDNo
 	    HAVING MONTH(`EvalDueDate`)='.$month.' AND YEAR(`EvalDueDate`)='.$currentyr.''; 
-      $sql='INSERT IGNORE INTO `hr_82perfevalmain` (`IDNo`,`CurrentPositionID`,`CurrentBranchNo`,`EvalDueDate`, `EvalAfterDays`,`HREncodedByNo`,`HRTimestamp`) '.
-	    $sql0.'90'.$sql1.'90'.$sql2.' UNION  '.$sql0.'150'.$sql1.'150'.$sql2.' UNION  '.$sql0.'365'.$sql1.'365'.$sql2;
-		
+      $sql='INSERT IGNORE INTO `hr_82perfevalmain` (`IDNo`,`CurrentPositionID`,`CurrentBranchNo`,`EvalDueDate`, `EvalSchedID`,`HREncodedByNo`,`HRTimestamp`) '.
+	    $sql0.'90'.$sql1.'1'.$sql2.' UNION  '.$sql0.'150'.$sql1.'2'.$sql2.' UNION  '.$sql0.'365'.$sql1.'3'.$sql2;
+		// echo $sql; exit();
       $stmt=$link->prepare($sql); $stmt->execute();
     
 //update main
@@ -33,31 +33,31 @@
 
     $sqlpopultatedtoday='SELECT pem.TxnID,
     
-    (SELECT FormID FROM hr_81perfevalforms WHERE FIND_IN_SET(cp.PositionID,Positions))
+    (SELECT FormID FROM hr_81ccmain WHERE FIND_IN_SET(cp.PositionID,Positions))
     
      AS FormID
       FROM attend_30currentpositions cp JOIN hr_82perfevalmain pem ON cp.IDNo=pem.IDNo WHERE DATE(HRTimestamp)=CURDATE()';
     $stmt=$link->query($sqlpopultatedtoday); $res=$stmt->fetchAll();
 		foreach ($res AS $row){
-            $sql='INSERT IGNORE INTO `hr_82perfevalsub` (`TxnID`,`CID`) SELECT '.$row['TxnID'].',CID FROM hr_81corecompetencies WHERE FormID="'.$row['FormID'].'";'; 
+            $sql='INSERT IGNORE INTO `hr_82perfevalsub` (`TxnID`,`CID`,`Weight`,`COrF`) SELECT '.$row['TxnID'].',CID,Weight,0 FROM hr_81ccsub WHERE FormID="'.$row['FormID'].'";'; 
               $stmt=$link->prepare($sql); $stmt->execute();  
         }
 
 
-        $sql='INSERT IGNORE INTO hr_82perfevalmonthlymain (IDNo,MonthNo,SIDNo,EncodedByNo,TimeStamp) select cp.IDNo,'.$month.',(IF((cp.deptid<>10),(SELECT cp3.LatestSupervisorIDNo FROM `attend_30currentpositions` cp3 WHERE cp3.IDNo=cp.IDNo),(SELECT OpsSpecialist FROM attend_30currentpositions cp4 JOIN attend_1branchgroups bg ON cp4.BranchNo=bg.BranchNo WHERE cp4.IDNo=cp.IDNo))),0,NOW() from attend_30currentpositions cp JOIN attend_howlongwithus h ON cp.IDNo=h.IDNo WHERE InYears>=.3 UNION SELECT cp.IDNo,'.date('m').',(IF((cp.deptid<>10),(SELECT cp3.LatestSupervisorIDNo FROM `attend_30currentpositions` cp3 WHERE cp3.IDNo=cp.IDNo),(SELECT OpsSpecialist FROM attend_30currentpositions cp4 JOIN attend_1branchgroups bg ON cp4.BranchNo=bg.BranchNo WHERE cp4.IDNo=cp.IDNo))),0,NOW() from attend_30currentpositions cp JOIN hr_82perfevalmain pem ON cp.IDNo=pem.IDNo WHERE MONTH(EvalDueDate)='.$month.'';
-        $stmt=$link->prepare($sql); $stmt->execute();
+        // $sql='INSERT IGNORE INTO hr_82perfevalmonthlymain (IDNo,MonthNo,SIDNo,EncodedByNo,TimeStamp) SELECT cp.IDNo,'.date('m').',(IF((cp.deptid<>10),(SELECT cp3.LatestSupervisorIDNo FROM `attend_30currentpositions` cp3 WHERE cp3.IDNo=cp.IDNo),(SELECT OpsSpecialist FROM attend_30currentpositions cp4 JOIN attend_1branchgroups bg ON cp4.BranchNo=bg.BranchNo WHERE cp4.IDNo=cp.IDNo))),0,NOW() from attend_30currentpositions cp JOIN hr_82perfevalmain pem ON cp.IDNo=pem.IDNo WHERE MONTH(EvalDueDate)='.$month.'';
+        // $stmt=$link->prepare($sql); $stmt->execute();
           
   
-      $sqlpopultatedtoday='SELECT pemm.TxnID,
+      $sqlpopultatedtoday='SELECT pem.TxnID,
       
-      (SELECT FID FROM hr_82fcmain WHERE FIND_IN_SET(cp.PositionID,DefaultPositions))
+      (SELECT FID FROM hr_81fcmain WHERE FIND_IN_SET(cp.PositionID,DefaultPositions))
       
        AS FID
-        FROM attend_30currentpositions cp JOIN hr_82perfevalmonthlymain pemm ON cp.IDNo=pemm.IDNo';
+        FROM attend_30currentpositions cp JOIN hr_82perfevalmain pem ON cp.IDNo=pem.IDNo WHERE DATE(`HRTimestamp`)=CURDATE();';
   
       $stmt=$link->query($sqlpopultatedtoday); $res=$stmt->fetchAll();
               foreach ($res AS $row){
-              $sql='INSERT IGNORE INTO `hr_82perfevalmonthlysub` (`TxnID`,`FCID`,`Weight`) SELECT '.$row['TxnID'].',FCID,DefaultWeight FROM hr_82fcsub WHERE FID="'.$row['FID'].'";'; 
+              $sql='INSERT IGNORE INTO `hr_82perfevalsub` (`TxnID`,`CID`,`Weight`,`COrF`) SELECT '.$row['TxnID'].',FCID,DefaultWeight,1 FROM hr_81fcsub WHERE FID="'.$row['FID'].'";'; 
                 $stmt=$link->prepare($sql); $stmt->execute(); 
           }
       

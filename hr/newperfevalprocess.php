@@ -47,6 +47,31 @@ switch ($which){
     
         header("Location:".$_SERVER['HTTP_REFERER']);
     break;
+
+    case 'FCSelfScore':
+        $num2 = 0;
+		$num = $_POST['selfnum'];
+
+        while ($num2 < $num) {
+            $selfscore = $_POST['SelfScore'.$num2];
+			$txnsubid = $_POST['TxnSubId'.$num2];
+			
+            if($selfscore==''){
+                $selfscoresql="SelfScore = NULL";
+            } else {
+                $selfscoresql="SelfScore = '".$selfscore."'";
+            }
+            
+            $sql = "UPDATE hr_82perfevalsub SET ".$selfscoresql." WHERE TxnSubId =  ".$txnsubid."";
+			$stmt= $link->prepare($sql);
+			$stmt->execute();
+
+
+            $num2++;
+        }
+    
+        header("Location:".$_SERVER['HTTP_REFERER']);
+    break;
     
     
     case 'SelfOverAllComment':
@@ -68,6 +93,32 @@ switch ($which){
     break;
 
     case 'SuperScore':
+        $num2 = 0;
+		$num = $_POST['supernum'];
+
+        while ($num2 < $num) {
+            $superscore = $_POST['SuperScore'.$num2];
+			$txnsubid = $_POST['TxnSubId'.$num2];
+			
+            if($superscore==''){
+                $superscoresql="SuperScore = NULL";
+            } else {
+                $superscoresql="SuperScore = '".$superscore."'";
+            }
+            
+            $sql = "UPDATE hr_82perfevalsub SET ".$superscoresql." WHERE TxnSubId =  ".$txnsubid."";
+           
+			$stmt= $link->prepare($sql);
+			$stmt->execute();
+
+
+            $num2++;
+        }
+    
+        header("Location:".$_SERVER['HTTP_REFERER']);
+    break;
+
+    case 'FCSuperScore':
         $num2 = 0;
 		$num = $_POST['supernum'];
 

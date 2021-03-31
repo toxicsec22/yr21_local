@@ -11,7 +11,7 @@ echo '
 <br><div id="section" style="display: block;">
     <div>';
     
-    echo '<a id=\'link\' href="newperfeval.php">Core Competencies Evaluation</a> ';
+    echo '<a id=\'link\' href="newperfeval.php">Unfinished Performance Evaluations</a> ';
     if(allowedToOpen(686,'1rtc')) {
         echo '<a id=\'link\' href="newperfeval.php?w=AddSpecialEval">Encode Special Evaluation</a> ';
 	    echo '<a id=\'link\' href="smsnewperfeval.php">Send SMS for Pending Evaluation</a> ';
@@ -31,24 +31,24 @@ echo '
     
     
 
-$columnnameslist=array('IDNo','FullName','Company','CurrentBranch','CurrentPosition','EvalAfterDays','EvalDueDate','Supervisor','PendingStep','HREncodedBy');
+$columnnameslist=array('IDNo','FullName','Company','CurrentBranch','CurrentPosition','EvalSched','EvalDueDate','Supervisor','PendingStep','HREncodedBy');
 $columnstoadd=array('EStat','Supervisor','SStat','DStat');
 
-$which=(!isset($_GET['w'])?'CoreCompetenciesEvaluation':$_GET['w']);
+$which=(!isset($_GET['w'])?'UnfinishedPerfEvals':$_GET['w']);
 
 if (in_array($which,array('AddSpecialEval','EditSpecifics','History'))){
    echo comboBox($link,'SELECT IDNo, CONCAT(Nickname, " ", Surname) AS FullName FROM `1employees` ORDER BY Nickname;','IDNo','FullName','employees');
    } 
    
 if (in_array($which,array('MyEval','EvaluationSummary','History'))){   
-   $columnnames=array('IDNo','FullName','DateHired','CurrentBranch','CurrentPosition','EvalAfterDays','EvalDueDate','Supervisor','Emp_Response');
+   $columnnames=array('IDNo','FullName','DateHired','CurrentBranch','CurrentPosition','EvalSched','EvalDueDate','Supervisor','Emp_Response');
 }
 
 if (in_array($which,array('Add','Edit'))){
    $idno=comboBoxValue($link,'`1employees`','CONCAT(Nickname, " ", Surname)',addslashes($_POST['FullName']),'IDNo');
    }
 	
-$sql='SELECT pf.*,
+$sql='SELECT pf.*,EvalSched,
 (CASE
    WHEN EStat=0 AND SStat=0 AND DStat=0 AND Ack=0 AND HRStatus=0 THEN "SelfEval"
    WHEN EStat=1 AND SStat=0 AND DStat=0 AND Ack=0 AND HRStatus=0 THEN "SuperEval"
@@ -57,11 +57,12 @@ $sql='SELECT pf.*,
    ELSE "HR"
 END)
 
- AS PendingStep,CONCAT(e1.FirstName, " ", e1.Surname) AS FullName, e1.DateHired, TRUNCATE(((TO_DAYS(NOW()) - TO_DAYS(`e1`.`DateHired`)) / 365),2) AS `HowLongWithUsinYrs`, e.Nickname as HREncodedBy, Position AS CurrentPosition, b.Branch AS CurrentBranch, c.Company, CONCAT(e2.Nickname, " ", e2.Surname) AS Supervisor, IF(HRStatus=1,"Filed","Pending") AS HR_Status, IF(Ack=0,"",IF(Ack=1,"Agree","Disagree")) AS Emp_Response
+ AS PendingStep,CONCAT(e1.FirstName, " ", e1.Surname) AS FullName, e1.DateHired,  e.Nickname as HREncodedBy, Position AS CurrentPosition, b.Branch AS CurrentBranch, c.Company, CONCAT(e2.Nickname, " ", e2.Surname) AS Supervisor, IF(HRStatus=1,"Filed","Pending") AS HR_Status, IF(Ack=0,"",IF(Ack=1,"Agree","Disagree")) AS Emp_Response
 	       FROM hr_82perfevalmain pf   
 	       LEFT JOIN `1employees` e ON e.IDNo=pf.HREncodedByNo
 	       JOIN `1employees` e1 ON e1.IDNo=pf.IDNo
 	       LEFT JOIN `1employees` e2 ON e2.IDNo=pf.SIDNo
+           LEFT JOIN `hr_80evalsched` es ON es.EvalSchedID=pf.EvalSchedID
 	       JOIN `1branches` b ON b.BranchNo=pf.CurrentBranchNo
 	       JOIN `1companies` c ON c.CompanyNo=e1.RCompanyNo
 	       LEFT JOIN `attend_0positions` p ON p.PositionID=pf.CurrentPositionID
@@ -69,7 +70,7 @@ END)
 
 switch ($which){
    
-   case 'CoreCompetenciesEvaluation':
+   case 'UnfinishedPerfEvals':
        if (!allowedToOpen(684,'1rtc')) {   echo 'No permission'; exit;}   
        
 if(allowedToOpen(686,'1rtc')) {
@@ -93,7 +94,7 @@ if(allowedToOpen(686,'1rtc')){
             <input type="submit" name="autoencodeyrend" value="Encode Year End Evaluations" OnClick="return confirm(\'Are you sure you want to encode year end evaluations?\');"> </form>';
        echo '</div></div>';
 }
-      $title='Core Competencies Evaluation'; $columnnames=array_diff($columnnameslist,array('Company','EComment','HREncodedBy','HR_Status','HRStatusTS'));;
+      $title='Unfinished Performance Evaluations'; $columnnames=array_diff($columnnameslist,array('Company','EComment','HREncodedBy','HR_Status','HRStatusTS'));;
          $sql=$sql.' WHERE pf.HRStatus<>1 AND e1.Resigned<>1 '.$evalcondi.' ORDER BY EvalDueDate ASC'; 
 		// echo $sql;
         $addlprocess2='newperfevalform.php?TxnID='; $addlprocesslabel2='Lookup';
@@ -126,8 +127,8 @@ if(allowedToOpen(686,'1rtc')){
         require_once $path.'/acrossyrs/logincodes/confirmtoken.php';
 		
 		
-        $sql='INSERT INTO `hr_82perfevalmain` (`IDNo`,`CurrentPositionID`,`CurrentBranchNo`,`EvalDueDate`, `EvalAfterDays`,`HREncodedByNo`,`HRTimeStamp`)
-	    SELECT '.$idno.', `PositionID`, `BranchNo`, \''.$_POST['EvalDueDate'].'\',  DateDiff(\''.$_POST['EvalDueDate'].'\',DateHired), '.$_SESSION['(ak0)'].', Now() FROM `attend_30currentpositions`  cp JOIN 1employees e ON e.IDNo=cp.IDNo WHERE cp.IDNo='.$idno;
+        $sql='INSERT INTO `hr_82perfevalmain` (`IDNo`,`CurrentPositionID`,`CurrentBranchNo`,`EvalDueDate`, `EvalSchedID`,`HREncodedByNo`,`HRTimeStamp`)
+	    SELECT '.$idno.', `PositionID`, `BranchNo`, \''.$_POST['EvalDueDate'].'\', 6, '.$_SESSION['(ak0)'].', Now() FROM `attend_30currentpositions`  cp JOIN 1employees e ON e.IDNo=cp.IDNo WHERE cp.IDNo='.$idno;
 		
         $stmt=$link->prepare($sql); $stmt->execute();
         
@@ -145,34 +146,34 @@ if(allowedToOpen(686,'1rtc')){
       
 $sqlpopultatedtoday='SELECT pem.TxnID,
     
-(SELECT FormID FROM hr_81perfevalforms WHERE FIND_IN_SET(cp.PositionID,Positions))
+(SELECT FormID FROM hr_81ccmain WHERE FIND_IN_SET(cp.PositionID,Positions))
 
  AS FormID
   FROM attend_30currentpositions cp JOIN hr_82perfevalmain pem ON cp.IDNo=pem.IDNo WHERE pem.TxnID='.$res0['TxnID'].'';
-  echo $sqlpopultatedtoday.'<br>';
+//   echo $sqlpopultatedtoday.'<br>';
 $stmt=$link->query($sqlpopultatedtoday); $res=$stmt->fetchAll();
     foreach ($res AS $row){
-        $sql='INSERT INTO `hr_82perfevalsub` (`TxnID`,`CID`) SELECT '.$row['TxnID'].',CID FROM hr_81corecompetencies WHERE FormID="'.$row['FormID'].'";'; 
-        echo $sql.'<br>';
+        $sql='INSERT INTO `hr_82perfevalsub` (`TxnID`,`CID`,`Weight`,`COrF`) SELECT '.$row['TxnID'].',CID,Weight,0 FROM hr_81ccsub WHERE FormID="'.$row['FormID'].'";'; 
+        // echo $sql.'<br>';
           $stmt=$link->prepare($sql); $stmt->execute();  
     }
 
-//sub
-$sql='INSERT IGNORE INTO hr_82perfevalmonthlymain (IDNo,MonthNo,SIDNo,EncodedByNo,TimeStamp) SELECT cp.IDNo,'.date('m',strtotime($_POST['EvalDueDate'])).',(IF((cp.deptid<>10),(SELECT cp3.LatestSupervisorIDNo FROM `attend_30currentpositions` cp3 WHERE cp3.IDNo=cp.IDNo),(SELECT OpsSpecialist FROM attend_30currentpositions cp4 JOIN attend_1branchgroups bg ON cp4.BranchNo=bg.BranchNo WHERE cp4.IDNo=cp.IDNo))),0,NOW() from attend_30currentpositions cp JOIN hr_82perfevalmain pem ON cp.IDNo=pem.IDNo WHERE pem.TxnID='.$res0['TxnID'].'';
-echo $sql.'<br>';
-        $stmt=$link->prepare($sql); $stmt->execute();
+// //sub
+// $sql='INSERT IGNORE INTO hr_82perfevalmonthlymain (IDNo,MonthNo,SIDNo,EncodedByNo,TimeStamp) SELECT cp.IDNo,'.date('m',strtotime($_POST['EvalDueDate'])).',(IF((cp.deptid<>10),(SELECT cp3.LatestSupervisorIDNo FROM `attend_30currentpositions` cp3 WHERE cp3.IDNo=cp.IDNo),(SELECT OpsSpecialist FROM attend_30currentpositions cp4 JOIN attend_1branchgroups bg ON cp4.BranchNo=bg.BranchNo WHERE cp4.IDNo=cp.IDNo))),0,NOW() from attend_30currentpositions cp JOIN hr_82perfevalmain pem ON cp.IDNo=pem.IDNo WHERE pem.TxnID='.$res0['TxnID'].'';
+// // echo $sql.'<br>';
+//         $stmt=$link->prepare($sql); $stmt->execute();
           
   
-      $sqlpopultatedtoday='SELECT pemm.TxnID,
+      $sqlpopultatedtoday='SELECT pem.TxnID,
       
-      (SELECT FID FROM hr_82fcmain WHERE FIND_IN_SET(cp.PositionID,DefaultPositions))
+      (SELECT FID FROM hr_81fcmain WHERE FIND_IN_SET(cp.PositionID,DefaultPositions))
       
        AS FID
-        FROM attend_30currentpositions cp JOIN hr_82perfevalmonthlymain pemm ON cp.IDNo=pemm.IDNo';
+        FROM attend_30currentpositions cp JOIN hr_82perfevalmain pem ON cp.IDNo=pem.IDNo WHERE pem.TxnID='.$res0['TxnID'].';';
   
       $stmt=$link->query($sqlpopultatedtoday); $res=$stmt->fetchAll();
               foreach ($res AS $row){
-              $sql='INSERT IGNORE INTO `hr_82perfevalmonthlysub` (`TxnID`,`FCID`,`Weight`) SELECT '.$row['TxnID'].',FCID,DefaultWeight FROM hr_82fcsub WHERE FID="'.$row['FID'].'";'; 
+              $sql='INSERT IGNORE INTO `hr_82perfevalsub` (`TxnID`,`CID`,`Weight`,`COrF`) SELECT '.$row['TxnID'].',FCID,DefaultWeight,1 FROM hr_81fcsub WHERE FID="'.$row['FID'].'";'; 
                 $stmt=$link->prepare($sql); $stmt->execute(); 
           }
         header("Location:newperfeval.php");
@@ -204,7 +205,7 @@ echo $sql.'<br>';
        if (!allowedToOpen(686,'1rtc')) {   echo 'No permission'; exit;}
          $title='Edit Specifics';
 	 $txnid=intval($_GET['TxnID']); $main='hr_82perfevalmain';
-		 $columnstoedit=array('Supervisor','EvalAfterDays','EvalDueDate');
+		 $columnstoedit=array('Supervisor','EvalDueDate');
 	 $sql=$sql.'WHERE pf.HRStatus<>1 AND TxnID='.$txnid;
 	 $columnnames=$columnnameslist;
 	 $columnswithlists=array('Supervisor');$listsname=array('Supervisor'=>'employees');
@@ -218,7 +219,7 @@ echo $sql.'<br>';
         $sql=''; 
         
         
-		$columnstoedit=array('EvalAfterDays','EvalDueDate');
+		$columnstoedit=array('EvalDueDate');
         foreach ($columnstoedit as $field) {$sql=$sql.' `' . $field. '`=\''.addslashes($_REQUEST[$field]).'\', '; $supercond='';}
                
         $sql='UPDATE `hr_82perfevalmain` SET HREncodedByNo='.$_SESSION['(ak0)'].','.$sql.'SIDNo='.$superidno.', HRTimeStamp=Now() WHERE HRStatus<>1 '.$supercond.' AND TxnID='.$_GET['TxnID'];
@@ -239,97 +240,97 @@ echo $sql.'<br>';
         break;
 
 
-        case 'FunctionalEvaluations':
-            if (!allowedToOpen(683,'1rtc')) {   echo 'No permission'; exit;}
+//         case 'FunctionalEvaluations':
+//             if (!allowedToOpen(683,'1rtc')) {   echo 'No permission'; exit;}
            
-            if(allowedToOpen(683,'1rtc')){
-          $formdesc='<br></i><form action="#" method="POST"><select name="MyView">
-          '.((allowedToOpen(686,'1rtc'))?'<option value="0">All</option>':'').'
-          '.((allowedToOpen(100,'1rtc'))?'<option value="1">My Department</option>':'').'
-          <option value="2">My Team</option>
-          <option value="3">Myself</option>
-          </select> <input type="submit" name="btbLookup" value="Lookup"></form><i>';
-            }
- else {
-     $formdesc='';
- }
+//             if(allowedToOpen(683,'1rtc')){
+//           $formdesc='<br></i><form action="#" method="POST"><select name="MyView">
+//           '.((allowedToOpen(686,'1rtc'))?'<option value="0">All</option>':'').'
+//           '.((allowedToOpen(100,'1rtc'))?'<option value="1">My Department</option>':'').'
+//           <option value="2">My Team</option>
+//           <option value="3">Myself</option>
+//           </select> <input type="submit" name="btbLookup" value="Lookup"></form><i>';
+//             }
+//  else {
+//      $formdesc='';
+//  }
 
 
-          if(allowedToOpen(686,'1rtc')) {
-            $evalcondi='';
-            $myview=' - All';
-        } elseif(allowedToOpen(685,'1rtc')){
-            $evalcondi=' WHERE (pf.SIDNo='.$_SESSION['(ak0)'].') ';
-            $myview=' - My Team';
-        } else {
-            $evalcondi=' WHERE (pf.IDNo='.$_SESSION['(ak0)'].') ';
-            $myview=' - Myself';
-        }
+//           if(allowedToOpen(686,'1rtc')) {
+//             $evalcondi='';
+//             $myview=' - All';
+//         } elseif(allowedToOpen(685,'1rtc')){
+//             $evalcondi=' WHERE (pf.SIDNo='.$_SESSION['(ak0)'].') ';
+//             $myview=' - My Team';
+//         } else {
+//             $evalcondi=' WHERE (pf.IDNo='.$_SESSION['(ak0)'].') ';
+//             $myview=' - Myself';
+//         }
 
-        if(isset($_POST['btbLookup'])){
+//         if(isset($_POST['btbLookup'])){
             
-            if($_POST['MyView']==0){
-                $evalcondi='';
-            } else if($_POST['MyView']==1){
-                $evalcondi=' WHERE cp.deptheadpositionid='.$_SESSION['&pos'].'';
-                $myview=' - My Department';
-            } else if($_POST['MyView']==2){
-                $evalcondi=' WHERE (pf.SIDNo='.$_SESSION['(ak0)'].') ';
-                $myview=' - My Team';
-            } else {
-                $evalcondi=' WHERE (pf.IDNo='.$_SESSION['(ak0)'].') ';
-                    $myview=' - Myself';
-            }
-        }
+//             if($_POST['MyView']==0){
+//                 $evalcondi='';
+//             } else if($_POST['MyView']==1){
+//                 $evalcondi=' WHERE cp.deptheadpositionid='.$_SESSION['&pos'].'';
+//                 $myview=' - My Department';
+//             } else if($_POST['MyView']==2){
+//                 $evalcondi=' WHERE (pf.SIDNo='.$_SESSION['(ak0)'].') ';
+//                 $myview=' - My Team';
+//             } else {
+//                 $evalcondi=' WHERE (pf.IDNo='.$_SESSION['(ak0)'].') ';
+//                     $myview=' - Myself';
+//             }
+//         }
 
 
-           $title='Functional Evaluations'.$myview; $method='POST';
+//            $title='Functional Evaluations'.$myview; $method='POST';
          
-           $arraymonthno=array('12'=>'Dec','11'=>'Nov','10'=>'Oct','09'=>'Sep','08'=>'Aug','07'=>'Jul','06'=>'Jun','05'=>'May','04'=>'Apr','03'=>'Mar','02'=>'Feb','01'=>'Jan');
+//            $arraymonthno=array('12'=>'Dec','11'=>'Nov','10'=>'Oct','09'=>'Sep','08'=>'Aug','07'=>'Jul','06'=>'Jun','05'=>'May','04'=>'Apr','03'=>'Mar','02'=>'Feb','01'=>'Jan');
   
-           $sqlmonthno=''; $monthfield=''; $columnnames=array('IDNo','FullName');
-           if((isset($_POST['MyView']) AND ($_POST['MyView']==1 OR $_POST['MyView']==0)) OR $evalcondi==''){
-               array_push($columnnames,'Branch','Position');
-           }
-           array_push($columnnames,'Lookup');
-           $cntaddlfield=0;
-           foreach($arraymonthno AS $arrmonthno=>$arrmonthname){
-             if($currentyr.'-'.$arrmonthno.'-01'<=date('Y-m-d')){
-               $sqlmonthno.='(SELECT IF(pf.Posted=1,TRUNCATE(SUM(SuperScore*(Weight/100)),2),"") AS TotScore FROM hr_82perfevalmonthlymain pf2 JOIN hr_82perfevalmonthlysub ps2 ON pf2.TxnID=ps2.TxnID WHERE IDNo=pf.IDNo AND MonthNo='.$arrmonthno.') AS `'.$arrmonthname.'`,';
-               $columnnames[].=$arrmonthname;
-               $cntaddlfield++;
-             }
-           }
+//            $sqlmonthno=''; $monthfield=''; $columnnames=array('IDNo','FullName');
+//            if((isset($_POST['MyView']) AND ($_POST['MyView']==1 OR $_POST['MyView']==0)) OR $evalcondi==''){
+//                array_push($columnnames,'Branch','Position');
+//            }
+//            array_push($columnnames,'Lookup');
+//            $cntaddlfield=0;
+//            foreach($arraymonthno AS $arrmonthno=>$arrmonthname){
+//              if($currentyr.'-'.$arrmonthno.'-01'<=date('Y-m-d')){
+//                $sqlmonthno.='(SELECT IF(pf.Posted=1,TRUNCATE(SUM(SuperScore*(Weight/100)),2),"") AS TotScore FROM hr_82perfevalmonthlymain pf2 JOIN hr_82perfevalmonthlysub ps2 ON pf2.TxnID=ps2.TxnID WHERE IDNo=pf.IDNo AND MonthNo='.$arrmonthno.') AS `'.$arrmonthname.'`,';
+//                $columnnames[].=$arrmonthname;
+//                $cntaddlfield++;
+//              }
+//            }
            
            
-           $sql='SELECT pf.IDNo,CONCAT("<a href=\"newperfevalformmonthly.php?IDNo=",pf.IDNo,"\">Lookup</a>") AS Lookup,IF(cp.deptid IN (2,10),Branch,dept) AS Branch,cp.Position,pf.IDNo AS TxnID,'.$sqlmonthno.' CONCAT(e1.FirstName, " ", e1.Surname) AS FullName
-            FROM hr_82perfevalmonthlymain pf   
-            JOIN `1employees` e1 ON e1.IDNo=pf.IDNo
+//            $sql='SELECT pf.IDNo,CONCAT("<a href=\"newperfevalformmonthly.php?IDNo=",pf.IDNo,"\">Lookup</a>") AS Lookup,IF(cp.deptid IN (2,10),Branch,dept) AS Branch,cp.Position,pf.IDNo AS TxnID,'.$sqlmonthno.' CONCAT(e1.FirstName, " ", e1.Surname) AS FullName
+//             FROM hr_82perfevalmonthlymain pf   
+//             JOIN `1employees` e1 ON e1.IDNo=pf.IDNo
 
-            LEFT JOIN `attend_30currentpositions` cp ON cp.IDNo=pf.IDNo
-            LEFT JOIN `1employees` e2 ON e2.IDNo=pf.SIDNo
+//             LEFT JOIN `attend_30currentpositions` cp ON cp.IDNo=pf.IDNo
+//             LEFT JOIN `1employees` e2 ON e2.IDNo=pf.SIDNo
 
-            JOIN `1companies` c ON c.CompanyNo=e1.RCompanyNo
-            '; 
+//             JOIN `1companies` c ON c.CompanyNo=e1.RCompanyNo
+//             '; 
  
-           if($cntaddlfield>=1 AND $cntaddlfield<=3){
-             $width='55%';
-           } else if($cntaddlfield>=4 AND $cntaddlfield<=6){
-             $width='70%';
-           } else if($cntaddlfield>=7 AND $cntaddlfield<=9){
-             $width='85%';
-           } else {
-             $width='100%';
-           }
+//            if($cntaddlfield>=1 AND $cntaddlfield<=3){
+//              $width='55%';
+//            } else if($cntaddlfield>=4 AND $cntaddlfield<=6){
+//              $width='70%';
+//            } else if($cntaddlfield>=7 AND $cntaddlfield<=9){
+//              $width='85%';
+//            } else {
+//              $width='100%';
+//            }
 
-          $sql=$sql.$evalcondi.' GROUP BY pf.IDNo'; 
+//           $sql=$sql.$evalcondi.' GROUP BY pf.IDNo'; 
           
-        //   $addlprocess2='newperfevalformmonthly.php?IDNo='; $addlprocesslabel2='Lookup';
-        //   $txnid='TxnID';
+//         //   $addlprocess2='newperfevalformmonthly.php?IDNo='; $addlprocesslabel2='Lookup';
+//         //   $txnid='TxnID';
          
-        include('../backendphp/layout/displayastable.php'); 
+//         include('../backendphp/layout/displayastable.php'); 
       
-          break;
+//           break;
 
         
    case 'History':
@@ -367,23 +368,23 @@ echo $sql.'<br>';
          $datecheck=5;
          $gcond='';
          $month=5;
-         $dividedby=2;
+         $evalsched=4;
      } else { //annual
         $datecheck=11;
         $gcond='';
         $month=11;
-        $dividedby=1;
+        $evalsched=5;
      }
     if(date('m')<$datecheck){
 		echo 'Month No should be greater than or equal to '.$datecheck.'.'; exit();
 	}
     require_once $path.'/acrossyrs/logincodes/confirmtoken.php';
       $sql='INSERT INTO `hr_82perfevalmain` 
-          (`IDNo`,`CurrentPositionID`,`CurrentBranchNo`,`SIDNo`,`DIDNo`,`EvalDueDate`, `EvalAfterDays`,`HREncodedByNo`,`HRTimestamp`)  
+          (`IDNo`,`CurrentPositionID`,`CurrentBranchNo`,`SIDNo`,`DIDNo`,`EvalDueDate`, `EvalSchedID`,`HREncodedByNo`,`HRTimestamp`)  
           SELECT e.`IDNo`, `PositionID`, `DefaultBranchAssignNo`, (IF((p.deptid<>10),(SELECT cp3.LatestSupervisorIDNo FROM `attend_30currentpositions` cp3 WHERE cp3.IDNo=p.IDNo),(SELECT OpsSpecialist FROM attend_30currentpositions cp4 JOIN attend_1branchgroups bg ON cp4.BranchNo=bg.BranchNo WHERE cp4.IDNo=p.IDNo))) AS SIDNo, 
           (SELECT IF(a.IDNo=e.IDNo,a.LatestSupervisorIDNo,a.IDNo) FROM `attend_30currentpositions` a 
           WHERE a.positionid=(SELECT `deptheadpositionid` FROM `attend_30currentpositions` b WHERE b.IDNo=e.IDNo)) AS `DIDNo`,
-          \''.$currentyr.'-'.$month.'-27\' AS `EvalDueDate`, ((SELECT YEAR(`DataClosedBy`) FROM `00dataclosedby` WHERE `ForDB`=1)/'.$dividedby.') AS `EvalAfterDays`, 
+          \''.$currentyr.'-'.$month.'-27\' AS `EvalDueDate`, '.$evalsched.' AS `EvalSchedID`, 
           '.$_SESSION['(ak0)'].' AS `EncodedByNo`, Now() AS `Timestamp`
 	    FROM `1employees` e JOIN `attend_30currentpositions` p ON e.IDNo=p.IDNo
 	    JOIN `attend_1defaultbranchassign` dba ON e.IDNo=dba.IDNo WHERE e.Resigned=0 AND e.IDNo>1002;';
@@ -391,31 +392,26 @@ echo $sql.'<br>';
       
     $sqlpopultatedtoday='SELECT pem.TxnID,
     
-    (SELECT FormID FROM hr_81perfevalforms WHERE FIND_IN_SET(cp.PositionID,Positions))
+    (SELECT FormID FROM hr_81ccmain WHERE FIND_IN_SET(cp.PositionID,Positions))
     
      AS FormID
-      FROM attend_30currentpositions cp JOIN hr_82perfevalmain pem ON cp.IDNo=pem.IDNo WHERE EvalAfterDays='.($currentyr/$dividedby).'';
+      FROM attend_30currentpositions cp JOIN hr_82perfevalmain pem ON cp.IDNo=pem.IDNo WHERE EvalSchedID='.$evalsched.'';
     $stmt=$link->query($sqlpopultatedtoday); $res=$stmt->fetchAll();
 		foreach ($res AS $row){
-            $sql='INSERT INTO `hr_82perfevalsub` (`TxnID`,`CID`) SELECT '.$row['TxnID'].',CID FROM hr_81corecompetencies WHERE FormID="'.$row['FormID'].'";'; 
+            $sql='INSERT INTO `hr_82perfevalsub` (`TxnID`,`CID`,`Weight`,`COrF`) SELECT '.$row['TxnID'].',CID,Weight,0 FROM hr_81ccsub WHERE FormID="'.$row['FormID'].'";'; 
               $stmt=$link->prepare($sql); $stmt->execute();  
         }
-
-
-        $sql='INSERT IGNORE INTO hr_82perfevalmonthlymain (IDNo,MonthNo,SIDNo,EncodedByNo,TimeStamp) SELECT cp.IDNo,'.$month.',(IF((cp.deptid<>10),(SELECT cp3.LatestSupervisorIDNo FROM `attend_30currentpositions` cp3 WHERE cp3.IDNo=cp.IDNo),(SELECT OpsSpecialist FROM attend_30currentpositions cp4 JOIN attend_1branchgroups bg ON cp4.BranchNo=bg.BranchNo WHERE cp4.IDNo=cp.IDNo))),0,NOW() from attend_30currentpositions cp JOIN hr_82perfevalmain pem ON cp.IDNo=pem.IDNo WHERE EvalAfterDays='.($currentyr/$dividedby).'';
-        $stmt=$link->prepare($sql); $stmt->execute();
-          
   
-      $sqlpopultatedtoday='SELECT pemm.TxnID,
+      $sqlpopultatedtoday='SELECT pem.TxnID,
       
-      (SELECT FID FROM hr_82fcmain WHERE FIND_IN_SET(cp.PositionID,DefaultPositions))
+      (SELECT FID FROM hr_81fcmain WHERE FIND_IN_SET(cp.PositionID,DefaultPositions))
       
        AS FID
-        FROM attend_30currentpositions cp JOIN hr_82perfevalmonthlymain pemm ON cp.IDNo=pemm.IDNo JOIN hr_82perfevalmain pem ON pemm.IDNo=pem.IDNo WHERE EvalAfterDays='.$currentyr.'';
+        FROM attend_30currentpositions cp JOIN hr_82perfevalmain pem ON cp.IDNo=pem.IDNo WHERE EvalSchedID='.$evalsched.'';
   
       $stmt=$link->query($sqlpopultatedtoday); $res=$stmt->fetchAll();
               foreach ($res AS $row){
-              $sql='INSERT IGNORE INTO `hr_82perfevalmonthlysub` (`TxnID`,`FCID`,`Weight`) SELECT '.$row['TxnID'].',FCID,DefaultWeight FROM hr_82fcsub WHERE FID="'.$row['FID'].'";'; 
+              $sql='INSERT IGNORE INTO `hr_82perfevalsub` (`TxnID`,`CID`,`Weight`,`COrF`) SELECT '.$row['TxnID'].',FCID,Weight,1 FROM hr_81fcsub WHERE FID="'.$row['FID'].'";'; 
                 $stmt=$link->prepare($sql); $stmt->execute(); 
           }
  
@@ -461,28 +457,28 @@ echo '<form action="newperfeval.php?w=Add&action_token='.$_SESSION['action_token
 		}
 			  $sql0 = $sql . $condi. ' AND e1.Resigned=0 '; 
 		  
-         $columnnames=array('IDNo','FullName','DateHired','CurrentBranch','CurrentPosition','EvalAfterDays','EvalDueDate','Supervisor','Emp_Response','HR_Status');
+         $columnnames=array('IDNo','FullName','DateHired','CurrentBranch','CurrentPosition','EvalSched','EvalDueDate','Supervisor','Emp_Response','HR_Status');
          $editprocess='newperfevalform.php?TxnID='; $editprocesslabel='Lookup';
          $subtitle='Unfinished SELF-Evaluation';
          $sql=$sql0.' AND EStat=0';
-         $columnnames=array('IDNo','FullName','DateHired','CurrentBranch','CurrentPosition','EvalAfterDays','EvalDueDate','Supervisor');
+         $columnnames=array('IDNo','FullName','DateHired','CurrentBranch','CurrentPosition','EvalSched','EvalDueDate','Supervisor');
 	 include('../backendphp/layout/displayastablenosort.php'); 
          $subtitle='<br/>Unfinished SUPERVISOR Evaluation';
-         $columnnames=array('IDNo','FullName','DateHired','CurrentBranch','CurrentPosition','EvalAfterDays','EvalDueDate','Supervisor');
+         $columnnames=array('IDNo','FullName','DateHired','CurrentBranch','CurrentPosition','EvalSched','EvalDueDate','Supervisor');
          if (allowedToOpen(100,'1rtc')){ unset($addlprocess,$addlprocesslabel);}
          $sql=$sql0.' AND EStat=1 AND SStat=0';
 	 include('../backendphp/layout/displayastableonlynoheaders.php');
 
          $subtitle='<br/>Unfinished DEPT HEAD Confirmation';
-         $columnnames=array('IDNo','FullName','DateHired','CurrentBranch','CurrentPosition','EvalAfterDays','EvalDueDate','Supervisor');
+         $columnnames=array('IDNo','FullName','DateHired','CurrentBranch','CurrentPosition','EvalSched','EvalDueDate','Supervisor');
          $sql=$sql0.' AND EStat=1 AND SStat=1 AND DStat=0';
 	 include('../backendphp/layout/displayastableonlynoheaders.php');
          $subtitle='<br/>No EMPLOYEE Acknowledgment';
-         $columnnames=array('IDNo','FullName','DateHired','CurrentBranch','CurrentPosition','EvalAfterDays','EvalDueDate','Supervisor');
+         $columnnames=array('IDNo','FullName','DateHired','CurrentBranch','CurrentPosition','EvalSched','EvalDueDate','Supervisor');
          $sql=$sql0.' AND EStat=1 AND SStat=1 AND DStat=1 AND Ack=0';
 	 include('../backendphp/layout/displayastableonlynoheaders.php');
          $subtitle='<br/>HR to Finalize';
-         $columnnames=array('IDNo','FullName','DateHired','CurrentBranch','CurrentPosition','EvalAfterDays','EvalDueDate','Supervisor','Emp_Response','HR_Status');
+         $columnnames=array('IDNo','FullName','DateHired','CurrentBranch','CurrentPosition','EvalSched','EvalDueDate','Supervisor','Emp_Response','HR_Status');
          $sql=$sql0.' AND EStat=1 AND SStat=1 AND DStat=1 AND Ack<>0 AND HRStatus=0';
 	 include('../backendphp/layout/displayastableonlynoheaders.php');
          
@@ -508,7 +504,7 @@ case 'FinishedEval':
   
 	 $editprocess='newperfevalform.php?TxnID='; $editprocesslabel='Lookup';
 	 
-	 $columnnames=array('IDNo','FullName','DateHired','CurrentBranch','CurrentPosition','EvalAfterDays','EvalDueDate','Supervisor','Emp_Response');
+	 $columnnames=array('IDNo','FullName','DateHired','CurrentBranch','CurrentPosition','EvalSched','EvalDueDate','Supervisor','Emp_Response');
 	
 	 $monthno=date("m"); $ytoday=$currentyr;
 	 if (isset($_POST['btnShow']))
@@ -533,7 +529,7 @@ case 'DeletePage':
 if (!allowedToOpen(686,'1rtc')) {   echo 'No permission'; exit;}           
           
 		$title='Delete Performance Evaluation';
-		$columnnames=array('IDNo','FullName','DateHired','CurrentBranch','EvalAfterDays','EvalDueDate','Supervisor');
+		$columnnames=array('IDNo','FullName','DateHired','CurrentBranch','EvalSched','EvalDueDate','Supervisor');
 		
 		echo comboBox($link,$sql.' WHERE pf.SStat=0 AND e1.Resigned<>1 ORDER BY FullName;','FullName','IDNo','employeeswithsuperzero');
 		echo '<title>'.$title.'</title>';
@@ -589,34 +585,34 @@ case 'EditStatements':
 </style>';
 echo '<br>';
 
-$title='Edit Monthly Evaluation';
+$title='Edit Functional Evaluation';
 echo '<title>'.$title.'</title>';
 echo '<h3>'.$title.'</h3>';
-$sqlmain='SELECT CONCAT(Nickname, " ", Surname) AS `Supervisor` FROM hr_82perfevalmonthlymain pemm JOIN 1employees e ON pemm.SIDNo=e.IDNo WHERE pemm.TxnID='.intval($_GET['TxnID']).'';
-$stmtsuper=$link->query($sqlmain);
-$rowsuper = $stmtsuper->fetch();
+// $sqlmain='SELECT CONCAT(Nickname, " ", Surname) AS `Supervisor` FROM hr_82perfevalmonthlymain pemm JOIN 1employees e ON pemm.SIDNo=e.IDNo WHERE pemm.TxnID='.intval($_GET['TxnID']).'';
+// $stmtsuper=$link->query($sqlmain);
+// $rowsuper = $stmtsuper->fetch();
 
-echo comboBox($link,'SELECT e.IDNo, CONCAT(Nickname, " ", Surname) AS FullName FROM `1employees` e JOIN attend_30currentpositions cp ON e.IDNo=cp.IDNo WHERE deptheadpositionid='.$_SESSION['&pos'].' ORDER BY Nickname;','IDNo','FullName','supervisorlist');
-echo '<br><form method="POST" action="newperfeval.php?w=EditSupervisor&TxnID='.intval($_GET['TxnID']).'"><input type="text" value="'.$rowsuper['Supervisor'].'" name="SIDNo" list="supervisorlist"> <input type="submit" value="Edit Supervisor" name="btnAdd"></form><br><br>';
+// echo comboBox($link,'SELECT e.IDNo, CONCAT(Nickname, " ", Surname) AS FullName FROM `1employees` e JOIN attend_30currentpositions cp ON e.IDNo=cp.IDNo WHERE deptheadpositionid='.$_SESSION['&pos'].' ORDER BY Nickname;','IDNo','FullName','supervisorlist');
+// echo '<br><form method="POST" action="newperfeval.php?w=EditSupervisor&TxnID='.intval($_GET['TxnID']).'"><input type="text" value="'.$rowsuper['Supervisor'].'" name="SIDNo" list="supervisorlist"> <input type="submit" value="Edit Supervisor" name="btnAdd"></form><br><br>';
 
 
     echo '<table>';
 echo '<tr><th>Statement</th><th>Weight in %</th><th colspan=2></th>';
-	$sqlcore='SELECT pems.TxnSubId,PositionID,pemm.IDNo,pemm.Posted,pems.FCID,SuperScore,`Weight` FROM hr_82perfevalmonthlymain pemm JOIN hr_82perfevalmonthlysub pems ON pemm.TxnID=pems.TxnID JOIN hr_82fcsub fv ON pems.FCID=fv.FCID JOIN attend_30currentpositions cp ON pemm.IDNo=cp.IDNo WHERE pemm.TxnID = '.intval($_GET['TxnID']).' ORDER BY OrderBy'; 
+	$sqlcore='SELECT pems.TxnSubId,PositionID,pemm.IDNo,pems.CID,SuperScore,`Weight` FROM hr_82perfevalmain pemm JOIN hr_82perfevalsub pems ON pemm.TxnID=pems.TxnID JOIN hr_81fcsub fv ON pems.CID=fv.FCID JOIN attend_30currentpositions cp ON pemm.IDNo=cp.IDNo WHERE pemm.TxnID = '.intval($_GET['TxnID']).' AND COrF=1 ORDER BY OrderBy'; 
 	$stmtcore=$link->query($sqlcore);
 	$rowcore = $stmtcore->fetchALL();
 	
 
 	foreach($rowcore AS $rowco){
 
-        $sqlforstmt='SELECT FCID,Statement FROM hr_82fcsub fs JOIN hr_82fcmain fm ON fs.FID=fm.FID WHERE Active=1 AND FIND_IN_SET('.$rowco['PositionID'].',DefaultPositions) ORDER BY OrderBy';
+        $sqlforstmt='SELECT FCID,Statement FROM hr_81fcsub fs JOIN hr_81fcmain fm ON fs.FID=fm.FID WHERE Active=1 AND FIND_IN_SET('.$rowco['PositionID'].',DefaultPositions) ORDER BY OrderBy';
        
         $stmtstmt=$link->query($sqlforstmt);
         $rowstmt = $stmtstmt->fetchALL();
 
         $statements='';
         foreach($rowstmt AS $statement){
-            $statements.='<option value="'.$statement['FCID'].'" '.($statement['FCID']==$rowco['FCID']?'selected':'').'>'.$statement['Statement'].'</option>';
+            $statements.='<option value="'.$statement['FCID'].'" '.($statement['FCID']==$rowco['CID']?'selected':'').'>'.$statement['Statement'].'</option>';
         }
 
 
@@ -649,9 +645,9 @@ if (!allowedToOpen(100,'1rtc')) {   echo 'No permission'; exit; }
         if (!allowedToOpen(100,'1rtc')) {   echo 'No permission'; exit; }
         $txnsubid=$_POST['TxnSubId'];
         if(isset($_POST['btnEdit'])){
-            $sql='UPDATE hr_82perfevalmonthlysub SET FCID='.$_POST['FCID'].',Weight="'.$_POST['Weight'].'" WHERE TxnSubId='.$txnsubid;
+            $sql='UPDATE hr_82perfevalsub SET CID='.$_POST['FCID'].',Weight="'.$_POST['Weight'].'" WHERE TxnSubId='.$txnsubid;
         } else {
-            $sql='DELETE FROM hr_82perfevalmonthlysub WHERE TxnSubId='.$txnsubid;
+            $sql='DELETE FROM hr_82perfevalsub WHERE TxnSubId='.$txnsubid;
         }
         $stmt= $link->prepare($sql);  $stmt->execute();
         header("Location:".$_SERVER['HTTP_REFERER']);

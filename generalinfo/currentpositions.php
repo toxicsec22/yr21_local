@@ -65,7 +65,7 @@ $showbranches=false;
      include('../backendphp/layout/displayastable.php');
 	 
 	 
-	 $sqlencodetoday='SELECT cop.IDNo,CONCAT(Nickname," ",Surname) AS Name FROM attend_2changeofpositions cop JOIN 1_gamit.0idinfo id ON cop.IDNo=id.IDNo WHERE `Resigned?`<>1 AND (DateofChange=CURDATE() OR cop.TimeStamp LIKE "%'.date('Y-m-d').'%");';
+	 $sqlencodetoday='SELECT cop.IDNo,CONCAT(Nickname," ",Surname) AS Name FROM attend_2changeofpositions cop JOIN 1_gamit.0idinfo id ON cop.IDNo=id.IDNo WHERE `Resigned?`<>1 AND (DateofChange>=CURDATE() - INTERVAL 7 DAY OR DATE(cop.TimeStamp)>= CURDATE() - INTERVAL 7 DAY);'; //7days na
 	 $stmtencodetoday=$link->query($sqlencodetoday);
 	$encodetoday='';
 	while ($rowencodetoday = $stmtencodetoday->fetch()){
@@ -135,7 +135,7 @@ if(isset($_GET['superonly']) AND $_GET['superonly']==1){
 	
 	case 'Delete':
     if (allowedToOpen(array(6701,67011),'1rtc')) {
-		$sql='DELETE FROM `attend_2changeofpositions` WHERE `IDNo`='.$_POST['IDNo'].' AND DateofChange=CURDATE();';
+		$sql='DELETE FROM `attend_2changeofpositions` WHERE `IDNo`='.$_POST['IDNo'].' AND (DateofChange>=CURDATE() - INTERVAL 7 DAY OR DATE(`TimeStamp`)>= CURDATE() - INTERVAL 7 DAY);';
 		$stmt=$link->prepare($sql);
 		$stmt->execute();
 	

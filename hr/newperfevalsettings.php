@@ -16,7 +16,7 @@ include_once('../backendphp/layout/linkstyle.php');
 $which=(!isset($_GET['w'])?'CoreCompetencies':$_GET['w']);
 
 if (in_array($which,array('FunctionalCompetencies','EditSpecificsFC'))){
-	$sql='SELECT FID AS TxnID,dept AS Department,FormDescription,CONCAT("<a href=\"newperfevalsettings.php?w=FCFormID&FID=",FID,"\"",">Lookup Default Positions</a>") AS DefaultPositions FROM hr_82fcmain fcm JOIN 1departments d ON fcm.DeptID=d.deptid ';
+	$sql='SELECT FID AS TxnID,dept AS Department,FormDescription,CONCAT("<a href=\"newperfevalsettings.php?w=FCFormID&FID=",FID,"\"",">Lookup Default Positions</a>") AS DefaultPositions FROM hr_81fcmain fcm JOIN 1departments d ON fcm.DeptID=d.deptid ';
 	echo comboBox($link,'SELECT deptid, dept FROM 1departments ORDER BY dept','deptid','dept','deptlist');
 	$columnnameslist=array('Department','FormDescription','DefaultPositions');
 	$columnstoadd=array('Department','FormDescription');
@@ -27,7 +27,7 @@ if (in_array($which,array('FunctionalCompetencies','EditSpecificsFC'))){
  }
 
  if (in_array($which,array('LookupFCStatements','EditSpecificsFCStatement'))){
-	$sql='SELECT *,FCID AS TxnID FROM hr_82fcsub ';
+	$sql='SELECT *,FCID AS TxnID FROM hr_81fcsub ';
 	$columnnameslist=array('Statement','DefaultWeight','OrderBy','Active');
 	$columnstoadd=array('Statement','DefaultWeight','OrderBy');
  }
@@ -53,7 +53,7 @@ switch ($which)
 		$txnid='TxnID';
 		
 		$columnnames=array('Competency','Interpretation','Weight');
-		$sqlmain='SELECT *,CONCAT(`Weight`,"%") AS `Weight` FROM hr_81corecompetencies WHERE ';
+		$sqlmain='SELECT *,CONCAT(`Weight`,"%") AS `Weight` FROM hr_81ccsub WHERE ';
 		$orderby='ORDER BY OrderBy';
 
 		$formidlink='newperfevalsettings.php?w=FormID&FormID=';
@@ -86,7 +86,7 @@ switch ($which)
 		echo '<title>'.$title1.'</title>';
 		
 		$formid = intval($_GET['FormID']);
-		$sqlvalue ="SELECT * FROM `hr_81perfevalforms` WHERE FormID=".$formid.";";
+		$sqlvalue ="SELECT * FROM `hr_81ccmain` WHERE FormID=".$formid.";";
 		
 		$stmtvalue=$link->query($sqlvalue); $rowvalue=$stmtvalue->fetch();
 		
@@ -135,7 +135,7 @@ switch ($which)
 			
 		
 				echo '<div style="margin-left:50%"><br><b>Positions</b><br>';
-				$sql ="SELECT Positions FROM hr_81perfevalforms WHERE FormID=".$FormID.";";
+				$sql ="SELECT Positions FROM hr_81ccmain WHERE FormID=".$FormID.";";
 				$stmt=$link->query($sql); $rowh=$stmt->fetch();
 				
 				$sql ="SELECT PositionID,Position FROM attend_0positions p JOIN attend_1joblevel jl ON jl.JobLevelNo=p.JobLevelNo WHERE PositionID IN (".$rowh['Positions'].") ORDER BY deptid,JLID DESC";
@@ -163,7 +163,7 @@ switch ($which)
 				$trimlastcomma='';
 			}
 
-			$sql='UPDATE `hr_81perfevalforms` SET FormDescription="'.addslashes($_POST['FormDescription']).'", Positions='.(empty($trimlastcomma) ? 'DEFAULT':'"'.$trimlastcomma.'"').', EncodedByNo="'.$_SESSION['(ak0)'].'",TimeStamp=NOW() WHERE FormID='.intval($_GET['FormID']);
+			$sql='UPDATE `hr_81ccmain` SET FormDescription="'.addslashes($_POST['FormDescription']).'", Positions='.(empty($trimlastcomma) ? 'DEFAULT':'"'.$trimlastcomma.'"').', EncodedByNo="'.$_SESSION['(ak0)'].'",TimeStamp=NOW() WHERE FormID='.intval($_GET['FormID']);
 		
 			$stmt = $link->prepare($sql);
 			$stmt->execute();
@@ -208,7 +208,7 @@ switch ($which)
 		
 			foreach ($columnstoadd as $field) {$sql=$sql.' `' . $field. '`=\''.addslashes($_POST[$field]).'\', '; }
 			
-			$sql='INSERT INTO `hr_82fcmain` SET EncodedByNo='.$_SESSION['(ak0)'].',DeptID='.$DeptID.', '.$sql.' TimeStamp=Now()';
+			$sql='INSERT INTO `hr_81fcmain` SET EncodedByNo='.$_SESSION['(ak0)'].',DeptID='.$DeptID.', '.$sql.' TimeStamp=Now()';
 			$link->query($sql);
 	header('Location:'.$_SERVER['HTTP_REFERER']);
 	
@@ -240,7 +240,7 @@ case 'EditFC':
 	$sql='';
 	foreach ($columnstoadd as $field) {$sql=$sql.' `' . $field. '`=\''.addslashes($_REQUEST[$field]).'\', '; }
 	
-	$sql='UPDATE `hr_82fcmain` SET EncodedByNo='.$_SESSION['(ak0)'].', '.$sql.' DeptID='.$DeptID.', TimeStamp=Now() WHERE FID='.intval($_GET['FID']);
+	$sql='UPDATE `hr_81fcmain` SET EncodedByNo='.$_SESSION['(ak0)'].', '.$sql.' DeptID='.$DeptID.', TimeStamp=Now() WHERE FID='.intval($_GET['FID']);
 	$stmt=$link->prepare($sql);
 	$stmt->execute();
 	
@@ -252,7 +252,7 @@ break;
 case 'DeleteFC':
 	//access
 	require_once $path.'/acrossyrs/logincodes/confirmtoken.php';
-	$sql='DELETE FROM `hr_82fcmain` WHERE FID='.intval($_GET['FID']);
+	$sql='DELETE FROM `hr_81fcmain` WHERE FID='.intval($_GET['FID']);
 		
 	$stmt=$link->prepare($sql); $stmt->execute();
 	header("Location:".$_SERVER['HTTP_REFERER']);
@@ -263,7 +263,7 @@ case 'LookupFCStatements':
 
 	$title='Functional Competency Statements'; 
 			$txnid='FCID';
-			$sqlm='SELECT dept,FormDescription,CONCAT("<a target=\"_blank\" href=\"newperfevalsettings.php?w=FCFormID&FID=",FID,"\"",">Lookup Default Positions</a>") AS DefaultPositions FROM hr_82fcmain fcm JOIN 1departments d ON fcm.DeptID=d.deptid WHERE FID='.intval($_GET['FID']).';';
+			$sqlm='SELECT dept,FormDescription,CONCAT("<a target=\"_blank\" href=\"newperfevalsettings.php?w=FCFormID&FID=",FID,"\"",">Lookup Default Positions</a>") AS DefaultPositions FROM hr_81fcmain fcm JOIN 1departments d ON fcm.DeptID=d.deptid WHERE FID='.intval($_GET['FID']).';';
 	$stmtm=$link->query($sqlm); $rowm=$stmtm->fetch();
 
         	 $formdesc='</i><br><br>Department: <font style="color:blue"><b>'.$rowm['dept'].'</b></font><br>Form Description: <b>'.$rowm['FormDescription'].'</b><br>'.$rowm['DefaultPositions'].'<i>';
@@ -294,7 +294,7 @@ case 'AddFCStatement':
 
 	$sql='';
 	foreach ($columnstoadd as $field) {$sql=$sql.' `' . $field. '`=\''.addslashes($_POST[$field]).'\', '; }
-	$sql='INSERT INTO `hr_82fcsub` SET FID='.intval($_GET['FID']).',EncodedByNo='.$_SESSION['(ak0)'].', '.$sql.' TimeStamp=Now()';
+	$sql='INSERT INTO `hr_81fcsub` SET FID='.intval($_GET['FID']).',EncodedByNo='.$_SESSION['(ak0)'].', '.$sql.' TimeStamp=Now()';
 	$link->query($sql);
 header('Location:'.$_SERVER['HTTP_REFERER']);
 
@@ -304,7 +304,7 @@ case 'StatementActiveInactive':
 	require_once $path.'/acrossyrs/logincodes/confirmtoken.php';
 	$sql='';
 	
-	$sql='UPDATE `hr_82fcsub` SET Active=IF(Active=1,0,1) WHERE FCID='.intval($_GET['FCID']);
+	$sql='UPDATE `hr_81fcsub` SET Active=IF(Active=1,0,1) WHERE FCID='.intval($_GET['FCID']);
 
 	$link->query($sql);
 header('Location:'.$_SERVER['HTTP_REFERER']);
@@ -329,7 +329,7 @@ case 'EditFCStatement':
 	$sql='';
 	foreach ($columnstoadd as $field) {$sql=$sql.' `' . $field. '`=\''.addslashes($_REQUEST[$field]).'\', '; }
 	
-	$sql='UPDATE `hr_82fcsub` SET EncodedByNo='.$_SESSION['(ak0)'].', '.$sql.' TimeStamp=Now() WHERE FCID='.intval($_GET['FCID']);
+	$sql='UPDATE `hr_81fcsub` SET EncodedByNo='.$_SESSION['(ak0)'].', '.$sql.' TimeStamp=Now() WHERE FCID='.intval($_GET['FCID']);
 	$stmt=$link->prepare($sql);
 	$stmt->execute();
 	
@@ -340,7 +340,7 @@ break;
 case 'DeleteFCStatement':
 	//access
 	require_once $path.'/acrossyrs/logincodes/confirmtoken.php';
-	$sql='DELETE FROM `hr_82fcsub` WHERE FCID='.intval($_GET['FCID']);
+	$sql='DELETE FROM `hr_81fcsub` WHERE FCID='.intval($_GET['FCID']);
 		
 	$stmt=$link->prepare($sql); $stmt->execute();
 	header("Location:".$_SERVER['HTTP_REFERER']);
@@ -353,7 +353,7 @@ case 'FCFormID':
 	echo '<title>'.$title1.'</title>';
 	
 	$formid = intval($_GET['FID']);
-	$sqlvalue ="SELECT fcm.*,dept FROM `hr_82fcmain` fcm JOIN 1departments d On fcm.DeptID=d.deptid WHERE FID=".$formid.";";
+	$sqlvalue ="SELECT fcm.*,dept FROM `hr_81fcmain` fcm JOIN 1departments d On fcm.DeptID=d.deptid WHERE FID=".$formid.";";
 	
 	$stmtvalue=$link->query($sqlvalue); $rowvalue=$stmtvalue->fetch();
 	
@@ -400,7 +400,7 @@ case 'FCFormID':
 		
 	
 			echo '<div style="margin-left:50%"><br><b>Positions</b><br>';
-			$sql ="SELECT DefaultPositions FROM hr_82fcmain WHERE FID=".$FormID.";";
+			$sql ="SELECT DefaultPositions FROM hr_81fcmain WHERE FID=".$FormID.";";
 			$stmt=$link->query($sql); $rowh=$stmt->fetch();
 			
 			$sql ="SELECT PositionID,Position FROM attend_0positions p JOIN attend_1joblevel jl ON jl.JobLevelNo=p.JobLevelNo WHERE PositionID IN (".$rowh['DefaultPositions'].") ORDER BY deptid,JLID DESC";
@@ -428,7 +428,7 @@ case 'UpdatePositionProcessFID':
 		$trimlastcomma='';
 	}
 
-	$sql='UPDATE `hr_82fcmain` SET DefaultPositions='.(empty($trimlastcomma) ? 'DEFAULT':'"'.$trimlastcomma.'"').', EncodedByNo="'.$_SESSION['(ak0)'].'",TimeStamp=NOW() WHERE FID='.intval($_GET['FID']);
+	$sql='UPDATE `hr_81fcmain` SET DefaultPositions='.(empty($trimlastcomma) ? 'DEFAULT':'"'.$trimlastcomma.'"').', EncodedByNo="'.$_SESSION['(ak0)'].'",TimeStamp=NOW() WHERE FID='.intval($_GET['FID']);
 
 	$stmt = $link->prepare($sql);
 	$stmt->execute();

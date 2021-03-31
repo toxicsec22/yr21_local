@@ -244,14 +244,14 @@ switch ($calledfrom){
        
         }
         $title='STL/SAM/Ops/CreditAnalyst Assignments';
-        $formdesc='</i><br/><b><a href=employeeinfo.php?calledfrom=6>Assignment History</a></b><i>';
-        $columnnames=array('DateofChange','BranchNo','Branch','TeamLeader1','TL1FullName','SAM','SAMName','OpsSpecialist','CreditAnalyst');//'AssignedAR',
+        $formdesc='</i><br/><b><a href=employeeinfo.php?calledfrom=6>Assignment History</a></b><i><br><br>* No need to set if Ops Manager or SAM.<br>';
+        $columnnames=array('DateofChange','BranchNo','Branch','TeamLeader1','TL1FullName','SAM','SAMName','OpsSpecialist','OpsManager','CreditAnalyst');//'AssignedAR',
         $columnsub=$columnnames;
 					$sql='SELECT bg.DateofChange, b.BranchNo, Branch, concat(e.Nickname," ",e.Surname) as TL1FullName, TeamLeader as TeamLeader1, '
                     . ' concat(e3.Nickname," ",e3.Surname) as CreditAnalyst, SAM, '
-                    . ' concat(e4.Nickname," ",e4.Surname) as SAMName, concat(e5.Nickname," ",e5.Surname) AS OpsSpecialist '
+                    . ' concat(e4.Nickname," ",e4.Surname) as SAMName, concat(e5.Nickname," ",e5.Surname) AS OpsSpecialist,concat(e6.Nickname," ",e6.Surname) AS OpsManager '
                     . ' FROM attend_1branchgroups bg LEFT join `1employees` e on bg.TeamLeader=e.IDNo '
-                    . '  LEFT join `1employees` e3 on bg.CNC=e3.IDNo LEFT join `1employees` e4 on bg.SAM=e4.IDNo  left join `1employees` e5 on bg.OpsSpecialist=e5.IDNo '
+                    . '  LEFT join `1employees` e3 on bg.CNC=e3.IDNo LEFT join `1employees` e4 on bg.SAM=e4.IDNo  left join `1employees` e5 on bg.OpsSpecialist=e5.IDNo left join `1employees` e6 on bg.OpsManager=e6.IDNo '
                     . ' join `1branches` b on b.BranchNo=bg.BranchNo '
                     . ' where b.Active=1';
 					
