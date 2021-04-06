@@ -142,7 +142,7 @@ if (in_array($whichqry,array('summary_for_payroll','my_attendance'))){
 				$pagetouse='tocheckattendance.php?calledfrom=7&qry=summary_for_payroll';
                 include_once '../attendance/attendsql/attendsumforpayroll.php';
 				$sql='SELECT `attend_44sumforpayroll`.*, Nickname, FirstName, SurName from `attend_44sumforpayroll` join `1employees` on `attend_44sumforpayroll`.IDNo=`1employees`.IDNo WHERE PayrollID='.$_POST['payrollid'].'';
-			 $columnnames=array('IDNo', 'Nickname','FirstName','SurName','RegDaysPresent','LWOPDays','LegalDays','SpecDays','SLDays','VLDays','LWPDays','QDays','RestDays','RegDaysActual','LegalHrsOT','SpecHrsOT','RestHrsOT','PaidLegalDays','RegOTHrs');
+			 $columnnames=array('IDNo', 'Nickname','FirstName','SurName','RegDaysPresent','LWOPDays','LegalDays','SpecDays','SLDays','VLDays','LWPDays','QDays','RestDays','RegDaysActual','LegalHrsOT','SpecHrsOT','RestHrsOT','ExcessRestHrsOT','PaidLegalDays','RegOTHrs');
 				$orderby='IDNo';
 				
 				include('../backendphp/layout/displayastable.php');

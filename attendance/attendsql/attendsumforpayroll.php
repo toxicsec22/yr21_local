@@ -102,7 +102,7 @@ SELECT
                     `a`.`Shift`)),
         0)) AS `SpecHrsOT`,
     SUM(IF(`a`.`LeaveNo` = 15
-            AND `a`.`Overtime` NOT IN (0 , 5),
+            AND `a`.`Overtime` NOT IN (0 ),
         REGHOURS(`a`.`TimeIn`,
                 `a`.`TimeOut`,
                 `e`.`JobClassNo`,
@@ -110,7 +110,7 @@ SELECT
         0)) AS `RestHrsOT`,
     SUM(IF(`a`.`LeaveNo` = 15
             AND `a`.`Overtime` = 5,
-        RDOTHOURS(`a`.`TimeIn`,
+        RDOTHOURS(TIME(CONCAT(a.Shift+9,":00")),
                 IF(`ot`.`EndOfOT` IS NULL,
                     `a`.`TimeOut`,
                     IF(`ot`.`EndOfOT` < `a`.`TimeOut`,
