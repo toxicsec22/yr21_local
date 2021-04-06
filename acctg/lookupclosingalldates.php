@@ -255,7 +255,7 @@ if($_SESSION['(ak0)']==1002) { echo 'As of '.date('Y-m-d h:i:s l').'<br><br>';}
 
 
 if (allowedToOpen(5571,'1rtc')) { goto skipincorrectdatesacctg;}
-$sql='SELECT 1 AS DB,  "acctg_2jvmain" AS `Table`, "Date" AS DateField, adjs.Date, concat("JVNo ",adjm.JVNo) AS ControlNo, "JV" as w, "addeditsupplyside" AS filetoopen, adjm.JVNo FROM acctg_2jvmain adjm JOIN acctg_2jvsub adjs ON adjm.JVNo=adjs.JVNo WHERE YEAR(`Date`)<>'.$currentyr.' 
+$sql='SELECT 1 AS DB,  "acctg_2jvmain" AS `Table`, "Date" AS DateField, adjs.Date, concat("JVNo ",adjm.JVNo) AS ControlNo, "JV" as w, "addeditsupplyside" AS filetoopen, adjm.JVNo AS TxnID FROM acctg_2jvmain adjm JOIN acctg_2jvsub adjs ON adjm.JVNo=adjs.JVNo WHERE YEAR(`Date`)<>'.$currentyr.' 
 UNION ALL SELECT 1 AS DB,  "acctg_1assets" AS `Table`, "DateAcquired" AS DateField, a.DateAcquired, concat("AssetID ",a.AssetID) AS ControlNo, "AssetandDepr" as w, "assetanddepr" AS filetoopen, a.AssetID FROM acctg_1assets a WHERE YEAR(DateAcquired)>'.$currentyr.'
 UNION ALL SELECT 1 AS DB,  "acctg_2purchasemain" AS `Table`, "Date" AS DateField, Date, concat("Supp.Inv# ",SupplierInv), "Purchases", "addeditsupplyside" AS filetoopen, p.TxnID FROM `acctg_2purchasemain` p LEFT JOIN `acctg_2purchasesub` ps ON p.TxnID=ps.TxnID WHERE YEAR(Date)<>'.$currentyr.'
 UNION ALL SELECT 1 AS DB, "acctg_2cvmain" AS `Table`, "Date" AS DateField, vchm.Date, concat("Vch# ",vchm.CVNo), "CVs", "addeditsupplyside" AS filetoopen, vchm.CVNo  FROM acctg_2cvmain vchm WHERE YEAR(Date)<>'.$currentyr.'
