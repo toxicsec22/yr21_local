@@ -38,7 +38,7 @@ if (isset($_POST['btnShowSwitch'])){
 	else {
 		$ownswitchcondi = '';
 	}
-if (allowedToOpen(6065,'1rtc') AND (basename($_SERVER['REQUEST_URI']) == "index.php")){
+if (basename($_SERVER['REQUEST_URI']) == "index.php"){
         echo '<h3><a href="newsystem.php">Click me to try the NEW switchboard [ BETA VERSION ]</a></h3><br>';
 }
 
