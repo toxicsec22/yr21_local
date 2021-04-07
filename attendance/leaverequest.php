@@ -8,7 +8,7 @@ include_once('../switchboard/contents.php');
 $which=(!isset($_GET['w'])?'RequestLeave':$_GET['w']);
    include_once $path.'/acrossyrs/commonfunctions/listoptions.php';
 if (in_array($which,array('RequestLeave','RequestLeaveSuperOrDeptHead'))){
-	echo comboBox($link,'SELECT * FROM `attend_0leavetype` WHERE LeaveNo IN (10,14,16,30,31,32) ORDER BY LeaveName;','LeaveNo','LeaveName','leavetype');
+	echo comboBox($link,'SELECT * FROM `attend_0leavetype` WHERE LeaveNo IN (10,14,16,22,30,31,32) ORDER BY LeaveName;','LeaveNo','LeaveName','leavetype');
 	
 }
 switch ($which){
