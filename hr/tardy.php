@@ -173,13 +173,13 @@ receipt of this letter why no disciplinary action must be imposed on you
 for the violation of the Company\'s Code of Conduct on attendance.  Your
 tardiness for the month of <b><u>'.date('F',strtotime(''.$currentyr.'-'.$res['MonthTardy'].'-01')).'</u></b> are detailed below:';
 
-$sql='select a.DateToday,LEFT(a.TimeIn,5) AS TimeIn,round(((time_to_sec(`a`.`TimeIn`) - time_to_sec("8:00")) / 60),0) AS `TotalMinutesLate` from ((`1employees` `e` join `attend_2attendance` `a` on(`e`.`IDNo` = `a`.`IDNo`)) join `attend_30currentpositions` `p` on(`e`.`IDNo` = `p`.`IDNo`)) where hour(`a`.`TimeIn`) <> 12 and hour(`a`.`TimeIn`) + minute(`a`.`TimeIn`) / 60 > if(`p`.`JLID` >= 6,8.5,8) and `e`.`Resigned` = 0 and `p`.`JLID` < 6 and `e`.`IDNo` not in (1010,1014) AND a.IDNo='.$res['IDNo'].' AND MONTH(`DateToday`)='.$res['MonthTardy'].' order by `e`.`Nickname`,`e`.`SurName`,month(`a`.`DateToday`);';
+$sql='select a.DateToday,LEFT(a.TimeIn,5) AS TimeIn,CONCAT(Shift,":00") AS Sched,round(((time_to_sec(`a`.`TimeIn`) - time_to_sec(CONCAT(Shift,":00"))) / 60),0) AS `TotalMinutesLate` from ((`1employees` `e` join `attend_2attendance` `a` on(`e`.`IDNo` = `a`.`IDNo`)) join `attend_30currentpositions` `p` on(`e`.`IDNo` = `p`.`IDNo`)) where hour(`a`.`TimeIn`) <> 12 and hour(`a`.`TimeIn`) + minute(`a`.`TimeIn`) / 60 > if(`p`.`JLID` >= 6,8.5,8) and `e`.`Resigned` = 0 and `p`.`JLID` < 6 and `e`.`IDNo` not in (1010,1014) AND a.IDNo='.$res['IDNo'].' AND MONTH(`DateToday`)='.$res['MonthTardy'].' order by `e`.`Nickname`,`e`.`SurName`,month(`a`.`DateToday`);';
 $stmt=$link->query($sql); $restable=$stmt->fetchAll();
 		
 		$letter.='<br><br><table width="100%" border="1px solid black" style="border-collapse:collapse;text-align:center;"><tr><th>DATE</th><th>SCHEDULE</th><th>ACTUAL TIME</th><th>NO. OF MINS. LATE</th></tr>';
 		$totalmin=0;
 		foreach($restable AS $rest){
-			$letter.='<tr><td>'.$rest['DateToday'].'</td><td>8:00</td><td>'.$rest['TimeIn'].'</td><td>'.$rest['TotalMinutesLate'].' mins</td></tr>';
+			$letter.='<tr><td>'.$rest['DateToday'].'</td><td>'.$rest['Sched'].'</td><td>'.$rest['TimeIn'].'</td><td>'.$rest['TotalMinutesLate'].' mins</td></tr>';
 			$totalmin=$totalmin+$rest['TotalMinutesLate'];
 		}
 		$letter.='<tr><td><b>TOTAL</b></td><td></td><td></td><td><b>'.$totalmin.' mins</b></td></tr>';

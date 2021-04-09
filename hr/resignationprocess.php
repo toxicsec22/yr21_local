@@ -146,29 +146,29 @@ switch ($which){
 	// $radmin='WHERE ADMINFD<>1';  if(!isset($_POST['filter'])){$racctg='WHERE ACCTGFD<>1';}else{$racctg='';} $rsales='WHERE SALESFD<>1'; $rops='WHERE OPSFD<>1'; $rfinance='WHERE FINANCEFD<>1';
 	// $rsc='WHERE SCFD<>1'; $rmktg='WHERE MKTGFD<>1';
 	if (allowedToOpen(7810,'1rtc')) {
-		$listcondition='WHERE ADMINFD=0';
+		$listcondition='WHERE ADMINFD=0 and FinalDecision<>3';
 		$othercondi='WHERE ADMINFD<>0 and FinalDecision=0';
 	}elseif(allowedToOpen(7811,'1rtc')) {
 		if(!isset($_POST['filter'])){
-			$listcondition='WHERE ACCTGFD=0';
+			$listcondition='WHERE ACCTGFD=0 and FinalDecision<>3';
 			$othercondi='WHERE ACCTGFD<>0 and FinalDecision=0';
 		}else{
 			$listcondition='';
 		}
 	}elseif(allowedToOpen(7812,'1rtc')) {
-		$listcondition='WHERE SALESFD=0';
+		$listcondition='WHERE SALESFD=0 and FinalDecision<>3';
 		$othercondi='WHERE SALESFD<>0 and FinalDecision=0';
 	}elseif(allowedToOpen(7813,'1rtc')) {
-		$listcondition='WHERE OPSFD=0';
+		$listcondition='WHERE OPSFD=0 and FinalDecision<>3';
 		$othercondi='WHERE OPSFD<>0 and FinalDecision=0';
 	}elseif(allowedToOpen(7814,'1rtc')) {
-		$listcondition='WHERE FINANCEFD=0';
+		$listcondition='WHERE FINANCEFD=0 and FinalDecision<>3';
 		$othercondi='WHERE FINANCEFD<>0 and FinalDecision=0';
 	}elseif(allowedToOpen(7815,'1rtc')) {
-		$listcondition='WHERE SCFD=0';
+		$listcondition='WHERE SCFD=0 and FinalDecision<>3';
 		$othercondi='WHERE SCFD<>0 and FinalDecision=0';
 	}elseif(allowedToOpen(7818,'1rtc')) {
-		$listcondition='WHERE MKTGFD=0';
+		$listcondition='WHERE MKTGFD=0 and FinalDecision<>3';
 		$othercondi='WHERE MKTGFD<>0 and FinalDecision=0';
 	}
 
@@ -178,7 +178,7 @@ switch ($which){
 		if (allowedToOpen(7802,'1rtc') or allowedToOpen(7821,'1rtc')) {
 			
 			if(!isset($_POST['filter'])){
-				if(allowedToOpen(7802,'1rtc')){$conditionf='WHERE FinalDecision=0'; $listcondition='';}else{$conditionf='';}
+				if(allowedToOpen(7802,'1rtc')){$conditionf='WHERE FinalDecision=0 '; $listcondition='';}else{$conditionf='';}
 				// echo $conditionf; exit();
 			}else{
 				switch($_POST['filtering']){
