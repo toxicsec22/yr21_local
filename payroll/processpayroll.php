@@ -51,14 +51,27 @@ include('../backendphp/layout/displayastableonlynoheaders.php');
 <?php echo str_repeat('&nbsp',15)?>De Minimis = (Monthly/2) De Minimis Rate<br>
 <?php echo str_repeat('&nbsp',15)?>Tax Shield = (Monthly/2) Tax Shield Rate<br><br>
 <?php echo str_repeat('&nbsp',15)?>Absence (Basic/Tax Shield) = Daily Rate x LWOP<br><br>
+<hr><br><br>
+Undertime = Daily Rate x (Regular Days Present - Regular Days Actual as calculated by attendance)
+<br><br>
 
-<hr>Overtime and Undertime<br><br>
-<?php echo str_repeat('&nbsp',15)?>Regular Overtime = Hourly Rate x Reg OT Hrs x 1.25<br>
-<?php echo str_repeat('&nbsp',15)?>Restday Overtime = Hourly Rate x Restday OT Hrs x 1.3<br>
-<?php echo str_repeat('&nbsp',15)?>Special Holiday Overtime = Hourly Rate x Spec Holiday OT Hrs x 1.3<br>
-<?php echo str_repeat('&nbsp',15)?>Legal Holiday Overtime = Hourly Rate x Legal Holiday OT Hrs x 1 (since the legal holiday is already paid)<br><br>
-
-<?php echo str_repeat('&nbsp',15)?>Undertime = Daily Rate x (Regular Days Present - Regular Days Actual as calculated by attendance)<br>
+<hr><br><br>Hourly Rate Multiplier for Overtime<br><br>
+<style>
+.ottable td { text-align: center;}
+.ottable table, p { margin-left: 10%; }
+</style>
+<div class='ottable'>
+<table>
+<thead><th>Type of Day</th><th>Regular Shift Hours</th><th>Beyond Shift Hours</th></thead>
+<tr><td>Regular Workday</td><td>1</td><td>1.25</td></tr>
+<tr><td>Restday</td><td>1.3</td><td>1.3 x 1.3</td></tr>
+<tr><td>Special Holiday</td><td>1.3</td><td>1.3 x 1.3</td></tr>
+<tr><td>Regular Holiday</td><td>2</td><td>2 x 1.3</td></tr>
+<tr><td>Restday & Special Holiday<sup>*</sup></td><td>1.5</td><td>1.5 x 1.3</td></tr>
+<tr><td>Restday & Regular Holiday<sup>*</sup></td><td>2.3</td><td>2 x 1.3 x 1.3</td></tr>
+</table><br>
+<p><i><sup>*</sup>For simplicity, the overtime HOURS for the holiday is multiplied by the restday factor, and the overtime pay is shown in the Restday column.</i></p>
+</div>
 <?php
 } // end of NOT recalc
 include_once '../generalinfo/lists.inc';
@@ -156,7 +169,13 @@ truncate(if(r.LatestDorM=0,LatestDeMinimisRate*(RegDaysPresent+PaidLegalDays+SLD
 truncate(if(r.LatestDorM=0,LatestTaxShield*(RegDaysPresent+PaidLegalDays+SLDays+VLDays+LWPDays),
 (IF(a.IDNo IN '.$newmonthlyemp.', (LatestTaxShield/13.04)*(RegDaysPresent+PaidLegalDays+SLDays+VLDays+LWPDays+SpecDays) ,LatestTaxShield))),2) as `TaxSh`,
 
-truncate(if(r.LatestDorM=0,(LatestBasicRate)/8,(LatestBasicRate)/ 13.04/8)*((LegalHrsOT)+((SpecHrsOT+RestHrsOT)*1.3)+(ExcessRestHrsOT*1.3*1.3)+(RegOTHrs*1.25)),2) as OT,
+truncate(if(r.LatestDorM=0,(LatestBasicRate)/8,(LatestBasicRate)/ 13.04/8)*((RegExShiftHrsOT*1.25)+
+(RestShiftHrsOT*1.3)+
+(SpecShiftHrsOT*1.3)+
+LegalShiftHrsOT+
+(RestExShiftHrsOT*1.3*1.3)+
+(SpecExShiftHrsOT*1.3*1.3)+
+(LegalExShiftHrsOT*2*1.3)),2) AS OT,
 
 truncate(if(r.LatestDorM=0 OR a.IDNo IN '.$newmonthlyemp.',0,(LatestBasicRate+LatestDeMinimisRate)/ 13.04)*(LWOPDays+QDays),2) as `AbsenceBasic`,
 

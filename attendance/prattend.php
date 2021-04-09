@@ -68,7 +68,7 @@ $login=addslashes($_POST['attendid']);
 	switch ($calledfrom){
 		case 1: //8 to 5 regular sched
 			$txnid=intval($_REQUEST['TxnID']);
-			$stmt=$link->prepare('UPDATE attend_2attendance INNER JOIN attend_2attendancedates ON `attend_2attendance`.DateToday = `attend_2attendancedates`.DateToday SET `attend_2attendance`.TimeIn = time(\'8:00\'), `attend_2attendance`.TimeOut = time(\'17:00\'), `attend_2attendance`.LeaveNo=\'11\', `attend_2attendance`.TIEncby=' . $_SESSION['(ak0)'] .', `attend_2attendance`.TOEncby=' . $_SESSION['(ak0)'] .',`attend_2attendance`.HREncby=' . $_SESSION['(ak0)'] .',attend_2attendance.HRTS=Now() WHERE TimeIn is null AND TimeOut is null AND Remarks is null AND Overtime=0 AND (((`attend_2attendance`.TxnID)=:TxnID) AND ((`attend_2attendancedates`.Posted)=0))');
+			$stmt=$link->prepare('UPDATE attend_2attendance a INNER JOIN attend_2attendancedates ad ON `ad`.DateToday = `a`.DateToday SET TimeIn = time(\'8:00\'), TimeOut = time(\'17:00\'), LeaveNo=\'11\', TIEncby=' . $_SESSION['(ak0)'] .', TOEncby=' . $_SESSION['(ak0)'] .',HREncby=' . $_SESSION['(ak0)'] .',attend_2attendance.HRTS=Now() WHERE TimeIn is null AND TimeOut is null AND Remarks is null AND OTApproval=0 AND (((`a`.TxnID)=:TxnID) AND ((`ad`.Posted)=0))');
 			$stmt->bindValue(':TxnID', $txnid, PDO::PARAM_STR);
 			$stmt->execute();
 			header("Location:encodeattend.php?AttendDate=$attenddate&w=EncodeAttend");
@@ -78,11 +78,12 @@ $login=addslashes($_POST['attendid']);
 			$txnid=intval($_REQUEST['TxnID']);
 			
 			$remarks=addslashes($_POST['RemarksHR']);
-			$overtime=addslashes($_POST['Overtime']);
+			$otapproval=addslashes($_POST['OTApproval']);
+			$ottypeno=addslashes($_POST['OTTypeNo']);
 			$leaveno=addslashes($_POST['LeaveNo']);
 			
-			if($overtime>5){ echo 'Invalid Overtime Value.'; exit(); }
-			if($overtime==2){
+			// there is a fk.  if($overtime>5){ echo 'Invalid Overtime Value.'; exit(); }
+			if($otapproval==2){
 				$sqlpot='SELECT a.IDNo from attend_2attendance a JOIN approvals_5ot ot ON a.IDNo=ot.IDNo AND a.DateToday=ot.DateToday WHERE a.TxnID='.$txnid.' AND ot.Approved=1';
 				$stmtpot = $link->query($sqlpot);
 				if($stmtpot->rowCount()==0){
@@ -124,19 +125,20 @@ $login=addslashes($_POST['attendid']);
 			allowsil:
 			
 			if (is_numeric($_POST['LeaveNo'])) {
-				$leavesql='`attend_2attendance`.LeaveNo = '.$leaveno.',';
+				$leavesql='LeaveNo = '.$leaveno.',';
 			} else {
 				$leavesql='';
 			} 
 			
-			$sql='UPDATE attend_2attendance INNER JOIN attend_2attendancedates ON `attend_2attendance`.DateToday = `attend_2attendancedates`.DateToday
+			$sql='UPDATE attend_2attendance a INNER JOIN attend_2attendancedates ad ON `ad`.DateToday = `a`.DateToday
 			SET 
-				`attend_2attendance`.RemarksHR = \''.$remarks.'\',
-				`attend_2attendance`.Overtime = '.$overtime.',
+				RemarksHR = \''.$remarks.'\',
+				OTApproval = '.$otapproval.',
+				OTTypeNo = '.$ottypeno.',
 				'.$leavesql.'
-				`attend_2attendance`.HREncby = ' . $_SESSION['(ak0)'] .',
-				`attend_2attendance`.HRTS=Now()
-				WHERE (((`attend_2attendance`.TxnID)='.$txnid.') AND ((`attend_2attendancedates`.Posted)=0))';
+				HREncby = ' . $_SESSION['(ak0)'] .',
+				HRTS=Now()
+				WHERE (((`a`.TxnID)='.$txnid.') AND ((`ad`.Posted)=0))';
 			// echo $sql; exit();
 			$stmt=$link->prepare($sql); $stmt->execute();
 			header("Location:encodeattend.php?AttendDate=$attenddate&w=EncodeAttend");
@@ -144,16 +146,16 @@ $login=addslashes($_POST['attendid']);
 			break;
 		case 3: // set as blank
 			$txnid=intval($_REQUEST['TxnID']);
-			$sql='UPDATE attend_2attendance INNER JOIN attend_2attendancedates ON `attend_2attendance`.DateToday = `attend_2attendancedates`.DateToday
-			SET `attend_2attendance`.TimeIn = null, `attend_2attendance`.TimeOut = null, 
-				`attend_2attendance`.RemarksHR = null,
-				`attend_2attendance`.Overtime = 0,
-				`attend_2attendance`.LeaveNo = 18,
-				`attend_2attendance`.TIEncby = ' . $_SESSION['(ak0)'] .',
-				`attend_2attendance`.TOEncby = ' . $_SESSION['(ak0)'] .',
-				`attend_2attendance`.HREncby = ' . $_SESSION['(ak0)'] .',
-				`attend_2attendance`.HRTS=Now(), TInTS=Now(), TOTS=Now()
-				WHERE (((`attend_2attendance`.TxnID)='.$txnid.') AND ((`attend_2attendancedates`.Posted)=0))';
+			$sql='UPDATE attend_2attendance INNER JOIN attend_2attendancedates ON DateToday = `attend_2attendancedates`.DateToday
+			SET TimeIn = null, TimeOut = null, 
+				RemarksHR = null,
+				OTApproval = 0,
+				LeaveNo = 18,
+				TIEncby = ' . $_SESSION['(ak0)'] .',
+				TOEncby = ' . $_SESSION['(ak0)'] .',
+				HREncby = ' . $_SESSION['(ak0)'] .',
+				HRTS=Now(), TInTS=Now(), TOTS=Now()
+				WHERE (((TxnID)='.$txnid.') AND ((`attend_2attendancedates`.Posted)=0))';
 				// echo $sql;
 			$stmt=$link->prepare($sql);
 			
@@ -165,22 +167,22 @@ $login=addslashes($_POST['attendid']);
 			require_once $path.'/acrossyrs/logincodes/confirmtoken.php';
 			$txnid=intval($_REQUEST['TxnID']);
 			$remarks=addslashes($_POST['Remarks']);
-			$overtime=addslashes($_POST['Overtime']);
+			$otapproval=addslashes($_POST['OTApproval']);
+			$ottypeno=addslashes($_POST['OTTypeNo']);
 			
 			 // print_r($_POST); exit();
 			if (addslashes($_POST['TimeIn'])){
-				 // $addsql='`attend_2attendance`.TimeIn = STR_TO_DATE(\''.$_POST['TimeIn'].'\',\'%l:%i %p\'), `attend_2attendance`.LeaveNo = 11, `attend_2attendance`.TIEncby = ' . $_SESSION['(ak0)'] .', '
-                                         // . 'TInTS=Now() ';
-				 $addsql='`attend_2attendance`.TimeIn = \''.$_POST['TimeIn'].'\', `attend_2attendance`.LeaveNo = 11, `attend_2attendance`.TIEncby = ' . $_SESSION['(ak0)'] .', '
+				 
+				 $addsql='TimeIn = \''.$_POST['TimeIn'].'\', LeaveNo = 11, TIEncby = ' . $_SESSION['(ak0)'] .', '
                                          . 'TInTS=Now() ';
 			} elseif (addslashes($_POST['TimeOut'])) {
-				$addsql='`attend_2attendance`.TimeOut = \''.$_POST['TimeOut'].'\',`attend_2attendance`.TOEncby = ' . $_SESSION['(ak0)'] .', '
+				$addsql='TimeOut = \''.$_POST['TimeOut'].'\',TOEncby = ' . $_SESSION['(ak0)'] .', '
                                         . 'TOTS=Now() ';            
 			}
 			
-			$sql='UPDATE attend_2attendance INNER JOIN attend_2attendancedates ON `attend_2attendance`.DateToday = `attend_2attendancedates`.DateToday
+			$sql='UPDATE attend_2attendance a INNER JOIN attend_2attendancedates ad ON `ad`.DateToday = `a`.DateToday
 			SET '.$addsql.'  
-			WHERE (((`attend_2attendance`.TxnID)='.$txnid.') AND ((`attend_2attendancedates`.Posted)=0))';
+			WHERE (((TxnID)='.$txnid.') AND ((`ad`.Posted)=0))';
 			// echo $sql; exit();
 			$stmt=$link->prepare($sql); $stmt->execute();
 			header("Location:encodeattend.php?AttendDate=$attenddate&w=EncodeAttend");
@@ -191,11 +193,11 @@ $login=addslashes($_POST['attendid']);
 			$txnid=intval($_REQUEST['TxnID']);
 			
 			$remarks2=addslashes($_POST['RemarksDept']);
-			$sql='UPDATE attend_2attendance INNER JOIN attend_2attendancedates ON `attend_2attendance`.DateToday = `attend_2attendancedates`.DateToday
-			SET `attend_2attendance`.RemarksDept = \''.$remarks2.'\',
-			`attend_2attendance`.DEPTTS=Now(),
-			`attend_2attendance`.DEPTEncby=' . $_SESSION['(ak0)'] .'
-				WHERE (((`attend_2attendance`.TxnID)='.$txnid.') AND ((`attend_2attendancedates`.Posted)=0) AND ((`attend_2attendancedates`.DateToday>CURDATE())))  ';
+			$sql='UPDATE attend_2attendance a INNER JOIN attend_2attendancedates ad ON `ad`.DateToday = `a`.DateToday
+			SET RemarksDept = \''.$remarks2.'\',
+			DEPTTS=Now(),
+			DEPTEncby=' . $_SESSION['(ak0)'] .'
+				WHERE (((`a`.TxnID)='.$txnid.') AND ((`ad`.Posted)=0) AND ((`ad`.DateToday>CURDATE())))  ';
 			// echo $sql; exit();
 			$stmt=$link->prepare($sql); $stmt->execute();
 			header("Location:encodeattend.php?w=RemarksOfDept");
@@ -206,11 +208,11 @@ $login=addslashes($_POST['attendid']);
 			$txnid=intval($_REQUEST['TxnID']);
 			
 			$remarks3=addslashes($_POST['RemarksHR']);
-			$sql='UPDATE attend_2attendance INNER JOIN attend_2attendancedates ON `attend_2attendance`.DateToday = `attend_2attendancedates`.DateToday
-			SET `attend_2attendance`.RemarksHR = \''.$remarks3.'\',
-			`attend_2attendance`.HRTS=Now(),
-			`attend_2attendance`.HREncby=' . $_SESSION['(ak0)'] .'
-				WHERE (((`attend_2attendance`.TxnID)='.$txnid.') AND ((`attend_2attendancedates`.Posted)=0) AND ((`attend_2attendancedates`.DateToday>CURDATE())))  ';
+			$sql='UPDATE attend_2attendance a INNER JOIN attend_2attendancedates ad ON `ad`.DateToday = `a`.DateToday
+			SET RemarksHR = \''.$remarks3.'\',
+			HRTS=Now(),
+			HREncby=' . $_SESSION['(ak0)'] .'
+				WHERE (((`a`.TxnID)='.$txnid.') AND ((`ad`.Posted)=0) AND ((`ad`.DateToday>CURDATE())))  ';
 			// echo $sql; exit();
 			$stmt=$link->prepare($sql); $stmt->execute();
 			header("Location:encodeattend.php?w=RemarksOfHR");
@@ -317,8 +319,8 @@ $login=addslashes($_POST['attendid']);
 			if (($_COOKIE['_comkey']=='timeinoutcookie') OR (isset($_COOKIE['_comkey2'])) OR ($stmtbc->rowCount()>0) OR (isset($_POST['In'])) OR (isset($_POST['Out']))) {
 				// $rtctime = date("H:i",strtotime(date("Y-m-d H:i:s")." +10 minutes"));
 				$rtctime = date("H:i",strtotime(date("Y-m-d H:i:s")));
-				$sql='UPDATE attend_2attendance INNER JOIN attend_2attendancedates ON
-				`attend_2attendance`.DateToday = `attend_2attendancedates`.DateToday ';
+				$sql='UPDATE attend_2attendance a INNER JOIN attend_2attendancedates  ad ON
+				`ad`.DateToday = `a`.DateToday ';
  
 					include_once($path.'/'.$url_folder.'/attendance/function_checkAttend.php'); 
 					
@@ -378,10 +380,10 @@ $login=addslashes($_POST['attendid']);
 							
 							
 							
-							$sql=$sql. 'SET `attend_2attendance`.TimeIn = time(\''.$rtctime.'\'),
-						`attend_2attendance`.LeaveNo = if(`attend_2attendance`.LeaveNo<>15,11,15),
-						`attend_2attendance`.TIEncby = ' . $loginid .
-						',  `attend_2attendance`.TInTS=Now() ';
+							$sql=$sql. 'SET TimeIn = time(\''.$rtctime.'\'),
+						LeaveNo = if(LeaveNo<>15,11,15),
+						TIEncby = ' . $loginid .
+						',  TInTS=Now() ';
 							 
 							 
 							 
@@ -446,9 +448,9 @@ $login=addslashes($_POST['attendid']);
                                                         if ($stmtcheck->rowCount()>0){ $nologout=true; goto nologout;}                                                        
                                                     }
                                                     skipcheck:
-						$sql=$sql. 'SET `attend_2attendance`.TimeOut = time(\''.$rtctime.'\'),
-						`attend_2attendance`.TOEncby = ' . $loginid .
-						', `attend_2attendance`.TOTS=Now()';
+						$sql=$sql. 'SET TimeOut = time(\''.$rtctime.'\'),
+						TOEncby = ' . $loginid .
+						', TOTS=Now()';
 						
 						                    
 						} else { //there is alrdy a recorded attendance
@@ -458,8 +460,8 @@ $login=addslashes($_POST['attendid']);
 					
 					
 					
-				$sql=$sql. ' WHERE (((`attend_2attendance`.IDNo)=' . $loginid.') AND (`attend_2attendance`.DateToday)=\'' . $attenddate.'\')
-				AND ((`attend_2attendancedates`.Posted)=0)';
+				$sql=$sql. ' WHERE (((IDNo)=' . $loginid.') AND (`a`.DateToday)=\'' . $attenddate.'\')
+				AND ((`ad`.Posted)=0)';
 					//echo $sql; exit();  
 					
 					$stmt=$link->prepare($sql);

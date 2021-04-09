@@ -54,7 +54,7 @@ if(in_array($whichqry,array('SetRestday','RemarksOfHR'))){
 
 switch ($whichqry){
 		
-case "EncodeAttend":
+case 'EncodeAttend':
 include_once('../backendphp/layout/showencodedbybutton.php');
     if (!allowedToOpen(615,'1rtc')){ echo 'No permission'; exit;}
 	
@@ -67,7 +67,7 @@ $fieldname='AttendDate';
 $txnid='TxnID';
 
 
-$columnnames=array('DateToday','IDNo','FullName','TimeIn','TimeOut','RemarksHR','Overtime','OTDesc','RemarksDept','Branch','Shift','LeaveNo');
+$columnnames=array('DateToday','IDNo','FullName','TimeIn','TimeOut','RemarksHR','OTApproval','OT_Approval','OTTypeNo','OTType','RemarksDept','Branch','Shift','LeaveNo');
 
 if ($showenc==1) { array_push($columnnames,'TIEncby','TInTS','TOEncby','TOTS','HREncby','HRTS'); }
 
@@ -84,18 +84,21 @@ include_once('../backendphp/layout/clickontabletoedithead.php');
     <div style="float:right; width:20%;"><font size="1">Grace Period for Office Personnel:<br>Casimiro, Imus, Molino, Noveleta, AbadSantos - 30 min<br>
 Dasmarinas, Fairview, QCMIndanaoAve, Binangonan, Roosevelt, Valenzuela, Zabarte - 1 hr</font></div>
 
-    <div style="float:right; width:20%;"><font size="1">Overtime Description<br>0 - No Overtime<br>1 - HR Approved OT<br>2 - Pre-Approved OT<br>3 - Extended OT<br>4 - Holiday OT)<br>5 - RDOT Beyond 8 Hrs<br></font></div>
+    <div style="float:right; width:12%;"><font size="1">Overtime Approval<br>0 - No Overtime<br>1 - HR Approved OT<br>2 - Pre-Approved OT<br></font></div>
+
+	<div style="float:right; width:15%;"><font size="1">Overtime Types<br>0 - No Overtime<br>10 - Full Shift<br>11 - Pre Shift<br>12 - Post Shift<br>13 - After Midnight<br>23 - Pre and Post Shift<br>24 - Pre and Post Shift after Midnight<br><br></font></div>
+
     <table style="display: inline-block; border: 1px solid; float: left; ">
 <?php
 
-if (allowedToOpen(615,'1rtc')) { ?> 
+if (allowedToOpen(615,'1rtc')) { ?> <br><br>
 	<a href='postattend.php?calledfrom=0&action_token=<?php echo $_SESSION['action_token'];?>&attenddate=<?php echo $attenddate?>'>Post Today's Attendance</a>&nbsp &nbsp &nbsp &nbsp &nbsp
 	<a href='encodeattend.php?w=WrongLeaveType&AttendDate=<?php echo $attenddate?>'>Lookup Incorrect Leave Type</a>
 	<?php } 
 	 /*end if */
 
 $columnstoedit=array('TimeIn','TimeOut');
-$columnstoedit2=array('RemarksHR','Overtime');
+$columnstoedit2=array('RemarksHR','OTApproval','OTTypeNo');
 
 $columnstoeditselect=array('LeaveNo');
 
@@ -127,19 +130,11 @@ if($showlabel==1){
 }
 
 $columnsub=$columnnames; 
-$tdform=true;
+$tdform=true; // .($showlabel==0?'IF(OTApproval=2,"Pre-approved",IF(OTApproval=1,"HR Approved","")) AS OT_Approval,':'').
 $sortfield=(!isset($_POST['sortfield']) OR empty($_POST['sortfield']))?'Branch, FirstName':$_POST['sortfield'];
-    // $sql='SELECT a.*,'.($showlabel==0?'IF(Overtime=1,"Yes","") AS Overtime,':'').' TIME_FORMAT(a.TimeIn, "%h:%i %p") AS TimeIn,TIME_FORMAT(a.TimeOut, "%h:%i %p") AS TimeOut, concat(FirstName,\' \',SurName) as `FullName`, concat(lt.LeaveNo,\' - \',lt.LeaveName) as `LeaveNo` FROM attend_45lookupattend a JOIN `1employees` e ON e.IDNo=a.IDNo LEFT JOIN `attend_0leavetype` lt ON a.LeaveNo=lt.LeaveNo WHERE (((`DateToday`)=\''.$attenddate.'\') and (a.IDNo<>\''.$_SESSION['(ak0)'].'\')) AND deptID NOT IN (SELECT deptID FROM attend_30currentpositions WHERE IDNo='.$_SESSION['(ak0)'].') ORDER BY '.$sortfield.(isset($_POST['sortarrange'])?' '.$_POST['sortarrange']:' ASC');
-    $sql='SELECT a.*,'.($showlabel==0?'IF(Overtime=1,"Yes","") AS Overtime,':'').' TIME_FORMAT(a.TimeIn, "%H:%i") AS TimeIn,TIME_FORMAT(a.TimeOut, "%H:%i") AS TimeOut, concat(FirstName,\' \',SurName) as `FullName`, concat(lt.LeaveNo,\' - \',lt.LeaveName) as `LeaveNo`,(
-	CASE
-		WHEN Overtime=0 THEN ""
-		WHEN Overtime=1 THEN "HR Approved OT"
-		WHEN Overtime=2 THEN "Pre-Approved OT"
-		WHEN Overtime=4 THEN "Holiday OT"
-		WHEN Overtime=5 THEN "RDOT Beyond 8 Hrs"
-		ELSE "Extended OT"
-	END
-	) AS OTDesc FROM attend_45lookupattend a JOIN `1employees` e ON e.IDNo=a.IDNo LEFT JOIN `attend_0leavetype` lt ON a.LeaveNo=lt.LeaveNo WHERE (((`DateToday`)=\''.$attenddate.'\') and (a.IDNo<>\''.$_SESSION['(ak0)'].'\')) AND deptID NOT IN (SELECT deptID FROM attend_30currentpositions WHERE IDNo='.$_SESSION['(ak0)'].') ORDER BY '.$sortfield.(isset($_POST['sortarrange'])?' '.$_POST['sortarrange']:' ASC');
+    $sql='SELECT a.*, IF(OTApproval=2,"Pre-approved",IF(OTApproval=1,"HR Approved","")) AS OT_Approval, TIME_FORMAT(a.TimeIn, "%H:%i") AS TimeIn,TIME_FORMAT(a.TimeOut, "%H:%i") AS TimeOut, concat(FirstName,\' \',SurName) as `FullName`, concat(lt.LeaveNo,\' - \',lt.LeaveName) as `LeaveNo`, IF(a.OTTypeNo<>0,OTType,"") AS OTType FROM attend_45lookupattend a JOIN `1employees` e ON e.IDNo=a.IDNo LEFT JOIN `attend_0leavetype` lt ON a.LeaveNo=lt.LeaveNo 
+	JOIN attend_0ottype ot ON ot.OTTypeNo=a.OTTypeNo
+	WHERE (((`DateToday`)=\''.$attenddate.'\') and (a.IDNo<>\''.$_SESSION['(ak0)'].'\')) AND deptID NOT IN (SELECT deptID FROM attend_30currentpositions WHERE IDNo='.$_SESSION['(ak0)'].') ORDER BY '.$sortfield.(isset($_POST['sortarrange'])?' '.$_POST['sortarrange']:' ASC');
 $title='';
 	echo '<div>';
 		if($showlabel==1){
@@ -151,7 +146,7 @@ $title='';
 		
 break;
 
-case "WrongLeaveType":
+case 'WrongLeaveType':
     if (!allowedToOpen(615,'1rtc')){ echo 'No permission'; exit;}
 $title='Wrong Leave Type';	
     $minorswitch='attendanceswitch.php';
@@ -171,7 +166,7 @@ $sql='SELECT * FROM attend_2attendance where LeaveNo not in (Select LeaveNo from
 include_once('../backendphp/layout/displayastablewithedit.php');
 break;
 
-case "UnpostAttend":
+case 'UnpostAttend':
     if (!allowedToOpen(617,'1rtc')){ echo 'No permission'; exit;}
 $title='Unpost Attendance';
 include_once('../backendphp/layout/clickontabletoedithead.php');

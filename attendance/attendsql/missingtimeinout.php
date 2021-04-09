@@ -10,7 +10,6 @@ SELECT
         `a`.`TimeIn` AS `TimeIn`,
         `a`.`TimeOut` AS `TimeOut`,
         `a`.`RemarksHR` AS `RemarksHR`,
-        `a`.`Overtime` AS `Overtime`,
         `a`.`RemarksDept` AS `RemarksDept`,
         `l`.`LeaveName` AS `LeaveName`,
         `a`.`BranchNo` AS `BranchNo`,

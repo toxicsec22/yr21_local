@@ -41,7 +41,7 @@ $sql0='create temporary table mandays (
 IDNo smallint(6) not null,
 ManDays smallint(3) not null
 )
-SELECT a.IDNo, count(LeaveNo) as ManDays FROM attend_2attendance a join `attend_30latestpositionsinclresigned` p on a.IDNo=p.IDNo where (p.PositionID in (32,33,34,37,81,50,51,52,53,55)) and a.BranchNo='.$branch.' and (LeaveNo=11 or (LeaveNo in (12,13,15) and Overtime<>0)) and (DateToday>=(Select LatestDateCount from latestdatecount) and DateToday<=\''.$txndate.'\') group by a.IDNo';
+SELECT a.IDNo, count(LeaveNo) as ManDays FROM attend_2attendance a join `attend_30latestpositionsinclresigned` p on a.IDNo=p.IDNo where (p.PositionID in (32,33,34,37,81,50,51,52,53,55)) and a.BranchNo='.$branch.' and (LeaveNo=11 or (LeaveNo in (12,13,15) and OTTypeNo<>0)) and (DateToday>=(Select LatestDateCount from latestdatecount) and DateToday<=\''.$txndate.'\') group by a.IDNo';
 $stmt0=$link->prepare($sql0);
 $stmt0->execute();
 

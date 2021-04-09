@@ -14,7 +14,7 @@ switch ($which){
 	$title='Attendance Errors';
 	$formdesc='<br></i><h3>No Time In Today</h3><i>';
        
-        $sqlmain='SELECT a.*,concat(FirstName,\' \',SurName) as `FullName` FROM attend_45lookupattend a JOIN `1employees` e ON e.IDNo=a.IDNo ';
+        $sqlmain='SELECT a.*,concat(FirstName,\' \',SurName) as `FullName`, OTType, IF(OTApproval=2,"Pre-approved",IF(OTApproval=1,"HR Approved","")) AS OT_Approval FROM attend_45lookupattend a JOIN `1employees` e ON e.IDNo=a.IDNo LEFT JOIN attend_0ottype ot ON ot.OTTypeNo=a.OTTypeNo ';
 		
 		$sql=$sqlmain.' WHERE (TimeIn IS NULL) AND DateToday=CURDATE() AND LeaveNo NOT IN (10,14,15,16,19,22,31,32) ORDER BY Branch, FullName ASC';
         $columnnames=array('DateToday', 'IDNo', 'FullName','RemarksDept','RemarksHR', 'Branch'); $width='60%';
@@ -25,7 +25,7 @@ switch ($which){
         include_once 'attendsql/missingtimeinout.php';
             $sql='SELECT `a`.*, concat(e.FirstName,\' \',e.SurName) as `FullName` FROM attend_41missingtimeinout a JOIN `1employees` e ON `e`.IDNo=`a`.IDNo 
             ORDER BY DateToday, FullName';
-            $columnnames=array('TxnID','DateToday', 'IDNo', 'FullName','TimeIn','TimeOut','RemarksDept','RemarksHR','Overtime','LeaveName', 'Branch');$width='100%';
+            $columnnames=array('TxnID','DateToday', 'IDNo', 'FullName','TimeIn','TimeOut','RemarksDept','RemarksHR','OTType','OT_Approval','LeaveName', 'Branch');$width='100%';
 	    include('../backendphp/layout/displayastable.php');
 		
 		$title='WFH No Response';
@@ -34,13 +34,13 @@ switch ($which){
 	    include('../backendphp/layout/displayastable.php');
 		
 		$title='With Attendance on Restday'; $width='60%';
-		$sql=$sqlmain.' WHERE Overtime=0 AND LeaveNo=15 AND TimeIn IS NOT NULL AND TimeOut IS NOT NULL ORDER BY DateToday DESC, Branch, FullName ASC';
+		$sql=$sqlmain.' WHERE (OTApproval=0 OR a.OTTypeNo=0) AND LeaveNo=15 AND TimeIn IS NOT NULL AND TimeOut IS NOT NULL ORDER BY DateToday DESC, Branch, FullName ASC';
         $columnnames=array('DateToday', 'IDNo', 'FullName','RemarksDept','RemarksHR', 'Branch'); 
         include('../backendphp/layout/displayastable.php'); 
 		
 		
 		$title='Wrong Time Out'; ;
-		$sql=$sqlmain.' WHERE (Overtime<>3 AND TimeOut<"10:00") OR (Overtime=3 AND TimeOut>"08:00") ORDER BY DateToday DESC, Branch, FullName ASC';
+		$sql=$sqlmain.' WHERE (a.OTTypeNo<>13 AND TimeOut<"10:00") OR (a.OTTypeNo=13 AND TimeOut>"08:00") ORDER BY DateToday DESC, Branch, FullName ASC';
         $columnnames=array('DateToday', 'IDNo', 'FullName','TimeIn','TimeOut','RemarksDept','RemarksHR', 'Branch'); $width='70%';
         include('../backendphp/layout/displayastable.php'); 
 		

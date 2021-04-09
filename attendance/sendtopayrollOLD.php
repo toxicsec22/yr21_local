@@ -47,7 +47,7 @@ $dbrecipient=$link;
 
 include_once '../attendance/attendsql/attendsumforpayroll.php';
 $sql0='CREATE TEMPORARY TABLE FromAttendance  
-Select PayrollID, p.IDNo,RegDaysPresent,LWOPDays,LegalDays,SpecDays,p.SLDays,p.VLDays,RestDays,LWPDays,QDays,RegDaysActual,PaidLegalDays,RegExShiftHrsOT,RestShiftHrsOT,SpecShiftHrsOT,LegalShiftHrsOT,RestExShiftHrsOT,SpecExShiftHrsOT,LegalExShiftHrsOT,`DefaultBranchAssignNo` as `LatestAssignedBranchNo` from `attend_44sumforpayroll` as p join `attend_1defaultbranchassign` on `attend_1defaultbranchassign`.IDNo=p.IDNo 
+Select PayrollID, p.IDNo,RegDaysPresent,LWOPDays,LegalDays,SpecDays,p.SLDays,p.VLDays,RestDays,LWPDays,QDays,RegDaysActual,LegalHrsOT,SpecHrsOT,RestHrsOT,PaidLegalDays,RegOTHrs,`DefaultBranchAssignNo` as `LatestAssignedBranchNo` from `attend_44sumforpayroll` as p join `attend_1defaultbranchassign` on `attend_1defaultbranchassign`.IDNo=p.IDNo 
 JOIN `1employees` e ON e.IDNo=p.IDNo
 WHERE e.`DirectOrAgency`=0 AND PayrollID='.$_POST['payrollid'];
 //echo $sql0;
@@ -60,7 +60,7 @@ $stmt2=$link->prepare('Select * from FromAttendance');
 foreach ($result as $row){
 $sqlinsert='INSERT INTO `payroll_20fromattendance` SET ';
         $sql='';
-        $columnstoadd=array('PayrollID','IDNo','RegDaysPresent','LWOPDays','QDays','LegalDays','SpecDays','SLDays','VLDays','RestDays','LWPDays','RegDaysActual','PaidLegalDays','RegExShiftHrsOT','RestShiftHrsOT','SpecShiftHrsOT','LegalShiftHrsOT','RestExShiftHrsOT','SpecExShiftHrsOT','LegalExShiftHrsOT','LatestAssignedBranchNo');
+        $columnstoadd=array('PayrollID','IDNo','RegDaysPresent','LWOPDays','QDays','LegalDays','SpecDays','SLDays','VLDays','RestDays','LWPDays','RegDaysActual','LegalHrsOT','SpecHrsOT','RestHrsOT','PaidLegalDays','RegOTHrs','LatestAssignedBranchNo');
        
 	foreach ($columnstoadd as $field) {
 		$sql=$sql.' `' . $field. '`=\''.$row[$field].'\', '; 

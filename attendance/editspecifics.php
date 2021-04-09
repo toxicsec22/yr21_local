@@ -12,11 +12,8 @@ case 'attend':
     if (!allowedToOpen(615,'1rtc')){ echo 'No permission'; exit;}
 $attenddate=$_REQUEST['AttendDate'];
 $title='Edit Attendance';
-   // $minorswitch='attendanceswitch.php';
-   // $minorswitchname='Attendance Switchboard';
-// $columnnames=array('TxnID','DateToday','IDNo','FullName','TimeIn','TimeOut','RemarksHR','Overtime','Branch','GroupHead','LeaveNo', 'LeaveName');
-$columnnames=array('TxnID','DateToday','IDNo','FullName','TimeIn','TimeOut','RemarksHR','Overtime','Branch','LeaveNo', 'LeaveName');
-$columnstoedit=array('TimeIn','TimeOut','RemarksHR','Overtime','LeaveNo');
+$columnnames=array('TxnID','DateToday','IDNo','FullName','TimeIn','TimeOut','RemarksHR','OTApproval','OTTypeNo','Branch','LeaveNo', 'LeaveName');
+$columnstoedit=array('TimeIn','TimeOut','RemarksHR','OTApproval','OTTypeNo','LeaveNo');
 $columnslist=array('LeaveNo'); //not sure which of these is used
 $listsname=array('LeaveNo'=>'leaves'); 
 $liststoshow=array('leaves');

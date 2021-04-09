@@ -46,11 +46,11 @@ $title='Attendance Per Dept Per Day';
 <?php
 if (allowedToOpen(608,'1rtc')){ $deptcondition='1=1'; }
 $date=(!isset($_POST['DateToday'])?date('Y-m-d'):$_POST['DateToday']);
-$sql='SELECT `a`.*,LEFT(TimeIn,5) AS TimeIn,LEFT(TimeOut,5) AS TimeOut, Position, concat(FirstName," ",SurName) as `FullName` FROM attend_45lookupattend a JOIN `1employees` on `1employees`.IDNo=`a`.IDNo 
-          JOIN `attend_30currentpositions` p ON a.IDNo=p.IDNo
+$sql='SELECT `a`.*,LEFT(TimeIn,5) AS TimeIn,LEFT(TimeOut,5) AS TimeOut, Position, concat(FirstName," ",SurName) as `FullName`, OTType, IF(OTApproval=2,"Pre-approved",IF(OTApproval=1,"HR Approved","")) AS OT_Approval FROM attend_45lookupattend a JOIN `1employees` on `1employees`.IDNo=`a`.IDNo 
+          JOIN `attend_30currentpositions` p ON a.IDNo=p.IDNo LEFT JOIN attend_0ottype ot ON ot.OTTypeNo=a.OTTypeNo
         WHERE '.$deptcondition.' AND DateToday=\''.$date.'\' ORDER BY Branch, FullName, DateToday';
 	
-        $columnnames=array('DateToday','IDNo','FullName','Position','TimeIn','TimeOut','RemarksHR','RemarksDept','Shift','Overtime','LeaveName', 'Branch');
+        $columnnames=array('DateToday','IDNo','FullName','Position','TimeIn','TimeOut','RemarksHR','RemarksDept','Shift','OT_Approval','OTType','LeaveName', 'Branch');
 
 $width='80%';
      include('../backendphp/layout/displayastable.php');
@@ -88,13 +88,13 @@ echo '<h4>Absences</h4>';
         
 		
 echo '<h4>Actual Attendance</h4>';
-      $sql='SELECT `a`.*,LEFT(TimeIn,5) AS TimeIn,LEFT(TimeOut,5) AS TimeOut, concat(FirstName," ",SurName) as `FullName` FROM attend_45lookupattend a JOIN `1employees` on `1employees`.IDNo=`a`.IDNo 
-          JOIN `attend_30currentpositions` p ON a.IDNo=p.IDNo
+      $sql='SELECT `a`.*,LEFT(TimeIn,5) AS TimeIn,LEFT(TimeOut,5) AS TimeOut, concat(FirstName," ",SurName) as `FullName`, IF(a.OTTypeNo=0,"",OTType) AS OTType, IF(OTApproval=2,"Pre-approved", IF(OTApproval=1,"HR Approved","")) AS OT_Approval   FROM attend_45lookupattend a JOIN `1employees` on `1employees`.IDNo=`a`.IDNo 
+          JOIN `attend_30currentpositions` p ON a.IDNo=p.IDNo LEFT JOIN attend_0ottype ot ON ot.OTTypeNo=a.OTTypeNo
         WHERE  '.$deptcondition.' AND Month(DateToday)='.$month; 
         $orderby='FullName';
 		$sql .= ' ORDER BY DateToday, Branch';
         
-        $columnnames=array('DateToday','IDNo','FullName','TimeIn','TimeOut','RemarksHR','RemarksDept','Shift','Overtime','LeaveName', 'Branch');
+        $columnnames=array('DateToday','IDNo','FullName','TimeIn','TimeOut','RemarksHR','RemarksDept','Shift','OTType','OT_Approval','LeaveName', 'Branch');
         
         include('../backendphp/layout/displayastable.php');
 break;
@@ -186,12 +186,12 @@ break;
 		$formdesc=!isset($_POST['IDNo'])?'':'</i><br><br>IDNo '.$_POST['IDNo'].' :  '.$fname.' of '.$lname.'<br><i>';
 	}
     
-    $sql='SELECT `a`.*,LEFT(TimeIn,5) AS TimeIn,LEFT(TimeOut,5) AS TimeOut, concat(e.FirstName," ",e.SurName) as `FullName`,concat(e1.FirstName," ",e1.SurName) as `INEncodedBy`,concat(e2.FirstName," ",e2.SurName) as `OUTEncodedBy`, MONTH(DateToday) AS `Month`  FROM attend_45lookupattend a JOIN `1employees` e on `e`.IDNo=`a`.IDNo 
+    $sql='SELECT `a`.*,LEFT(TimeIn,5) AS TimeIn,LEFT(TimeOut,5) AS TimeOut, concat(e.FirstName," ",e.SurName) as `FullName`,concat(e1.FirstName," ",e1.SurName) as `INEncodedBy`,concat(e2.FirstName," ",e2.SurName) as `OUTEncodedBy`, MONTH(DateToday) AS `Month`, IF(a.OTTypeNo=0,"",OTType) AS OTType, IF(OTApproval=2,"Pre-approved", IF(OTApproval=1,"HR Approved","")) AS OT_Approval    FROM attend_45lookupattend a JOIN `1employees` e on `e`.IDNo=`a`.IDNo LEFT JOIN attend_0ottype ot ON ot.OTTypeNo=a.OTTypeNo
           LEFT JOIN `1employees` e1 ON a.`TIEncby`=e1.IDNo LEFT JOIN `1employees` e2 ON a.`TOEncby`=e2.IDNo
 		  LEFT JOIN attend_30currentpositions p ON a.IDNo=p.IDNo 
         WHERE  '.$deptcondition.' AND a.IDNo='.$_POST['IDNo'].'  ORDER BY DateToday'; //AND PayrollID='.$_POST['payperiod'].'
 // echo $deptcondition;
-$columnnames=array('DateToday','TimeIn','TimeOut','RemarksHR','RemarksDept','Shift','Overtime','LeaveName', 'INEncodedBy','OUTEncodedBy','Branch');
+$columnnames=array('DateToday','TimeIn','TimeOut','RemarksHR','RemarksDept','Shift','OTType','OT_Approval','LeaveName', 'INEncodedBy','OUTEncodedBy','Branch');
 
 if(isset($_POST['ColorField']) AND $_POST['ColorField']==0){
 	$changecolorfield='Month';
@@ -222,11 +222,11 @@ if(isset($_POST['ColorField']) AND $_POST['ColorField']==0){
     if(!isset($_POST['BranchNo'])) { goto nodata;}
     $name=comboBoxValue($link, '`1branches`', 'BranchNo', $_POST['BranchNo'], 'Branch');
     $formdesc=!isset($_POST['BranchNo'])?'':'</i><br><br>BranchNo '.$_POST['BranchNo'].' :  '.$name.'<i>';
-    $sql='SELECT `a`.*,LEFT(TimeIn,5) AS TimeIn,LEFT(TimeOut,5) AS TimeOut, concat(FirstName," ",SurName) as `FullName` FROM attend_45lookupattend a JOIN `1employees` e on `e`.IDNo=`a`.IDNo 
-          JOIN `attend_30currentpositions` p ON a.IDNo=p.IDNo
+    $sql='SELECT `a`.*,LEFT(TimeIn,5) AS TimeIn,LEFT(TimeOut,5) AS TimeOut, concat(FirstName," ",SurName) as `FullName`, OTType, IF(OTApproval=2,"Pre-approved",IF(OTApproval=1,"HR Approved","")) AS OT_Approval   FROM attend_45lookupattend a JOIN `1employees` e on `e`.IDNo=`a`.IDNo 
+          JOIN `attend_30currentpositions` p ON a.IDNo=p.IDNo LEFT JOIN attend_0ottype ot ON ot.OTTypeNo=a.OTTypeNo
         WHERE  '.$deptcondition.' AND a.BranchNo='.$_POST['BranchNo'].' AND PayrollID='.$_POST['payperiod'].' ORDER BY DateToday';
 
-$columnnames=array('DateToday','IDNo','FullName','TimeIn','TimeOut','RemarksHR','RemarksDept','Shift','Overtime','LeaveName', 'Branch');
+$columnnames=array('DateToday','IDNo','FullName','TimeIn','TimeOut','RemarksHR','RemarksDept','Shift','OTType','OT_Approval','LeaveName', 'Branch');
      include('../backendphp/layout/displayastable.php');
      
        break;     

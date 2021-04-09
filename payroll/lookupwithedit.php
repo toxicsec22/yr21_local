@@ -94,12 +94,12 @@ skipsession:
             $sql='SELECT a.*, NickName,FirstName,SurName, IF(deptid IN (10,2,3,4),Branch,Dept) AS Branch,IF(e.Resigned=0,"","Resigned") AS `Resigned?`, IF((`SLDays` + `VLDays` + `LWPDays` + `QDays` + `RegDaysPresent`)=0,0,if(LatestDorM=0,(RegDaysActual+PaidLegalDays+a.SLDays+VLDays+LWPDays),(RegDaysActual+PaidLegalDays+a.SLDays+VLDays+LWPDays+SpecDays))) AS DaysToBePaid FROM `payroll_20fromattendance` a JOIN `1employees` `e` ON `a`.`IDNo` = `e`.`IDNo` LEFT JOIN attend_30currentpositions cp ON e.IDNo=cp.IDNo AND a.IDNo=cp.IDNo JOIN payroll_20latestrates lr ON a.IDNo=lr.IDNo ';
             $orderby='IDNo';
 	    $txnid='TxnID';
-            $columnnames=array('IDNo','NickName','FirstName','SurName','Branch','Resigned?','RegDaysPresent','LWOPDays','LegalDays','SpecDays','SLDays','VLDays','RestDays','LWPDays','QDays','RegDaysActual','LegalHrsOT','SpecHrsOT','RestHrsOT','PaidLegalDays','RegOTHrs','ExcessRestHrsOT','DaysToBePaid');
+            $columnnames=array('IDNo','NickName','FirstName','SurName','Branch','Resigned?','RegDaysPresent','LWOPDays','LegalDays','SpecDays','SLDays','VLDays','RestDays','LWPDays','QDays','RegDaysActual','PaidLegalDays','RegExShiftHrsOT','RestShiftHrsOT','SpecShiftHrsOT','LegalShiftHrsOT','RestExShiftHrsOT','SpecExShiftHrsOT','LegalExShiftHrsOT','DaysToBePaid');
             if ($_GET['edit']==2){
             $txnid=intval($_GET['TxnID']);
             $sql=$sql.' WHERE (a.TxnID)=\''.$txnid.'\'';
             $action='prpayrolldata.php?edit=2&w=AttendPerPayID&TxnID='.$txnid;
-	    $columnstoedit=array('LWOPDays','LegalDays','SpecDays','SLDays','VLDays','RestDays','LWPDays','QDays','RegDaysActual','LegalHrsOT','SpecHrsOT','RestHrsOT','PaidLegalDays','RegOTHrs','ExcessRestHrsOT');
+	    $columnstoedit=array('LWOPDays','LegalDays','SpecDays','SLDays','VLDays','RestDays','LWPDays','QDays','RegDaysActual','PaidLegalDays','RegExShiftHrsOT','RestShiftHrsOT','SpecShiftHrsOT','LegalShiftHrsOT','RestExShiftHrsOT','SpecExShiftHrsOT','LegalExShiftHrsOT');
 	    include('../backendphp/layout/rendersubform.php');
 	    } else { 
 	    include('payrolllayout/displayandeditpayrolldata.php');

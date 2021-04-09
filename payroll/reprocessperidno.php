@@ -35,7 +35,7 @@ $idno=$_POST['IDNo'];
 $sqlattend='SELECT a.*, FirstName,SurName FROM payroll_20fromattendance a JOIN 1employees e ON e.IDNo=a.IDNo WHERE a.PayrollID='.$payrollid.' AND e.IDNo='.$idno;
 $stmtattend=$link->query($sqlattend); $resattend=$stmtattend->fetch();
 
-$attendcolumns=array('RegDaysPresent', 'LWOPDays', 'LegalDays', 'SpecDays', 'SLDays','VLDays', 'RestDays', 'LWPDays','QDays', 'RegDaysActual', 'LegalHrsOT', 'SpecHrsOT', 'RestHrsOT','ExcessRestHrsOT', 'RegOTHrs');
+$attendcolumns=array('RegDaysPresent', 'LWOPDays', 'LegalDays', 'SpecDays', 'SLDays','VLDays', 'RestDays', 'LWPDays','QDays', 'RegDaysActual','RegDaysActual','RegExShiftHrsOT','RestShiftHrsOT','SpecShiftHrsOT','LegalShiftHrsOT','RestExShiftHrsOT','SpecExShiftHrsOT','LegalExShiftHrsOT');
 $attend=''; 
 foreach ($attendcolumns as $attendcol){
     $attend.=$attendcol.'&nbsp; <input type=text size=4 name='.$attendcol.' value="'.$resattend[$attendcol].'" ><br>';

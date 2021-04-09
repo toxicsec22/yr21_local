@@ -26,11 +26,14 @@ $editok=(($res0['Posted']==0) AND ($res1['Approval']==0))?TRUE:FALSE;
 $file='payrolladjust.php?w='; 
 
 if (in_array($which, array('List','EditAttend'))){
-    $zeroblank=array('SpecDays','LWPDays','RegDaysActual','LegalHrsOT','SpecHrsOT','RestHrsOT','PaidLegalDays','RegOTHrs','ExcessRestHrsOT');
+    $zeroblank=array('SpecDays','LWPDays','RegDaysActual','PaidLegalDays','RegExShiftHrsOT','RestShiftHrsOT','SpecShiftHrsOT','LegalShiftHrsOT','RestExShiftHrsOT','SpecExShiftHrsOT','LegalExShiftHrsOT');
     $sqlattend='';
     foreach ($zeroblank as $field) { $sqlattend.='IF(`'.$field.'`=0,"",`'.$field.'`) AS `'.$field.'`, ';}
     $sqlattend='SELECT a.*,'.$sqlattend.' CONCAT(e.FirstName, " ", e.SurName) AS FullName, IFNULL(Branch,"No payroll yet") AS Branch, e2.Nickname AS EncodedBy FROM payroll_50adjattendance a JOIN 1employees e ON e.IDNo=a.IDNo LEFT JOIN payroll_25payroll p ON p.PayrollID=a.AdjInPayrollID AND p.IDNo=a.IDNo LEFT JOIN 1branches b ON b.BranchNo=p.`RecordInBranchNo` JOIN 1employees e2 ON e2.IDNo=a.EncodedByNo ';
-    $columnnamesattend=array('LackInPayrollID','IDNo','FullName','Branch','Remarks','SpecDays','LWPDays','RegDaysActual','LegalHrsOT','SpecHrsOT','RestHrsOT','PaidLegalDays','RegOTHrs','ExcessRestHrsOT');
+
+    $columnnamesattend=array('LackInPayrollID','IDNo','FullName','Branch','Remarks','SpecDays','LWPDays','RegDaysActual','PaidLegalDays','RegExShiftHrsOT','RestShiftHrsOT','SpecShiftHrsOT','LegalShiftHrsOT','RestExShiftHrsOT','SpecExShiftHrsOT','LegalExShiftHrsOT');
+    
+	    
 }
 
 if (in_array($which, array('List','EditPay'))){
@@ -49,7 +52,7 @@ if (in_array($which, array('AddAttend','EditAttend','EditAttendPr','DelAttend','
 }
 
 if (in_array($which, array('AddAttend','EditAttend','EditAttendPr','DelAttend'))){
-    $columnstoadd=array('LackInPayrollID','IDNo','Remarks','SpecDays','LWPDays','RegDaysActual','LegalHrsOT','SpecHrsOT','RestHrsOT','PaidLegalDays','RegOTHrs','ExcessRestHrsOT');
+    $columnstoadd=array('LackInPayrollID','IDNo','Remarks','SpecDays','LWPDays','RegDaysActual','PaidLegalDays','RegExShiftHrsOT','RestShiftHrsOT','SpecShiftHrsOT','LegalShiftHrsOT','RestExShiftHrsOT','SpecExShiftHrsOT','LegalExShiftHrsOT');
     if(empty($_POST['Remarks'])) { $columnstoadd= array_diff($columnstoadd, array('Remarks'));}
     $table='payroll_50adjattendance';
 }
@@ -76,26 +79,26 @@ case 'List':
 	    <?php
 
     if($editok){
+
+        $fields=array('RegDaysActual','PaidLegalDays','RegExShiftHrsOT','RestShiftHrsOT','SpecShiftHrsOT','LegalShiftHrsOT','RestExShiftHrsOT','SpecExShiftHrsOT','LegalExShiftHrsOT');
+
        
     $columnnames=array(
                     array('field'=>'LackInPayrollID', 'caption'=>'<h4 style="color:lightgrey;">Please follow the format of Attendance Basis for Payroll</h4><br>Lacking in Payroll ID','type'=>'number min="1" max="'.($payrollid-1).'"','size'=>5,'required'=>true),
                     array('field'=>'IDNo', 'type'=>'text','size'=>10,'required'=>true,'list'=>'employeeid'),
                     array('field'=>'SpecDays', 'type'=>'number min="1" max="13"','size'=>5,'required'=>FALSE),
-                    array('field'=>'LWPDays', 'type'=>'number min="1" max="13"','size'=>5,'required'=>FALSE),
-                    array('field'=>'RegDaysActual', 'type'=>'text','size'=>5,'required'=>FALSE),
-                    array('field'=>'PaidLegalDays', 'type'=>'text','size'=>5,'required'=>FALSE),
-                    array('field'=>'LegalHrsOT', 'type'=>'text','size'=>5,'required'=>FALSE),
-                    array('field'=>'SpecHrsOT', 'type'=>'text','size'=>5,'required'=>FALSE),
-                    array('field'=>'RestHrsOT', 'type'=>'text','size'=>5,'required'=>FALSE),
-                    array('field'=>'RegOTHrs', 'type'=>'text','size'=>5,'required'=>FALSE),
-                    array('field'=>'ExcessRestHrsOT', 'type'=>'text','size'=>5,'required'=>FALSE),
-                    array('field'=>'Remarks', 'caption'=>'Remarks regarding attendance', 'type'=>'text','size'=>50, 'required'=>false)
+                    array('field'=>'LWPDays', 'type'=>'number min="1" max="13"','size'=>5,'required'=>FALSE));
+
+        foreach ($fields as $fld){
+            $columnnames[]=array('field'=>$fld, 'type'=>'text','size'=>5,'required'=>FALSE);
+        }            
+
+        $columnnames[]=array('field'=>'Remarks', 'caption'=>'Remarks regarding attendance', 'type'=>'text','size'=>50, 'required'=>false);
         
-        );
                     
     
     $action=$file.'AddAttend';
-    $liststoshow=array('employeeid'); $fieldsinrow=7; $fieldsetwidth='65%';
+    $liststoshow=array('employeeid'); $fieldsinrow=6; $fieldsetwidth='85%';
     $editprocess=$file.'EditAttend&action_token='.html_escape($_SESSION['action_token']).'&TxnID='; $editprocesslabel='Edit';
     $delprocess=$file.'DelAttend&TxnID=';
     $editprocess3=$file.'ProcessPer&action_token='.html_escape($_SESSION['action_token']).'&TxnID='; $editprocesslabel3='Process';
@@ -163,7 +166,13 @@ case 'ProcessPer':
 TRUNCATE(if(r.LatestDorM=0,LatestBasicRate,LatestBasicRate/13.04)*(SELECT DaysAdj),2) AS `Basic`,
 TRUNCATE(if(r.LatestDorM=0,LatestDeMinimisRate,LatestDeMinimisRate/13.04)*(SELECT DaysAdj),2) AS `DeM`,
 TRUNCATE(if(r.LatestDorM=0,LatestTaxShield,LatestTaxShield/13.04)*(SELECT DaysAdj),2) AS `TaxSh`,
-TRUNCATE(if(r.LatestDorM=0,LatestBasicRate/8,(LatestBasicRate/13.04/8))*((LegalHrsOT)+((SpecHrsOT+RestHrsOT)*1.3)+(RegOTHrs*1.25)+(ExcessRestHrsOT*1.3*1.3)),2) AS OT
+TRUNCATE(if(r.LatestDorM=0,(LatestBasicRate)/8,(LatestBasicRate)/ 13.04/8)*((RegExShiftHrsOT*1.25)+
+(RestShiftHrsOT*1.3)+
+(SpecShiftHrsOT*1.3)+
+LegalShiftHrsOT+
+(RestExShiftHrsOT*1.3*1.3)+
+(SpecExShiftHrsOT*1.3*1.3)+
+(LegalExShiftHrsOT*2*1.3)),2) AS OT
 FROM `payroll_50adjattendance` a JOIN `payroll_20latestrates` r ON a.IDNo=r.IDNo JOIN `1employees` e ON a.IDNo = e.IDNo WHERE (a.AdjInPayrollID='.$payrollid.' AND r.DirectOrAgency=0) AND a.TxnID='.$txnid;
     $stmt=$link->prepare($sql0); $stmt->execute();
     $sql='';

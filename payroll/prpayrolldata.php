@@ -51,7 +51,7 @@ switch ($whichqry){
             $txnid=intval($_REQUEST['TxnID']);
             //echo $txnid;
             if (allowedToOpen(8163,'1rtc')){
-            $columnstoedit=array('LWOPDays','LegalDays','SpecDays','SLDays','VLDays','RestDays','LWPDays','QDays','RegDaysActual','LegalHrsOT','SpecHrsOT','RestHrsOT','PaidLegalDays','RegOTHrs','LatestAssignedBranchNo');
+            $columnstoedit=array('LWOPDays','LegalDays','SpecDays','SLDays','VLDays','RestDays','LWPDays','QDays','RegDaysActual','PaidLegalDays','RegExShiftHrsOT','RestShiftHrsOT','SpecShiftHrsOT','LegalShiftHrsOT','RestExShiftHrsOT','SpecExShiftHrsOT','LegalExShiftHrsOT');
             } else {
                 $columnstoedit=array();
 	    }

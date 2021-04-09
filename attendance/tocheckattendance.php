@@ -60,15 +60,7 @@ if (in_array($whichqry,array('summary_for_payroll','my_attendance'))){
 		  }
             include('../backendphp/layout/displayastablewithsub.php');
 		  
-		  
-		  
-            // $title='Attendance Dates';
-            // $sql='SELECT d.*,t.TypeofDayName FROM attend_2attendancedates d join `attend_0typeofday` t on t.TypeOfDayNo=d.TypeofDayNo order by DateToday;';
-            // $orderby='';
-	    // $txnid='TxnID';
-            // $columnnames=array('PayrollID','DateToday', 'TypeofDayName','RemarksOnDates','CheckDateBefore','CheckDateAfter','Posted');
-	    // $editprocess='editspecifics.php?w=attend_dates&edit=2&TxnID=';$editprocesslabel='Edit';
-            // include('../backendphp/layout/displayastablewithedit.php');
+	
             break;
 			
 		case'unpost':
@@ -96,7 +88,7 @@ if (in_array($whichqry,array('summary_for_payroll','my_attendance'))){
             //$pagetouse='../backendphp/layout/displayastablewithdatecondition.php?calledfrom=7';
             $sql='SELECT `a`.*, concat(FirstName," ",SurName) as `FullName` FROM `attend_45lookupattend` a JOIN `1employees` e ON `e`.IDNo=`a`.IDNo WHERE ((STR_TO_DATE(`TimeIn`,\'%l:%i %p\'))>\'08:00:59\') ';
             $orderby='DateToday, FullName';    
-            $columnnames=array('TxnID','DateToday', 'IDNo', 'FullName','TimeIn','TimeOut','RemarksDept','RemarksHR','Overtime','LeaveName', 'Branch');
+            $columnnames=array('TxnID','DateToday', 'IDNo', 'FullName','TimeIn','TimeOut','RemarksDept','RemarksHR','OTApproval','OTTypeNo','LeaveName', 'Branch');
             include('../backendphp/layout/displayastablewithdatecondition.php');
             break;
         case 'time_out_before_5':
@@ -105,7 +97,7 @@ if (in_array($whichqry,array('summary_for_payroll','my_attendance'))){
             $pagetouse='tocheckattendance.php?calledfrom=7&qry=time_out_before_5';
             $sql='SELECT `a`.*, CONCAT(FirstName," ",SurName) as `FullName` FROM `attend_45lookupattend` a JOIN `1employees` e ON `e`.IDNo=`a`.IDNo WHERE  ((STR_TO_DATE(`TimeOut`,\'%l:%i %p\'))<(IF(DAYOFWEEK(DateToday)=7,IF(WithSat=2,\'17:00:00\',\'12:00:00\'),\'17:00:00\')))';
             $orderby='DateToday, FullName';    
-            $columnnames=array('TxnID','DateToday', 'IDNo', 'FullName','TimeIn','TimeOut','RemarksDept','RemarksHR','Overtime','LeaveName', 'Branch');
+            $columnnames=array('TxnID','DateToday', 'IDNo', 'FullName','TimeIn','TimeOut','RemarksDept','RemarksHR','OTApproval','OTTypeNo','LeaveName', 'Branch');
             include('../backendphp/layout/displayastablewithdatecondition.php');
             break;
         case 'check_overtime': 
@@ -113,9 +105,9 @@ if (in_array($whichqry,array('summary_for_payroll','my_attendance'))){
             $title='Approved Overtime';
             $pagetouse='tocheckattendance.php?calledfrom=7&qry=check_overtime';
             $sql='SELECT `a`.*, concat(FirstName," ",SurName) as `FullName` FROM `attend_45lookupattend` a JOIN `1employees` e ON `e`.IDNo=`a`.IDNo WHERE 
- `Overtime`<>0';
+ `OTApproval`<>0';
             $orderby='DateToday, FullName';    
-            $columnnames=array('TxnID','DateToday', 'IDNo', 'FullName','TimeIn','TimeOut','RemarksDept','RemarksHR','Overtime','LeaveName', 'Branch');
+            $columnnames=array('TxnID','DateToday', 'IDNo', 'FullName','TimeIn','TimeOut','RemarksDept','RemarksHR','OTApproval','OTTypeNo','LeaveName', 'Branch');
             include('../backendphp/layout/displayastablewithdatecondition.php');
             break;
         case 'attendance_per_payperiod':
@@ -124,23 +116,23 @@ if (in_array($whichqry,array('summary_for_payroll','my_attendance'))){
             $pagetouse='tocheckattendance.php?calledfrom=7&qry=attendance_per_payperiod';
             $sql='SELECT `attend_45lookupattend`.*, concat(FirstName,\' \',SurName) as `FullName` FROM attend_45lookupattend inner join `1employees` on `1employees`.IDNo=`attend_45lookupattend`.IDNo WHERE ((`attend_45lookupattend`.Posted)<>\'0\')';
             $orderby='DateToday, FullName';    
-            $columnnames=array('TxnID','DateToday', 'IDNo', 'FullName','TimeIn','TimeOut','RemarksDept','RemarksHR','Overtime','LeaveName', 'Branch');
+            $columnnames=array('TxnID','DateToday', 'IDNo', 'FullName','TimeIn','TimeOut','RemarksDept','RemarksHR','OTApproval','OTTypeNo','LeaveName', 'Branch');
             include('../backendphp/layout/displayastablewithdatecondition.php');
             break;
-        case 'summary_for_payroll':
+        case 'summary_for_payrollOLD':
             if (!allowedToOpen(635,'1rtc')){ echo 'No permission'; exit;}
 				
-				$title='Summary For Payroll';
+				$title='Summary For Payroll OLD';
 				echo '<title>'.$title.'</title>';
 				echo '<br><h3>'.$title.'</h3>';
 				
-				echo '<form action="tocheckattendance.php?calledfrom=7&qry=summary_for_payroll" method="POST">payperiod: <input type="text" size="5" name="payrollid" list="payperiods"><input type="submit" name="btnSubmit" value="Lookup"/></form>';
+				echo '<form action="tocheckattendance.php?calledfrom=7&qry=summary_for_payrollOLD" method="POST">payperiod: <input type="text" size="5" name="payrollid" list="payperiods"><input type="submit" name="btnSubmit" value="Lookup"/></form>';
 			
 				
 				$title='';
 				$formdesc='</i>payperiod: '.$_POST['payrollid'].'<i>';
-				$pagetouse='tocheckattendance.php?calledfrom=7&qry=summary_for_payroll';
-                include_once '../attendance/attendsql/attendsumforpayroll.php';
+				$pagetouse='tocheckattendance.php?calledfrom=7&qry=summary_for_payrollOLD';
+                include_once '../attendance/attendsql/attendsumforpayrollOLD.php';
 				$sql='SELECT `attend_44sumforpayroll`.*, Nickname, FirstName, SurName from `attend_44sumforpayroll` join `1employees` on `attend_44sumforpayroll`.IDNo=`1employees`.IDNo WHERE PayrollID='.$_POST['payrollid'].'';
 			 $columnnames=array('IDNo', 'Nickname','FirstName','SurName','RegDaysPresent','LWOPDays','LegalDays','SpecDays','SLDays','VLDays','LWPDays','QDays','RestDays','RegDaysActual','LegalHrsOT','SpecHrsOT','RestHrsOT','ExcessRestHrsOT','PaidLegalDays','RegOTHrs');
 				$orderby='IDNo';
@@ -148,6 +140,29 @@ if (in_array($whichqry,array('summary_for_payroll','my_attendance'))){
 				include('../backendphp/layout/displayastable.php');
 			
             break;
+
+            case 'summary_for_payroll':
+                if (!allowedToOpen(635,'1rtc')){ echo 'No permission'; exit;}
+                    
+                    $title='Summary For Payroll';
+                    echo '<title>'.$title.'</title>';
+                    echo '<br><h3>'.$title.'</h3>';
+                    
+                    echo '<form action="tocheckattendance.php?calledfrom=7&qry=summary_for_payroll" method="POST">payperiod: <input type="text" size="5" name="payrollid" list="payperiods"><input type="submit" name="btnSubmit" value="Lookup"/></form>';
+                
+                    
+                    $title='';
+                    $formdesc='</i>payperiod: '.$_POST['payrollid'].'<i>';
+                    $pagetouse='tocheckattendance.php?calledfrom=7&qry=summary_for_payroll';
+                    include_once '../attendance/attendsql/attendsumforpayroll.php';
+                    $sql='SELECT `attend_44sumforpayroll`.*, Nickname, FirstName, SurName from `attend_44sumforpayroll` join `1employees` on `attend_44sumforpayroll`.IDNo=`1employees`.IDNo WHERE PayrollID='.$_POST['payrollid'].'';
+                 $columnnames=array('IDNo', 'Nickname','FirstName','SurName','RegDaysPresent','LWOPDays','LegalDays','SpecDays','SLDays','VLDays','LWPDays','QDays','RestDays','RegDaysActual','LegalShiftHrsOT','LegalExShiftHrsOT','SpecShiftHrsOT','SpecExShiftHrsOT','RestShiftHrsOT','RestExShiftHrsOT','PaidLegalDays','RegExShiftHrsOT');
+                    $orderby='IDNo';
+                    
+                    include('../backendphp/layout/displayastable.php');
+                
+                break;
+
 	   case 'PerCompanyList':
             include_once $path.'/acrossyrs/commonfunctions/listoptions.php';
             $title='Employee List From '.companyandbranchValue($link,'1companies','CompanyNo', $_GET['RCompanyNo'],'Company') . ' Company';
@@ -300,7 +315,7 @@ if (in_array($whichqry,array('summary_for_payroll','my_attendance'))){
              
             $title='My Attendance Per Payroll Period'; 
             $sql='SELECT *, DateToday AS `Date` FROM attend_45lookupattend WHERE (IDNo='.$_SESSION['(ak0)'].') AND PayrollID='.$_POST['payrollid'].' ORDER BY DateToday';
-            $columnnames=array('TxnID','Date', 'IDNo', 'TimeIn','TimeOut','RemarksHR','Overtime','LeaveName', 'Branch');
+            $columnnames=array('TxnID','Date', 'IDNo', 'TimeIn','TimeOut','RemarksHR','OTApproval','OTTypeNo','LeaveName', 'Branch');
             $width='60%';
             include('../backendphp/layout/displayastable.php');
             break;
