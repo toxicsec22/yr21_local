@@ -22,7 +22,7 @@ if (in_array($which,array('RequestOT','Submit','OTPerPersonPerPayrollID','TotalO
 	$listsql='SELECT PayrollID, concat(PayrollID, " : ", FromDate, " - ", ToDate) as PayPeriod FROM payroll_1paydates;';
 	$_POST['payrollid']=(isset($_POST['payrollid'])?$_POST['payrollid']:((date('m')*2)+(date('d')<15?-1:0)));
     echo comboBox($link,$listsql,'PayPeriod','PayrollID','payperiods');
-	echo comboBox($link,'SELECT "Regular" AS TypeOfOvertime, 0 AS TypeOfOvertimeValue UNION SELECT "RDOT Regular Hrs" AS TypeOfOvertime, 2 AS TypeOfOvertimeValue UNION SELECT "RDOT Beyond 8 Hrs" AS TypeOfOvertime, 1 AS TypeOfOvertimeValue','TypeOfOvertimeValue','TypeOfOvertime','typeofovertimelist');
+	echo comboBox($link,'SELECT OTType, OTTypeNo FROM attend_0ottype','OTTypeNo','OTType','ottypes');
 }
 
 switch ($which){
@@ -42,7 +42,10 @@ switch ($which){
 	&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; for APPROVER: can approve until 18:00 [06:00 PM] (Otherwise, request status will tag automatically as "No Response").
 	</font><br>
 &nbsp; &nbsp; &nbsp; &nbsp; 6. There is a possible demerit if OT has not been requested.<br>
-&nbsp; &nbsp; &nbsp; &nbsp; 7. ONLY HR can override all OT on rare occasions.</div><br>';
+&nbsp; &nbsp; &nbsp; &nbsp; 7. ONLY HR can override all OT on rare occasions.</div><br>
+<div style="float:right; width:15%;"><font size="1">Overtime Types<br>0 - No Overtime<br>10 - Full Shift<br>11 - Pre Shift<br>12 - Post Shift<br>13 - After Midnight<br>23 - Pre and Post Shift<br>24 - Pre and Post Shift after Midnight<br><br></font></div>
+
+';
 
 		
 		
@@ -75,7 +78,7 @@ switch ($which){
         <form method='post' action='otrequest.php?w=Submit'>
             Date Today/Future Date <input type='date' name='DateToday' value='<?php echo date('Y-m-d'); ?>'>&nbsp &nbsp &nbsp
             IDNo <input type='text' name='IDNo' value='' list='employees' size=7>&nbsp &nbsp &nbsp
-			Type Of Overtime: <input type='text' name='TypeOfOvertime' list="typeofovertimelist" size=9 required> &nbsp &nbsp &nbsp
+			Type Of Overtime: <input type='text' name='OTType' list="ottypes" size=9 required> &nbsp &nbsp &nbsp
             EndOfOT <input type='time' name='EndOfOT' value='19:00'> &nbsp &nbsp &nbsp<br>
             Reason <input type='text' name='Reason' size=50> &nbsp &nbsp &nbsp
             <input type="hidden" name="action_token" value="<?php echo html_escape($_SESSION['action_token']); ?>" />
@@ -103,10 +106,20 @@ switch ($which){
 			$showprocesslabel=','.$maincon.' AS showeditprocess,'.$maincon.' AS showaddlprocess';
 		}
 		
-        $sqlmain='SELECT if(TypeOfOvertime=0,"Regular",IF(TypeOfOvertime=1,"RDOT Beyond 8 Hrs","RDOT Regular Hrs")) as TypeOfOvertime,ot.TxnID,Position,ApprovedTS,PayrollID,CONCAT(e.Nickname," ",e.SurName) AS FullName,CONCAT(e3.Nickname," ",e3.SurName) AS ApprovedBy,CONCAT(e3.Nickname," ",e3.SurName) AS DeniedBy,ApprovedTS AS DeniedTS,CONCAT(e2.Nickname," ",e2.SurName) AS RequestedBy,RequestedTS, Branch, ot.DateToday AS DateOfOT,EndOfOT, Reason'.$showprocesslabel.' FROM approvals_5ot ot JOIN `1employees` e ON ot.IDNo=e.IDNo JOIN attend_1defaultbranchassign dba ON ot.IDNo=dba.IDNo JOIN 1branches b ON dba.DefaultBranchAssignNo=b.BranchNo JOIN 1employees e2 ON ot.RequestedByNo=e2.IDNo LEFT JOIN 1employees e3 ON ot.ApprovedByNo=e3.IDNo JOIN attend_2attendancedates ad ON ot.DateToday=ad.DateToday JOIN attend_30latestpositionsinclresigned lpir ON ot.IDNo=lpir.IDNo JOIN attend_0positions p ON lpir.PositionID=p.PositionID WHERE '.$addlcondi.' '.$morp.' AND ';
+        $sqlmain1='SELECT OTType,ot.TxnID,Position,ApprovedTS,PayrollID,CONCAT(e.Nickname," ",e.SurName) AS FullName,CONCAT(e3.Nickname," ",e3.SurName) AS ApprovedBy,CONCAT(e3.Nickname," ",e3.SurName) AS DeniedBy,ApprovedTS AS DeniedTS,CONCAT(e2.Nickname," ",e2.SurName) AS RequestedBy,RequestedTS, Branch, ot.DateToday AS DateOfOT,(CASE WHEN a.LeaveNo=15 THEN IF(ad.TypeOfDayNo IN (2,3),CONCAT(LeaveName," & ",TypeofDayName),LeaveName)
+		WHEN a.LeaveNo IN (12,13) THEN LeaveName
+		ELSE "" END) AS TypeofDay, EndOfOT, Reason ';
+		$sqlmain2=' FROM approvals_5ot ot
+		LEFT JOIN attend_0ottype t ON t.OTTypeNo=ot.OTTypeNo
+		JOIN attend_2attendancedates ad ON ot.DateToday=ad.DateToday 
+		JOIN attend_2attendance a ON a.IDNo=ot.IDNo AND a.DateToday=ot.DateToday
+		JOIN attend_0leavetype lt ON lt.LeaveNo=a.LeaveNo
+		JOIN attend_0typeofday td ON td.TypeofDayNo=ad.`TypeOfDayNo`
+		JOIN `1employees` e ON ot.IDNo=e.IDNo JOIN attend_1defaultbranchassign dba ON ot.IDNo=dba.IDNo JOIN 1branches b ON dba.DefaultBranchAssignNo=b.BranchNo JOIN 1employees e2 ON ot.RequestedByNo=e2.IDNo LEFT JOIN 1employees e3 ON ot.ApprovedByNo=e3.IDNo JOIN attend_30latestpositionsinclresigned lpir ON ot.IDNo=lpir.IDNo JOIN attend_0positions p ON lpir.PositionID=p.PositionID WHERE ';
+		$sqlmain=$sqlmain1.$showprocesslabel.$sqlmain2.$addlcondi.' '.$morp.' AND ';
 		
         $title='Pending OT Request'; 
-		$columnnames=array('FullName','Position','Branch','TypeOfOvertime','DateOfOT','PayrollID','EndOfOT','Reason','RequestedBy','RequestedTS');
+		$columnnames=array('FullName','Position','Branch','OTType','DateOfOT','TypeofDay','PayrollID','EndOfOT','Reason','RequestedBy','RequestedTS');
 		if (allowedToOpen(6212,'1rtc')){
 			$delprocess='otrequest.php?w=DeleteRequest&TxnID=';
 		}
@@ -124,24 +137,24 @@ switch ($which){
 		
 		$showprocesslabel=',IF(ot.DateToday>=CURDATE(),1,0) AS showeditprocess';
 		
-		$sqlmain='SELECT if(TypeOfOvertime=0,"Regular",IF(TypeOfOvertime=1,"RDOT Beyond 8 Hrs","RDOT Regular Hrs")) as TypeOfOvertime,ot.TxnID,Position,ApprovedTS,PayrollID,CONCAT(e.Nickname," ",e.SurName) AS FullName,CONCAT(e3.Nickname," ",e3.SurName) AS ApprovedBy,CONCAT(e3.Nickname," ",e3.SurName) AS DeniedBy,ApprovedTS AS DeniedTS,CONCAT(e2.Nickname," ",e2.SurName) AS RequestedBy,RequestedTS, Branch, ot.DateToday AS DateOfOT,EndOfOT, Reason'.$showprocesslabel.' FROM approvals_5ot ot JOIN `1employees` e ON ot.IDNo=e.IDNo JOIN attend_1defaultbranchassign dba ON ot.IDNo=dba.IDNo JOIN 1branches b ON dba.DefaultBranchAssignNo=b.BranchNo JOIN 1employees e2 ON ot.RequestedByNo=e2.IDNo LEFT JOIN 1employees e3 ON ot.ApprovedByNo=e3.IDNo JOIN attend_2attendancedates ad ON ot.DateToday=ad.DateToday JOIN attend_30latestpositionsinclresigned lpir ON ot.IDNo=lpir.IDNo JOIN attend_0positions p ON lpir.PositionID=p.PositionID WHERE '.$addlcondi.' '.$morp.' AND ';
-       
+		/*$sqlmain='SELECT OTType,ot.TxnID,Position,ApprovedTS,PayrollID,CONCAT(e.Nickname," ",e.SurName) AS FullName,CONCAT(e3.Nickname," ",e3.SurName) AS ApprovedBy,CONCAT(e3.Nickname," ",e3.SurName) AS DeniedBy,ApprovedTS AS DeniedTS,CONCAT(e2.Nickname," ",e2.SurName) AS RequestedBy,RequestedTS, Branch, ot.DateToday AS DateOfOT,EndOfOT, Reason'.$showprocesslabel.' FROM approvals_5ot ot 
+		LEFT JOIN attend_0ottype t ON t.OTTypeNo=ot.OTTypeNo
+		JOIN `1employees` e ON ot.IDNo=e.IDNo JOIN attend_1defaultbranchassign dba ON ot.IDNo=dba.IDNo JOIN 1branches b ON dba.DefaultBranchAssignNo=b.BranchNo JOIN 1employees e2 ON ot.RequestedByNo=e2.IDNo LEFT JOIN 1employees e3 ON ot.ApprovedByNo=e3.IDNo JOIN attend_2attendancedates ad ON ot.DateToday=ad.DateToday JOIN attend_30latestpositionsinclresigned lpir ON ot.IDNo=lpir.IDNo JOIN attend_0positions p ON lpir.PositionID=p.PositionID WHERE '.$addlcondi.' '.$morp.' AND ';*/
+		$sqlmain=$sqlmain1.$showprocesslabel.$sqlmain2.$addlcondi.' '.$morp.' AND ';
         $sql=$sqlmain.'Approved=1';
         $title='Approved OT Request'; 
-		$columnnames=array('FullName','Position','Branch','TypeOfOvertime','DateOfOT','EndOfOT','Reason','RequestedBy','RequestedTS','ApprovedBy','ApprovedTS');
+		$columnnames=array('FullName','Position','Branch','OTType','DateOfOT','TypeofDay','EndOfOT','Reason','RequestedBy','RequestedTS','ApprovedBy','ApprovedTS');
         include('../backendphp/layout/displayastable.php');
 		
-		// unset($editprocess);
-		// $sql=str_replace($showprocesslabel,'',$sqlmain).'Approved=2';
 		$sql=$sqlmain.'Approved=2';
         $title='Denied OT Request'; 
-		$columnnames=array('FullName','Position','Branch','TypeOfOvertime','DateOfOT','EndOfOT','Reason','RequestedBy','RequestedTS','DeniedBy','DeniedTS');
+		$columnnames=array('FullName','Position','Branch','OTType','DateOfOT','TypeofDay','EndOfOT','Reason','RequestedBy','RequestedTS','DeniedBy','DeniedTS');
         include('../backendphp/layout/displayastable.php');
 		
 		unset($editprocess);
 		$sql=str_replace($showprocesslabel,'',$sqlmain).'Approved=3';
         $title='"No Response" OT Request'; 
-		$columnnames=array('FullName','Position','Branch','TypeOfOvertime','DateOfOT','EndOfOT','Reason','RequestedBy','RequestedTS');
+		$columnnames=array('FullName','Position','Branch','OTType','DateOfOT','TypeofDay','EndOfOT','Reason','RequestedBy','RequestedTS');
         include('../backendphp/layout/displayastable.php');
 		
     break;
@@ -153,18 +166,19 @@ switch ($which){
 		if(''.$_POST['DateToday'].''<''.date('Y-m-d').''){ echo 'Date should be Date Today or Future Date.'; exit();}
 		if(''.date("H:i").''>'17:10'){ echo 'Can request until 17:00 [05:00 PM]'; exit(); }
         require_once $path.'/acrossyrs/logincodes/confirmtoken.php';
+		$ottypeno=comboBoxValue($link,'`attend_0ottype`','OTType',addslashes($_POST['OTType']),'OTTypeNo');
         $columnstoadd=array('IDNo','DateToday','EndOfOT','Reason'); $sql='';
         foreach ($columnstoadd as $field) {$sql=$sql.' `' . $field. '`=\''.addslashes($_POST[$field]).'\', '; }
 		
-		if($_POST['TypeOfOvertime']=='Regular'){
-			$typeofovertime=0;
-		}elseif($_POST['TypeOfOvertime']=='RDOT Regular Hrs'){
-			$typeofovertime=2;
+		if($_POST['OTType']=='Regular'){
+			$OTType=0;
+		}elseif($_POST['OTType']=='RDOT Regular Hrs'){
+			$OTType=2;
 		}else{
-			$typeofovertime=1;
+			$OTType=1;
 		}
-		// echo $typeofovertime; exit();
-        $sql='INSERT INTO `approvals_5ot` SET RequestedByNo='.$_SESSION['(ak0)'].','.$sql.' RequestedTS=NOW(),TypeOfOvertime=\''.$typeofovertime.'\'';
+		// echo $OTType; exit();
+        $sql='INSERT INTO `approvals_5ot` SET RequestedByNo='.$_SESSION['(ak0)'].','.$sql.' RequestedTS=NOW(),OTTypeNo=\''.$ottypeno.'\'';
 		$stmt=$link->prepare($sql); $stmt->execute();
         header('Location:otrequest.php?w=RequestOT');
     break;
@@ -185,8 +199,6 @@ switch ($which){
 		$stmt0=$link->query($sqlf); $res0=$stmt0->fetch();
 		echo '<br>'.$res0['IDNo'].' : '.$res0['FullName'];
 		
-            /* TRUNCATE((TIMESTAMPDIFF(MINUTE,(SELECT CONCAT(a.DateToday," 17:00:00")),(SELECT CONCAT(IF(`Overtime`=3,a.DateToday + INTERVAL 1 DAY,a.DateToday)," ",AcceptedOT)))/60),2) AS OTHoursToday, */
-			/* Replaced: TRUNCATE(OTHOURSwithDate(CONCAT(a.DateToday," ",(a.Shift+9)),(SELECT CONCAT(IF(`Overtime`=3,a.DateToday + INTERVAL 1 DAY,a.DateToday)," ",AcceptedOT))),2) AS OTHoursToday,*/
 	  $sql='SELECT 
         `d`.`PayrollID` AS `PayrollID`,
         `a`.`IDNo` AS `IDNo`,
@@ -215,7 +227,7 @@ switch ($which){
         LEFT JOIN `attend_441legaldays` `l` ON `l`.`IDNo` = `a`.`IDNo`
             AND `l`.`LegalHoliday` = `a`.`DateToday`
         WHERE `a`.`Overtime` <> 0 AND LeaveNo IN (11,20) AND a.IDNo='.$_POST['IDNo'].' GROUP BY a.DateToday ORDER BY a.DateToday;';
-		// REMOVED: LEFT JOIN `attend_443semimonthlyempnoattendance` `sm` ON `sm`.`PayrollID` = `d`.`PayrollID` AND `sm`.`IDNo` = `a`.`IDNo` 	
+			
 			$title='';
         $columnnames=array('PayrollID','DateToday','OTDesc','TimeOut','EndofOT','AcceptedOT','OTHoursToday');;
 		
@@ -249,10 +261,10 @@ switch ($which){
         $stmt=$link->prepare($sql); $stmt->execute();
 		
 		if($which=='Approve'){
-			$stmt0=$link->query('SELECT IDNo,DateToday,TypeOfOvertime FROM approvals_5ot WHERE TxnID='.$_GET['TxnID'].'');
+			$stmt0=$link->query('SELECT IDNo,DateToday,OTTypeNo FROM approvals_5ot WHERE TxnID='.$_GET['TxnID'].'');
 			$res0=$stmt0->fetch();
 		
-			$sql='UPDATE `attend_2attendance` SET Overtime=IF('.$res0['TypeOfOvertime'].'=0,2,IF('.$res0['TypeOfOvertime'].'=2,1,5)), HREncby='.$_SESSION['(ak0)'].', HRTS=Now() WHERE IDNo='.$res0['IDNo'].' AND DateToday="'.$res0['DateToday'].'"';
+			$sql='UPDATE `attend_2attendance` SET OTApproval=2, OTTypeNo='.$res0['OTTypeNo'].', HREncby='.$_SESSION['(ak0)'].', HRTS=Now() WHERE IDNo='.$res0['IDNo'].' AND DateToday="'.$res0['DateToday'].'"';
 			$stmt=$link->prepare($sql); $stmt->execute();
 		}
         header("Location:".$_SERVER['HTTP_REFERER']);
@@ -266,7 +278,7 @@ switch ($which){
 		$stmt0=$link->query('SELECT IDNo,DateToday FROM approvals_5ot WHERE TxnID='.$_GET['TxnID'].'');
 		$res0=$stmt0->fetch();
 	
-		$sql='UPDATE `attend_2attendance` SET Overtime=0, HREncby='.$_SESSION['(ak0)'].', HRTS=Now() WHERE IDNo='.$res0['IDNo'].' AND DateToday="'.$res0['DateToday'].'"';
+		$sql='UPDATE `attend_2attendance` SET OTApproval=0, OTTypeNo=0, HREncby='.$_SESSION['(ak0)'].', HRTS=Now() WHERE IDNo='.$res0['IDNo'].' AND DateToday="'.$res0['DateToday'].'"';
 		$stmt=$link->prepare($sql); $stmt->execute();
 		
         header("Location:".$_SERVER['HTTP_REFERER']);

@@ -103,10 +103,14 @@ SELECT
 FROM
     `attend_2attendance` `a` JOIN `attend_2attendancedates` `d` ON (`d`.`DateToday` = `a`.`DateToday`)
     LEFT JOIN `attend_30latestpositionsinclresigned` `e` ON (`e`.`IDNo` = `a`.`IDNo`)
-    LEFT JOIN `approvals_5ot` `ot` ON (`a`.`IDNo` = `ot`.`IDNo` AND `a`.`DateToday` = `ot`.`DateToday`)
+    LEFT JOIN `approvals_5ot` `ot` ON (`a`.`IDNo` = `ot`.`IDNo` AND `a`.`DateToday` = `ot`.`DateToday` AND `a`.`OTApproval` NOT IN (0,1))
     LEFT JOIN `attend_441legaldays` `l` ON (`l`.`IDNo` = `a`.`IDNo` AND `l`.`LegalHoliday` = `a`.`DateToday`)
     LEFT JOIN `443semimonthlyempnoattendance` `sm` ON (`sm`.`PayrollID` = `d`.`PayrollID` AND `sm`.`IDNo` = `a`.`IDNo`) 
     WHERE `d`.`PayrollID`='. $_POST['payrollid'].'
 GROUP BY `d`.`PayrollID` , `a`.`IDNo` 
 HAVING IF(`e`.`Resigned` <> 0, `SLDays` + `VLDays` + `LWPDays` + `QDays` + `RegDaysPresent` <> 0, 1)';
 $stmt0=$link->prepare($sql0); $stmt0->execute();
+
+/*
+* If approvals_5ot is overridden by HR, EndofOT=TimeOut
+*/
