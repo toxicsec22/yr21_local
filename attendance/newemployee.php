@@ -97,7 +97,7 @@ case 'AddNewEmployee':
 		<div class="tab-content">
 			<div id="tab1" class="tab active">';
 			?>
-			<form action="praddemployee.php?calledfrom=1" method="POST">
+			<form action="praddemployee.php?calledfrom=1&action_token=<?php echo $_SESSION['action_token'];?>" method="POST">
 			<div style="background-color:white;padding:20px;">
 
     Next available IDNo: <?php echo $newidno;?><br><br>
@@ -166,7 +166,7 @@ case 'AddNewEmployee':
  <div style="margin-bottom:3px;"><div><label>Place Of Birth <span>*</span></label><input type="text" name="PlaceOfBirth" value="" size="25" maxlength="255" autocomplete="off" required/></div></div>
  <div style="margin-bottom:3px;"><div><label>Mother's Maiden Name <span>*</span></label><input type="text" name="MMName" value="" size="25" maxlength="255" autocomplete="off" required/></div></div>
  <div style="margin-bottom:3px;"><div><label>CivilStatus <span>*</span></label><input type="text" name="CivilStatus" value="" size="25" maxlength="255" autocomplete="off" list="civilstatus" required/></div></div>
- <div style="margin-bottom:3px;"><div><label>AssignedEmail </label><input type="text" name="RTCEmail" size="25" maxlength="255" autocomplete="off" value="@1rotarytrading.com" required/></div></div>
+ <div style="margin-bottom:3px;"><div><label>AssignedEmail </label><input type="text" name="RTCEmail" size="25" maxlength="255" autocomplete="off" value="@1rotary.com.ph" required/></div></div>
  <div style="margin-bottom:3px;"><div><label>SpouseName </label><input type="text" name="SpouseName" value="" size="15" maxlength="255" autocomplete="off" /></div></div>
  <div style="margin-bottom:3px;"><div><label>SpouseBirthdate </label><input type="date" name="SpouseBirthdate" value="" size="15" maxlength="255" autocomplete="off" /></div></div>
  

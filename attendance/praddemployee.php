@@ -97,7 +97,7 @@ case 1: //newemployee.php
        $saltforid=generateSaltforid(9);
 	   
 	   	
-       $email=($_POST['RTCEmail']<>'@1rotarytrading.com')?$_POST['RTCEmail']:null;
+       $email=($_POST['RTCEmail']<>'@1rotary.com.ph')?$_POST['RTCEmail']:null;
         $sql='Insert into `1_gamit`.`1rtcusers` set `IDNo`='.addslashes($_POST['IDNo']) .',`uphashmayasin`=\''.$newhash.'\', `saltforid`=\''.$saltforid.'\',`ProgCookie`=\''.$progcookie.'\',`ProgCookieOld`=\''.$progcookie.'\',`Email`=\''.$email.'\', EncodedByNo='.$user;
         $stmt=$link->prepare($sql);
        $stmt->execute();
