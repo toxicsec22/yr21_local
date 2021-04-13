@@ -219,7 +219,8 @@ if (!allowedToOpen(2133,'1rtc')){
     <form method="post" action="postattend.php?calledfrom=5&action_token=<?php echo $_SESSION['action_token'];?>" enctype="multipart/form-data">
     IDNo:<input type="text" name="IDNo" list="names" size=7 autocomplete="off" required="true"> &nbsp;
 	Start Date:  <input type="date" name="attenddate" value=<?php echo date('Y-m-d',time()); ?>></input> <br><br>
-    <label>Shift</label><br><br><input type=radio name="Shift"  value=7> &nbsp; 7:00 am to 4:00 pm
+    <label>Shift</label><br>
+	<!-- <br><input type=radio name="Shift"  value=7> &nbsp; 7:00 am to 4:00 pm -->
 	<br><input type=radio name="Shift"  value=8> &nbsp; 8:00 am to 5:00 pm
 	<br><input type=radio name="Shift"  value=9> &nbsp; 9:00 am to 6:00 pm
 	&nbsp;  &nbsp; 
@@ -428,13 +429,13 @@ include_once('../backendphp/layout/clickontabletoedithead.php');
 					IDNo:<input type="text" name="IDNo" list="namesnoall" size=7 autocomplete="off" required="true"> &nbsp;
 					Date From: <input type="date" name="sDate" value="'.$attendshift.'"/>
 					Date To: <input type="date" name="eDate" value="'.$attendshift.'">
-					&nbsp; &nbsp; Shift &nbsp; <input type=radio name="Shift"  value=7>  7:00 am to 4:00 pm
+					
 					&nbsp; &nbsp; <input type=radio name="Shift"  value=8>  8:00 am to 5:00 pm
 					&nbsp; &nbsp; <input type=radio name="Shift"  value=9>  9:00 am to 6:00 pm
 					<input type="hidden" name="editby" value="d">
 					<input type="hidden" name="action_token" value="'.$_SESSION['action_token'].'">
 					&nbsp;  &nbsp; ';
-
+					// removed: &nbsp; &nbsp; Shift &nbsp; <input type=radio name="Shift"  value=7>  7:00 am to 4:00 pm
 					echo ' <input type="submit" name="btnSubmit" value="Set Shift">';
 					echo '</form>'; 
 					echo '</table>';
@@ -581,12 +582,13 @@ include_once('../backendphp/layout/clickontabletoedithead.php');
 					IDNo:<input type="text" name="IDNo" list="names" size=7 autocomplete="off" required="true"> &nbsp;
 					Date From: <input type="date" name="sDate" value="'.$attendshift.'"/>
 					Date To: <input type="date" name="eDate" value="'.$attendshift.'">
-					&nbsp; &nbsp; Shift &nbsp; <input type=radio name="Shift"  value=7>  7:00 am to 4:00 pm
+					
 					&nbsp; &nbsp; <input type=radio name="Shift"  value=8>  8:00 am to 5:00 pm
 					&nbsp; &nbsp; <input type=radio name="Shift"  value=9>  9:00 am to 6:00 pm
 					<input type="hidden" name="editby" value="h">
 					<input type="hidden" name="action_token" value="'.$_SESSION['action_token'].'">
 					&nbsp;  &nbsp; ';
+					//removed:&nbsp; &nbsp; Shift &nbsp; <input type=radio name="Shift"  value=7>  7:00 am to 4:00 pm
 
 					echo ' <input type="submit" name="btnSubmit" value="Set Shift">';
 					echo '</form>'; 
