@@ -146,7 +146,7 @@ $login=addslashes($_POST['attendid']);
 			break;
 		case 3: // set as blank
 			$txnid=intval($_REQUEST['TxnID']);
-			$sql='UPDATE attend_2attendance INNER JOIN attend_2attendancedates ON DateToday = `attend_2attendancedates`.DateToday
+			$sql='UPDATE attend_2attendance INNER JOIN attend_2attendancedates ON attend_2attendance.DateToday = `attend_2attendancedates`.DateToday
 			SET TimeIn = null, TimeOut = null, 
 				RemarksHR = null,
 				OTApproval = 0,
