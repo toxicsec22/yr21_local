@@ -245,16 +245,6 @@ $stmt=$link->prepare($sql); $stmt->execute();
 $sql='UPDATE `payroll_25payroll'.$temp.'` p SET Basic=0, DeM=0, TaxSh=0, OT=0, AbsenceBasic=0, UndertimeBasic=0, AbsenceTaxSh=0, UndertimeTaxSh=0, `SSS-EE`=0, `PhilHealth-EE`=0, `PagIbig-EE`=0, WTax=0, `SSS-ER`=0, `PhilHealth-ER`=0, `PagIbig-ER`=0, DisburseVia=0, Remarks="No attendance for payroll period." WHERE PayrollID='.$payrollid . ' AND p.IDNo IN  '.$zeroattend; //echo $sql;
 $stmt=$link->prepare($sql); $stmt->execute();
 
-
-/* 
-$sqladj='INSERT INTO `payroll_21paydayadjustments'.$temp.'` ( PayrollID, IDNo, AdjustTypeNo, AdjustAmt,BranchNo, Remarks,EncodedByNo)
-SELECT s.PayrollID, s.IDNo, s.AdjustTypeNo, s.AdjustAmt,BranchNo, s.Remarks, \''.$_SESSION['(ak0)'].'\' AS EncodedByNo
-FROM `payroll_21scheduledpaydayadjustments` as s
-WHERE s.PayrollID='.$payrollid;
-// echo $sqladj; exit();
-$stmtadj=$link->prepare($sqladj); $stmtadj->execute();
- */
- 
  
 //All Adjustment Except OIC allowance,and loans
 $sqladj='INSERT INTO `payroll_21paydayadjustments'.$temp.'` ( PayrollID, IDNo, AdjustTypeNo, AdjustAmt,BranchNo, Remarks,EncodedByNo)
@@ -279,7 +269,7 @@ $stmtadj2=$link->prepare($sqladj2); $stmtadj2->execute();
  
 
 
-// insert payment for qarantine days
+// insert payment for quarantine days
 $sql0='SELECT SUM(QDays) AS Q FROM `payroll_20fromattendance` WHERE PayrollID='.$payrollid;
 $stmt0=$link->query($sql0); $res0=$stmt0->fetch();
 
@@ -294,36 +284,38 @@ if($res0['Q']>0){
     
     $sqlins2=' AS AdjustTypeNo, IF(LatestDorM=0,';
     
-    $sqlins3='/13.04)*IFNULL(QDays,0) AS AdjustAmt, BranchNo, "Quarantine Days", \''.$_SESSION['(ak0)'].'\' AS EncodedByNo FROM `payroll_20latestrates` lr JOIN (SELECT PayrollID, IDNo, QDays FROM `payroll_20fromattendance` WHERE PayrollID='.$payrollid.' AND QDays<>0) fa ON fa.IDNo=lr.IDNo JOIN `payroll_25payroll'.$temp.'` p ON p.IDNo=lr.IDNo LEFT JOIN given13th g ON fa.IDNo=g.IDNo';
+    $sqlins3='/13.04)*IFNULL(QDays,0) AS AdjustAmt, BranchNo, "Quarantine Days'.($temp=='temp'?' - temp calc':'').'", \''.$_SESSION['(ak0)'].'\' AS EncodedByNo FROM `payroll_20latestrates` lr JOIN (SELECT PayrollID, IDNo, QDays FROM `payroll_20fromattendance` WHERE PayrollID='.$payrollid.' AND QDays<>0) fa ON fa.IDNo=lr.IDNo JOIN `payroll_25payroll'.$temp.'` p ON p.IDNo=lr.IDNo LEFT JOIN given13th g ON fa.IDNo=g.IDNo';
     
     $sqlins4=' AND AdjustTypeNo=';
     
     $sqlins5=' WHERE p.PayrollID='.$payrollid;
     
-    $sqlupdate1='UPDATE `payroll_21paydayadjustments'.$temp.'` pa JOIN `payroll_20latestrates` lr ON pa.IDNo=lr.IDNo LEFT JOIN given13th g ON pa.IDNo=g.IDNo AND pa.AdjustTypeNo=g.AdjustTypeNo SET AdjustAmt=IF((';    
-    $sqlupdate2='*IF(LatestDorM=0,26.08,2))-IFNULL( g.Given13th,0)-AdjustAmt>=0,AdjustAmt,IF((';    
-    $sqlupdate3='*IF(LatestDorM=0,26.08,2))-IFNULL( g.Given13th,0)>0,(';    
-    $sqlupdate4='*IF(LatestDorM=0,26.08,2))-IFNULL( g.Given13th,0),0)) WHERE pa.AdjustTypeNo=';    
-    $sqlupdate5=' AND pa.PayrollID='.$payrollid.' AND g.Given13th>0';
+    // QL will be paid from EARNED 13th month
+    $sqlupdate1='UPDATE `payroll_21paydayadjustments'.$temp.'` pa LEFT JOIN `payroll_26yrtotaland13thmonthcalc` tmc ON pa.IDNo=tmc.IDNo LEFT JOIN given13th g ON pa.IDNo=g.IDNo AND pa.AdjustTypeNo=g.AdjustTypeNo SET AdjustAmt=IF(IFNULL(';    
+    $sqlupdate2=',0)-IFNULL( g.Given13th,0)-AdjustAmt>=0,AdjustAmt,IF(IFNULL(';    
+    $sqlupdate3=',0)-IFNULL( g.Given13th,0)>0,IFNULL(';    
+    $sqlupdate4=',0)-IFNULL( g.Given13th,0),0)) WHERE pa.AdjustTypeNo=';    
+    $sqlupdate5=' AND pa.PayrollID='.$payrollid; //.' AND g.Given13th>0';
     
     
     // Basic
-    $adjtypeno='21'; $rate='LatestBasicRate';
+    $adjtypeno='21'; $rate='LatestBasicRate'; $thirteenth='13thBasicCalc';
    
     $sqlins=$sqlins1.' '.$adjtypeno.' '.$sqlins2.$rate.','.$rate.$sqlins3.$sqlins4.$adjtypeno.$sqlins5;
-    	// echo $sqlins; exit();
+    // if($_SESSION['(ak0)']==1002) { echo $sqlins; exit();}
     $stmtadjq=$link->prepare($sqlins); $stmtadjq->execute();
     
-    $sqlupdate=$sqlupdate1.$rate.$sqlupdate2.$rate.$sqlupdate3.$rate.$sqlupdate4.$adjtypeno.$sqlupdate5;
+    $sqlupdate=$sqlupdate1.$thirteenth.$sqlupdate2.$thirteenth.$sqlupdate3.$thirteenth.$sqlupdate4.$adjtypeno.$sqlupdate5;
+    //if($_SESSION['(ak0)']==1002) { echo $sqlins.'<br><br>'.$sqlupdate; exit();}
     $stmtadjq=$link->prepare($sqlupdate); $stmtadjq->execute();
 	
     if($_SESSION['(ak0)']==1002) { echo $sqlupdate;}
     // DeMinimis and TaxShield
-    $adjtypeno='22'; $rate='(LatestDeMinimisRate+LatestTaxShield)';
-    $sqlins=$sqlins1.' '.$adjtypeno.' '.$sqlins2.$rate.','.$rate.$sqlins3.$sqlins4.$adjtypeno.$sqlins5;
+    $adjtypeno='22'; $rate='(LatestDeMinimisRate+LatestTaxShield)'; $thirteenth='13thTaxShCalc';
+    $sqlins=$sqlins1.' '.$adjtypeno.' '.$sqlins2.$rate.','.$rate.$sqlins3.$sqlins4.$adjtypeno.$sqlins5.' AND (LatestDeMinimisRate+LatestTaxShield)<>0';
     $stmtadjq=$link->prepare($sqlins); $stmtadjq->execute();
     
-    $sqlupdate=$sqlupdate1.$rate.$sqlupdate2.$rate.$sqlupdate3.$rate.$sqlupdate4.$adjtypeno.$sqlupdate5;
+    $sqlupdate=$sqlupdate1.$thirteenth.$sqlupdate2.$thirteenth.$sqlupdate3.$thirteenth.$sqlupdate4.$adjtypeno.$sqlupdate5;
     $stmtadjq=$link->prepare($sqlupdate); $stmtadjq->execute();    
 
 }
@@ -405,6 +397,12 @@ if (isset($_POST['submit']) AND (!isset($_POST['sortfield']))){
 	       include('../backendphp/layout/displayastableonlynoheaders.php');
 	       echo '<br><br>';
 	    }
+      unset($coltototal,$showgrandtotal);
+      $subtitle='Payroll Adjustments';
+      $columnnames=array('AdjustType','IDNo','FirstName','Nickname','SurName','AdjustAmt','Remarks');
+      $sql='SELECT AdjID,a.IDNo, a.PayrollID, FirstName, Nickname, e.SurName, a.AdjustTypeNo, ac.AdjustType, FORMAT(a.AdjustAmt,2) AS AdjustAmt, Remarks,BranchNo, a.EncodedByNo FROM `1employees` as e JOIN (`payroll_21paydayadjustments'.$temp.'` as a JOIN payroll_0acctid ac ON a.AdjustTypeNo = ac.AdjustTypeNo ) ON e.IDNo = a.IDNo ORDER BY a.AdjustTypeNo,a.IDNo';
+      include('../backendphp/layout/displayastableonlynoheaders.php');
+
             } // end NOT for recalc
             
 }
