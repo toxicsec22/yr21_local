@@ -9,9 +9,13 @@ if (!allowedToOpen(627,'1rtc')){ echo 'No permission'; exit;}
 <form action='#' method='POST'>
     <input type='text' name='payrollid'  autocomplete='off' size='2'>
     <input type='submit' name='submit' value='Send this to Payroll'>
+    <?php
+    if($_SESSION['(ak0)']==1002) { echo "<input type='submit' name='submit' value='Skip check and send this to Payroll'>";}
+    ?>
 </form>
 <?php
 $payrollid=(!isset($_POST['payrollid'])?((date('m')*2)+(date('d')<15?-1:0)):$_POST['payrollid']);
+if(($_SESSION['(ak0)']==1002) and $_POST['submit']==='Skip check and send this to Payroll' ){ goto skipcheck;}
 $sqlcheck='SELECT COUNT(*) AS Pending FROM attend_3leaverequest lr JOIN `attend_30currentpositions` p ON lr.IDNo=p.IDNo  WHERE  (Approved=0 OR Acknowledged=0 or SupervisorApproved=0 OR (IF(Approved=1,HRVerifiedByNo IS NULL, FALSE))) AND FromDate<=(SELECT ToDate FROM payroll_1paydates WHERE PayrollID='.$payrollid.')';
 
 $stmtcheck=$link->prepare($sqlcheck); $stmtcheck->execute(); $rescheck=$stmtcheck->fetch();
@@ -43,6 +47,7 @@ if (!isset($_POST['submit'])){
     goto nopermission;
 }
 
+skipcheck:
 $dbrecipient=$link;
 
 include_once '../attendance/attendsql/attendsumforpayroll.php';
