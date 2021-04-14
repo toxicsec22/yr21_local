@@ -316,7 +316,7 @@ $columnnames=array('DateToday','IDNo','FullName','TimeIn','TimeOut','RemarksDept
 
 $columnstoedit=array('TimeOut','RemarksDept');
 
-if (($attenddate==date('Y-m-d') AND date('H:s')>'20:00') OR ($attenddate==((date('w')==1)?date('Y-m-d',(strtotime ( '-1 day' , strtotime ($ydate) ) )):$ydate) AND date('H:s')<'09:00')){ //!!!
+if (($attenddate==date('Y-m-d') AND date('H:i')>'20:00') OR ($attenddate==((date('w')==1)?date('Y-m-d',(strtotime ( '-1 day' , strtotime ($ydate) ) )):$ydate) AND date('H:i')<'09:00')){ //!!!
 	$showlabel=1;
 } else {
 	$showlabel=0;
@@ -347,7 +347,7 @@ $formdesc='<br>Notes: <br>&nbsp; &nbsp; &nbsp; WH Supervisor can override time o
 			
 			$sql='UPDATE attend_2attendance a JOIN attend_2attendancedates ad ON `a`.DateToday = `ad`.DateToday
 			SET 
-				`a`.Overtime = 1,
+				`a`.OTApproval = 1,
 				`a`.TimeOut = \''.$_POST['TimeOut'].'\',
 				`a`.RemarksDept = \''.addslashes($_POST['RemarksDept']).'\',
 				`a`.TOEncby = ' . $_SESSION['(ak0)'] .',

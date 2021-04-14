@@ -146,7 +146,7 @@ $login=addslashes($_POST['attendid']);
 			break;
 		case 3: // set as blank
 			$txnid=intval($_REQUEST['TxnID']);
-			$sql='UPDATE attend_2attendance INNER JOIN attend_2attendancedates ON DateToday = `attend_2attendancedates`.DateToday
+			$sql='UPDATE attend_2attendance INNER JOIN attend_2attendancedates ON attend_2attendance.DateToday = `attend_2attendancedates`.DateToday
 			SET TimeIn = null, TimeOut = null, 
 				RemarksHR = null,
 				OTApproval = 0,
@@ -155,7 +155,7 @@ $login=addslashes($_POST['attendid']);
 				TOEncby = ' . $_SESSION['(ak0)'] .',
 				HREncby = ' . $_SESSION['(ak0)'] .',
 				HRTS=Now(), TInTS=Now(), TOTS=Now()
-				WHERE (((TxnID)='.$txnid.') AND ((`attend_2attendancedates`.Posted)=0))';
+				WHERE (((attend_2attendance.TxnID)='.$txnid.') AND ((`attend_2attendancedates`.Posted)=0))';
 				// echo $sql;
 			$stmt=$link->prepare($sql);
 			
@@ -182,7 +182,7 @@ $login=addslashes($_POST['attendid']);
 			
 			$sql='UPDATE attend_2attendance a INNER JOIN attend_2attendancedates ad ON `ad`.DateToday = `a`.DateToday
 			SET '.$addsql.'  
-			WHERE (((TxnID)='.$txnid.') AND ((`ad`.Posted)=0))';
+			WHERE (((a.TxnID)='.$txnid.') AND ((`ad`.Posted)=0))';
 			// echo $sql; exit();
 			$stmt=$link->prepare($sql); $stmt->execute();
 			header("Location:encodeattend.php?AttendDate=$attenddate&w=EncodeAttend");
