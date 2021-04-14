@@ -10,7 +10,7 @@ $sql1='SELECT
         `jvs`.`DebitAccountID` AS `AccountID`,
         `jvs`.`BranchNo` AS `BranchNo`,
 		`jvs`.`FromBudgetOf` AS `FromBudgetOf`,
-        `jvs`.`Amount` AS `Amount`,
+        `jvs`.`Amount` AS `Amount`,IFNULL(`Forex`,1) AS `FOREX`,IFNULL(`Forex`,1)*`Amount` AS `PHPAmount`,
         "DR" AS `Entry`,
         "JV" AS `w`,
         `jvm`.`JVNo` AS `JVNo`
@@ -26,7 +26,7 @@ UNION ALL SELECT
         `jvs`.`CreditAccountID` AS `CreditAccountID`,
         `jvs`.`BranchNo` AS `BranchNo`,
 		`jvs`.`FromBudgetOf` AS `FromBudgetOf`,
-        (`jvs`.`Amount` * -(1)) AS `Amount`,
+        (`jvs`.`Amount` * -(1)) AS `Amount`,IFNULL(`Forex`,1) AS `FOREX`,IFNULL(`Forex`,1)*`Amount`*-1 AS `PHPAmount`,
         "CR" AS `Entry`,
         "JV" AS `w`,
         `jvm`.`JVNo` AS `JVNo`
@@ -39,14 +39,14 @@ UNION ALL SELECT
 
 
 // DEPRECIATION
-$sql1=$sql1.' UNION ALL SELECT d.DeprDate, concat("DeprID ",d.DeprID) AS ControlNo, "B" AS `BECS`, 0 as `SuppNo/ClientNo`,"-" as `Supplier/Customer/Branch`, AssetDesc, d.DeprAccountID as AccountID, BranchNo,BranchNo AS `FromBudgetOf`, d.Amount, "DR" as Entry, "Depreciation" as w, a.AssetID FROM acctg_1assets a JOIN acctg_1assetsdepr d ON a.AssetID=d.AssetID WHERE '.$conditiondepr.' 
+$sql1=$sql1.' UNION ALL SELECT d.DeprDate, concat("DeprID ",d.DeprID) AS ControlNo, "B" AS `BECS`, 0 as `SuppNo/ClientNo`,"-" as `Supplier/Customer/Branch`, AssetDesc, d.DeprAccountID as AccountID, BranchNo,BranchNo AS `FromBudgetOf`, d.Amount, 1 AS Forex, d.Amount AS PHPAmount, "DR" as Entry, "Depreciation" as w, a.AssetID FROM acctg_1assets a JOIN acctg_1assetsdepr d ON a.AssetID=d.AssetID WHERE '.$conditiondepr.' 
 UNION ALL
-SELECT d.DeprDate, concat("DeprID ",d.DeprID) AS ControlNo, "B" AS `BECS`, 0 as `SuppNo/ClientNo`,"-" as `Supplier/Customer/Branch`, AssetDesc, ca.AccountID, BranchNo,BranchNo AS `FromBudgetOf`, d.Amount*-1, "CR" as Entry, "AssetandDepr" as w, a.AssetID FROM acctg_1assets a JOIN acctg_1assetsdepr d ON a.AssetID=d.AssetID JOIN `acctg_1chartofaccounts` ca ON ca.AccumDepAcctOf=d.DeprAccountID WHERE '.$conditiondepr;
+SELECT d.DeprDate, concat("DeprID ",d.DeprID) AS ControlNo, "B" AS `BECS`, 0 as `SuppNo/ClientNo`,"-" as `Supplier/Customer/Branch`, AssetDesc, ca.AccountID, BranchNo,BranchNo AS `FromBudgetOf`, d.Amount*-1, 1 AS Forex, d.Amount*-1 AS PHPAmount, "CR" as Entry, "AssetandDepr" as w, a.AssetID FROM acctg_1assets a JOIN acctg_1assetsdepr d ON a.AssetID=d.AssetID JOIN `acctg_1chartofaccounts` ca ON ca.AccumDepAcctOf=d.DeprAccountID WHERE '.$conditiondepr;
 
 // APPLICATION OF PREPAID EXPENSES
-$sql1=$sql1.' UNION ALL SELECT d.AmortDate, concat("PrExp ",d.AmortID) AS ControlNo, "B" AS `BECS`, 0 as `SuppNo/ClientNo`,"-" as `Supplier/Customer/Branch`, PrepaidDesc, d.ExpenseAccountID as AccountID, BranchNo,BranchNo AS `FromBudgetOf`, d.Amount, "DR" as Entry, "PrepaidExpense" as w, a.PrepaidID FROM acctg_2prepaid a JOIN acctg_2prepaidamort d ON a.PrepaidID=d.PrepaidID WHERE '.$conditionprepd.' 
+$sql1=$sql1.' UNION ALL SELECT d.AmortDate, concat("PrExp ",d.AmortID) AS ControlNo, "B" AS `BECS`, 0 as `SuppNo/ClientNo`,"-" as `Supplier/Customer/Branch`, PrepaidDesc, d.ExpenseAccountID as AccountID, BranchNo,BranchNo AS `FromBudgetOf`, d.Amount, 1 AS Forex, d.Amount AS PHPAmount, "DR" as Entry, "PrepaidExpense" as w, a.PrepaidID FROM acctg_2prepaid a JOIN acctg_2prepaidamort d ON a.PrepaidID=d.PrepaidID WHERE '.$conditionprepd.' 
 UNION ALL
-SELECT d.AmortDate, concat("PrExp ",d.AmortID) AS ControlNo, "B" AS `BECS`, 0 as `SuppNo/ClientNo`,"-" as `Supplier/Customer/Branch`, PrepaidDesc, PrepaidAccountID as AccountID, BranchNo,BranchNo AS `FromBudgetOf`, d.Amount*-1, "CR" as Entry, "PrepaidExpense" as w, a.PrepaidID FROM acctg_2prepaid a JOIN acctg_2prepaidamort d ON a.PrepaidID=d.PrepaidID WHERE '.$conditionprepd;
+SELECT d.AmortDate, concat("PrExp ",d.AmortID) AS ControlNo, "B" AS `BECS`, 0 as `SuppNo/ClientNo`,"-" as `Supplier/Customer/Branch`, PrepaidDesc, PrepaidAccountID as AccountID, BranchNo,BranchNo AS `FromBudgetOf`, d.Amount*-1, 1 AS Forex, d.Amount*-1 AS PHPAmount, "CR" as Entry, "PrepaidExpense" as w, a.PrepaidID FROM acctg_2prepaid a JOIN acctg_2prepaidamort d ON a.PrepaidID=d.PrepaidID WHERE '.$conditionprepd;
         
 // PURCHASES
 $sql1=$sql1.' UNION ALL SELECT 
@@ -58,7 +58,7 @@ $sql1=$sql1.' UNION ALL SELECT
         `ps`.`DebitAccountID` AS `DebitAccountID`,
         `pm`.`BranchNo` AS `BranchNo`,
 		`FromBudgetOf`,
-        `ps`.`Amount` AS `Amount`,
+        `ps`.`Amount` AS `Amount`, IFNULL(`Forex`,1) AS `FOREX`,IFNULL(`Forex`,1)*`Amount` AS `PHPAmount`,
         "DR" AS `DR`,
         "Purchase" AS `Purchases`,
         `pm`.`TxnID` AS `TxnID`
@@ -66,6 +66,7 @@ $sql1=$sql1.' UNION ALL SELECT
         ((`acctg_2purchasemain` `pm`
         JOIN `acctg_2purchasesub` `ps` ON ((`pm`.`TxnID` = `ps`.`TxnID`)))
         JOIN `1suppliers` `s` ON ((`s`.`SupplierNo` = `pm`.`SupplierNo`)))  where '.$condition.'
+
         UNION ALL SELECT 
         `pm`.`Date` AS `Date`,
         CONCAT("Supp.Inv# ", `pm`.`SupplierInv`) AS `concat("Supp.Inv# ",SupplierInv)`, "S" AS `BECS`,
@@ -75,7 +76,7 @@ $sql1=$sql1.' UNION ALL SELECT
         `pm`.`CreditAccountID` AS `CreditAccountID`,
         `pm`.`BranchNo` AS `BranchNo`,
 		`FromBudgetOf`,
-        (`ps`.`Amount` * -(1)) AS `Amount`,
+        (`ps`.`Amount` * -(1)) AS `Amount`, IFNULL(`Forex`,1) AS `FOREX`,IFNULL(`Forex`,1)*`Amount`*-1 AS `PHPAmount`,
         "CR" AS `CR`,
         "Purchase" AS `Purchases`,
         `pm`.`TxnID` AS `TxnID`
@@ -95,7 +96,7 @@ if(isnull(vchs.TIN),"", concat(" TIN#",vchs.TIN, " ", t.CompanyName," ", t.Addre
         `vchs`.`DebitAccountID` AS `DebitAccountID`,
         `vchs`.`BranchNo` AS `BranchNo`,
 		`vchs`.`FromBudgetOf` AS `FromBudgetOf`,
-        `vchs`.`Amount` AS `Amount`,
+        `vchs`.`Amount` AS `Amount`, IFNULL(`Forex`,1) AS `FOREX`,IFNULL(`Forex`,1)*`Amount` AS `PHPAmount`,
         "DR" AS `DR`,
         "CV" AS `CV`,
         `vchm`.`CVNo` AS `CVNo`
@@ -112,7 +113,7 @@ if(isnull(vchs.TIN),"", concat(" TIN#",vchs.TIN, " ", t.CompanyName," ", t.Addre
         `vchm`.`CreditAccountID` AS `CreditAccountID`,
         `vchs`.`BranchNo` AS `BranchNo`,
 		`vchs`.`FromBudgetOf` AS `FromBudgetOf`,
-        (`vchs`.`Amount` * -(1)) AS `Amount`,
+        (`vchs`.`Amount` * -(1)) AS `Amount`,IFNULL(`Forex`,1) AS `FOREX`,IFNULL(`Forex`,1)*`Amount` AS `PHPAmount`,
         "CR" AS `CR`,
         "CV" AS `CV`,
         `vchm`.`CVNo` AS `CVNo`
@@ -130,7 +131,7 @@ $sql1=$sql1.' UNION ALL SELECT
         `ss`.`DebitAccountID` AS `DebitAccountID`,
         `sm`.`BranchNo` AS `BranchNo`,
 		`sm`.`BranchNo` AS `FromBudgetOf`,
-        `ss`.`Amount` AS `Amount`,
+        `ss`.`Amount` AS `Amount`, 1 AS Forex, ss.Amount AS PHPAmount, 
         "DR" AS `Expr2`,
         "Sale" AS `Sale`,
         `sm`.`TxnID` AS `TxnID`
@@ -147,7 +148,7 @@ $sql1=$sql1.' UNION ALL SELECT
         `ss`.`CreditAccountID` AS `CreditAccountID`,
         `sm`.`BranchNo` AS `BranchNo`,
 		`sm`.`BranchNo` AS `FromBudgetOf`,
-        (`ss`.`Amount` * -(1)) AS `Expr2`,
+        (`ss`.`Amount` * -(1)) AS `Expr2`, 1 AS Forex, ss.Amount*-1 AS PHPAmount, 
         "CR" AS `Expr3`,
         "Sale" AS `Sale`,
         `sm`.`TxnID` AS `TxnID`
@@ -159,11 +160,12 @@ $sql1=$sql1.' UNION ALL SELECT
 // COLLECTIONS
 $sql1=$sql1.' UNION ALL SELECT `orm`.`Date`, CONCAT("Collect", `orm`.`CollectNo`) AS `Expr1`,  IF(orm.ClientNo<9999,"E","C") AS `BECS`,`orm`.`ClientNo`, `c`.`ClientName`,
         CONCAT(`orm`.`CollectNo`, " Inv", `ors`.`ForChargeInvNo`, "/", `orm`.`Type`, "/", IFNULL(`orm`.`CheckNo`,"")) AS `Expr2`, `orm`.`DebitAccountID` AS `DebitAccountID`,
-        `ors`.`BranchNo`,`ors`.`BranchNo` AS `FromBudgetOf`, `ors`.`Amount` ,  "DR" AS `Expr3`,  "Collect" AS `OR`, `orm`.`TxnID`
+        `ors`.`BranchNo`,`ors`.`BranchNo` AS `FromBudgetOf`, `ors`.`Amount` ,  1 AS Forex, ors.Amount AS PHPAmount,   "DR" AS `Expr3`,  "Collect" AS `OR`, `orm`.`TxnID`
     FROM
         ((`acctg_2collectmain` `orm`
         LEFT JOIN `acctg_01uniclientsalespersonfordep` `c` ON ((`orm`.`ClientNo` = `c`.`ClientNo`)))
         JOIN `acctg_2collectsub` `ors` ON ((`orm`.`TxnID` = `ors`.`TxnID`)))  where '.$condition.'
+
     UNION ALL SELECT 
         `orm`.`Date` AS `Date`,
         CONCAT("Collect", `orm`.`CollectNo`) AS `Expr1`, IF(orm.ClientNo<9999,"E","C") AS `BECS`,
@@ -173,7 +175,7 @@ $sql1=$sql1.' UNION ALL SELECT `orm`.`Date`, CONCAT("Collect", `orm`.`CollectNo`
         `orm`.`DebitAccountID` AS `CreditAccountID`,
         `ors`.`BranchNo` AS `BranchNo`,
 		`ors`.`BranchNo` AS `FromBudgetOf`,
-        `ors`.`Amount`*-1 AS `Amount`,
+        `ors`.`Amount`*-1 AS `Amount`,  1 AS Forex, ors.Amount*-1 AS PHPAmount, 
         "CR" AS `Expr3`,
         "Collect" AS `OR`,
         `orm`.`TxnID` AS `TxnID`
@@ -181,6 +183,7 @@ $sql1=$sql1.' UNION ALL SELECT `orm`.`Date`, CONCAT("Collect", `orm`.`CollectNo`
         ((`acctg_2collectmain` `orm`
         LEFT JOIN `acctg_01uniclientsalespersonfordep` `c` ON ((`orm`.`ClientNo` = `c`.`ClientNo`)))
         JOIN `acctg_2collectsubdeduct` `ors` ON ((`orm`.`TxnID` = `ors`.`TxnID`)))  where '.$condition.'
+
         UNION ALL SELECT 
         `orm`.`Date` AS `Date`,
         CONCAT("Collect", `orm`.`CollectNo`) AS `Expr1`, IF(orm.ClientNo<9999,"E","C") AS `BECS`,
@@ -196,7 +199,7 @@ $sql1=$sql1.' UNION ALL SELECT `orm`.`Date`, CONCAT("Collect", `orm`.`CollectNo`
         `ors`.`CreditAccountID` AS `CreditAccountID`,
         `ors`.`BranchNo` AS `BranchNo`,
 		`ors`.`BranchNo` AS `FromBudgetOf`,
-        (`ors`.`Amount` * -(1)) AS `Expr3`,
+        (`ors`.`Amount` * -(1)) AS `Expr3`,  1 AS Forex, ors.Amount*-1 AS PHPAmount, 
         "CR" AS `Expr4`,
         "Collect" AS `OR`,
         `orm`.`TxnID` AS `TxnID`
@@ -204,6 +207,7 @@ $sql1=$sql1.' UNION ALL SELECT `orm`.`Date`, CONCAT("Collect", `orm`.`CollectNo`
         ((`acctg_2collectmain` `orm`
         LEFT JOIN `acctg_01uniclientsalespersonfordep` `c` ON ((`orm`.`ClientNo` = `c`.`ClientNo`)))
         JOIN `acctg_2collectsub` `ors` ON ((`orm`.`TxnID` = `ors`.`TxnID`)))  where '.$condition.'
+
         UNION ALL SELECT 
         `orm`.`Date` AS `Date`,
         CONCAT("Collect", `orm`.`CollectNo`) AS `Expr1`, IF(orm.ClientNo<9999,"E","C") AS `BECS`,
@@ -212,7 +216,7 @@ $sql1=$sql1.' UNION ALL SELECT `orm`.`Date`, CONCAT("Collect", `orm`.`CollectNo`
         `ors`.`DebitAccountID` AS `DebitAccountID`,
         `ors`.`BranchNo` AS `BranchNo`,
 		`ors`.`BranchNo` AS `FromBudgetOf`,
-        (`ors`.`Amount`) AS `Expr3`,
+        (`ors`.`Amount`) AS `Expr3`,  1 AS Forex, ors.Amount AS PHPAmount, 
         "DR" AS `Expr4`,
         "Collect" AS `OR`,
         `orm`.`TxnID` AS `TxnID`
@@ -237,7 +241,7 @@ $sql1=$sql1.' UNION ALL SELECT
         `depm`.`DebitAccountID` AS `DebitAccountID`,
         `deps`.`BranchNo` AS `BranchNo`,
 		`deps`.`BranchNo` AS `FromBudgetOf`,
-        `deps`.`Amount` AS `Amount`,
+        `deps`.`Amount` AS `Amount`, IFNULL(`Forex`,1) AS `Forex`,IFNULL(`Forex`,1)*`Amount` AS `PHPAmount`,
         "DR" AS `DR`,
         "Deposit" AS `Deposit`,
         `depm`.`TxnID` AS `TxnID`
@@ -254,7 +258,7 @@ $sql1=$sql1.' UNION ALL SELECT
         `depe`.`DebitAccountID` AS `DebitAccountID`,
         `depe`.`BranchNo` AS `BranchNo`,
 		`depe`.`FromBudgetOf` AS `FromBudgetOf`,
-        `depe`.`Amount` AS `Amount`,
+        `depe`.`Amount` AS `Amount`, 1 AS `Forex`,`Amount` AS `PHPAmount`,
         "DR" AS `Expr4`,
         "Deposit" AS `Deposit`,
         `depm`.`TxnID` AS `TxnID`
@@ -276,7 +280,7 @@ $sql1=$sql1.' UNION ALL SELECT
         `deps`.`CreditAccountID` AS `CreditAccountID`,
         `deps`.`BranchNo` AS `BranchNo`,
 		`deps`.`BranchNo` AS `FromBudgetOf`,
-        (`deps`.`Amount` * -(1)) AS `Expr4`,
+        (`deps`.`Amount` * -(1)) AS `Expr4`, IFNULL(`Forex`,1) AS `Forex`,IFNULL(`Forex`,1)*`Amount`*-1 AS `PHPAmount`,
         "CR" AS `Expr5`,
         "Deposit" AS `Deposit`,
         `depm`.`TxnID` AS `TxnID`
@@ -293,7 +297,7 @@ $sql1=$sql1.' UNION ALL SELECT
         `depm`.`DebitAccountID` AS `CreditAcctID`,
         `depe`.`BranchNo` AS `BranchNo`,
 		`depe`.`FromBudgetOf` AS `FromBudgetOf`,
-        (`depe`.`Amount` * -(1)) AS `Expr3`,
+        (`depe`.`Amount` * -(1)) AS `Expr3`, 1 AS `Forex`,`Amount`*-1 AS `PHPAmount`,
         "CR" AS `Expr4`,
         "Deposit" AS `Deposit`,
         `depm`.`TxnID` AS `TxnID`
@@ -303,10 +307,10 @@ $sql1=$sql1.' UNION ALL SELECT
         
 
 // BOUNCED CHECKS FROM LAST PERIOD
-$sql1=$sql1.' UNION ALL SELECT bs.DateBounced, CONCAT("Bounced#CR",bm.CRNo,"_",bm.PDCNo), IF(bm.ClientNo<9999,"E","C") AS `BECS`, bm.ClientNo, c.ClientName, PDCNo, 200 AS DebitAccountID, BranchNo,BranchNo AS `FromBudgetOf`, AmountofPDC, "DR" AS Expr4, "Bounced", bm.UndepPDCId
+$sql1=$sql1.' UNION ALL SELECT bs.DateBounced, CONCAT("Bounced#CR",bm.CRNo,"_",bm.PDCNo), IF(bm.ClientNo<9999,"E","C") AS `BECS`, bm.ClientNo, c.ClientName, PDCNo, 200 AS DebitAccountID, BranchNo,BranchNo AS `FromBudgetOf`, AmountofPDC, 1 AS `Forex`,`AmountofPDC`AS `PHPAmount`, "DR" AS Expr4, "Bounced", bm.UndepPDCId
 FROM (`acctg_01uniclientsalespersonfordep` c right JOIN `acctg_3undepositedpdcfromlastperiod` bm ON c.ClientNo = bm.ClientNo) INNER JOIN `acctg_3undepositedpdcfromlastperiodbounced` bs ON  (bm.UndepPDCId = bs.UndepPDCId)
 WHERE '.$conditionbounced.' 
-UNION ALL SELECT bs.DateBounced, CONCAT("Bounced#CR",bm.CRNo,"_",bm.PDCNo), IF(bm.ClientNo<9999,"E","C") AS `BECS`, bm.ClientNo, c.ClientName, PDCNo, CreditAccountID, BranchNo,BranchNo AS `FromBudgetOf`, `AmountofPDC`*-1 AS Expr3, "CR" AS Expr4, "Bounced", bm.UndepPDCId
+UNION ALL SELECT bs.DateBounced, CONCAT("Bounced#CR",bm.CRNo,"_",bm.PDCNo), IF(bm.ClientNo<9999,"E","C") AS `BECS`, bm.ClientNo, c.ClientName, PDCNo, CreditAccountID, BranchNo,BranchNo AS `FromBudgetOf`, `AmountofPDC`*-1 AS Expr3, 1 AS `Forex`,`AmountofPDC`*-1 AS `PHPAmount`, "CR" AS Expr4, "Bounced", bm.UndepPDCId
 FROM (`acctg_01uniclientsalespersonfordep` c right JOIN `acctg_3undepositedpdcfromlastperiod` bm ON c.ClientNo = bm.ClientNo) INNER JOIN `acctg_3undepositedpdcfromlastperiodbounced` bs ON  (bm.UndepPDCId = bs.UndepPDCId)
 WHERE '.$conditionbounced;
 
@@ -325,7 +329,7 @@ $sql1=$sql1.' UNION ALL SELECT
         200 AS `DebitAccountID`,
         `cs`.`BranchNo` AS `BranchNo`,
 		`cs`.`BranchNo` AS `FromBudgetOf`,
-        `cs`.`Amount` AS `Amount`,
+        `cs`.`Amount` AS `Amount`, 1 AS `Forex`,`Amount` AS `PHPAmount`,
         "DR" AS `Expr4`,
         "Bounced" AS `Bounced`,
         `cm`.`TxnID` AS `TxnID`
@@ -343,19 +347,20 @@ $sql1=$sql1.' UNION ALL SELECT
         `cbs`.`CreditAccountID` AS `CreditAccountID`,
         `cs`.`BranchNo` AS `BranchNo`,
 		`cs`.`BranchNo` AS `FromBudgetOf`,
-        (`cs`.`Amount` * -(1)) AS `Expr3`,
+        (`cs`.`Amount` * -(1)) AS `Expr3`, 1 AS `Forex`,`Amount`*-1 AS `PHPAmount`,
         "CR" AS `Expr4`,
         "Bounced" AS `Bounced`,
         `cm`.`TxnID` AS `TxnID`
     FROM
     `acctg_2collectmain` `cm` JOIN  `acctg_2collectsub` `cs` ON `cm`.`TxnID` = `cs`.`TxnID` JOIN `acctg_2collectsubbounced` `cbs` ON `cm`.`TxnID` = `cbs`.`TxnID`
         JOIN `'.$thisyr.'_1rtc`.`1clients` `c` ON `c`.`ClientNo` = `cm`.`ClientNo`  WHERE '.$conditionbounced.'
+
      UNION ALL
-SELECT DateBounced, CONCAT("Bounced#CR",cm.CollectNo,"_",cm.CheckNo) AS Expr1,  IF(cm.ClientNo<9999,"E","C") AS `BECS`,cm.ClientNo, c.ClientName, concat(cm.CheckNo," deduct ",DeductDetails), cbb.CreditAccountID AS DebitAccountID, cbs.BranchNo,cbs.BranchNo AS `FromBudgetOf`, cbs.Amount, "DR" AS Expr3, "Bounced", cm.TxnID
+SELECT DateBounced, CONCAT("Bounced#CR",cm.CollectNo,"_",cm.CheckNo) AS Expr1,  IF(cm.ClientNo<9999,"E","C") AS `BECS`,cm.ClientNo, c.ClientName, concat(cm.CheckNo," deduct ",DeductDetails), cbb.CreditAccountID AS DebitAccountID, cbs.BranchNo,cbs.BranchNo AS `FromBudgetOf`, cbs.Amount, 1 AS `Forex`,`Amount` AS `PHPAmount`, "DR" AS Expr3, "Bounced", cm.TxnID
 FROM (acctg_2collectmain cm LEFT JOIN `acctg_01uniclientsalespersonfordep` c ON cm.ClientNo = c.ClientNo) JOIN `acctg_2collectsubdeduct` cbs ON  (cm.TxnID = cbs.TxnID)   JOIN `acctg_2collectsubbounced` cbb ON  (cm.TxnID = cbb.TxnID) 
 WHERE  '.$conditionbounced. '
     UNION ALL
-SELECT DateBounced, CONCAT("Bounced#CR",cm.CollectNo,"_",cm.CheckNo) AS Expr1,  IF(cm.ClientNo<9999,"E","C") AS `BECS`,cm.ClientNo, c.ClientName, concat(cm.CheckNo," deduct ",DeductDetails), cbs.DebitAccountID as CreditAccountID, cbs.BranchNo,cbs.BranchNo AS `FromBudgetOf`, cbs.Amount*-1, "CR" AS Expr3, "Bounced", cm.TxnID
+SELECT DateBounced, CONCAT("Bounced#CR",cm.CollectNo,"_",cm.CheckNo) AS Expr1,  IF(cm.ClientNo<9999,"E","C") AS `BECS`,cm.ClientNo, c.ClientName, concat(cm.CheckNo," deduct ",DeductDetails), cbs.DebitAccountID as CreditAccountID, cbs.BranchNo,cbs.BranchNo AS `FromBudgetOf`, cbs.Amount*-1, 1 AS `Forex`,`Amount`*-1 AS `PHPAmount`, "CR" AS Expr3, "Bounced", cm.TxnID
 FROM (acctg_2collectmain cm LEFT JOIN `acctg_01uniclientsalespersonfordep` c ON cm.ClientNo = c.ClientNo) JOIN `acctg_2collectsubdeduct` cbs ON  (cm.TxnID = cbs.TxnID)   JOIN `acctg_2collectsubbounced` cbb ON  (cm.TxnID = cbb.TxnID) 
 WHERE '.$conditionbounced;
 
@@ -370,7 +375,7 @@ $sql1=$sql1.' UNION ALL SELECT
         `ts`.`DebitAccountID` AS `DebitAccountID`,
         `tm`.`FromBranchNo` AS `FromBranchNo`,
 		`tm`.`FromBranchNo` AS `FromBudgetOf`,
-        `ts`.`Amount` AS `Amount`,
+        `ts`.`Amount` AS `Amount`, 1 AS `Forex`,`Amount` AS `PHPAmount`,
         "DR" AS `Expr2`,
         "Interbranch" AS `Interbranch`,
         `tm`.`TxnID` AS `TxnID`
@@ -388,7 +393,7 @@ $sql1=$sql1.' UNION ALL SELECT
         `tm`.`CreditAccountID` AS `CreditAccountID`,
         `tm`.`FromBranchNo` AS `FromBranchNo`,
 		`tm`.`FromBranchNo` AS `FromBudgetOf`,
-        (`ts`.`Amount` * -(1)) AS `Amount`,
+        (`ts`.`Amount` * -(1)) AS `Amount`, 1 AS `Forex`,`Amount`*-1 AS `PHPAmount`,
         "CR" AS `Expr2`,
         "Interbranch" AS `Interbranch`,
         `tm`.`TxnID` AS `TxnID`
@@ -404,12 +409,12 @@ $sql1=$sql1.' UNION ALL SELECT
         (`ts`.`DateIN` IS NOT NULL)  AND (MONTH(ts.DateIN)=MONTH(tm.Date)) AND (YEAR(ts.DateIN)=YEAR(tm.Date))  and '.$conditionin;
     $sql1=$sql1.' UNION ALL SELECT 
         `ts`.`DateIN` AS `DateIN`, "TxfrIN" AS `Expr1`,  "B" AS `BECS`,`tm`.`FromBranchNo` AS `SuppNo/ClientNo`, `tm`.`FromBranchNo` AS `FromBranchNo`,`ts`.`Particulars` AS `Particulars`,
-        300 AS `DRID`, `ts`.`ClientBranchNo` AS `ClientBranchNo`, `ts`.`ClientBranchNo` AS `FromBudgetOf`, `ts`.`Amount` AS `Amount`, "DR" AS `Expr3`, "Interbranch" AS `Interbranch`, `tm`.`TxnID` AS `TxnID`
+        300 AS `DRID`, `ts`.`ClientBranchNo` AS `ClientBranchNo`, `ts`.`ClientBranchNo` AS `FromBudgetOf`, `ts`.`Amount` AS `Amount`, 1 AS `Forex`,`Amount` AS `PHPAmount`,"DR" AS `Expr3`, "Interbranch" AS `Interbranch`, `tm`.`TxnID` AS `TxnID`
     FROM
         (`acctg_2txfrmain` `tm` JOIN `acctg_2txfrsub` `ts` ON ((`tm`.`TxnID` = `ts`.`TxnID`))) '.$wherecondition.'
     UNION ALL SELECT 
         `ts`.`DateIN` AS `DateIN`, "TxfrIN" AS `Expr1`,  "B" AS `BECS`,`tm`.`FromBranchNo` AS `SuppNo/ClientNo`, `tm`.`FromBranchNo` AS `FromBranchNo`, `ts`.`Particulars` AS `Particulars`,
-        404 AS `CRID`, `ts`.`ClientBranchNo` AS `ClientBranchNo`,`ts`.`ClientBranchNo` AS `FromBudgetOf`, (`ts`.`Amount` * -(1)) AS `Amount`, "CR" AS `Expr3`, "Interbranch" AS `Interbranch`, `tm`.`TxnID` AS `TxnID`
+        404 AS `CRID`, `ts`.`ClientBranchNo` AS `ClientBranchNo`,`ts`.`ClientBranchNo` AS `FromBudgetOf`, (`ts`.`Amount` * -(1)) AS `Amount`, 1 AS `Forex`,`Amount`*-1 AS `PHPAmount`, "CR" AS `Expr3`, "Interbranch" AS `Interbranch`, `tm`.`TxnID` AS `TxnID`
     FROM
         (`acctg_2txfrmain` `tm`
         JOIN `acctg_2txfrsub` `ts` ON ((`tm`.`TxnID` = `ts`.`TxnID`)))
@@ -427,7 +432,7 @@ $sql1=$sql1.' UNION ALL SELECT
         330 AS `DRID`,
         `ts`.`ClientBranchNo` AS `ClientBranchNo`,
 		`ts`.`ClientBranchNo` AS `FromBudgetOf`,
-        (`ts`.`Amount`) AS `Amount`,
+        (`ts`.`Amount`) AS `Amount`, 1 AS `Forex`,`Amount` AS `PHPAmount`,
         "DR" AS `Expr3`,
         "Interbranch" AS `Interbranch`,
         `tm`.`TxnID` AS `TxnID`
@@ -444,7 +449,7 @@ $sql1=$sql1.' UNION ALL SELECT
         404 AS `CRID`,
         `ts`.`ClientBranchNo` AS `ClientBranchNo`,
 		`ts`.`ClientBranchNo` AS `FromBudgetOf`,
-        (`ts`.`Amount` * -(1)) AS `Amount`,
+        (`ts`.`Amount` * -(1)) AS `Amount`, 1 AS `Forex`,`Amount`*-1 AS `PHPAmount`,
         "CR" AS `Expr3`,
         "Interbranch" AS `Interbranch`,
         `tm`.`TxnID` AS `TxnID`
@@ -458,13 +463,13 @@ $sql1=$sql1.' UNION ALL SELECT
         (`ts`.`DateIN` IS NOT NULL)  AND ((MONTH(ts.DateIN)<>MONTH(tm.Date)) OR (YEAR(ts.DateIN)<>YEAR(tm.Date))) AND '.$conditionin;
     $sql1=$sql1.' UNION ALL SELECT 
         `ts`.`DateIN` AS `DateIN`, "TxfrIN" AS `Expr1`, "B" AS `BECS`, `tm`.`FromBranchNo` AS `SuppNo/ClientNo`, `tm`.`FromBranchNo` AS `FromBranchNo`, `ts`.`Particulars` AS `Particulars`,
-        300 AS `DRID`, `ts`.`ClientBranchNo` AS `ClientBranchNo`, `ts`.`ClientBranchNo` AS `FromBudgetOf`,`ts`.`Amount` AS `Amount`, "DR" AS `Expr3`, "Interbranch" AS `Interbranch`, `tm`.`TxnID` AS `TxnID`
+        300 AS `DRID`, `ts`.`ClientBranchNo` AS `ClientBranchNo`, `ts`.`ClientBranchNo` AS `FromBudgetOf`,`ts`.`Amount` AS `Amount`, 1 AS `Forex`,`Amount` AS `PHPAmount`,  "DR" AS `Expr3`, "Interbranch" AS `Interbranch`, `tm`.`TxnID` AS `TxnID`
     FROM
         (`acctg_2txfrmain` `tm` JOIN `acctg_2txfrsub` `ts` ON ((`tm`.`TxnID` = `ts`.`TxnID`))) '
     .$wherecondition.'
         UNION ALL SELECT 
         `ts`.`DateIN` AS `DateIN`, "TxfrIN" AS `Expr1`, "B" AS `BECS`, `tm`.`FromBranchNo` AS `SuppNo/ClientNo`, `tm`.`FromBranchNo` AS `FromBranchNo`,`ts`.`Particulars` AS `Particulars`,
-        330 AS `CRID`, `ts`.`ClientBranchNo` AS `ClientBranchNo`,`ts`.`ClientBranchNo` AS `FromBudgetOf`,  (`ts`.`Amount`*-1) AS `Amount`, "CR" AS `Expr3`, "Interbranch" AS `Interbranch`, `tm`.`TxnID` AS `TxnID`
+        330 AS `CRID`, `ts`.`ClientBranchNo` AS `ClientBranchNo`,`ts`.`ClientBranchNo` AS `FromBudgetOf`,  (`ts`.`Amount`*-1) AS `Amount`, 1 AS `Forex`,`Amount`*-1 AS `PHPAmount`, "CR" AS `Expr3`, "Interbranch" AS `Interbranch`, `tm`.`TxnID` AS `TxnID`
     FROM
         (`acctg_2txfrmain` `tm` JOIN `acctg_2txfrsub` `ts` ON ((`tm`.`TxnID` = `ts`.`TxnID`)))
      '.$wherecondition;
@@ -479,13 +484,14 @@ $sql1=$sql1.' UNION ALL SELECT
         `ts`.`Particulars` AS `Particulars`,
         330 AS `DRID`,
         `ts`.`ClientBranchNo` AS `ClientBranchNo`, `ts`.`ClientBranchNo` AS `FromBudgetOf`,
-        (`ts`.`Amount`) AS `Amount`,
+        (`ts`.`Amount`) AS `Amount`, 1 AS `Forex`,`Amount` AS `PHPAmount`,
         "DR" AS `Expr3`,
         "Interbranch" AS `Interbranch`,
         `tm`.`TxnID` AS `TxnID`
     FROM
         (`acctg_2txfrmain` `tm`
         JOIN `acctg_2txfrsub` `ts` ON ((`tm`.`TxnID` = `ts`.`TxnID`))) '.$wherecondition.'
+
         UNION ALL SELECT 
         `tm`.`Date` AS `Date`,
         "TxfrIN" AS `Expr1`, "B" AS `BECS`,
@@ -493,7 +499,7 @@ $sql1=$sql1.' UNION ALL SELECT
         `tm`.`FromBranchNo` AS `FromBranchNo`,		
         `ts`.`Particulars` AS `Particulars`,
         404 AS `CRID`, `ts`.`ClientBranchNo` AS `ClientBranchNo`, `ts`.`ClientBranchNo` AS `FromBudgetOf`,
-        (`ts`.`Amount` * -(1)) AS `Amount`,
+        (`ts`.`Amount` * -(1)) AS `Amount`, 1 AS `Forex`,`Amount`*-1 AS `PHPAmount`,
         "CR" AS `Expr3`,
         "Interbranch" AS `Interbranch`,
         `tm`.`TxnID` AS `TxnID`
@@ -512,7 +518,7 @@ $wherecondition=' WHERE ((`ts`.`DebitAccountID` = 204) AND (`ts`.`DatePaid` IS N
         `ts`.`PaidViaAcctID` AS `PaidViaAcctID`,
         `tm`.`FromBranchNo` AS `FromBranchNo`,
 		`tm`.`FromBranchNo` AS `FromBudgetOf`,
-        `ts`.`Amount` AS `Amount`,
+        `ts`.`Amount` AS `Amount`, 1 AS `Forex`,`Amount` AS `PHPAmount`,
         "DR" AS `Expr2`,
         "InterbranchPaymt" AS `Interbranch`,
         `tm`.`TxnID` AS `TxnID`
@@ -521,6 +527,7 @@ $wherecondition=' WHERE ((`ts`.`DebitAccountID` = 204) AND (`ts`.`DatePaid` IS N
         JOIN `acctg_2txfrsub` `ts` ON ((`tm`.`TxnID` = `ts`.`TxnID`)))
         JOIN `1branches` `b` ON b.BranchNo=tm.FromBranchNo
         '.$wherecondition.'
+
     UNION ALL SELECT 
         `ts`.`DatePaid` AS `DatePaid`,
         "TxfrOUTRecvPayment" AS `Expr1`, "B" AS `BECS`,
@@ -530,7 +537,7 @@ $wherecondition=' WHERE ((`ts`.`DebitAccountID` = 204) AND (`ts`.`DatePaid` IS N
         `ts`.`DebitAccountID` AS `DebitAccountID`,
         `tm`.`FromBranchNo` AS `FromBranchNo`,
 		`tm`.`FromBranchNo` AS `FromBudgetOf`,
-        (`ts`.`Amount` * -(1)) AS `Amount`,
+        (`ts`.`Amount` * -(1)) AS `Amount`, 1 AS `Forex`,`Amount`*-1 AS `PHPAmount`,
         "CR" AS `Expr2`,
         "InterbranchPaymt" AS `Interbranch`,
         `tm`.`TxnID` AS `TxnID`
@@ -551,13 +558,14 @@ $sql1=$sql1.'
         404 AS `DRID`,
         `ts`.`ClientBranchNo` AS `ClientBranchNo`,
 		`ts`.`ClientBranchNo` AS `FromBudgetOf`,
-        `ts`.`Amount` AS `Amount`,
+        `ts`.`Amount` AS `Amount`, 1 AS `Forex`,`Amount` AS `PHPAmount`,
         "DR" AS `Expr3`,
         "InterbranchPaymt" AS `Interbranch`,
         `tm`.`TxnID` AS `TxnID`
     FROM
         (`acctg_2txfrmain` `tm`
         JOIN `acctg_2txfrsub` `ts` ON ((`tm`.`TxnID` = `ts`.`TxnID`))) '.$wherecondition.'
+
     UNION ALL SELECT 
         `ts`.`DatePaid` AS `DatePaid`,
         "TxfrINPayment" AS `Expr1`, "B" AS `BECS`,
@@ -567,7 +575,7 @@ $sql1=$sql1.'
         `ts`.`PaidViaAcctID` AS `CRID`,
         `ts`.`ClientBranchNo` AS `ClientBranchNo`,
 		`ts`.`ClientBranchNo` AS `FromBudgetOf`,
-        (`ts`.`Amount` * -(1)) AS `Amount`,
+        (`ts`.`Amount` * -(1)) AS `Amount`, 1 AS `Forex`,`Amount`*-1 AS `PHPAmount`,
         "CR" AS `Expr3`,
         "InterbranchPaymt" AS `Interbranch`,
         `tm`.`TxnID` AS `TxnID`

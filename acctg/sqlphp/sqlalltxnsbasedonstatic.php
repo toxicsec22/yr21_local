@@ -26,7 +26,8 @@ $sqlalltxns='SELECT `Date`,
     `AccountID`,
     `BranchNo`, 
 	`FromBudgetOf`, 
-    IFNULL(`Amount`,0) AS `Amount`,
+    IFNULL(`Amount`,0) AS `Amount`, IFNULL(`Forex`,1) AS Forex,
+    IFNULL(`Amount`*`Forex`,0) AS PHPAmount,
     `Entry`,
     `w`,
     `TxnID`
@@ -40,15 +41,15 @@ $sqllastmonth='SELECT
     `AccountID`,
     `BranchNo`,
 	`FromBudgetOf`,
-    IFNULL(Sum(`Amount`),0) as SumofAmount,
+    IFNULL(Sum(`Amount`),0) as SumofAmount, IFNULL(Forex,1) AS Forex, IFNULL(Sum(`Amount`*IFNULL(Forex,1)),0) as SumofPHPAmount,
     `Entry`
 FROM `'.$currentyr.'_static`.`acctg_unialltxns` WHERE YEAR(Date)='.$currentyr.' AND (MONTH(Date)<='.($monthfrom<=$closedmonth?($monthfrom-1):$closedmonth).' OR `ControlNo` LIKE \'%BegBal\') and AccountID in '.$acctid.' GROUP BY AccountID, BranchNo';
-//echo $sqllastmonth; break;
+//if($_SESSION['(ak0)']==1002) { echo $sqllastmonth.'<br><br>'; }
 $sqllastmonthcompany='SELECT 
     `ControlNo`, `BECS`,
     `SuppNo/ClientNo`,
     `AccountID`,    
-    Sum(`Amount`) as SumofAmount,CompanyNo,
+    Sum(`Amount`) as SumofAmount, IFNULL(Forex,1) AS Forex, IFNULL(Sum(`Amount`*(IFNULL(Forex,1))),0) as SumofPHPAmount, CompanyNo,
     `Entry`
 FROM `'.$currentyr.'_static`.`acctg_unialltxns` WHERE YEAR(Date)='.$currentyr.' AND (MONTH(Date)<='.($monthfrom<=$closedmonth?($monthfrom-1):$closedmonth).' OR `ControlNo` LIKE \'%BegBal\') and AccountID in '.$acctid.' GROUP BY AccountID';
 //}

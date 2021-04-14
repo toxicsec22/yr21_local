@@ -9,6 +9,8 @@ AccountID smallint(6) not null,
 BranchNo smallint(6) not null, 
 FromBudgetOf smallint(6) not null, 
 Amount double null,
+Forex double null,
+PHPAmount double null,
 Entry varchar(2) not null,
 w varchar(20) not null,
 TxnID int(11) not null

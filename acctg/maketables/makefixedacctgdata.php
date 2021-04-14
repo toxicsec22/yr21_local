@@ -67,6 +67,8 @@ switch ($whichdata){
    `BranchNo` smallint(6) NOT NULL DEFAULT "0",
    `FromBudgetOf` smallint(6) NOT NULL DEFAULT "0",
    `Amount` double DEFAULT 0,
+   `Forex` double DEFAULT 1,
+   `PHPAmount` double DEFAULT 0,
    `Entry` varchar(2) NOT NULL DEFAULT "",
    `w` varchar(16) NOT NULL DEFAULT "",
    `TxnID` int(11) NOT NULL DEFAULT "0",
@@ -86,7 +88,7 @@ switch ($whichdata){
         `bb`.`AccountID` AS `AccountID`,
         `bb`.`BranchNo` AS `BranchNo`,
 	`bb`.`BranchNo` AS `FromBudgetOf`,
-        `bb`.`BegBalance` AS `Amount`,
+        `bb`.`BegBalance` AS `Amount`, `bb`.`Forex`, `bb`.`BegBalance`*`bb`.`Forex` AS `PHPAmount`, 
         "DR" AS `Entry`,
         "BegBal" AS `w`,
         0 AS `TxnID`
