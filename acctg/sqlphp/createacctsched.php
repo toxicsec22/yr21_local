@@ -15,7 +15,7 @@ Entry varchar(2) not null,
 w varchar(20) not null,
 TxnID int(11) not null
 )'.$sqlalltxns;
-// echo $acctid.'<br>'.$sql0; break;
+//if($_SESSION['(ak0)']==1002) { echo $acctid.'<br>'.$sql0; }
 $stmt=$link->prepare($sql0);
 $stmt->execute();
 
