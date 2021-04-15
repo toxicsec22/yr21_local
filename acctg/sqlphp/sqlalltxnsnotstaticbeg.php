@@ -17,9 +17,9 @@ SELECT "Depr" AS ControlNo, "B" AS `BECS`, 0 as `SuppNo/ClientNo`, IFNULL(ca.Acc
 
 if(countRows('acctg_2prepaidamort')>0){ 
 // APPLICATION OF PREPAID EXPENSES
-$sqllastmonth=$sqllastmonth.' UNION ALL SELECT "PrExp" AS ControlNo, "B" AS `BECS`, 0 as `SuppNo/ClientNo`, IFNULL(d.ExpenseAccountID,100) as AccountID, BranchNo,BranchNo as FromBudgetOf, Sum(d.Amount), 1 AS Forex, SUM(Amount) AS SumofPHPAmount,  "DR" as Entry FROM acctg_2prepaid a JOIN acctg_2prepaidamort d ON a.PrepaidID=d.PrepaidID WHERE YEAR(AmortDate)='.$thisyr.' AND MONTH(AmortDate) in ('.$lastmonth.') and ExpenseAccountID in '.$acctid.' 
+$sqllastmonth=$sqllastmonth.' UNION ALL SELECT "PrExp" AS ControlNo, "B" AS `BECS`, 0 as `SuppNo/ClientNo`, IFNULL(d.ExpenseAccountID,100) as AccountID, BranchNo,BranchNo as FromBudgetOf, Sum(d.Amount), 1 AS Forex, SUM(d.Amount) AS SumofPHPAmount,  "DR" as Entry FROM acctg_2prepaid a JOIN acctg_2prepaidamort d ON a.PrepaidID=d.PrepaidID WHERE YEAR(AmortDate)='.$thisyr.' AND MONTH(AmortDate) in ('.$lastmonth.') and ExpenseAccountID in '.$acctid.' 
 UNION ALL
-SELECT "PrExp" AS ControlNo, "B" AS `BECS`, 0 as `SuppNo/ClientNo`, IFNULL(PrepaidAccountID,100) as AccountID, BranchNo,BranchNo as FromBudgetOf, Sum(d.Amount)*-1, 1 AS Forex, SUM(Amount*-1) AS SumofPHPAmount, "CR" as Entry FROM acctg_2prepaid a JOIN acctg_2prepaidamort d ON a.PrepaidID=d.PrepaidID WHERE YEAR(AmortDate)='.$thisyr.' AND MONTH(AmortDate) in ('.$lastmonth.') and PrepaidAccountID in '.$acctid;
+SELECT "PrExp" AS ControlNo, "B" AS `BECS`, 0 as `SuppNo/ClientNo`, IFNULL(PrepaidAccountID,100) as AccountID, BranchNo,BranchNo as FromBudgetOf, Sum(d.Amount)*-1, 1 AS Forex, SUM(d.Amount*-1) AS SumofPHPAmount, "CR" as Entry FROM acctg_2prepaid a JOIN acctg_2prepaidamort d ON a.PrepaidID=d.PrepaidID WHERE YEAR(AmortDate)='.$thisyr.' AND MONTH(AmortDate) in ('.$lastmonth.') and PrepaidAccountID in '.$acctid;
 }
 
 // PURCHASES
