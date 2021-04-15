@@ -1139,7 +1139,7 @@ switch ($which)
 				
 			}
 			//Requester
-			if ((allowedToOpen(8287,'1rtc')) OR (allowedToOpen(8289,'1rtc')) OR (allowedToOpen(8286,'1rtc')) OR (allowedToOpen(82861,'1rtc'))){
+			if ((allowedToOpen(8287,'1rtc')) OR (allowedToOpen(8289,'1rtc')) OR (allowedToOpen(8286,'1rtc')) OR (allowedToOpen(82861,'1rtc')) OR $res['RequestedByNo']==$_SESSION['(ak0)']){
 				if ($res['Approved']==0 AND $res['RequestCompleted']==0){
 				echo '<tr><td><a href="motorvehicles.php?w=RequestCompleted&action_token='.html_escape($_SESSION['action_token']).'&TxnID='.$txnid.'">Set_Request_As_Completed</a></td><td><a href="motorvehicles.php?w=EditSpecificsListOfRepairs&action_token='.html_escape($_SESSION['action_token']).'&TxnID='.$txnid.'">Edit Request</a></td></tr>';}
 			}
@@ -1148,7 +1148,7 @@ switch ($which)
 					
 					// if ($res['Approved']==0 AND $res['Approved2ByNo']==0){
 					if ($res['Approved']==0 AND $res['Approved2']==0){
-						if ((allowedToOpen(8289,'1rtc')) OR (allowedToOpen(82862,'1rtc'))){ //To approve by sir jeck /heads
+						if ((allowedToOpen(array(82862,8289,8290),'1rtc'))){ //To approve by sir jeck /heads
 							echo '<tr><td align="left">';
 							echo '<form action="motorvehicles.php?w=Approve" method="POST"><br/>Remarks:<br/><textarea name="ApprovedRemarks" rows="2" cols="50" placeholder="Leave empty if no remarks.">'.$res['ApprovedRemarks'].'</textarea><input type="hidden" name="action_token" value="'.html_escape($_SESSION['action_token']).'" /><input type="hidden" name="TxnID" value="'.$txnid.'"><br/><br/><div><div style="float:left;"><input type="submit" name="btnApprove" value="APPROVE"></div><div style="margin-left:30%;"><input type="submit" name="btnDeny" value="DENY"></div></div></form>';
 							
@@ -1357,7 +1357,7 @@ switch ($which)
 	
 	
 	case 'RequestCompleted':
-	if ((allowedToOpen(8287,'1rtc')) OR (allowedToOpen(8289,'1rtc')) OR (allowedToOpen(8286,'1rtc')) OR (allowedToOpen(82861,'1rtc'))){
+	if ((allowedToOpen(8288,'1rtc'))){
 	require_once $path.'/acrossyrs/logincodes/confirmtoken.php';
 	$txnid = $_GET['TxnID'];
 	$sql='';
@@ -1370,7 +1370,7 @@ switch ($which)
 	break;
 	
 	case 'Approve':
-    if ((allowedToOpen(8289,'1rtc')) OR (allowedToOpen(82862,'1rtc'))){
+    if (allowedToOpen(array(8289,82862,8290),'1rtc')){
 	require_once $path.'/acrossyrs/logincodes/confirmtoken.php';
 	$sql='';
 	$txnid = $_POST['TxnID'];

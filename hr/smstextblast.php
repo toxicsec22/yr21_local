@@ -44,12 +44,12 @@ $delprocess='smstextblast.php?w=Delete&TxnID=';
 case 'ListAll':
 $title='List of All Messages';
 
-$width="85%";
+// $width="85%";
 $editprocess='smstextblast.php?w=SendSMS&TxnID=';
 $editprocesslabel='Lookup';
 $sql.=' ORDER BY a.TimeStamp DESC';
 $delprocess='smstextblast.php?w=Delete&TxnID=';
-     include('../backendphp/layout/displayastable.php');
+     include('../backendphp/layout/displayastablenosort.php');
 	 
      break;
 	
@@ -202,7 +202,7 @@ $delprocess='smstextblast.php?w=DeleteCondi&TxnID=';
 	case 'Add':
 	require_once $path.'/acrossyrs/logincodes/confirmtoken.php';
 	$sql='INSERT INTO `hr_2smstxtblast` (`Msg`,`MsgFor`,`EncodedByNo`,`TimeStamp`,`CID`)
-	VALUES (\''.$_POST['Msg'].'\',\''.$_POST['MsgFor'].'\', '.$_SESSION['(ak0)'].',NOW(),'.$_POST['CID'].')';
+	VALUES (\''.addslashes($_POST['Msg']).'\',\''.$_POST['MsgFor'].'\', '.$_SESSION['(ak0)'].',NOW(),'.$_POST['CID'].')';
 	
 	$stmt=$link->prepare($sql);
 	$stmt->execute();
