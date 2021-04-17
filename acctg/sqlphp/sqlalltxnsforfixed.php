@@ -584,5 +584,5 @@ $sql1=$sql1.'
         JOIN `acctg_2txfrsub` `ts` ON ((`tm`.`TxnID` = `ts`.`TxnID`))) '.$wherecondition;
             
 
-if($_SESSION['(ak0)']==1002) { echo $sql1; }
+//if($_SESSION['(ak0)']==1002) { echo $sql1; }
 ?>

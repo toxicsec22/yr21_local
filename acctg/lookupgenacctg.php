@@ -50,7 +50,7 @@ To Month (1 - 12):  <input type="text" size=5 name="Month2" value="<?php echo $m
 <?php echo  (allowedToOpen(5581,'1rtc')?'<input type="submit" name="submit" value="ALL">':''); ?>&nbsp &nbsp &nbsp 
 </form>
 <?php 
-
+if(!(isset($_REQUEST['Account']))) { goto noform;}
 $showprint=true;
 include('../backendphp/functions/getnumber.php');
 $accts=array(getNumber('Account',addslashes($account)));
@@ -66,49 +66,57 @@ $acctid=$acctid.')';
 $formdesc='<br><b>'.$account.' '.$acctid.' <i>for the months '.strtoupper(date('F',strtotime(''.$currentyr.'-'.$month1.'-1'))).'&nbsp to '.strtoupper(date('F',strtotime(''.$currentyr.'-'.$month2.'-1'))).str_repeat('&nbsp',3).'</i>(';
 $monthfrom=$month1; $monthto=$month2;
 
-
-// REPLACED THIS WITH STATIC DATA: include('../acctg/sqlphp/sqlalltxnsperaccountpermonth.php');
 include('../acctg/sqlphp/createacctsched.php');
 include('../acctg/sqlphp/createacctbegbal.php');
-//}
 
-$columnsub=array('Date', 'ControlNo', 'Supplier/Customer/Branch', 'Particulars','Debit','Credit');
+$sqlf='SELECT Forex FROM acctbegbal';
+$stmt=$link->query($sqlf);   $resultf=$stmt->fetch();
+$sqlf2='SELECT COUNT(Forex) AS CountForex FROM acctsched WHERE Forex<>1';
+$stmt=$link->query($sqlf2);   $resultf2=$stmt->fetch();
+
+if(($resultf['Forex']>1) or ($resultf2['CountForex']>0)){
+    $columnsub=array('Date', 'ControlNo', 'Supplier/Customer/Branch', 'Particulars','Forex','Debit','Credit');
+} else {
+    $columnsub=array('Date', 'ControlNo', 'Supplier/Customer/Branch', 'Particulars','Debit','Credit');
+}
+
+
 
 if ($show==='Per Company') { 
    $formdesc=$formdesc.$_SESSION['*cname'];
    $condition=' WHERE a.BranchNo IN (SELECT BranchNo FROM `1branches` WHERE CompanyNo='.$_SESSION['*cnum'].') ';
    $columnsub[]='FromBudgetOf'; $columnsub[]='Branch'; 
-   $sqlsum='Select (Select (Sum(SumofAmount)) from acctbegbal a '.$condition.' ) as Beginning , Sum(Case when (Entry="DR" and (Amount)>=0) or (Entry="CR" and (Amount)>=0)  then (IFNULL(Amount,0)) else 0 end) as TotalDebit,abs(Sum(Case when (Entry="CR" and (Amount)<0) or (Entry="DR" and (Amount)<0)  then ((IFNULL(Amount,0))) else 0 end)) as TotalCredit from  `acctsched` a
+   $sqlsum='Select (Select (Sum(PHPAmount)) from acctbegbal a '.$condition.' ) as Beginning , Sum(Case when (Entry="DR" and (PHPAmount)>=0) or (Entry="CR" and (PHPAmount)>=0)  then (IFNULL(PHPAmount,0)) else 0 end) as TotalDebit,abs(Sum(Case when (Entry="CR" and (PHPAmount)<0) or (Entry="DR" and (PHPAmount)<0)  then ((IFNULL(PHPAmount,0))) else 0 end)) as TotalCredit from  `acctsched` a
    '.$condition.' group by a.AccountID';
 } elseif ($show==='ALL') { 
    $formdesc=$formdesc.' ALL';
    $condition=''; $columnsub[]='FromBudgetOf'; $columnsub[]='Branch'; //$addlgroupby='';
-   $sqlsum='Select (Select (Sum(SumofAmount)) from
-   acctbegbal a '.$condition.' ) as Beginning , Sum(Case when (Entry="DR" and (Amount)>=0) or (Entry="CR" and (Amount)>=0)  then (IFNULL(Amount,0)) else 0 end) as TotalDebit,abs(Sum(Case when (Entry="CR" and (Amount)<0) or (Entry="DR" and (Amount)<0) then ((IFNULL(Amount,0))*-1) else 0 end)) as TotalCredit from  `acctsched` a
+   $sqlsum='Select (Select (Sum(PHPAmount)) from
+   acctbegbal a '.$condition.' ) as Beginning , Sum(Case when (Entry="DR" and (PHPAmount)>=0) or (Entry="CR" and (PHPAmount)>=0)  then (IFNULL(PHPAmount,0)) else 0 end) as TotalDebit,abs(Sum(Case when (Entry="CR" and (PHPAmount)<0) or (Entry="DR" and (PHPAmount)<0) then ((IFNULL(PHPAmount,0))*-1) else 0 end)) as TotalCredit from  `acctsched` a
    join `acctg_1chartofaccounts` ca on ca.AccountID=a.AccountID '.$condition.' group by a.AccountID';
 } else { // per branch
    $formdesc=$formdesc.$_SESSION['@brn'];
    $condition=' where a.BranchNo='.$_SESSION['bnum'];  $columnsub[]='FromBudgetOf';
-   $sqlsum='Select (Select (Sum(IFNULL(SumofAmount,0))) from
-   acctbegbal a '.$condition.' ) as Beginning , Sum(Case when (Entry="DR" and (IFNULL(Amount,0))>=0) or (Entry="CR" and (Amount)>=0)  then (IFNULL(Amount,0)) else 0 end) as TotalDebit,abs(Sum(Case when (Entry="CR" and (Amount)<0) or (Entry="DR" and (Amount)<0)  then ((IFNULL(Amount,0))) else 0 end)) as TotalCredit from  `acctsched` a
+   $sqlsum='Select (Select (Sum(IFNULL(PHPAmount,0))) from
+   acctbegbal a '.$condition.' ) as Beginning , Sum(Case when (Entry="DR" and (IFNULL(PHPAmount,0))>=0) or (Entry="CR" and (PHPAmount)>=0)  then (IFNULL(PHPAmount,0)) else 0 end) as TotalDebit,abs(Sum(Case when (Entry="CR" and (PHPAmount)<0) or (Entry="DR" and (PHPAmount)<0)  then ((IFNULL(PHPAmount,0))) else 0 end)) as TotalCredit from  `acctsched` a
    '.$condition.' group by a.BranchNo, a.AccountID';
 }  
 
 $formdesc=$formdesc.')</b>';
 $sortfield=(isset($_POST['sortfield'])?$_POST['sortfield']:'Date,ControlNo');
 
-$sql='SELECT Last_Day(\''.($month1<>1?(''.$currentyr.'-'.($month1-1).'-1'):($currentyr-1).'-12-30').'\') as Date, "-" as ControlNo, "Beginning Balance" as `Supplier/Customer/Branch`, "" as Particulars, Branch,Entity as FromBudgetOf, if(Sum(SumofAmount)>0,format(Sum(SumofAmount),2),0) as Debit, if(Sum(SumofAmount)<0,format(abs(Sum(SumofAmount)),2),0) as Credit, Sum(SumofAmount) as AmtToTotal, "AcctSched" as w, 0 as TxnID, ca.NormBal
+$sql='SELECT Last_Day(\''.($month1<>1?(''.$currentyr.'-'.($month1-1).'-1'):($currentyr-1).'-12-30').'\') as Date, "-" as ControlNo, "Beginning Balance" as `Supplier/Customer/Branch`, "" as Particulars, Branch,Entity as FromBudgetOf, Forex, if(Sum(PHPAmount)>0,format(Sum(PHPAmount),2),0) as Debit, if(Sum(PHPAmount)<0,format(abs(Sum(PHPAmount)),2),0) as Credit, Sum(PHPAmount) as AmtToTotal, "AcctSched" as w, 0 as TxnID, ca.NormBal
 from  acctbegbal a join `1branches` b on b.BranchNo=a.BranchNo left join acctg_1budgetentities be on be.EntityID=a.FromBudgetOf
 join `acctg_1chartofaccounts` ca on ca.AccountID=a.AccountID '.$condition.' 
 UNION ALL
-SELECT Date, ControlNo, `Supplier/Customer/Branch`, Particulars, Branch,Entity as FromBudgetOf, (Case when (Entry="DR" and (Amount)>=0) OR (Entry="CR" and (Amount)>=0) then format((Amount),2) else "" end) as Debit,(Case when ((Entry="CR" and (Amount)<0) or (Entry="DR" and (Amount)<0)) then format(abs((Amount)),2) else 0 end) as Credit,(Amount) as AmtToTotal, w, TxnID, ca.NormBal from `1branches` b join acctsched a on a.BranchNo=b.BranchNo left join acctg_1budgetentities be on be.EntityID=a.FromBudgetOf join `acctg_1chartofaccounts` ca on ca.AccountID=a.AccountID  '.$condition.'  order by '.$sortfield.(isset($_POST['sortarrange'])?' '.$_POST['sortarrange']:' ASC');
+SELECT Date, ControlNo, `Supplier/Customer/Branch`, Particulars, Branch,Entity as FromBudgetOf, Forex,(Case when (Entry="DR" and (PHPAmount)>=0) OR (Entry="CR" and (PHPAmount)>=0) then format((PHPAmount),2) else "" end) as Debit,(Case when ((Entry="CR" and (PHPAmount)<0) or (Entry="DR" and (PHPAmount)<0)) then format(abs((PHPAmount)),2) else 0 end) as Credit,(PHPAmount) as AmtToTotal, w, TxnID, ca.NormBal from `1branches` b join acctsched a on a.BranchNo=b.BranchNo left join acctg_1budgetentities be on be.EntityID=a.FromBudgetOf join `acctg_1chartofaccounts` ca on ca.AccountID=a.AccountID  '.$condition.'  order by '.$sortfield.(isset($_POST['sortarrange'])?' '.$_POST['sortarrange']:' ASC');
 // echo $sql;break;
     
 $main='';
 $columnnames=array();
 $sub=''; $downloadsub='';
 
-// echo $acctid.'<br>'.$sql; break;
+//if($_SESSION['(ak0)']==1002){ echo $acctid.'<br>'.$sql; }
 $stmt=$link->query($sql);   $result=$stmt->fetchAll();
  
    $subcol='';$runtotal=0; $downloadsubcol='';

@@ -21,6 +21,8 @@ switch ($whichdata){
           `BranchNo` smallint(6) NOT NULL,
           `FromBudgetOf` smallint(6) NOT NULL DEFAULT \'0\',
           `Amount` double NOT NULL DEFAULT \'0\',
+          `Forex` double NOT NULL DEFAULT \'1\',
+          `PHPAmount` double NOT NULL DEFAULT \'0\',
           `Entry` varchar(2) CHARACTER SET utf8 NOT NULL DEFAULT \'\',
           `w` varchar(16) CHARACTER SET utf8 NOT NULL DEFAULT \'\',
           `TxnID` bigint(11) NOT NULL DEFAULT \'0\'
@@ -34,7 +36,7 @@ switch ($whichdata){
         `AccountID` AS `AccountID`,
         `BranchNo` AS `BranchNo`,
 		`FromBudgetOf` AS `FromBudgetOf`,
-        IFNULL(`Amount`,0) AS `Amount`,
+        IFNULL(`Amount`,0) AS `Amount`, IFNULL(Forex,1) AS Forex, IFNULL(`Amount`,0)*IFNULL(Forex,1) AS PHPAmount,
         `Entry` AS `Entry`,
         `w` AS `w`,
         `TxnID` AS `TxnID`
