@@ -1,4 +1,5 @@
 <?php 
+include_once('regulartablestyle.php');
 include_once('../backendphp/functions/editok.php');
 $editok=editOk($main,$txnid,$link,$title);
 $stmt=$link->query($sql); $result=$stmt->fetch();
