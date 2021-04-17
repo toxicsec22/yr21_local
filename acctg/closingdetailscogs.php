@@ -60,6 +60,7 @@ switch ($which){
 
 case 'COGSAdj':
     include_once('../backendphp/functions/checkexists.php');
+    include_once($path.'/acrossyrs/commonfunctions/lastnum.php'); 
     $stringtomatch='Cogs'.str_pad($reportmonth,2,'0',STR_PAD_LEFT);
      $jvno=checkExists($stringtomatch,'Remarks','acctg_2jvmain','JVNo',$link);
 	if ($jvno==0){
@@ -67,7 +68,7 @@ case 'COGSAdj':
                 $done=1; 
     
 	 
-	$sql='INSERT INTO `acctg_2jvmain` SET JVNo='.$jvno.' Posted=0, JVDate=Last_Day(\''.$currentyr.'-'.$reportmonth.'-1\'), Remarks=concat("Cogs","'.str_pad($reportmonth,2,"0",STR_PAD_LEFT).'"), EncodedByNo=\''.$_SESSION['(ak0)'].'\', PostedByNo=\''.$_SESSION['(ak0)'].'\',TimeStamp=Now();'; 
+	$sql='INSERT INTO `acctg_2jvmain` SET JVNo='.$jvno.', Posted=0, JVDate=Last_Day(\''.$currentyr.'-'.$reportmonth.'-1\'), Remarks=concat("Cogs","'.str_pad($reportmonth,2,"0",STR_PAD_LEFT).'"), EncodedByNo=\''.$_SESSION['(ak0)'].'\', PostedByNo=\''.$_SESSION['(ak0)'].'\',TimeStamp=Now();'; 
 	
         $stmt=$link->prepare($sql); $stmt->execute();
 	
