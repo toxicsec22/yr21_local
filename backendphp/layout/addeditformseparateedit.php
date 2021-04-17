@@ -21,7 +21,7 @@ echo '<title>'.$title.'</title>';
 // MAIN FORM  
 $stmt=$link->query($sqlmain); $result=$stmt->fetch();
 if (!isset($nopost)){
-    $postvalue=($result[$postfield]==1?0:1); 
+    $postvalue=($result[$postfield]==1?0:1); $main=$table; $txnid=$txnidname;
     include($path.'/acrossyrs/commonfunctions/postunpostformgeneric.php');
 }
 
@@ -56,7 +56,16 @@ if ($editok){
 }
 
 //SUB FORM
+
+include_once('regulartablestyle.php');
+
 unset($title);
+
+//to make alternating rows have different colors
+$colorcount=0;
+$rcolor[0]=(!isset($_REQUEST['print'])?(isset($alternatecolor)?$alternatecolor:"FFFFCC"):"FFFFFF");
+$rcolor[1]="FFFFFF";
+
 $subth='';
 foreach ($columnsub as $colsub){ $subth=$subth.'<th>'.$colsub.'</th>';}
 
@@ -64,6 +73,12 @@ $stmt=$link->query($sqlsub); $resultsub=$stmt->fetchAll();
 $sub='';
 
 foreach ($resultsub as $row){
+    if(isset($changecolorfield)){
+        if($rows[$changecolorfield]%2==0){ $rcolor[0]=(!isset($_REQUEST['print'])?"ccffff":"FFFFFF");} else { $rcolor[0]=(!isset($_REQUEST['print'])?"FFFFCC":"FFFFFF");}  
+    }
+    $sub.="<tr  bgcolor=". $rcolor[$colorcount%2].">";
+    $colorcount++;
+
 if ($editok){
     $editsub='<td><a href="'.$editprocesssub.$row['TxnSubId'].'">'.$editprocesssublabel.'</a>'.str_repeat('&nbsp',8).'<a href='.$delprocesssub.$row['TxnSubId'].'&action_token='.$_SESSION['action_token'].' OnClick="return confirm(\'Really delete this?\');">Delete</a>';
     if (isset($addlprocesssub)){ $editsub=$editsub.str_repeat('&nbsp',8).'<a href="'.$addlprocesssub.$row['TxnSubId'].'&action_token='.$_SESSION['action_token'].'">'.$addlprocesssublabel.'</a>';}
@@ -78,7 +93,7 @@ $colno=0;
         $colno=$colno+1;
         $sub=$sub.'<td>'.$row[$rowsub].str_repeat('&nbsp',5).'</td>';
 }
-$sub='<tr>'.$sub.$editsub.'</tr>';
+$sub.=$editsub.'</tr>';
 }
 echo '<table><tr>'.$subth.'</tr>'.$sub.'</table>';
 
