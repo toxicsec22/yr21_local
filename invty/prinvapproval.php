@@ -157,7 +157,13 @@ case 'RecordSU':
 	//To get Store Used Number 
 	include_once '../backendphp/functions/getnumber.php';
 	$txnnoprefix='su-'.str_pad($_SESSION['bnum'],2,'0',STR_PAD_LEFT).'-';
-	$txnno=getAutoTxnNo($txnnoprefix,6,'MRRNo','invty_2mrr',$link);
+	// $txnno=getAutoTxnNo($txnnoprefix,6,'MRRNo','invty_2mrr',$link);
+
+	$charssu=6;
+	if($_SESSION['bnum']>=100){
+		$charssu=7;
+	}
+	$txnno=getAutoTxnNo($txnnoprefix,$charssu,'MRRNo','invty_2mrr',$link);
 	
 	$sql='INSERT INTO `invty_2mrr` SET `Date`=curdate(), MRRNo=\''.$txnno.'\', SupplierNo=\''.$_SESSION['bnum'].'\', txntype=9, ForPONo=\'StoreUsed\', SuppInvNo=0, BranchNo=\''.$_SESSION['bnum'].'\',  EncodedByNo=\''.$_SESSION['(ak0)'].'\', PostedByNo=\''.$_SESSION['(ak0)'].'\',TimeStamp=Now()';
 	//echo $sql; break;
