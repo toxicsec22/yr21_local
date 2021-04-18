@@ -176,22 +176,20 @@ include_once('../backendphp/layout/displayastable.php');
             $editprocesssublabel='Edit'; $editprocesssub='formjv.php?w=Edit'.$form.'Sub&'.$txnidname.'='.$txnid.'&TxnSubId=';
             
             $delprocesssub='..\backendphp\functions\delrecordssub.php?TxnID='.$txnid.'&w='.$subtable.'&l=acctg'.'&TxnSubId=';
-
-        //     $sqltotal='SELECT'
             
             include('../backendphp/layout/mainandsubform.php');
             // to show totals
-          //  $colamt=$coltototal;
             unset($textfordisplay,$sql,$columnnames,$editprocess,$delprocess,$addlprocess,$addlprocesslabel,$coltototal,$sortfield);
             
             $sql='SELECT FORMAT(SUM(`Forex`*Amount),2) AS Total, Branch FROM '.$subtable.' s join `1branches` b on b.BranchNo=s.BranchNo WHERE s.JVNo='.$txnid.' GROUP BY s.BranchNo ORDER BY Branch';
             $subtitle='<br/><br/>Totals Per Branch'; $columnnames=array('Branch','Total'); $width='40%';
+            //if($_SESSION['(ak0)']==1002){echo $sql;}
            // echo '<div id="right">';
             include('../backendphp/layout/displayastableonlynoheaders.php');
             $sql0='CREATE TEMPORARY TABLE AdjTotal AS 
         SELECT DebitAccountID AS AccountID, TRUNCATE(SUM(Forex*Amount),2) AS Amount FROM acctg_2jvsub s WHERE JVNo='.$txnid.' GROUP BY DebitAccountID
         UNION ALL
-        SELECT CreditAccountID AS AccountID, TRUNCATE(SUM(Amount)*-1,2) AS Amount FROM acctg_2jvsub s WHERE JVNo='.$txnid.' GROUP BY CreditAccountID';
+        SELECT CreditAccountID AS AccountID, TRUNCATE(SUM(Forex*Amount)*-1,2) AS Amount FROM acctg_2jvsub s WHERE JVNo='.$txnid.' GROUP BY CreditAccountID';
             $stmt=$link->prepare($sql0); $stmt->execute();
             $sql='SELECT FORMAT(SUM(`Amount`),2) AS NetDRLessCR, ShortAcctID AS Account FROM AdjTotal s join `acctg_1chartofaccounts` ca on ca.AccountID=s.AccountID  GROUP BY s.AccountID ORDER BY Account';
             $subtitle='Totals Per Account'; $columnnames=array('Account','NetDRLessCR'); $width='40%';
