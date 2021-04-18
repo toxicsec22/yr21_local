@@ -148,9 +148,11 @@ include_once('../backendphp/layout/displayastable.php');
             $sortfield=(isset($_POST['sortfield'])?$_POST['sortfield']:'s.TimeStamp'); 
             $sqlsub.=' ORDER BY '.$sortfield.(isset($_POST['sortarrange'])?' '.$_POST['sortarrange']:' ASC');
             
-            $sqlsum='SELECT sum('.$coltototal.') as Total, SUM(Amount*Forex) AS PHPTotal FROM  `'.$subtable.'` s JOIN `'.$table.'` m ON m.JVNo=s.JVNo WHERE m.JVNo='.$txnid;
+            $sqlsum='SELECT sum('.$coltototal.') as Total, SUM(CASE WHEN Forex<>1 THEN 1 ELSE 0 END) AS CountForex, SUM(Amount*Forex) AS PHPTotal FROM  `'.$subtable.'` s JOIN `'.$table.'` m ON m.JVNo=s.JVNo WHERE m.JVNo='.$txnid;
             $stmt=$link->query($sqlsum); $result=$stmt->fetch();
-            $addlinfo='Total:  '.number_format($result['Total'],2).str_repeat('&nbsp',10).number_format($result['PHPTotal'],2).str_repeat('&nbsp',10).'<a href="formjv.php?w=AddMain">Add '. $w.'</a>'.'<br><br>';
+            $addlinfo='Total:  '.number_format($result['Total'],2).str_repeat('&nbsp',10);
+            if ($result['CountForex']<>1) { $addlinfo.='PHP Total:'.number_format($result['PHPTotal'],2).str_repeat('&nbsp',10);}
+            $addlinfo.='<a href="formjv.php?w=AddMain">Add '. $w.'</a>'.'<br><br>';
         
             
             $columnnames=array(
@@ -180,14 +182,14 @@ include_once('../backendphp/layout/displayastable.php');
             include('../backendphp/layout/mainandsubform.php');
             // to show totals
           //  $colamt=$coltototal;
-            unset($textfordisplay,$sql,$columnnames,$editprocess,$delprocess,$addlprocess,$addlprocesslabel,$sortfield);
+            unset($textfordisplay,$sql,$columnnames,$editprocess,$delprocess,$addlprocess,$addlprocesslabel,$coltototal,$sortfield);
             
-            $sql='SELECT FORMAT(SUM(`'.$coltototal.'`),2) AS Total, Branch FROM '.$subtable.' s join `1branches` b on b.BranchNo=s.BranchNo WHERE s.JVNo='.$txnid.' GROUP BY s.BranchNo ORDER BY Branch';
+            $sql='SELECT FORMAT(SUM(`Forex`*Amount),2) AS Total, Branch FROM '.$subtable.' s join `1branches` b on b.BranchNo=s.BranchNo WHERE s.JVNo='.$txnid.' GROUP BY s.BranchNo ORDER BY Branch';
             $subtitle='<br/><br/>Totals Per Branch'; $columnnames=array('Branch','Total'); $width='40%';
            // echo '<div id="right">';
             include('../backendphp/layout/displayastableonlynoheaders.php');
             $sql0='CREATE TEMPORARY TABLE AdjTotal AS 
-        SELECT DebitAccountID AS AccountID, TRUNCATE(SUM(Amount),2) AS Amount FROM acctg_2jvsub s WHERE JVNo='.$txnid.' GROUP BY DebitAccountID
+        SELECT DebitAccountID AS AccountID, TRUNCATE(SUM(Forex*Amount),2) AS Amount FROM acctg_2jvsub s WHERE JVNo='.$txnid.' GROUP BY DebitAccountID
         UNION ALL
         SELECT CreditAccountID AS AccountID, TRUNCATE(SUM(Amount)*-1,2) AS Amount FROM acctg_2jvsub s WHERE JVNo='.$txnid.' GROUP BY CreditAccountID';
             $stmt=$link->prepare($sql0); $stmt->execute();
