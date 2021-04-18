@@ -39,6 +39,17 @@ END)/COUNT(IDNo))*100),2),"%") AS `AgreeRate` FROM event_1bakuna ;';
 
     include ('../backendphp/layout/displayastableonlynoheaders.php');
 
+    echo '<br><br>';
+    $subtitle='Registered and Vaccinated';
+    $sql='SELECT SUM(CASE WHEN LGU IS NOT NULL THEN 1 ELSE 0 END) AS Registered,
+    SUM(CASE WHEN DateVac1 IS NOT NULL THEN 1 ELSE 0 END) AS Dose1,
+    SUM(CASE WHEN DateVac2 IS NOT NULL THEN 1 ELSE 0 END) AS Dose2,
+    (SELECT COUNT(IDNo) FROM 1employees WHERE Resigned=0) AS NoofEmployees
+    FROM 2021_1rtc.event_1bakuna ;';
+    $columnnames=array('Registered', 'Dose1','Dose2','NoofEmployees');
+
+    include ('../backendphp/layout/displayastableonlynoheaders.php');
+
 ?></div>
 
 <div width='40%' style='float: left;margin-left:10%; '>
