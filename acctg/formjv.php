@@ -148,9 +148,9 @@ include_once('../backendphp/layout/displayastable.php');
             $sortfield=(isset($_POST['sortfield'])?$_POST['sortfield']:'s.TimeStamp'); 
             $sqlsub.=' ORDER BY '.$sortfield.(isset($_POST['sortarrange'])?' '.$_POST['sortarrange']:' ASC');
             
-            $sqlsum='SELECT sum('.$coltototal.') as Total FROM  `'.$subtable.'` s JOIN `'.$table.'` m ON m.JVNo=s.JVNo WHERE m.JVNo='.$txnid;
+            $sqlsum='SELECT sum('.$coltototal.') as Total, SUM(Amount*Forex) AS PHPTotal FROM  `'.$subtable.'` s JOIN `'.$table.'` m ON m.JVNo=s.JVNo WHERE m.JVNo='.$txnid;
             $stmt=$link->query($sqlsum); $result=$stmt->fetch();
-            $addlinfo='Total:  '.number_format($result['Total'],2).str_repeat('&nbsp',10).'<a href="formjv.php?w=AddMain">Add '. $w.'</a>'.'<br><br>';
+            $addlinfo='Total:  '.number_format($result['Total'],2).str_repeat('&nbsp',10).number_format($result['PHPTotal'],2).str_repeat('&nbsp',10).'<a href="formjv.php?w=AddMain">Add '. $w.'</a>'.'<br><br>';
         
             
             $columnnames=array(
@@ -174,15 +174,17 @@ include_once('../backendphp/layout/displayastable.php');
             $editprocesssublabel='Edit'; $editprocesssub='formjv.php?w=Edit'.$form.'Sub&'.$txnidname.'='.$txnid.'&TxnSubId=';
             
             $delprocesssub='..\backendphp\functions\delrecordssub.php?TxnID='.$txnid.'&w='.$subtable.'&l=acctg'.'&TxnSubId=';
+
+        //     $sqltotal='SELECT'
             
-            include('../backendphp/layout/addeditformseparateedit.php');
+            include('../backendphp/layout/mainandsubform.php');
             // to show totals
-            $colamt=$coltototal;
-            unset($textfordisplay,$sql,$columnnames,$editprocess,$delprocess,$coltototal,$addlprocess,$addlprocesslabel,$sortfield);
+          //  $colamt=$coltototal;
+            unset($textfordisplay,$sql,$columnnames,$editprocess,$delprocess,$addlprocess,$addlprocesslabel,$sortfield);
             
-            $sql='SELECT FORMAT(SUM(`'.$colamt.'`),2) AS Total, Branch FROM '.$subtable.' s join `1branches` b on b.BranchNo=s.BranchNo WHERE s.JVNo='.$txnid.' GROUP BY s.BranchNo ORDER BY Branch';
+            $sql='SELECT FORMAT(SUM(`'.$coltototal.'`),2) AS Total, Branch FROM '.$subtable.' s join `1branches` b on b.BranchNo=s.BranchNo WHERE s.JVNo='.$txnid.' GROUP BY s.BranchNo ORDER BY Branch';
             $subtitle='<br/><br/>Totals Per Branch'; $columnnames=array('Branch','Total'); $width='40%';
-            echo '<div id="right">';
+           // echo '<div id="right">';
             include('../backendphp/layout/displayastableonlynoheaders.php');
             $sql0='CREATE TEMPORARY TABLE AdjTotal AS 
         SELECT DebitAccountID AS AccountID, TRUNCATE(SUM(Amount),2) AS Amount FROM acctg_2jvsub s WHERE JVNo='.$txnid.' GROUP BY DebitAccountID
@@ -192,7 +194,7 @@ include_once('../backendphp/layout/displayastable.php');
             $sql='SELECT FORMAT(SUM(`Amount`),2) AS NetDRLessCR, ShortAcctID AS Account FROM AdjTotal s join `acctg_1chartofaccounts` ca on ca.AccountID=s.AccountID  GROUP BY s.AccountID ORDER BY Account';
             $subtitle='Totals Per Account'; $columnnames=array('Account','NetDRLessCR'); $width='40%';
             include('../backendphp/layout/displayastableonlynoheaders.php');
-            echo '</div id="right">'; 
+          //  echo '</div id="right">'; 
 	 break;
    
    case $form.'MainEdit':
