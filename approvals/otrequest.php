@@ -164,7 +164,7 @@ switch ($which){
 	if (!allowedToOpen(6212,'1rtc')){ echo 'No Permission'; exit(); }
 		
 		if(''.$_POST['DateToday'].''<''.date('Y-m-d').''){ echo 'Date should be Date Today or Future Date.'; exit();}
-		if(''.date("H:i").''>'17:10'){ echo 'Can request until 17:00 [05:00 PM]'; exit(); }
+		if(''.date("H:i").''>'18:00'){ echo 'Can request until 18:00 [06:00 PM]'; exit(); }
         require_once $path.'/acrossyrs/logincodes/confirmtoken.php';
 		$ottypeno=comboBoxValue($link,'`attend_0ottype`','OTType',addslashes($_POST['OTType']),'OTTypeNo');
         $columnstoadd=array('IDNo','DateToday','EndOfOT','Reason'); $sql='';
