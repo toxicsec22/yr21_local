@@ -47,6 +47,6 @@ $link=!isset($link)?connect_db($currentyr.'_1rtc',0):$link;
     $stmt=$link->prepare($sql);
     $stmt->execute();
     $result=$stmt->fetch();  $link=null; $stmt=null;
-    return $result['SalaryCredit'];
+    return $result['SSECCredit'];
 }
 ?>
