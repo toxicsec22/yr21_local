@@ -33,18 +33,21 @@ case 4: //set restday
         // set restday in employees table
         $sql='UPDATE  `1employees` SET RestDay='.$_POST['Restday'].', TimeStamp=Now(), EncodedByNo='.$_SESSION['(ak0)'].'  WHERE Resigned=0 AND IDNo='.$_POST['IDNo'];
         $stmt=$link->prepare($sql); $stmt->execute(); 
+
+    $condifuture=' AND DateToday>CURDATE() ';
+
         // reset future attendance 
-	$sql='UPDATE `attend_2attendance` SET LeaveNo=18, HRTS=Now(), HREncby='.$_SESSION['(ak0)'].' where DateToday>=\''.$attenddate.'\' AND IDNo='.$_POST['IDNo'];
+	$sql='UPDATE `attend_2attendance` SET LeaveNo=18, HRTS=Now(), HREncby='.$_SESSION['(ak0)'].' where DateToday>=\''.$attenddate.'\' '.$condifuture.' AND IDNo='.$_POST['IDNo'];
         $stmt=$link->prepare($sql); $stmt->execute(); 
         // set restdays
        if($_POST['set']==' Set Sat AND Sun as Restdays/RWS '){ 
            $sql0='SELECT WithSat FROM `1employees` WHERE IDNo='.$_POST['IDNo'].' AND WithSat=0'; //choose which have 2 restdays
            $stmt0=$link->query($sql0); 
            if($stmt0->rowCount()>0){ 
-           $sql='UPDATE `attend_2attendance` SET LeaveNo=15, HRTS=Now(), HREncby='.$_SESSION['(ak0)'].' where DateToday>=\''.$attenddate.'\' AND IDNo='.$_POST['IDNo'].' AND (DAYOFWEEK(DateToday) IN (1,7)) AND '.$_POST['IDNo'].' IN (SELECT IDNo FROM `1employees` WHERE WithSat=0)';    }
-           else { $sql='UPDATE `attend_2attendance` SET LeaveNo=15, HRTS=Now(), HREncby='.$_SESSION['(ak0)'].' where DateToday>=\''.$attenddate.'\' AND IDNo='.$_POST['IDNo'].' AND DAYOFWEEK(DateToday)=1';}
+           $sql='UPDATE `attend_2attendance` SET LeaveNo=15, HRTS=Now(), HREncby='.$_SESSION['(ak0)'].' where DateToday>=\''.$attenddate.'\' '.$condifuture.' AND IDNo='.$_POST['IDNo'].' AND (DAYOFWEEK(DateToday) IN (1,7)) AND '.$_POST['IDNo'].' IN (SELECT IDNo FROM `1employees` WHERE WithSat=0)';    }
+           else { $sql='UPDATE `attend_2attendance` SET LeaveNo=15, HRTS=Now(), HREncby='.$_SESSION['(ak0)'].' where DateToday>=\''.$attenddate.'\' '.$condifuture.' AND IDNo='.$_POST['IDNo'].' AND DAYOFWEEK(DateToday)=1';}
         } else { 
-        $sql='UPDATE `attend_2attendance` SET LeaveNo=15, HRTS=Now(), HREncby='.$_SESSION['(ak0)'].' where DateToday>=\''.$attenddate.'\' AND IDNo='.$_POST['IDNo'].' AND DAYOFWEEK(DateToday)='. $_POST['Restday'];
+        $sql='UPDATE `attend_2attendance` SET LeaveNo=15, HRTS=Now(), HREncby='.$_SESSION['(ak0)'].' where DateToday>=\''.$attenddate.'\' '.$condifuture.' AND IDNo='.$_POST['IDNo'].' AND DAYOFWEEK(DateToday)='. $_POST['Restday'];
         }
         $stmt=$link->prepare($sql); $stmt->execute();
         header("Location:encodeattend.php?w=SetRestday&IDNo=".$_POST['IDNo']); exit;

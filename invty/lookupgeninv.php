@@ -239,6 +239,7 @@ case 'SupplierUndelivered':
 <input name="wh" TYPE="radio" value='40'>Central
 <input name="wh" TYPE="radio" value='27'>CDO Warehouse
 <input name="wh" TYPE="radio" value='65'>Luzon Warehouse
+<input name="wh" TYPE="radio" value='104'>Cavite Warehouse
 <input type=submit name=submit value=Submit>
 </form>
 <?php
@@ -252,6 +253,7 @@ $wh=$_POST['wh'];
     $showbranches=false;
     $groupby='PONo';
     $orderby=' ORDER By PONo';
+   
     $columnnames1=array('SupplierName','PONo', 'AsOf');
     $columnnames2=array('ItemCode','Category','Description','Ordered','Received','SupplierUndelivered','Unit');
   
@@ -597,7 +599,7 @@ $sql0='Create temporary table comparesales(
     SalesCollectLessReturns double default 0
 ) Select b.BranchNo, m.Date, truncate(ifnull(sum(case when (m.txntype in (1,5,10)) then (Qty*UnitPrice) end),0),0) as SalesCollectLessReturns
 from `1branches` b left join `invty_2sale` m  on b.BranchNo=m.BranchNo and (m.Date>=\''.$fromdate.'\') and (m.Date<=\''.$todate.'\')
- join `invty_2salesub` s on m.TxnID=s.TxnID  WHERE b.Active=1 AND PseudoBranch=0 and b.BranchNo<97 '.$condition.' group by m.Date, m.BranchNo 
+ join `invty_2salesub` s on m.TxnID=s.TxnID  WHERE b.Active=1 AND PseudoBranch=0 and b.BranchNo<150 '.$condition.' group by m.Date, m.BranchNo 
 union all
 SELECT b.BranchNo, m.DateofCheck, Sum(ifnull(Amount,0)) as Collections FROM acctg_2collectmain m join `acctg_2collectsub` b on m.TxnID=b.TxnID 
 WHERE (DateofCheck>=\''.$fromdate.'\' and DateofCheck<=\''.$todate.'\') '.$condition.' group by b.BranchNo,m.Date';
@@ -612,7 +614,7 @@ if (allowedToOpen(7331,'1rtc')){
     SalesCollectLessReturns double default 0
 ) Select m.Date, truncate(ifnull(sum(case when (m.txntype in (1,5,10)) then (Qty*UnitPrice) end),0),0) as SalesCollectLessReturns
 from `1branches` b left join `invty_2sale` m  on b.BranchNo=m.BranchNo and (m.Date>=\''.$fromdate.'\') and (m.Date<=\''.$todate.'\')
- join `invty_2salesub` s on m.TxnID=s.TxnID where b.Active=1 and b.BranchNo<97 group by m.Date
+ join `invty_2salesub` s on m.TxnID=s.TxnID where b.Active=1 and b.BranchNo<150 group by m.Date
 union all
 SELECT m.Date, Sum(ifnull(Amount,0)) as Collections FROM acctg_2collectmain m join `acctg_2collectsub` s on m.TxnID=s.TxnID 
 where (DateofCheck>=\''.$fromdate.'\' and DateofCheck<=\''.$todate.'\') group by m.Date';
@@ -644,7 +646,7 @@ $stmttemp=$link->prepare($sqltemp);
 $stmttemp->execute();
 
 
-$sql='select '.$sql.' format(sum(SalesCollectLessReturns),0) as "SubTotal",IFNULL((SELECT FORMAT(DatedCollections,0) FROM tempCollections WHERE BranchNo=cs.BranchNo),0) as DatedCollections,IFNULL(FORMAT((SUM(SalesCollectLessReturns) - (SELECT DatedCollections)),0),0) AS `CashSales - Returns`, b.BranchNo, Branch, b.AreaNo from comparesales cs '.((allowedToOpen(7331,'1rtc'))?'right':'') .' join `1branches` b on b.BranchNo=cs.BranchNo where Active=1 and PseudoBranch=0 and b.BranchNo<95 group by b.BranchNo 
+$sql='select '.$sql.' format(sum(SalesCollectLessReturns),0) as "SubTotal",IFNULL((SELECT FORMAT(DatedCollections,0) FROM tempCollections WHERE BranchNo=cs.BranchNo),0) as DatedCollections,IFNULL(FORMAT((SUM(SalesCollectLessReturns) - (SELECT DatedCollections)),0),0) AS `CashSales - Returns`, b.BranchNo, Branch, b.AreaNo from comparesales cs '.((allowedToOpen(7331,'1rtc'))?'right':'') .' join `1branches` b on b.BranchNo=cs.BranchNo where Active=1 and PseudoBranch=0 and b.BranchNo<150 group by b.BranchNo 
 union all
 select '.$sqlsum.' "" as "SubTotal","" AS DatedCollections,"" AS `CashSales - Returns`, "" as BranchNo, "Total" as Branch, "999" as AreaNo from comparesalessum order by AreaNo, Branch';
 // echo $sql; exit();
