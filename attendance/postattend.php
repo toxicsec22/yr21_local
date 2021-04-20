@@ -34,7 +34,7 @@ case 4: //set restday
         $sql='UPDATE  `1employees` SET RestDay='.$_POST['Restday'].', TimeStamp=Now(), EncodedByNo='.$_SESSION['(ak0)'].'  WHERE Resigned=0 AND IDNo='.$_POST['IDNo'];
         $stmt=$link->prepare($sql); $stmt->execute(); 
 
-    $condifuture=' AND DateToday>=CURDATE() ';
+    $condifuture=' AND DateToday>CURDATE() ';
 
         // reset future attendance 
 	$sql='UPDATE `attend_2attendance` SET LeaveNo=18, HRTS=Now(), HREncby='.$_SESSION['(ak0)'].' where DateToday>=\''.$attenddate.'\' '.$condifuture.' AND IDNo='.$_POST['IDNo'];
