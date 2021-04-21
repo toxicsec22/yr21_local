@@ -151,7 +151,7 @@ include_once('../backendphp/layout/displayastable.php');
             $sqlsum='SELECT sum('.$coltototal.') as Total, SUM(CASE WHEN Forex<>1 THEN 1 ELSE 0 END) AS CountForex, SUM(Amount*Forex) AS PHPTotal FROM  `'.$subtable.'` s JOIN `'.$table.'` m ON m.JVNo=s.JVNo WHERE m.JVNo='.$txnid;
             $stmt=$link->query($sqlsum); $result=$stmt->fetch();
             $addlinfo='Total:  '.number_format($result['Total'],2).str_repeat('&nbsp',10);
-            if ($result['CountForex']<>1) { $addlinfo.='PHP Total:'.number_format($result['PHPTotal'],2).str_repeat('&nbsp',10);}
+            if ($result['CountForex']<>0) { $addlinfo.='PHP Total:  '.number_format($result['PHPTotal'],2).str_repeat('&nbsp',10);}
             $addlinfo.='<a href="formjv.php?w=AddMain">Add '. $w.'</a>'.'<br><br>';
         
             
@@ -168,8 +168,7 @@ include_once('../backendphp/layout/displayastable.php');
                             );
            
             $addsub='formjv.php?w=AddSub&'.$txnidname.'='.$txnid;
-            $liststoshow=array();
-            //$whichotherlist='acctg'; $otherlist=array('accounts');
+            
             // info for posting: $table has been defined
             $post='1';
               $fieldsinrow=4;
