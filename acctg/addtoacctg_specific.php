@@ -253,7 +253,7 @@ case 'Audit Charges':
       if ($stmtfc->rowCount()>0){
          $sqlwhere=' WHERE ism.Date=\''.$txndate.'\' And (ism.Date)>\''.$_SESSION['nb4A'].'\' AND (ism.BranchNo)='.$_SESSION['bnum'].'  and ism.txntype='.$txntype.' AND PriceFreightInclusive=1 AND ARClientType<>4 group by ism.TxnID ';
          $sqlfcinsert='Insert into acctg_2salesub (TxnID, Particulars, ClientNo, DebitAccountID, `CreditAccountID`, Amount, EncodedByNo, `TimeStamp`) 
-    SELECT '.$txnid.' as TxnID, concat(ism.`SaleNo`, "FreightAdjIncl") as Particulars, ClientNo, 706 AS DebitAccountID, 925 as `CreditAccountID`, round((Amount),2) as Amount, '.$_SESSION['(ak0)'].', Now() FROM `invty_2sale` ism join `approvals_2freightclients` fc ON ism.SaleNo=fc.ForInvoiceNo AND ism.BranchNo=fc.BranchNo AND ism.txntype=fc.txntype '.$sqlwhere;
+    SELECT '.$txnid.' as TxnID, concat(ism.`SaleNo`, "FreightAdjIncl") as Particulars, ClientNo, 706 AS DebitAccountID, 925 as `CreditAccountID`, round((Amount),2) as Amount, '.$_SESSION['(ak0)'].', Now() FROM `invty_2sale` ism join `approvals_2freightclients` fc ON ism.SaleNo=fc.ForInvoiceNo AND ism.BranchNo=fc.BranchNo AND ism.txntype=fc.txntype left join `1clients` c on c.ClientNo=ism.ClientNo '.$sqlwhere;
     
       // check if freight is covered by selling price
          $sqlmin='CREATE TEMPORARY TABLE FreightInc AS
@@ -266,7 +266,7 @@ case 'Audit Charges':
 			   ) as MinPriceTotal, SUM(Qty*UnitPrice) as SellPriceTotal
                FROM `invty_5latestminprice` lmp JOIN `invty_2salesub` s ON s.ItemCode=lmp.ItemCode
                JOIN `invty_2sale` ism ON s.TxnID=ism.TxnID 
-               JOIN  `approvals_2freightclients` fc ON (fc.ForInvoiceNo=ism.SaleNo AND fc.BranchNo=ism.BranchNo AND fc.txntype=ism.txntype) '.$sqlwhere;
+               JOIN  `approvals_2freightclients` fc ON (fc.ForInvoiceNo=ism.SaleNo AND fc.BranchNo=ism.BranchNo AND fc.txntype=ism.txntype) left join `1clients` c on c.ClientNo=ism.ClientNo '.$sqlwhere;
          $stmtmin=$link->prepare($sqlmin); $stmtmin->execute();
          if ($stmtmin->rowCount()>0){
          $sqlfcinsert=$sqlfcinsert.' UNION ALL SELECT '.$txnid.' as TxnID, concat(SaleNo," ShortInFreight") AS Particulars, ClientNo, 100 as DebitAccountID, 925 as `CreditAccountID`,
@@ -353,8 +353,8 @@ CASE 'AR1 CHARGE Sales':
       if ($stmtfc->rowCount()>0){
          $sqlwhere=' WHERE ism.Date=\''.$txndate.'\' And (ism.Date)>\''.$_SESSION['nb4A'].'\' AND (ism.BranchNo)='.$_SESSION['bnum'].'  and ism.txntype='.$txntype.' AND PriceFreightInclusive=1 AND ARClientType=4 group by ism.TxnID ';
          $sqlfcinsert='Insert into acctg_2salesub (TxnID, Particulars, ClientNo, DebitAccountID, `CreditAccountID`, Amount, EncodedByNo, `TimeStamp`) 
-    SELECT '.$txnid.' as TxnID, concat(ism.`SaleNo`, "FreightAdjIncl") as Particulars, ClientNo, 706 AS DebitAccountID, 925 as `CreditAccountID`, round((Amount),2) as Amount, '.$_SESSION['(ak0)'].', Now() FROM `invty_2sale` ism join `approvals_2freightclients` fc ON ism.SaleNo=fc.ForInvoiceNo AND ism.BranchNo=fc.BranchNo AND ism.txntype=fc.txntype '.$sqlwhere;
-    
+    SELECT '.$txnid.' as TxnID, concat(ism.`SaleNo`, "FreightAdjIncl") as Particulars, ClientNo, 706 AS DebitAccountID, 925 as `CreditAccountID`, round((Amount),2) as Amount, '.$_SESSION['(ak0)'].', Now() FROM `invty_2sale` ism join `approvals_2freightclients` fc ON ism.SaleNo=fc.ForInvoiceNo AND ism.BranchNo=fc.BranchNo AND ism.txntype=fc.txntype left join `1clients` c on c.ClientNo=ism.ClientNo '.$sqlwhere;
+   
       // check if freight is covered by selling price
          $sqlmin='CREATE TEMPORARY TABLE FreightInc AS
                SELECT ism.TxnID,ism.SaleNo, ism.ClientNo, (fc.Amount+
@@ -366,7 +366,7 @@ CASE 'AR1 CHARGE Sales':
 			   ) as MinPriceTotal, SUM(Qty*UnitPrice) as SellPriceTotal
                FROM `invty_5latestminprice` lmp JOIN `invty_2salesub` s ON s.ItemCode=lmp.ItemCode
                JOIN `invty_2sale` ism ON s.TxnID=ism.TxnID 
-               JOIN  `approvals_2freightclients` fc ON (fc.ForInvoiceNo=ism.SaleNo AND fc.BranchNo=ism.BranchNo AND fc.txntype=ism.txntype) '.$sqlwhere;
+               JOIN  `approvals_2freightclients` fc ON (fc.ForInvoiceNo=ism.SaleNo AND fc.BranchNo=ism.BranchNo AND fc.txntype=ism.txntype) left join `1clients` c on c.ClientNo=ism.ClientNo '.$sqlwhere;
          $stmtmin=$link->prepare($sqlmin); $stmtmin->execute();
          if ($stmtmin->rowCount()>0){
          $sqlfcinsert=$sqlfcinsert.' UNION ALL SELECT '.$txnid.' as TxnID, concat(SaleNo," ShortInFreight") AS Particulars, ClientNo, 100 as DebitAccountID, 925 as `CreditAccountID`,
