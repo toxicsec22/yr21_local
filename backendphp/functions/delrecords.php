@@ -142,6 +142,8 @@ switch ($table) {
         case 'invty_2transfer': header('Location:../../invty/txnsinterperday.php?w=Transfers&perday=0'); break;  
         case 'acctg_2collectsubbounced': header('Location:../../acctg/txnsperday.php?w=BouncedfromCR'); break;
         case 'acctg_3undepositedpdcfromlastperiodbounced': header('Location:../../acctg/txnsperday.php?w=Bounced'); break;
+		case 'acctg_2jvmain': header('Location:../../acctg/formjv.php'); exit(); break;
+		case 'acctg_2cvmain': header('Location:../../acctg/formcv.php'); exit(); break;
         default:
         header('Location:../../'.$prog.'/txnsperday.php?perday=0&w='.ucfirst(str_replace('main','',substr(strrchr($table,'_'),2))));
             break;
