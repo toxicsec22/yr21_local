@@ -140,7 +140,7 @@ include_once('../backendphp/layout/displayastable.php');
               array_push($columnsub,'EncodedBy','TimeStamp');
               } 
             
-            $left='60%'; $leftmargin='65%'; $right='30%'; 
+           
             
             $editprocessmainlabel='Edit'; $editprocessmain='formjv.php?w='.$form.'MainEdit&edit=2&'.$txnidname.'='.$txnid;
             $delprocessmain='..\backendphp\functions\delrecords.php?TxnID='.$txnid.'&action_token='.$_SESSION['action_token'].'&w='.$table.'&l=acctg';
@@ -181,9 +181,9 @@ include_once('../backendphp/layout/displayastable.php');
             unset($textfordisplay,$sql,$columnnames,$editprocess,$delprocess,$addlprocess,$addlprocesslabel,$coltototal,$sortfield);
             
             $sql='SELECT FORMAT(SUM(`Forex`*Amount),2) AS Total, Branch FROM '.$subtable.' s join `1branches` b on b.BranchNo=s.BranchNo WHERE s.JVNo='.$txnid.' GROUP BY s.BranchNo ORDER BY Branch';
-            $subtitle='<br/><br/>Totals Per Branch'; $columnnames=array('Branch','Total'); $width='40%';
+            $subtitle='<br/><br/>Totals Per Branch'; $columnnames=array('Branch','Total'); $width='35%'; $widthoftotal=$width;
             //if($_SESSION['(ak0)']==1002){echo $sql;}
-           // echo '<div id="right">';
+           echo '<div id="wrap"><div id="total">';
             include('../backendphp/layout/displayastableonlynoheaders.php');
             $sql0='CREATE TEMPORARY TABLE AdjTotal AS 
         SELECT DebitAccountID AS AccountID, TRUNCATE(SUM(Forex*Amount),2) AS Amount FROM acctg_2jvsub s WHERE JVNo='.$txnid.' GROUP BY DebitAccountID
@@ -191,9 +191,10 @@ include_once('../backendphp/layout/displayastable.php');
         SELECT CreditAccountID AS AccountID, TRUNCATE(SUM(Forex*Amount)*-1,2) AS Amount FROM acctg_2jvsub s WHERE JVNo='.$txnid.' GROUP BY CreditAccountID';
             $stmt=$link->prepare($sql0); $stmt->execute();
             $sql='SELECT FORMAT(SUM(`Amount`),2) AS NetDRLessCR, ShortAcctID AS Account FROM AdjTotal s join `acctg_1chartofaccounts` ca on ca.AccountID=s.AccountID  GROUP BY s.AccountID ORDER BY Account';
-            $subtitle='Totals Per Account'; $columnnames=array('Account','NetDRLessCR'); $width='40%';
+            $subtitle='Totals Per Account'; $columnnames=array('Account','NetDRLessCR'); 
+            echo '<br><br><br></div><br><br><div id="total">';
             include('../backendphp/layout/displayastableonlynoheaders.php');
-          //  echo '</div id="right">'; 
+            echo '</div id="wrap">'; 
 	 break;
    
    case $form.'MainEdit':

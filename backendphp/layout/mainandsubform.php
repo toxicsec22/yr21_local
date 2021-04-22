@@ -1,3 +1,33 @@
+<style type="text/css">
+#wrap {
+   width:100%;
+   margin:0 auto; margin-left: 20px;
+}
+#wrap:after {
+  clear: both;
+}
+#main {
+   float:left;
+   width:<?php echo !isset($left)?'70%':$left; ?>;
+   overflow: auto;
+}
+/* #right {
+   margin-left: <?php echo !isset($leftmargin)?'51%':$leftmargin; ?>;overflow: auto;
+   width:<?php echo !isset($right)?'50%':$right; ?>;
+   margin-top: <?php echo !isset($topmargin)?'0%':$topmargin; ?>;
+} */
+#total {
+   width:<?php echo !isset($widthoftotal)?'28%':$widthoftotal; ?>;overflow: auto;
+   padding-left: 1px;
+   float: right; 
+}
+/* #righttotal {
+   margin-left: <?php echo !isset($leftmargin)?'51%':$leftmargin; ?>;overflow: auto;
+   width:<?php echo !isset($right)?'50%':$right; ?>; float: left;
+   margin-top: <?php echo !isset($topmargin)?'0%':$topmargin; ?>;
+} */
+
+</style>
 <?php 
 $path=$_SERVER['DOCUMENT_ROOT'];
 if (isset($outside) AND $outside){ $hidecontents=true;}// for zzjye & othercompanies
@@ -24,7 +54,9 @@ if (!isset($nopost)){
     $postvalue=($result[$postfield]==1?0:1); $main=$table; 
     include($path.'/acrossyrs/commonfunctions/postunpostformgeneric.php');
 }
-
+?>
+<div id="wrap"><div id="main">
+<?php
 $main='';
 
 if ($editok){
@@ -105,4 +137,8 @@ echo '<br><br>Total: '.$resulttotal['Total'];
 
 addlinfo:
 if(!isset($addlinfo)) { exit();} else { echo $addlinfo;}
+echo isset($lookupdata)?'</div><div id="total">'.$lookupdata.'</div></div><div id="wrap">':'';
+
 ?>
+</div>
+</div>

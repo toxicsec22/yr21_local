@@ -1,6 +1,4 @@
-<div id="wrap"><div id="left">
-<?php echo isset($lookupdata)?$lookupdata.'<br></div><div id="right">':'</div><div id="left">';
-?><br>
+<br>
 <form method="POST" action="<?php echo $addsub ?>" enctype="multipart/form-data" style="font-family:sans-serif;">
 <input type="hidden" name="action_token" value="<?php echo html_escape($_SESSION['action_token']) ?>" />
 <?php
@@ -20,12 +18,10 @@ for ($row = 0; $row <  $nooffields; $row++) {
 ?><input type="submit" name="submit" value="Add"><br><br>
 </form>
 <?php
+
 if (isset($addlsubmit)) { echo $addlsubmit;}
 } // end if editsub=true
 if (!empty($sub)) { echo $sub.'<br>';}
 echo isset($rowcount)?$rowcount." record/s shown &nbsp &nbsp":"";
 echo isset($total)?$total:'';
-if (isset($withsub) and $withsub=true){include($path.'/'.$url_folder.'/backendphp/layout/displayastableeditcellssub.php');}
 ?>
-</div>
-</div>
