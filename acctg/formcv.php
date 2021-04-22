@@ -33,7 +33,7 @@ if (isset($_GET[$txnidname])){
 }
 
 
-if (in_array($w,array($form,$form.'MainEdit','EditMain','AddSub','EditSub'))){
+if (in_array($w,array($form,$form.'MainEdit','EditMain','AddSub','EditSub','CVSubAutoAdd'))){
         include_once('../backendphp/functions/editok.php');
 }
 
@@ -194,7 +194,7 @@ switch ($w){
               array_push($columnsub,'EncodedBy','TimeStamp');
               } 
             
-            $left='60%'; $leftmargin='65%'; $right='30%'; 
+            
             
             $editprocessmainlabel='Edit'; $editprocessmain='formcv.php?w='.$form.'MainEdit&edit=2&'.$txnidname.'='.$txnid;
             $delprocessmain='..\backendphp\functions\delrecords.php?TxnID='.$txnid.'&action_token='.$_SESSION['action_token'].'&w='.$table.'&l=acctg';
@@ -202,9 +202,10 @@ switch ($w){
             $sortfield=(isset($_POST['sortfield'])?$_POST['sortfield']:'s.TimeStamp'); 
             $sqlsub.=' ORDER BY '.$sortfield.(isset($_POST['sortarrange'])?' '.$_POST['sortarrange']:' ASC');
             
-            $sqlsum='SELECT CheckNo,sum('.$coltototal.') as Total, SUM(CASE WHEN Forex<>1 THEN 1 ELSE 0 END) AS CountForex, SUM(Amount*Forex) AS PHPTotal FROM  `'.$subtable.'` s JOIN `'.$table.'` m ON m.CVNo=s.CVNo WHERE m.CVNo='.$txnid;
+            $sqlsum='SELECT Posted,PayeeNo,CheckNo,sum('.$coltototal.') as Total, SUM(CASE WHEN Forex<>1 THEN 1 ELSE 0 END) AS CountForex, SUM(Amount*Forex) AS PHPTotal FROM  `'.$subtable.'` s JOIN `'.$table.'` m ON m.CVNo=s.CVNo WHERE m.CVNo='.$txnid;
             $stmt=$link->query($sqlsum); $result=$stmt->fetch();
-           // $addlinfo='Total:  '.number_format($result['Total'],2).str_repeat('&nbsp',10).'<a href="formcv.php?w=AddMain">Add '. $w.'</a>'.'<br><br>';
+            $editsub=$result['Posted']==0?true:false;
+            $suppno=$result['PayeeNo'];
             $addlinfo='Total:  '.number_format($result['Total'],2).str_repeat('&nbsp',10);
             if ($result['CountForex']<>0) { $addlinfo.='PHP Total:  '.number_format($result['PHPTotal'],2).str_repeat('&nbsp',10);}
             $addlinfo.='<a href="formcv.php?w=AddMain">Add '. $w.'</a>'.'<br><br>';
@@ -231,21 +232,57 @@ switch ($w){
             $delprocesssub='..\backendphp\functions\delrecordssub.php?TxnID='.$txnid.'&w='.$subtable.'&l=acctg'.'&TxnSubId=';
             $postedprocess='printvoucher.php?w=CV&FromVch='.$txnid.'&ToVch='.$txnid.'">Print CV</a>&nbsp; &nbsp;<a href="printvoucher.php?w=Check&CheckNo='.$result['CheckNo'].'&CVNo='.$txnid.'"';
             $postedprocesslabel='Print Check (mm-dd-yyyy)';
+
             
+    // start of unpaid inv list
+    if(is_null($suppno)){
+        //  $lookupdata='';
+          goto nounpaid;
+        }
+        $colorcount=0;
+        $rcolor[0]="FFE3E3";
+        $rcolor[1]="FFFFFF";
+        $sqlunpd='Select SupplierInv, concat(date_format(`Date`,\'%Y-%m-%d\')) as Details, PayBalance,format(PayBalance,2) as Amount, DateDue, b.Branch from acctg_23balperinv i join `1branches` as b on b.BranchNo= i.BranchNo where i.PayBalance<>0 and i.SupplierNo='.$suppno.' order by DateDue, SupplierInv';
+    
+    $stmt=$link->query($sqlunpd);
+        $result=$stmt->fetchAll();
+        
+        if ($stmt->rowCount()>0){
+        $columnsub2=array('SupplierInv','Details','Branch','DateDue','Amount');
+        $lookupdata='';$subcol=''; 
+        foreach ($columnsub2 as $colsub){
+            $subcol=$subcol.'<td><font face="arial" size="2">'.$colsub.'</font></td>';
+        } 
+        foreach($result as $row){
+            $lookupdata=$lookupdata.'<tr bgcolor='. $rcolor[$colorcount%2].'>';
+            foreach ($columnsub2 as $colsub){
+                $lookupdata=$lookupdata.'<td>'.$row[$colsub].'</td>';
+            }
+            $lookupdata=$lookupdata.($editsub?'<td><a href="formcv.php?w=CVSubAutoAdd&action_token='.$_SESSION['action_token'].'&SupplierInv='.$row['SupplierInv'].'&SupplierNo='.$suppno.'&CVNo='.$txnid.'">Pay</a></td>':'').'</tr>';
+            $colorcount++;
+        }
+        $lookupdata='<br><br>Unpaid Invoices<br><table><tr>'.$subcol.'<td>Pay?</td></tr><tbody>'.$lookupdata.'</tbody></table>';
+        $left='60%'; $width='35%'; $widthoftotal=$width;
+        } else { $left='70%'; $width='30%'; $widthoftotal=$width;}
+        // end of unpaid inv list
+        nounpaid:
+        
             include('../backendphp/layout/mainandsubform.php');
+           
             // to show totals
             unset($textfordisplay,$sql,$columnnames,$editprocess,$delprocess,$coltototal,$addlprocess,$addlprocesslabel,$sortfield);
             $color1='e6e8e6';
             $sql='SELECT FORMAT(SUM(Forex*Amount),2) AS Subtotal, Branch FROM '.$subtable.' s join `1branches` b on b.BranchNo=s.BranchNo WHERE s.CVNo='.$txnid.' GROUP BY s.BranchNo ORDER BY Branch';
-            $subtitle='<br/><br/>Totals Per Branch'; $columnnames=array('Branch','Subtotal'); $width='40%';
-            echo '<div id="right">';
+            $subtitle='<br/><br/>Totals Per Branch'; $columnnames=array('Branch','Subtotal'); 
+            echo '<div id="wrap"><div id="total">';
             include('../backendphp/layout/displayastableonlynoheaders.php');
-            echo '<br><br>';
+            echo '<br><br><br></div id="total">';
             $sql='SELECT FORMAT(SUM(Forex*Amount),2) AS Subtotal, ShortAcctID AS Account FROM '.$subtable.' s join `1branches` b on b.BranchNo=s.BranchNo JOIN acctg_1chartofaccounts ca ON ca.AccountID=s.DebitAccountID WHERE s.CVNo='.$txnid.' GROUP BY s.DebitAccountID ORDER BY Account';
             //$sql='SELECT FORMAT(SUM(`Amount`),2) AS NetDRLessCR, ShortAcctID AS Account FROM Totals s join `acctg_1chartofaccounts` ca on ca.AccountID=s.AccountID  GROUP BY s.AccountID ORDER BY Account';
-            $subtitle='Totals Per Account'; $columnnames=array('Account','Subtotal'); $width='40%';
+            $subtitle='Totals Per Account'; $columnnames=array('Account','Subtotal'); 
+            echo '<div id="total">';
             include('../backendphp/layout/displayastableonlynoheaders.php');
-            echo '</div id="right">'; 
+            echo '</div id="total"></div id="wrap">'; 
 	 break;
    
    case $form.'MainEdit':
@@ -312,6 +349,21 @@ switch ($w){
        $stmt=$link->prepare($sql); $stmt->execute();}
         header('Location:formcv.php?w='.$form.'&'.$txnidname.'='.$_GET[$txnidname]);
         break;
+
+   case 'CVSubAutoAdd':
+                if (!allowedToOpen($addallow,'1rtc')) { echo 'No permission'; exit;}
+                //to check if editable
+                if (editOk($table,$txnid,$link,$w)){
+                        $sql0='Select SupplierInv, PayBalance, BranchNo, CreditAccountID from acctg_23balperinv i  where SupplierInv like \''.$_REQUEST['SupplierInv'].'\' and i.SupplierNo='.$_REQUEST['SupplierNo'];
+                        $stmt=$link->query($sql0);
+                        $result=$stmt->fetch();
+                $sql='INSERT INTO `acctg_2cvsub` SET `CVNo`=\''.$txnid.'\', DebitAccountID='.$result['CreditAccountID'].', ForInvoiceNo=\''.$result['SupplierInv'].'\', Amount='.$result['PayBalance'].', FromBudgetOf='.$result['BranchNo'].', BranchNo='.$result['BranchNo'].', EncodedByNo=\''.$_SESSION['(ak0)'].'\', TimeStamp=Now()'; 
+                // echo $sql;break;
+                $stmt=$link->prepare($sql);
+                $stmt->execute();	
+                        } 
+                        header('Location:formcv.php?w='.$form.'&'.$txnidname.'='.$txnid);
+                break;
 
 }
 $link=null; $linkacctg=null;
