@@ -32,6 +32,7 @@ SELECT
     COUNT(IF(`a`.`LeaveNo` = 13, 1, NULL)) AS `SpecDays`,
     COUNT(IF(`a`.`TimeIn` IS NULL AND `d`.`TypeOfDayNo` <> 2 AND `a`.`LeaveNo` = 14, 1, NULL)) AS `SLDays`,
     COUNT(IF(`a`.`TimeIn` IS NULL AND `d`.`TypeOfDayNo` <> 2 AND `a`.`LeaveNo` = 31, 1, NULL)) AS `VLDays`,
+    COUNT(IF(`a`.`LeaveNo` = 25, 1, NULL)) AS `RWSDays`,
     COUNT(IF(`a`.`LeaveNo` = 15, 1, NULL)) AS `RestDays`,
     COUNT(IF(`a`.`LeaveNo` IN (16 , 32), 1, NULL)) AS `LWPDays`,
     COUNT(IF(`a`.`LeaveNo` = 22, 1, NULL)) AS `QDays`,

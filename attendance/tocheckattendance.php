@@ -156,7 +156,7 @@ if (in_array($whichqry,array('summary_for_payroll','my_attendance'))){
                     $pagetouse='tocheckattendance.php?calledfrom=7&qry=summary_for_payroll';
                     include_once '../attendance/attendsql/attendsumforpayroll.php';
                     $sql='SELECT `attend_44sumforpayroll`.*, Nickname, FirstName, SurName from `attend_44sumforpayroll` join `1employees` on `attend_44sumforpayroll`.IDNo=`1employees`.IDNo WHERE PayrollID='.$_POST['payrollid'].'';
-                 $columnnames=array('IDNo', 'Nickname','FirstName','SurName','RegDaysPresent','LWOPDays','LegalDays','SpecDays','SLDays','VLDays','LWPDays','QDays','RestDays','RegDaysActual','LegalShiftHrsOT','LegalExShiftHrsOT','SpecShiftHrsOT','SpecExShiftHrsOT','RestShiftHrsOT','RestExShiftHrsOT','PaidLegalDays','RegExShiftHrsOT');
+                 $columnnames=array('IDNo', 'Nickname','FirstName','SurName','RegDaysPresent','LWOPDays','LegalDays','SpecDays','SLDays','VLDays','LWPDays','QDays','RWSDays','RestDays','RegDaysActual','LegalShiftHrsOT','LegalExShiftHrsOT','SpecShiftHrsOT','SpecExShiftHrsOT','RestShiftHrsOT','RestExShiftHrsOT','PaidLegalDays','RegExShiftHrsOT');
                     $orderby='IDNo';
                     
                     include('../backendphp/layout/displayastable.php');
@@ -303,9 +303,9 @@ if (in_array($whichqry,array('summary_for_payroll','my_attendance'))){
              
             $title='Attendance Summary';
  
-            $sql='SELECT `RegDaysActual` AS  `Regular Days`,`LWOPDays` AS `Leave WITHOUT Pay`,`PaidLegalDays` AS `Legal Holidays`,`SpecDays` AS `Special Holidays`,`SLDays` AS `Sick Leaves`,`VLDays` AS `Vacation Leaves`,`RestDays` AS `Restdays`,`LWPDays` AS `Leave WITH Pay`,`LegalHrsOT` AS `Overtime (Legal Holiday in Hrs)`,`SpecHrsOT` AS `Overtime (Special Holiday in Hrs)`,`RestHrsOT` AS `Overtime (Restday in Hrs)`,`RegOTHrs` AS `Overtime (Regular Workday in Hrs)` FROM `attend_44sumforpayroll` WHERE IDNo='.$_SESSION['(ak0)'].' AND PayrollID='.$_POST['payrollid'];
+            $sql='SELECT `RegDaysActual` AS  `Regular Days`,`LWOPDays` AS `Leave WITHOUT Pay`,`PaidLegalDays` AS `Legal Holidays`,`SpecDays` AS `Special Holidays`,`SLDays` AS `Sick Leaves`,`VLDays` AS `Vacation Leaves`,`RWSDays`,`RestDays` AS `Restdays`,`LWPDays` AS `Leave WITH Pay`,`LegalHrsOT` AS `Overtime (Legal Holiday in Hrs)`,`SpecHrsOT` AS `Overtime (Special Holiday in Hrs)`,`RestHrsOT` AS `Overtime (Restday in Hrs)`,`RegOTHrs` AS `Overtime (Regular Workday in Hrs)` FROM `attend_44sumforpayroll` WHERE IDNo='.$_SESSION['(ak0)'].' AND PayrollID='.$_POST['payrollid'];
             $stmt=$link->query($sql);$row=$stmt->fetch();
-            $columnnames=array('Regular Days','Legal Holidays','Special Holidays','Sick Leaves','Vacation Leaves','Restdays','Leave WITH Pay','Leave WITHOUT Pay','Overtime (Legal Holiday in Hrs)','Overtime (Special Holiday in Hrs)','Overtime (Restday in Hrs)','Overtime (Regular Workday in Hrs)');
+            $columnnames=array('Regular Days','Legal Holidays','Special Holidays','Sick Leaves','Vacation Leaves','RWSDays','Restdays','Leave WITH Pay','Leave WITHOUT Pay','Overtime (Legal Holiday in Hrs)','Overtime (Special Holiday in Hrs)','Overtime (Restday in Hrs)','Overtime (Regular Workday in Hrs)');
             $attend='';
             foreach($columnnames as $col){
                 $attend.=($row[$col]<>0?'<tr><td>'.$col.'</td><td>'.number_format($row[$col],2).'</td></tr>':'');
