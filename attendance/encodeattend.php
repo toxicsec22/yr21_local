@@ -207,7 +207,7 @@ $columnnames=array('DateToday','RemarksDept','RemarksHR','Shift','LeaveName', 'B
 	<br><br>
     <input type="submit" name="set" value=" Set Restday "> <?php 
 if (!allowedToOpen(2133,'1rtc')){
-?> &nbsp; &nbsp; &nbsp; <input type="submit" name="set" value=" Set Sat AND Sun as Restdays/RWS ">
+?> &nbsp; &nbsp; &nbsp; <input type="submit" name="set" value=" Set Sat as RWS AND Sun as Restdays ">
 <?php } ?>
 </form>
 <?php 
