@@ -601,19 +601,19 @@ case 'VerifyGovt':
             $formdesc='<style> .priority { background: #e60000; color: white; font-weight: bold; }</style>'
                     .'<br><form action="#" method="post"><input type=submit value="'.($show==0?'Show Discrepancies':'Show All').'">
             <input type=hidden name="show" value="'.($show==0?1:0).'"></form>';
-            $showdisc=($show==1?' WHERE (ROUND(`SSS-EE`-`CalculatedSSS`,2)<>0) OR (ROUND(`Philhealth-EE`-`CalculatedPHIC`,2)<>0)':'');
+            $showdisc=($show==1?' WHERE (ROUND(`SSS-EE`-`CalculatedSSS`,2)<>0) OR (ROUND(`PhilHealth-EE`-`CalculatedPHIC`,2)<>0)':'');
 	    $addlcondition=((!allowedToOpen(8173,'1rtc'))?' WHERE p.IDNo>1002 ':'');
             // FORMAT(BasicMonthly,2) AS MonthlyBasic, '  <div class=priority >&nbsp P &nbsp</div>
             //        .'FORMAT(ColaMonthly,2) AS MonthlyCola, FORMAT(DeMMonthly,2) AS MonthlyDeM,
             $sql0='CREATE TEMPORARY TABLE `comparegovt` AS
-SELECT r.IDNo, FullName, Position, Branch, if(r.LatestDorM=1,"Monthly","Daily") AS DorM, BasicMonthly AS Basic, TaxShieldMonthly AS TaxShield, DeMMonthly AS DeMinimis, lr.`SSS-EE`, lr.`Philhealth-EE`, lr.`PagIbig-EE`, 
+SELECT r.IDNo, FullName, Position, Branch, if(r.LatestDorM=1,"Monthly","Daily") AS DorM, BasicMonthly AS Basic, TaxShieldMonthly AS TaxShield, DeMMonthly AS DeMinimis, lr.`SSS-EE`, lr.`PhilHealth-EE`, lr.`PagIbig-EE`, 
 (SELECT (SSEE+ECEE+MPFEE) FROM `payroll_0ssstable` WHERE (BasicMonthly+DeMMonthly) BETWEEN RangeMin AND RangeMax) AS CalculatedSSS,
 TRUNCATE(getContriEE(BasicMonthly,"phic"),2) AS CalculatedPHIC
 FROM `payroll_21dailyandmonthly` r JOIN `attend_30currentpositions` p ON r.IDNo=p.IDNo JOIN `payroll_20latestrates` lr ON r.IDNo=lr.IDNo '.$addlcondition;
     $stmt0=$link->prepare($sql0); $stmt0->execute(); 
     
-    $sql='SELECT *, IF(`SSS-EE`-`CalculatedSSS`=0,"",ROUND(`SSS-EE`-`CalculatedSSS`,2)) AS `SSS_Difference`, IF(`Philhealth-EE`-`CalculatedPHIC`=0,"",ROUND(`Philhealth-EE`-`CalculatedPHIC`,2)) AS `Philhealth_Difference` FROM `comparegovt` '.$showdisc;
-    $columnnames=array('IDNo','FullName','Position','Branch','DorM','Basic','DeMinimis','SSS-EE','CalculatedSSS','SSS_Difference','Philhealth-EE','CalculatedPHIC','Philhealth_Difference');
+    $sql='SELECT *, IF(`SSS-EE`-`CalculatedSSS`=0,"",ROUND(`SSS-EE`-`CalculatedSSS`,2)) AS `SSS_Difference`, IF(`PhilHealth-EE`-`CalculatedPHIC`=0,"",ROUND(`PhilHealth-EE`-`CalculatedPHIC`,2)) AS `Philhealth_Difference` FROM `comparegovt` '.$showdisc;
+    $columnnames=array('IDNo','FullName','Position','Branch','DorM','Basic','DeMinimis','SSS-EE','CalculatedSSS','SSS_Difference','PhilHealth-EE','CalculatedPHIC','Philhealth_Difference');
             include('../backendphp/layout/displayastable.php');
             break;   
    

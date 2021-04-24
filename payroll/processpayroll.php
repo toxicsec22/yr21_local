@@ -29,33 +29,10 @@ JOIN attend_0positions p ON p.PositionID=cp.PositionID WHERE e.`Resigned`=0 AND 
 $columnnames=array('IDNo','Nickname', 'SurName','Position','RecordedRate','PreferredForPosition');
 $subtitle='Recorded Rate Type Different from Preferred for Position';
 include('../backendphp/layout/displayastableonlynoheaders.php');
-include_once '../payrolllayout/dailyformula.php';
-include_once '../payrolllayout/semimonthlyformula.php';
+include_once 'payrolllayout/dailyformula.php';
+include_once 'payrolllayout/semimonthlyformula.php';
+include_once 'payrolllayout/overtimeandundertime.php';
 
-?>      
-      
-<hr><br><br>
-Undertime = Daily Rate x (Regular Days Present - Regular Days Actual as calculated by attendance)
-<br><br>
-
-<hr><br><br>Hourly Rate Multiplier for Overtime<br><br>
-<style>
-.ottable td { text-align: center;}
-.ottable table, p { margin-left: 10%; }
-</style>
-<div class='ottable'>
-<table>
-<thead><th>Type of Day</th><th>Regular Shift Hours</th><th>Beyond Shift Hours</th></thead>
-<tr><td>Regular Workday</td><td>1</td><td>1.25</td></tr>
-<tr><td>Restday</td><td>1.3</td><td>1.3 x 1.3</td></tr>
-<tr><td>Special Holiday</td><td>1.3</td><td>1.3 x 1.3</td></tr>
-<tr><td>Regular Holiday</td><td>2</td><td>2 x 1.3</td></tr>
-<tr><td>Restday & Special Holiday<sup>*</sup></td><td>1.5</td><td>1.5 x 1.3</td></tr>
-<tr><td>Restday & Regular Holiday<sup>*</sup></td><td>2.3</td><td>2 x 1.3 x 1.3</td></tr>
-</table><br>
-<p><i><sup>*</sup>For simplicity, the overtime HOURS for the holiday is multiplied by the restday factor, and the overtime pay is shown in the Restday column.</i></p>
-</div>
-<?php
 } // end of NOT recalc
 include_once '../generalinfo/lists.inc';
 renderlist('payperiods');    
@@ -160,12 +137,12 @@ $zeroattend='('.$res0['ZeroAttend'].')';
 // Overtime is now calculated based on Basic only 2020-07-21
 
 $sql='INSERT INTO `payroll_25payroll'.$temp.'`
-(PayrollID, IDNo, BranchNo, RecordInBranchNo, BasicRate,DeMRate,TaxShRate,DorSM,DisburseVia,`PagIbig-EE`,`PagIbig-ER`, EncodedByNo, `TimeStamp`)
-SELECT a.PayrollID, a.IDNo, a.LatestAssignedBranchNo as `BranchNo`, IF(a.`LatestAssignedBranchNo` IN (SELECT BranchNo FROM `1branches` WHERE CompanyNo=e.RCompanyNo),a.`LatestAssignedBranchNo`,(SELECT BranchNo FROM `1branches` WHERE PseudoBranch=1 AND BranchNo<>95 AND CompanyNo=e.RCompanyNo)) AS RecordInBranchNo, LatestBasicRate, LatestDeMinimisRate, LatestTaxShield, LatestDorM, IF(e.Resigned=1,0,IF((UBPATM IS NOT NULL AND UBPATM<>0),3,0)) AS DisburseVia, `PagIbig-EE`, `PagIbig-EE`, \''.$_SESSION['(ak0)'].'\' as `EncodedByNo`,Now() as `TimeStamp`
+(PayrollID, IDNo, BranchNo, RecordInBranchNo, BasicRate,DeMRate,TaxShRate,DorSM,DisburseVia, EncodedByNo, `TimeStamp`)
+SELECT a.PayrollID, a.IDNo, a.LatestAssignedBranchNo as `BranchNo`, IF(a.`LatestAssignedBranchNo` IN (SELECT BranchNo FROM `1branches` WHERE CompanyNo=e.RCompanyNo),a.`LatestAssignedBranchNo`,(SELECT BranchNo FROM `1branches` WHERE PseudoBranch=1 AND BranchNo<>95 AND CompanyNo=e.RCompanyNo)) AS RecordInBranchNo, LatestBasicRate, LatestDeMinimisRate, LatestTaxShield, LatestDorM, IF(e.Resigned=1,0,IF((UBPATM IS NOT NULL AND UBPATM<>0),3,0)) AS DisburseVia, \''.$_SESSION['(ak0)'].'\' as `EncodedByNo`,Now() as `TimeStamp`
 FROM `payroll_20fromattendance` a JOIN `payroll_20latestrates` r ON a.IDNo=r.IDNo JOIN `1employees` e ON a.IDNo = e.IDNo WHERE (a.PayrollID='.$payrollid.' AND r.DirectOrAgency=0)
 UNION 
 SELECT '.$payrollid.', r.IDNo, DefaultBranchAssignNo as BranchNo, 
-IF(a.`DefaultBranchAssignNo` IN (SELECT BranchNo FROM `1branches` WHERE CompanyNo=r.RCompanyNo),a.`DefaultBranchAssignNo`,(SELECT BranchNo FROM `1branches` WHERE PseudoBranch=1 AND BranchNo<>95 AND CompanyNo=r.RCompanyNo)) AS RecordInBranchNo, LatestBasicRate, LatestDeMinimisRate, LatestTaxShield, 1 as `DorSM`, IF((UBPATM IS NOT NULL AND UBPATM<>0),3,0) as `DisburseVia`, `PagIbig-EE`, `PagIbig-EE`, \''.$_SESSION['(ak0)'].'\' as `EncodedByNo`,Now() as `TimeStamp` FROM `payroll_20latestrates` r JOIN `attend_1defaultbranchassign` a ON a.IDNo=r.IDNo JOIN 1employees e ON r.IDNo=e.IDNo WHERE r.IDNo IN (1001,1002);';
+IF(a.`DefaultBranchAssignNo` IN (SELECT BranchNo FROM `1branches` WHERE CompanyNo=r.RCompanyNo),a.`DefaultBranchAssignNo`,(SELECT BranchNo FROM `1branches` WHERE PseudoBranch=1 AND BranchNo<>95 AND CompanyNo=r.RCompanyNo)) AS RecordInBranchNo, LatestBasicRate, LatestDeMinimisRate, LatestTaxShield, 1 as `DorSM`, IF((UBPATM IS NOT NULL AND UBPATM<>0),3,0) as `DisburseVia`, \''.$_SESSION['(ak0)'].'\' as `EncodedByNo`,Now() as `TimeStamp` FROM `payroll_20latestrates` r JOIN `attend_1defaultbranchassign` a ON a.IDNo=r.IDNo JOIN 1employees e ON r.IDNo=e.IDNo WHERE r.IDNo IN (1001,1002);';
 
 $stmt=$link->prepare($sql); $stmt->execute(); 
 
@@ -206,7 +183,7 @@ WHERE p.PayrollID='.$payrollid.' AND p.IDNo NOT IN  '.$zeroattend;
 //if($_SESSION['(ak0)']==1002){ echo $sql;}
 $stmt=$link->prepare($sql); $stmt->execute(); 
 
-$sql='UPDATE payroll_25payroll SET RegDayBasic=BasicRate,RegDayDeM=DeMRate, RegDayTaxSh=TaxShRate WHERE IDNo IN (1001,1002) AND PayrollID='.$payrollid;
+$sql='UPDATE `payroll_25payroll'.$temp.'` SET RegDayBasic=BasicRate,RegDayDeM=DeMRate, RegDayTaxSh=TaxShRate WHERE IDNo IN (1001,1002) AND PayrollID='.$payrollid;
 $stmt=$link->prepare($sql); $stmt->execute(); 
 
 $sqlfrom=' FROM `payroll_20fromattendance` as a INNER JOIN `payroll_20latestrates` as r ON a.IDNo=r.IDNo JOIN `1employees` as e ON a.IDNo = e.IDNo WHERE (a.PayrollID='.$payrollid.' AND r.DirectOrAgency=0) ';
@@ -214,28 +191,22 @@ $sqlfrom=' FROM `payroll_20fromattendance` as a INNER JOIN `payroll_20latestrate
 if ($payrollid%2==0 AND $payrollid<=24){ //SSS 
         
     $payrollwithsss=1;
-  //  $sql.='UPDATE  ';
-// IF ($_SESSION['(ak0)']==1002){  echo $sql;  exit();}
-//$stmt=$link->prepare($sql); $stmt->execute(); 
+    $sql='UPDATE `payroll_25payroll'.$temp.'` p JOIN payroll_20latestrates r ON p.IDNo=r.IDNo 
+    SET p.`PhilHealth-EE`=r.`PhilHealth-EE`, p.`PhilHealth-ER`=r.`PhilHealth-ER`, p.`PagIbig-EE`=r.`PagIbig-EE`, p.`PagIbig-ER`=r.`PagIbig-EE`
+    WHERE p.PayrollID='.$payrollid;
+ //IF ($_SESSION['(ak0)']==1002){  echo $sql;  exit();}
+    $stmt=$link->prepare($sql); $stmt->execute(); 
 
 include_once 'sssbasistemptable.php';
 
 $sql='UPDATE `payroll_25payroll'.$temp.'` p JOIN sssbasis ss ON p.IDNo=ss.IDNo JOIN `1employees` as e ON e.IDNo = p.IDNo '
-        . ' SET `SSS-EE`=getContriEE(Basis,"sss"), `SSS-ER`=getContriEE(Basis,"sser") WHERE p.PayrollID='.$payrollid . '  AND p.IDNo NOT IN  '.$zeroattend; //AND e.Resigned=0; 
+        . ' SET `SSS-EE`=getContriEE(Basis,"sss"), `SSS-ER`=getContriEE(Basis,"sser") WHERE p.PayrollID='.$payrollid . '  AND p.IDNo NOT IN  '.$zeroattend;
 //IF ($_SESSION['(ak0)']==1002){  echo $sql;  exit();}
 $stmt=$link->prepare($sql); $stmt->execute();
 
 
-
-//moved to wtax
- 
-
 } else { //WTax
     $payrollwithsss=0;
-//     $sql.=' 0 as `SSS-EE`,0 as `Philhealth-EE`,0 as `PagIbig-EE`, 0 as `WTax`,0 as `SSS-ER`,0 as `Philhealth-ER`,0 as `PagIbig-ER`, IF(e.Resigned=1,0,IF((UBPATM IS NOT NULL AND UBPATM<>0),3,0)) as `DisburseVia`, \''.$_SESSION['(ak0)'].'\' as `EncodedByNo`,Now() as `TimeStamp` '.$sqlfrom.' UNION ALL SELECT '.$payrollid.', r.IDNo, DefaultBranchAssignNo as BranchNo, 
-// IF(a.`DefaultBranchAssignNo` IN (SELECT BranchNo FROM `1branches` WHERE CompanyNo=r.RCompanyNo),a.`DefaultBranchAssignNo`,(SELECT BranchNo FROM `1branches` WHERE PseudoBranch=1 AND BranchNo<>95 AND CompanyNo=r.RCompanyNo)) AS RecordInBranchNo,  1 as `DorSM`, TRUNCATE(LatestBasicRate/13.04,2) AS EffectiveDailyRate, LatestBasicRate,LatestDeMinimisRate as `DeM`,LatestTaxShield as `TaxSh`,0,0,0,0,0, 0 as `SSS-EE`,0 as `Philhealth-EE`,0 as `PagIbig-EE`,`WTax`,0 as `SSS-ER`,0 as `Philhealth-ER`,0 as `PagIbig-ER`,IF((UBPATM IS NOT NULL AND UBPATM<>0),3,0) as `DisburseVia`, \''.$_SESSION['(ak0)'].'\' as `EncodedByNo`,Now() as `TimeStamp` FROM `payroll_20latestrates` r JOIN `attend_1defaultbranchassign` a ON a.IDNo=r.IDNo JOIN 1employees e ON r.IDNo=e.IDNo WHERE r.IDNo IN (1001,1002)'; 
-//   // IF ($_SESSION['(ak0)']==1002){  echo $sql;  exit();}
-// $stmt=$link->prepare($sql); $stmt->execute();
 
 $sql='UPDATE `payroll_25payroll'.$temp.'` p JOIN `1employees` as e ON e.IDNo = p.IDNo SET WTax=CalcTax(p.IDNo,'.$payrollid.') WHERE PayrollID='.$payrollid . '  and CalcTax(p.IDNo,'.$payrollid.')>0 AND e.Resigned=0 AND p.IDNo NOT IN  '.$zeroattend; //echo $sql;
 $stmt=$link->prepare($sql); $stmt->execute();

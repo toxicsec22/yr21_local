@@ -26,12 +26,12 @@ $editok=(($res0['Posted']==0) AND ($res1['Approval']==0))?TRUE:FALSE;
 $file='payrolladjust.php?w='; 
 
 if (in_array($which, array('List','EditAttend'))){
-    $zeroblank=array('SpecDays','LWPDays','RegDaysActual','PaidLegalDays','RegExShiftHrsOT','RestShiftHrsOT','SpecShiftHrsOT','LegalShiftHrsOT','RestExShiftHrsOT','SpecExShiftHrsOT','LegalExShiftHrsOT');
+    $zeroblank=array('SpecDays','LWPDays','RegDaysActual','RWSDays','PaidLegalDays','RegExShiftHrsOT','RestShiftHrsOT','SpecShiftHrsOT','LegalShiftHrsOT','RestExShiftHrsOT','SpecExShiftHrsOT','LegalExShiftHrsOT');
     $sqlattend='';
     foreach ($zeroblank as $field) { $sqlattend.='IF(`'.$field.'`=0,"",`'.$field.'`) AS `'.$field.'`, ';}
     $sqlattend='SELECT a.*,'.$sqlattend.' CONCAT(e.FirstName, " ", e.SurName) AS FullName, IFNULL(Branch,"No payroll yet") AS Branch, e2.Nickname AS EncodedBy FROM payroll_50adjattendance a JOIN 1employees e ON e.IDNo=a.IDNo LEFT JOIN payroll_25payroll p ON p.PayrollID=a.AdjInPayrollID AND p.IDNo=a.IDNo LEFT JOIN 1branches b ON b.BranchNo=p.`RecordInBranchNo` JOIN 1employees e2 ON e2.IDNo=a.EncodedByNo ';
 
-    $columnnamesattend=array('LackInPayrollID','IDNo','FullName','Branch','Remarks','SpecDays','LWPDays','RegDaysActual','PaidLegalDays','RegExShiftHrsOT','RestShiftHrsOT','SpecShiftHrsOT','LegalShiftHrsOT','RestExShiftHrsOT','SpecExShiftHrsOT','LegalExShiftHrsOT');
+    $columnnamesattend=array('LackInPayrollID','IDNo','FullName','Branch','Remarks','SpecDays','LWPDays','RegDaysActual','RWSDays','PaidLegalDays','RegExShiftHrsOT','RestShiftHrsOT','SpecShiftHrsOT','LegalShiftHrsOT','RestExShiftHrsOT','SpecExShiftHrsOT','LegalExShiftHrsOT');
     
 	    
 }
@@ -41,7 +41,7 @@ if (in_array($which, array('List','EditPay'))){
     $sqlpay='';
     foreach ($zeroblank as $field) { $sqlpay.='IF(`'.$field.'`=0,"",`'.$field.'`) AS `'.$field.'`, ';}
     $sqlpay='SELECT LackInPayrollID,AdjInPayrollID, a.IDNo, ap.*, CONCAT(e.FirstName, " ", e.SurName) AS FullName, IFNULL(Branch,"No payroll yet") AS Branch, IF(SentToPayroll=1,"Paid","") AS `Paid?`, e2.Nickname AS EncodedBy FROM payroll_55adjpayroll ap JOIN payroll_50adjattendance a ON a.TxnID=ap.TxnID JOIN 1employees e ON e.IDNo=a.IDNo LEFT JOIN payroll_25payroll p ON p.PayrollID=a.AdjInPayrollID AND p.IDNo=a.IDNo LEFT JOIN 1branches b ON b.BranchNo=p.`RecordInBranchNo` JOIN 1employees e2 ON e2.IDNo=ap.EncodedByNo ';
-    $columnnamespay=array('LackInPayrollID','AdjInPayrollID','IDNo','FullName','Branch','Basic', 'DeM', 'TaxSh', 'OT','Paid?');
+    $columnnamespay=array('LackInPayrollID','AdjInPayrollID','IDNo','FullName','Branch','RegDayBasic','RegDayDeM','RegDayTaxSh','RegDayOT','RestDayOT','SpecOT','RHOT','Paid?');
 }
 
 
@@ -52,13 +52,13 @@ if (in_array($which, array('AddAttend','EditAttend','EditAttendPr','DelAttend','
 }
 
 if (in_array($which, array('AddAttend','EditAttend','EditAttendPr','DelAttend'))){
-    $columnstoadd=array('LackInPayrollID','IDNo','Remarks','SpecDays','LWPDays','RegDaysActual','PaidLegalDays','RegExShiftHrsOT','RestShiftHrsOT','SpecShiftHrsOT','LegalShiftHrsOT','RestExShiftHrsOT','SpecExShiftHrsOT','LegalExShiftHrsOT');
+    $columnstoadd=array('LackInPayrollID','IDNo','Remarks','SpecDays','LWPDays','RegDaysActual','RWSDays','PaidLegalDays','RegExShiftHrsOT','RestShiftHrsOT','SpecShiftHrsOT','LegalShiftHrsOT','RestExShiftHrsOT','SpecExShiftHrsOT','LegalExShiftHrsOT');
     if(empty($_POST['Remarks'])) { $columnstoadd= array_diff($columnstoadd, array('Remarks'));}
     $table='payroll_50adjattendance';
 }
 
-if (in_array($which, array('ProcessPer','EditPay','EditPayPr','DelPay'))){
-    $columnstoadd=array('Basic', 'DeM', 'TaxSh', 'OT');
+if (in_array($which, array('ProcessPer','EditPay','EditPayPr','DelPay','AddToPayroll','UnsetPayment'))){
+    $columnstoadd=array('RegDayBasic','RegDayDeM','RegDayTaxSh','RegDayOT','RestDayOT','SpecOT','RHOT');
     $table='payroll_55adjpayroll';
 }
 
@@ -80,7 +80,7 @@ case 'List':
 
     if($editok){
 
-        $fields=array('RegDaysActual','PaidLegalDays','RegExShiftHrsOT','RestShiftHrsOT','SpecShiftHrsOT','LegalShiftHrsOT','RestExShiftHrsOT','SpecExShiftHrsOT','LegalExShiftHrsOT');
+        $fields=array('RegDaysActual','RWSDays','PaidLegalDays','RegExShiftHrsOT','RestShiftHrsOT','SpecShiftHrsOT','LegalShiftHrsOT','RestExShiftHrsOT','SpecExShiftHrsOT','LegalExShiftHrsOT');
 
        
     $columnnames=array(
@@ -161,29 +161,29 @@ case 'EditAttendPr':
 break;
 
 case 'ProcessPer':
+    $sqlhrrate='IF(LatestDorM=0,LatestBasicRate/8,LatestBasicRate/ 13.04/8)';
     $sql0='CREATE TEMPORARY TABLE payadj AS
-        SELECT a.TxnID, (RegDaysActual+PaidLegalDays+SpecDays+LWPDays) AS DaysAdj,
-TRUNCATE(if(r.LatestDorM=0,LatestBasicRate,LatestBasicRate/13.04)*(SELECT DaysAdj),2) AS `Basic`,
-TRUNCATE(if(r.LatestDorM=0,LatestDeMinimisRate,LatestDeMinimisRate/13.04)*(SELECT DaysAdj),2) AS `DeM`,
-TRUNCATE(if(r.LatestDorM=0,LatestTaxShield,LatestTaxShield/13.04)*(SELECT DaysAdj),2) AS `TaxSh`,
-TRUNCATE(if(r.LatestDorM=0,(LatestBasicRate)/8,(LatestBasicRate)/ 13.04/8)*((RegExShiftHrsOT*1.25)+
-(RestShiftHrsOT*1.3)+
-(SpecShiftHrsOT*1.3)+
-LegalShiftHrsOT+
-(RestExShiftHrsOT*1.3*1.3)+
-(SpecExShiftHrsOT*1.3*1.3)+
-(LegalExShiftHrsOT*2*1.3)),2) AS OT
-FROM `payroll_50adjattendance` a JOIN `payroll_20latestrates` r ON a.IDNo=r.IDNo JOIN `1employees` e ON a.IDNo = e.IDNo WHERE (a.AdjInPayrollID='.$payrollid.' AND r.DirectOrAgency=0) AND a.TxnID='.$txnid;
+        SELECT a.TxnID, IF(LatestDorM=0,(RegDaysActual+PaidLegalDays+LWPDays),(RegDaysActual+PaidLegalDays+RWSDays+SpecDays+LWPDays)) AS DaysAdj, 
+        ROUND(IF(LatestDorM=0,LatestBasicRate,(LatestBasicRate/13.04))*(SELECT DaysAdj),2) AS RegDayBasic, 
+        ROUND(IF(LatestDorM=0,LatestDeMinimisRate,(LatestDeMinimisRate/13.04))*(SELECT DaysAdj),2) AS RegDayDeM, 
+        ROUND(IF(LatestDorM=0,LatestTaxShield,(LatestTaxShield/13.04))*(SELECT DaysAdj),2)  AS RegDayTaxSh, 
+        ROUND('.$sqlhrrate.'*(RegExShiftHrsOT*1.3),2) AS RegDayOT,
+ROUND('.$sqlhrrate.'*((RestShiftHrsOT*1.3)+(RestExShiftHrsOT*1.3*1.3)),2) AS RestDayOT,
+ROUND('.$sqlhrrate.'*((SpecShiftHrsOT*1.3)+(SpecExShiftHrsOT*1.3*1.3)),2) AS SpecOT,
+ROUND('.$sqlhrrate.'*((LegalShiftHrsOT)+(LegalExShiftHrsOT*2*1.3)),2) AS RHOT
+
+FROM `payroll_50adjattendance` a JOIN `payroll_20latestrates` r ON a.IDNo=r.IDNo JOIN `1employees` e ON a.IDNo = e.IDNo WHERE (a.AdjInPayrollID='.$payrollid.' AND r.DirectOrAgency=0) AND a.TxnID='.$txnid; 
+    if($_SESSION['(ak0)']==1002){ echo $sql0;}
     $stmt=$link->prepare($sql0); $stmt->execute();
     $sql='';
     foreach ($columnstoadd as $col){ $sql.=$col.',';}
-    $sql='INSERT INTO `'.$table.'` (TxnID, '.$sql.' EncodedByNo, TimeStamp) SELECT TxnID, '.$sql.' \''.$_SESSION['(ak0)'].'\', NOW() FROM payadj'; echo $sql;
+    $sql='INSERT INTO `'.$table.'` (TxnID, '.$sql.' EncodedByNo, TimeStamp) SELECT TxnID, '.$sql.' \''.$_SESSION['(ak0)'].'\', NOW() FROM payadj'; if($_SESSION['(ak0)']==1002){ echo $sql;}
     		$stmt=$link->prepare($sql); $stmt->execute();
 		header('Location:'.$file.'List');
     break;
 
 case 'AddToPayroll': 
-    $sql='SELECT * FROM payroll_55adjpayroll ap JOIN payroll_50adjattendance a ON a.TxnID=ap.TxnID WHERE ap.SentToPayroll=0 AND ap.TxnID='.$txnid;
+    $sql='SELECT *,(RegDayBasic+RegDayDeM+RegDayTaxSh+RegDayOT+RestDayOT+SpecOT+RHOT) AS NetAdj FROM payroll_55adjpayroll ap JOIN payroll_50adjattendance a ON a.TxnID=ap.TxnID WHERE ap.SentToPayroll=0 AND ap.TxnID='.$txnid;
     $stmt=$link->query($sql); $res=$stmt->fetch(); 
     if($stmt->rowCount()==0){ echo '<h3>Adjustment has been recorded. Please unset.</h3>' ; exit();}
     
@@ -193,24 +193,22 @@ case 'AddToPayroll':
     $stmt=$link->query($sql);
     if($stmt->rowCount()==0){ echo '<h3>No target payroll record.</h3>' ; exit();}
     
-    $columnstoadd=array('Basic','DeM','TaxSh','OT');
     $sql='';
     foreach ($columnstoadd as $col){
         $sql.=$col.'=('.$col.'+'.$res[$col].'),';
     }
-    $sql='UPDATE payroll_25payroll SET '.$sql.' Remarks=CONCAT(IFNULL(CONCAT(Remarks,"; "),""),"With adjustment from payroll '.$res['LackInPayrollID'].'"), EncodedByNo=\''.$_SESSION['(ak0)'].'\',TimeStamp=NOW() WHERE IDNo='.$idno.' AND PayrollID='.$payrollid; 
+    $sql='UPDATE payroll_25payroll SET '.$sql.' Remarks=CONCAT(IFNULL(CONCAT(Remarks,"; "),""),"With '.$res['NetAdj'].' adjustment from payroll '.$res['LackInPayrollID'].'"), EncodedByNo=\''.$_SESSION['(ak0)'].'\',TimeStamp=NOW() WHERE IDNo='.$idno.' AND PayrollID='.$payrollid; 
     $stmt=$link->prepare($sql); $stmt->execute();    
     
     header('Location:'.$file.'UpdateGovt&SetAs=1&TxnID='.$txnid.'&IDNo='.$idno.'&PayrollID='.$payrollid);
     break;
     
 case 'UpdateGovt' :
-    $idno=$_GET['IDNo']; $payrollid=$_GET['PayrollID']; $txnid=$_GET['TxnID'];
+    $idno=$_GET['IDNo']; $payrollid=$_GET['PayrollID']; $txnid=$_GET['TxnID']; 
     // Update govt deductions
     if ($payrollid%2==0 AND $payrollid<=24){ //SSS
-        $sql='CREATE TEMPORARY TABLE sssbasis AS '
-        . 'SELECT EncodedByNo,TimeStamp,IDNo, SUM(Basic+OT-UndertimeBasic-AbsenceBasic)+(SELECT IFNULL(SUM(Basic+OT-UndertimeBasic-AbsenceBasic),0) FROM `payroll_25payroll` pp WHERE pp.IDNo=p.IDNo AND pp.PayrollID='.($payrollid-1) . ') AS Basis FROM `payroll_25payroll` p WHERE IDNo='.$idno.' AND PayrollID='.$payrollid ;
-        $stmt=$link->prepare($sql); $stmt->execute(); 
+        $perid=' AND p.IDNo='.$idno;
+        include_once 'sssbasistemptable.php';
 
         $sql='UPDATE `payroll_25payroll` p JOIN sssbasis ss ON p.IDNo=ss.IDNo JOIN `1employees` as e ON e.IDNo = p.IDNo '
         . ' SET `SSS-EE`=getContriEE(Basis,"sss"), `SSS-ER`=getContriEE(Basis,"sser") WHERE p.IDNo='.$idno.' AND p.PayrollID='.$payrollid; 
@@ -226,7 +224,7 @@ $stmt=$link->prepare($sql); $stmt->execute();
     break;
     
 case 'UnsetPayment' :
-    $sql='SELECT * FROM payroll_55adjpayroll ap JOIN payroll_50adjattendance a ON a.TxnID=ap.TxnID WHERE ap.SentToPayroll=1 AND ap.TxnID='.$txnid;
+    $sql='SELECT *,(RegDayBasic+RegDayDeM+RegDayTaxSh+RegDayOT+RestDayOT+SpecOT+RHOT) AS NetAdj FROM payroll_55adjpayroll ap JOIN payroll_50adjattendance a ON a.TxnID=ap.TxnID WHERE ap.SentToPayroll=1 AND ap.TxnID='.$txnid;
     $stmt=$link->query($sql); $res=$stmt->fetch(); 
     if($stmt->rowCount()==0){ echo '<h3>Adjustment has not been paid.</h3>' ; exit();}
     
@@ -236,12 +234,12 @@ case 'UnsetPayment' :
     $stmt=$link->query($sql);
     if($stmt->rowCount()==0){ echo '<h3>There is no such record in payroll.</h3>' ; exit();}
     
-    $columnstoadd=array('Basic','DeM','TaxSh','OT');
+    //$columnstoadd=array('Basic','DeM','TaxSh','OT');
     $sql='';
     foreach ($columnstoadd as $col){
         $sql.=$col.'=('.$col.'-'.$res[$col].'),';
     }
-    $sql='UPDATE payroll_25payroll SET '.$sql.' Remarks=REPLACE(Remarks,\'With adjustment from payroll '.$res['LackInPayrollID'].'\',""), EncodedByNo=\''.$_SESSION['(ak0)'].'\',TimeStamp=NOW() WHERE IDNo='.$idno.' AND PayrollID='.$payrollid;
+    $sql='UPDATE payroll_25payroll SET '.$sql.' Remarks=REPLACE(Remarks,\'With '.$res['NetAdj'].' adjustment from payroll '.$res['LackInPayrollID'].'\',""), EncodedByNo=\''.$_SESSION['(ak0)'].'\',TimeStamp=NOW() WHERE IDNo='.$idno.' AND PayrollID='.$payrollid;
     $stmt=$link->prepare($sql); $stmt->execute();
     
     header('Location:'.$file.'UpdateGovt&SetAs=0&TxnID='.$txnid.'&IDNo='.$idno.'&PayrollID='.$payrollid);

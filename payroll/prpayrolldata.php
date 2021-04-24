@@ -51,7 +51,7 @@ switch ($whichqry){
             $txnid=intval($_REQUEST['TxnID']);
             //echo $txnid;
             if (allowedToOpen(8163,'1rtc')){
-            $columnstoedit=array('LWOPDays','LegalDays','SpecDays','SLDays','VLDays','RestDays','LWPDays','QDays','RegDaysActual','PaidLegalDays','RegExShiftHrsOT','RestShiftHrsOT','SpecShiftHrsOT','LegalShiftHrsOT','RestExShiftHrsOT','SpecExShiftHrsOT','LegalExShiftHrsOT');
+            $columnstoedit=array('LWOPDays','LegalDays','SpecDays','SLDays','VLDays','RestDays','RWSDays','LWPDays','QDays','RegDaysActual','PaidLegalDays','RegExShiftHrsOT','RestShiftHrsOT','SpecShiftHrsOT','LegalShiftHrsOT','RestExShiftHrsOT','SpecExShiftHrsOT','LegalExShiftHrsOT');
             } else {
                 $columnstoedit=array();
 	    }
@@ -70,7 +70,12 @@ switch ($whichqry){
             $txnid=intval($_REQUEST['TxnID']);
             //echo $txnid;
             if (allowedToOpen(816,'1rtc')){
-            $columnstoedit=array('BranchNo','Basic','DeM','TaxSh','OT','Remarks','AbsenceBasic','UndertimeBasic','AbsenceTaxSh','UndertimeTaxSh','SSS-EE','SSS-ER','PhilHealth-EE','PhilHealth-ER','PagIbig-EE','PagIbig-ER','WTax','DisburseVia');
+           // $columnstoedit=array('BranchNo','Basic','DeM','TaxSh','OT','Remarks','AbsenceBasic','UndertimeBasic','AbsenceTaxSh','UndertimeTaxSh','SSS-EE','SSS-ER','PhilHealth-EE','PhilHealth-ER','PagIbig-EE','PagIbig-ER','WTax','DisburseVia');
+		   $columnstoedit=array('BranchNo','RegDayBasic','RegDayDeM','RegDayTaxSh','VLBasic','VLDeM','VLTaxSh','SLBasic','SLDeM','SLTaxSh',
+        'LWPBasic','LWPDeM','LWPTaxSh','RHBasicforDaily','RHDeMforDaily','RHTaxShforDaily',
+        'AbsenceBasicforMonthly','AbsenceDeMforMonthly','AbsenceTaxShforMonthly',
+        'UndertimeBasic','UndertimeDeM','UndertimeTaxSh','RegDayOT','RestDayOT','SpecOT','RHOT','Remarks','SSS-EE','SSS-ER','PhilHealth-EE','PhilHealth-ER','PagIbig-EE','PagIbig-ER','WTax','DisburseVia');
+   	    
 	    $sqlbranchno='SELECT IF('.$_POST['BranchNo'].' IN (SELECT BranchNo FROM `1branches` WHERE CompanyNo=RCompanyNo),'.$_POST['BranchNo'].',(SELECT BranchNo FROM `1branches` WHERE PseudoBranch=1 AND BranchNo<>95 AND CompanyNo=RCompanyNo)) AS RecordInBranchNo FROM `1employees` e JOIN `payroll_25payroll` p ON e.IDNo=p.IDNo WHERE TxnID='.$txnid; //echo $sqlbranchno;
 	    $stmt=$link->query($sqlbranchno);	$resultbranch=$stmt->fetch();
             } else {
