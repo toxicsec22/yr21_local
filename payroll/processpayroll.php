@@ -193,7 +193,7 @@ if ($payrollid%2==0 AND $payrollid<=24){ //SSS
     $payrollwithsss=1;
     $sql='UPDATE `payroll_25payroll'.$temp.'` p JOIN payroll_20latestrates r ON p.IDNo=r.IDNo 
     SET p.`PhilHealth-EE`=r.`PhilHealth-EE`, p.`PhilHealth-ER`=r.`PhilHealth-ER`, p.`PagIbig-EE`=r.`PagIbig-EE`, p.`PagIbig-ER`=r.`PagIbig-EE`
-    WHERE p.PayrollID='.$payrollid;
+    WHERE p.PayrollID='.$payrollid.' AND p.IDNo NOT IN  '.$zeroattend;
  //IF ($_SESSION['(ak0)']==1002){  echo $sql;  exit();}
     $stmt=$link->prepare($sql); $stmt->execute(); 
 
