@@ -490,18 +490,18 @@ case 'YearTotals':
    $showbranches=false; 
    $condition=!isset($_REQUEST['MonthLookup'])?'': 'WHERE MONTH(pd.PayrollDate)='.$_REQUEST['Month']; //echo $condition;
    
-    
+
     $sql2='Select *,format(`Basic`,2) as `Basic`,format(`DeM`,2) as `DeM`,format(`TaxSh`,2) as `TaxSh`,format(`OT`,2) as `OT`,
-    format(`AbsenceBasic`,2) as `AbsenceBasic`,format(`UndertimeBasic`,2) as `UndertimeBasic`,
+    format(`AbsenceBasic`+`AbsenceDem`,2) as `AbsenceBasic`,format(`UndertimeBasic`+`UndertimeDeM`,2) as `UndertimeBasic`,
     format(`AbsenceTaxSh`,2) as `AbsenceTaxSh`,format(`UndertimeTaxSh`,2) as `UndertimeTaxSh`,
     format(`SSS-EE`,2) as `SSS-EE`,format(`PhilHealth-EE`,2) as `PhilHealth-EE`,format(`PagIbig-EE`,2) as `PagIbig-EE`,truncate(`WTax`,2) as `WTax`,format(`WTax`,2) as `TaxWithheld`, 
-    format((`Basic`+`OT`-`AbsenceBasic`-`UndertimeBasic`),2) as TaxSalaries,
-    format((`DeM`),2) as NonTaxSalaries,
-    `13th`, `LeaveConversion`,
+    format(TaxSalaries,2) as TaxSalaries,
+    format(NonTaxSalaries,2) as NonTaxSalaries,
+    FORMAT(`13th`,2) AS `13th`, FORMAT(`LeaveConversion`,2) AS `LeaveConversion`,
     format((`DeM` +`13th`+`LeaveConversion`),2) as TotalNotTax,
-    ROUND((`SSS-EE`+`PhilHealth-EE`+`PagIbig-EE`),2) as TotalGovtDeduct, ((`Basic`+`OT`-`AbsenceBasic`-`UndertimeBasic`)-(`SSS-EE`+`PhilHealth-EE`+`PagIbig-EE`))  as Taxable, format(if(Taxable<0,0,Taxable),2) as NetTaxable, format(truncate(TaxDue(Taxable),2),2) as TotalDue, format((TaxDue(Taxable)-WTax),2) as NetTaxDue from yrgross yg ';
+    format(if(Taxable<0,0,Taxable),2) as NetTaxable, format(truncate(TaxDue(Taxable),2),2) as TotalDue, format((TaxDue(Taxable)-WTax),2) as NetTaxDue from yrgross yg ';
     $sql1='SELECT CompanyNo,`CompanyName` FROM 1companies;';
-	include('yrtotalssql.php');
+	include('tempdata/yrtotalssql.php');
      $groupby='CompanyNo'; $orderby=' order by SurName';
     $columnnames1=array('CompanyName');
     $columnnames2=array('IDNo','FullName','Basic','DeM','TaxSh','OT','AbsenceBasic','UndertimeBasic','AbsenceTaxSh','UndertimeTaxSh','SSS-EE','PhilHealth-EE','PagIbig-EE','TaxWithheld', 'TaxSalaries','NonTaxSalaries','13th','LeaveConversion','TotalNotTax','TotalGovtDeduct','Taxable', 'NetTaxable', 'TotalDue', 'NetTaxDue');
@@ -527,7 +527,13 @@ case 'TotalTaxAndNonTax':
    $title='Monthly Salaries Per Company';
   
    $sql='SELECT CompanyName,  concat(mid(Monthname(pd.PayrollDate),1,3),mid(Year(pd.PayrollDate),3,2)) as Month, 
-format(sum(ifnull(p.Basic,0)+ifnull(p.DeM,0)+ifnull(p.OT,0)-ifnull(p.AbsenceBasic,0)-ifnull(p.UndertimeBasic,0)),2) AS TotalCompensation
+   FORMAT(SUM(
+    (RegDayBasic+VLBasic+SLBasic+LWPBasic+RHBasicforDaily) +  -- Basic
+      (RegDayDeM+VLDeM+SLDeM+LWPDeM+RHDeMforDaily)  +  -- `DeM`,
+      (RegDayOT + RestDayOT + SpecOT + RHOT)   -- `OT`
+      - (AbsenceBasicforMonthly + AbsenceDeMforMonthly ) -- `Absence`
+      - (UndertimeBasic + UndertimeDeM ) -- `Undertime`
+),2) AS TotalCompensation
 FROM payroll_25payroll as p join `1employees` e on e.IDNo=p.IDNo
 join `1companies` c on c.CompanyNo=e.RCompanyNo
 join `payroll_1paydates` pd on pd.PayrollID=p.PayrollID 
