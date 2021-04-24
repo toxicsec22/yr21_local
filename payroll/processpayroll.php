@@ -29,28 +29,11 @@ JOIN attend_0positions p ON p.PositionID=cp.PositionID WHERE e.`Resigned`=0 AND 
 $columnnames=array('IDNo','Nickname', 'SurName','Position','RecordedRate','PreferredForPosition');
 $subtitle='Recorded Rate Type Different from Preferred for Position';
 include('../backendphp/layout/displayastableonlynoheaders.php');
+include_once '../payrolllayout/dailyformula.php';
+include_once '../payrolllayout/semimonthlyformula.php';
+
 ?>      
-      <br><br><hr><br><br>
-      Payroll Formulas for DAILY<br><br>
-      <?php echo str_repeat('&nbsp',10)?>Total Days = Regular Days Present + Paid Legal Days + SL Days + VL Days + Birthday + LWP Days<br>
-<?php echo str_repeat('&nbsp',15)?>Basic = Daily Basic Rate x Total Days<br>
-<!--<?php //echo str_repeat('&nbsp',15)?>Cola = Daily Cola Rate x Total Days<br>-->
-<?php echo str_repeat('&nbsp',15)?>De Minimis = Daily De Minimis Rate x Total Days<br>
-<?php echo str_repeat('&nbsp',15)?>Tax Shield = Daily Tax Shield Rate x Total Days<br><br>
-<?php echo str_repeat('&nbsp',10)?>Hourly Rate = (Daily Basic + De Minimis + Tax Shield)/8<br><br><hr><br><br>
-      Payroll Formulas for MONTHLY<br><br>
-      <?php echo str_repeat('&nbsp',10)?><i>Notes:  1. Calculations start as if perfect attendance, before absences are deducted.<br>
-      <?php echo str_repeat('&nbsp',20)?>2. The first payroll of a NEW employee will be counted as daily paid.  Remote Working Saturdays and Special Holidays are added to the counted regular days so these will be paid as well.<br>
-      <?php echo str_repeat('&nbsp',20)?>3. The following calculations assume that Saturday <u>whole days</u> are paid for monthly employees.</i><br><br>
-      <?php echo str_repeat('&nbsp',15)?>Days Per Year = Total Days Per Year less Sundays:  365-(365/7) = 313<br>
-      <?php echo str_repeat('&nbsp',15)?>Average Days Per Month = Days Per Year divided by 12 = 26.08<br>
-      <?php echo str_repeat('&nbsp',15)?>Daily Rate = (Monthly Basic + De Minimis + Tax Shield) / 26.08<br>
-      <?php echo str_repeat('&nbsp',15)?>Hourly Rate = (Monthly Basic + De Minimis + Tax Shield) / 26.08 / 8<br><br>      
-<?php echo str_repeat('&nbsp',15)?>Basic = (Monthly/2) Basic Rate<br>
-<!--<?php //echo str_repeat('&nbsp',15)?>Cola = (Monthly/2) Cola Rate<br>-->
-<?php echo str_repeat('&nbsp',15)?>De Minimis = (Monthly/2) De Minimis Rate<br>
-<?php echo str_repeat('&nbsp',15)?>Tax Shield = (Monthly/2) Tax Shield Rate<br><br>
-<?php echo str_repeat('&nbsp',15)?>Absence (Basic/Tax Shield) = Daily Rate x LWOP<br><br>
+      
 <hr><br><br>
 Undertime = Daily Rate x (Regular Days Present - Regular Days Actual as calculated by attendance)
 <br><br>
@@ -83,37 +66,57 @@ if (isset($_POST['submit']) AND (!isset($_POST['submit2'])) AND (!isset($_POST['
 	$temp=''; 
 } else if (isset($_POST['submit2']) OR (isset($_POST['sortfield']))) {
 	$sql = "CREATE TEMPORARY TABLE `payroll_25payrolltemp` (
-	  `PayrollID` tinyint(3) unsigned NOT NULL,
-	  `IDNo` smallint(6) NOT NULL,
-	  `BranchNo` smallint(6) NOT NULL COMMENT 'AssignedBranchNo',
-	  `DorSM` tinyint(3) unsigned DEFAULT '0' COMMENT 'DailyorBiWeekly',
-	  `Basic` double DEFAULT '0' COMMENT 'BasicRate',
-	  `DeM` double DEFAULT '0' COMMENT 'DeMinimisRate',
-	  `TaxSh` double DEFAULT '0' COMMENT 'Tax ShieldRate',
-	  `OT` double DEFAULT '0' COMMENT 'OTActual',
-	  `Remarks` varchar(255) DEFAULT '0',
-	  `AbsenceBasic` double DEFAULT '0' COMMENT 'LessAbsenceValueBasic',
-	  `UndertimeBasic` double DEFAULT '0' COMMENT 'LessUndertimeValueBasic',
-	  `AbsenceTaxSh` double DEFAULT '0' COMMENT 'LessAbsenceValueAllow',
-	  `UndertimeTaxSh` double DEFAULT '0' COMMENT 'LessUndertimeValueAllow',
-	  `SSS-EE` double DEFAULT '0',
-	  `PhilHealth-EE` double DEFAULT '0',
-	  `PagIbig-EE` double DEFAULT '0',
-	  `WTax` double DEFAULT '0',
-	  `SSS-ER` double DEFAULT '0',
-	  `PhilHealth-ER` double DEFAULT '0',
-	  `PagIbig-ER` double DEFAULT '0',
-	  `EncodedByNo` smallint(6) DEFAULT NULL,
-	  `TimeStamp` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-	  `DisburseVia` tinyint(1) NOT NULL DEFAULT '1', 
-	  `TxnID` int(11) NOT NULL AUTO_INCREMENT,
-	  `RecordInBranchNo` smallint(6) NOT NULL COMMENT 'To record into the correct company',
-	  PRIMARY KEY (`TxnID`),
-	  UNIQUE KEY `PayrollID_UNIQUE` (`PayrollID`,`IDNo`),
-	  KEY `AssignedBranchNo` (`BranchNo`),
-	  KEY `IDNo` (`IDNo`),
-	  KEY `PayrollID` (`PayrollID`)
-	) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+  `TxnID` int(11) NOT NULL AUTO_INCREMENT,
+  `PayrollID` tinyint(3) unsigned NOT NULL,
+  `IDNo` smallint(6) NOT NULL,
+  `BranchNo` smallint(6) NOT NULL COMMENT 'AssignedBranchNo',
+  `RecordInBranchNo` smallint(6) NOT NULL COMMENT 'To record into the correct company',
+  `Remarks` varchar(255) DEFAULT NULL,
+  `BasicRate` double DEFAULT 0 COMMENT 'BasicRate',
+  `DeMRate` double DEFAULT 0 COMMENT 'DeMinimisRate',
+  `TaxShRate` double DEFAULT 0 COMMENT 'TaxShield',
+  `DorSM` tinyint(1) unsigned DEFAULT 0 COMMENT 'DailyorBiWeekly',
+  `RegDayBasic` double DEFAULT 0,
+  `RegDayDeM` double DEFAULT 0,
+  `RegDayTaxSh` double DEFAULT 0,
+  `VLBasic` double DEFAULT 0,
+  `VLDeM` double DEFAULT 0,
+  `VLTaxSh` double DEFAULT 0,
+  `SLBasic` double DEFAULT 0,
+  `SLDeM` double DEFAULT 0,
+  `SLTaxSh` double DEFAULT 0,
+  `LWPBasic` double DEFAULT 0,
+  `LWPDeM` double DEFAULT 0,
+  `LWPTaxSh` double DEFAULT 0,
+  `RHBasicforDaily` double DEFAULT 0,
+  `RHDeMforDaily` double DEFAULT 0,
+  `RHTaxShforDaily` double DEFAULT 0,
+  `AbsenceBasicforMonthly` double DEFAULT 0,
+  `AbsenceDeMforMonthly` double DEFAULT 0,
+  `AbsenceTaxShforMonthly` double DEFAULT 0,
+  `UndertimeBasic` double DEFAULT 0,
+  `UndertimeDeM` double DEFAULT 0,
+  `UndertimeTaxSh` double DEFAULT 0,
+  `RegDayOT` double DEFAULT 0,
+  `RestDayOT` double DEFAULT 0,
+  `SpecOT` double DEFAULT 0,
+  `RHOT` double DEFAULT 0,
+  `SSS-EE` double DEFAULT 0,
+  `PhilHealth-EE` double DEFAULT 0,
+  `PagIbig-EE` double DEFAULT 0,
+  `WTax` double DEFAULT 0,
+  `SSS-ER` double DEFAULT 0,
+  `PhilHealth-ER` double DEFAULT 0,
+  `PagIbig-ER` double DEFAULT 0,
+  `EncodedByNo` smallint(6) DEFAULT NULL,
+  `TimeStamp` timestamp NULL DEFAULT NULL,
+  `DisburseVia` tinyint(1) DEFAULT 3 COMMENT '0 Via Cash \n1 Via BPI \n2 Via GCash \n3 Via UBP',
+  PRIMARY KEY (`TxnID`),
+  UNIQUE KEY `PayrollID_UNIQUE` (`PayrollID`,`IDNo`),
+  KEY `AssignedBranchNo` (`BranchNo`),
+  KEY `IDNo` (`IDNo`),
+  KEY `PayrollID` (`PayrollID`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 	";
 	$stmt=$link->prepare($sql); $stmt->execute();
 	
@@ -126,7 +129,7 @@ if (isset($_POST['submit']) AND (!isset($_POST['submit2'])) AND (!isset($_POST['
   `EncodedByNo` smallint(6) DEFAULT NULL,
   `TimeStamp` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `AdjID` int(11) NOT NULL AUTO_INCREMENT,
-  `BranchNo` smallint(6) NOT NULL COMMENT 'To record into the correct company',
+  `BranchNo` smallint(6) NOT NULL,
   PRIMARY KEY (`AdjID`),
   UNIQUE KEY `PayrollIDAdjUnique` (`PayrollID`,`IDNo`,`AdjustTypeNo`),
   KEY `PayrollID` (`PayrollID`),
@@ -144,55 +147,76 @@ $payrollid=$_SESSION['payrollidses'];
 // First get who are the new employees with monthly rate
 $sql0='SELECT IFNULL(GROUP_CONCAT(e.IDNo),0) AS NewMonthlyEmployees FROM 1employees e JOIN payroll_20latestrates r ON e.IDNo=r.IDNo WHERE 
 LatestDorM=1 AND
-DateHired BETWEEN (SELECT FromDate FROM payroll_1paydates WHERE PayrollID='.$payrollid.') AND (SELECT ToDate FROM payroll_1paydates WHERE PayrollID='.$payrollid.');';
+DateHired > (SELECT FromDate FROM payroll_1paydates WHERE PayrollID='.$payrollid.') AND 
+DateHired <= (SELECT ToDate FROM payroll_1paydates WHERE PayrollID='.$payrollid.');';
 $stmt0=$link->query($sql0); $res0=$stmt0->fetch();
-$newmonthlyemp='('.$res0['NewMonthlyEmployees'].')';
+$newmonthlyemp=$res0['NewMonthlyEmployees'];
 
 // Get employees with no attendance for the whole payroll period
-$sql0='SELECT IFNULL(GROUP_CONCAT(IDNo),0) AS ZeroAttend FROM 2021_1rtc.payroll_20fromattendance WHERE (`SLDays` + `VLDays` + `LWPDays` + `QDays` + `RegDaysPresent`)=0 AND PayrollID='.$payrollid;
+$sql0='SELECT IFNULL(GROUP_CONCAT(IDNo),0) AS ZeroAttend FROM payroll_20fromattendance WHERE (`SLDays` + `VLDays` + `LWPDays` + `QDays` + `RegDaysPresent`)=0 AND PayrollID='.$payrollid;
 $stmt0=$link->query($sql0); $res0=$stmt0->fetch();
 $zeroattend='('.$res0['ZeroAttend'].')';
 
 // Overtime is now calculated based on Basic only 2020-07-21
 
 $sql='INSERT INTO `payroll_25payroll'.$temp.'`
-(`PayrollID`,`IDNo`,`BranchNo`,`RecordInBranchNo`,`DorSM`,`Basic`,`DeM`,`TaxSh`,`OT`,`AbsenceBasic`,`UndertimeBasic`,`AbsenceTaxSh`,`UndertimeTaxSh`,`SSS-EE`,`PhilHealth-EE`,`PagIbig-EE`,`WTax`,`SSS-ER`,`PhilHealth-ER`,`PagIbig-ER`,`DisburseVia`, `EncodedByNo`,`TimeStamp`)
-SELECT a.PayrollID, a.IDNo, a.LatestAssignedBranchNo as `BranchNo`,
-IF(a.`LatestAssignedBranchNo` IN (SELECT BranchNo FROM `1branches` WHERE CompanyNo=e.RCompanyNo),a.`LatestAssignedBranchNo`,(SELECT BranchNo FROM `1branches` WHERE PseudoBranch=1 AND BranchNo<>95 AND CompanyNo=e.RCompanyNo)) AS RecordInBranchNo,
- r.LatestDorM as `DorSM`,
-truncate(if(r.LatestDorM=0,LatestBasicRate*(RegDaysPresent+PaidLegalDays+SLDays+VLDays+LWPDays),
-(IF(a.IDNo IN '.$newmonthlyemp.', (LatestBasicRate/13.04)*(RegDaysPresent+PaidLegalDays+SLDays+VLDays+LWPDays+SpecDays) ,LatestBasicRate))),2) as `Basic`,
-    
-truncate(if(r.LatestDorM=0,LatestDeMinimisRate*(RegDaysPresent+PaidLegalDays+SLDays+VLDays+LWPDays),
-(IF(a.IDNo IN '.$newmonthlyemp.', (LatestDeMinimisRate/13.04)*(RegDaysPresent+PaidLegalDays+SLDays+VLDays+LWPDays+SpecDays) ,LatestDeMinimisRate))),2) as `DeM`,
-    
-truncate(if(r.LatestDorM=0,LatestTaxShield*(RegDaysPresent+PaidLegalDays+SLDays+VLDays+LWPDays),
-(IF(a.IDNo IN '.$newmonthlyemp.', (LatestTaxShield/13.04)*(RegDaysPresent+PaidLegalDays+SLDays+VLDays+LWPDays+SpecDays) ,LatestTaxShield))),2) as `TaxSh`,
+(PayrollID, IDNo, BranchNo, RecordInBranchNo, BasicRate,DeMRate,TaxShRate,DorSM,DisburseVia,`PagIbig-EE`,`PagIbig-ER`, EncodedByNo, `TimeStamp`)
+SELECT a.PayrollID, a.IDNo, a.LatestAssignedBranchNo as `BranchNo`, IF(a.`LatestAssignedBranchNo` IN (SELECT BranchNo FROM `1branches` WHERE CompanyNo=e.RCompanyNo),a.`LatestAssignedBranchNo`,(SELECT BranchNo FROM `1branches` WHERE PseudoBranch=1 AND BranchNo<>95 AND CompanyNo=e.RCompanyNo)) AS RecordInBranchNo, LatestBasicRate, LatestDeMinimisRate, LatestTaxShield, LatestDorM, IF(e.Resigned=1,0,IF((UBPATM IS NOT NULL AND UBPATM<>0),3,0)) AS DisburseVia, `PagIbig-EE`, `PagIbig-EE`, \''.$_SESSION['(ak0)'].'\' as `EncodedByNo`,Now() as `TimeStamp`
+FROM `payroll_20fromattendance` a JOIN `payroll_20latestrates` r ON a.IDNo=r.IDNo JOIN `1employees` e ON a.IDNo = e.IDNo WHERE (a.PayrollID='.$payrollid.' AND r.DirectOrAgency=0)
+UNION 
+SELECT '.$payrollid.', r.IDNo, DefaultBranchAssignNo as BranchNo, 
+IF(a.`DefaultBranchAssignNo` IN (SELECT BranchNo FROM `1branches` WHERE CompanyNo=r.RCompanyNo),a.`DefaultBranchAssignNo`,(SELECT BranchNo FROM `1branches` WHERE PseudoBranch=1 AND BranchNo<>95 AND CompanyNo=r.RCompanyNo)) AS RecordInBranchNo, LatestBasicRate, LatestDeMinimisRate, LatestTaxShield, 1 as `DorSM`, IF((UBPATM IS NOT NULL AND UBPATM<>0),3,0) as `DisburseVia`, `PagIbig-EE`, `PagIbig-EE`, \''.$_SESSION['(ak0)'].'\' as `EncodedByNo`,Now() as `TimeStamp` FROM `payroll_20latestrates` r JOIN `attend_1defaultbranchassign` a ON a.IDNo=r.IDNo JOIN 1employees e ON r.IDNo=e.IDNo WHERE r.IDNo IN (1001,1002);';
 
-truncate(if(r.LatestDorM=0,(LatestBasicRate)/8,(LatestBasicRate)/ 13.04/8)*((RegExShiftHrsOT*1.25)+
-(RestShiftHrsOT*1.3)+
-(SpecShiftHrsOT*1.3)+
-LegalShiftHrsOT+
-(RestExShiftHrsOT*1.3*1.3)+
-(SpecExShiftHrsOT*1.3*1.3)+
-(LegalExShiftHrsOT*2*1.3)),2) AS OT,
+$stmt=$link->prepare($sql); $stmt->execute(); 
 
-truncate(if(r.LatestDorM=0 OR a.IDNo IN '.$newmonthlyemp.',0,(LatestBasicRate+LatestDeMinimisRate)/ 13.04)*(LWOPDays+QDays),2) as `AbsenceBasic`,
+$sql='UPDATE `payroll_25payroll'.$temp.'` p JOIN payroll_20fromattendance a ON p.IDNo=a.IDNo AND p.PayrollID=a.PayrollID
+SET 
+RegDayBasic=ROUND(IF(DorSM=0,BasicRate*RegDaysPresent,(IF(a.IDNo IN ('.$newmonthlyemp.'), (BasicRate/13.04)*(RegDaysPresent+RWSDays+SpecDays+PaidLegalDays),BasicRate))),2),
+RegDayDeM=ROUND(IF(DorSM=0,DeMRate*RegDaysPresent,(IF(a.IDNo IN ('.$newmonthlyemp.'), (DeMRate/13.04)*(RegDaysPresent+RWSDays+SpecDays+PaidLegalDays),DeMRate))),2),
+RegDayTaxSh=ROUND(IF(DorSM=0,TaxShRate*RegDaysPresent,(IF(a.IDNo IN ('.$newmonthlyemp.'), (TaxShRate/13.04)*(RegDaysPresent+RWSDays+SpecDays+PaidLegalDays),TaxShRate))),2),
+VLBasic=ROUND((IF(DorSM=0,BasicRate,0)*VLDays),2),
+VLDeM=ROUND((IF(DorSM=0,DeMRate,0)*VLDays),2),
+VLTaxSh=ROUND((IF(DorSM=0,TaxShRate,0)*VLDays),2),
 
-truncate(if(r.LatestDorM=0,(LatestBasicRate+LatestDeMinimisRate),(LatestBasicRate+LatestDeMinimisRate)/ 13.04)*(RegDaysPresent-RegDaysActual),2) as `UndertimeBasic`,
+SLBasic=ROUND((IF(DorSM=0,BasicRate,0)*SLDays),2),
+SLDeM=ROUND((IF(DorSM=0,DeMRate,0)*SLDays),2),
+SLTaxSh=ROUND((IF(DorSM=0,TaxShRate,0)*SLDays),2),
 
-truncate(if(r.LatestDorM=0 OR a.IDNo IN '.$newmonthlyemp.',0,(LatestTaxShield)/ 13.04)*(LWOPDays+QDays),2) as `AbsenceTaxSh`,
-truncate(if(r.LatestDorM=0,(LatestTaxShield),(LatestTaxShield)/ 13.04)*(RegDaysPresent-RegDaysActual),2) as `UndertimeTaxSh`,';
+LWPBasic=ROUND((IF(DorSM=0,BasicRate,0)*LWPDays),2),
+LWPDeM=ROUND((IF(DorSM=0,DeMRate,0)*LWPDays),2),
+LWPTaxSh=ROUND((IF(DorSM=0,TaxShRate,0)*LWPDays),2),
+
+RHBasicforDaily=ROUND(IF(DorSM=0,BasicRate,0)*PaidLegalDays,2),
+RHDeMforDaily=ROUND(IF(DorSM=0,DeMRate,0)*PaidLegalDays,2),
+RHTaxShforDaily=ROUND(IF(DorSM=0,TaxShRate,0)*PaidLegalDays,2),
+
+AbsenceBasicforMonthly=ROUND(IF(DorSM=0 OR (a.IDNo IN ('.$newmonthlyemp.')),0,(BasicRate/13.04)*(LWOPDays+QDays)),2),
+AbsenceDeMforMonthly=ROUND(IF(DorSM=0 OR (a.IDNo IN ('.$newmonthlyemp.')),0,(DeMRate/13.04)*(LWOPDays+QDays)),2),
+AbsenceTaxShforMonthly=ROUND(IF(DorSM=0 OR (a.IDNo IN ('.$newmonthlyemp.')),0,(TaxShRate/13.04)*(LWOPDays+QDays)),2),
+
+UndertimeBasic=ROUND(IF(DorSM=0,BasicRate,(BasicRate/13.04))*(RegDaysPresent-RegDaysActual),2),
+UndertimeDeM=ROUND(IF(DorSM=0,DeMRate,(DeMRate/13.04))*(RegDaysPresent-RegDaysActual),2),
+UndertimeTaxSh=ROUND(IF(DorSM=0,TaxShRate,(TaxShRate/13.04))*(RegDaysPresent-RegDaysActual),2),
+RegDayOT=ROUND(IF(DorSM=0,BasicRate/8,BasicRate/ 13.04/8)*(RegExShiftHrsOT*1.25),2),
+
+RestDayOT=ROUND(IF(DorSM=0,BasicRate/8,BasicRate/ 13.04/8)*((RestShiftHrsOT*1.3)+(RestExShiftHrsOT*1.3*1.3)),2),
+SpecOT=ROUND(IF(DorSM=0,BasicRate/8,BasicRate/ 13.04/8)*((SpecShiftHrsOT*1.3)+(SpecExShiftHrsOT*1.3*1.3)),2),
+RHOT=ROUND(IF(DorSM=0,BasicRate/8,BasicRate/ 13.04/8)*((LegalShiftHrsOT)+(LegalExShiftHrsOT*2*1.3)),2)
+WHERE p.PayrollID='.$payrollid.' AND p.IDNo NOT IN  '.$zeroattend;
+//if($_SESSION['(ak0)']==1002){ echo $sql;}
+$stmt=$link->prepare($sql); $stmt->execute(); 
+
+$sql='UPDATE payroll_25payroll SET RegDayBasic=BasicRate,RegDayDeM=DeMRate, RegDayTaxSh=TaxShRate WHERE IDNo IN (1001,1002) AND PayrollID='.$payrollid;
+$stmt=$link->prepare($sql); $stmt->execute(); 
 
 $sqlfrom=' FROM `payroll_20fromattendance` as a INNER JOIN `payroll_20latestrates` as r ON a.IDNo=r.IDNo JOIN `1employees` as e ON a.IDNo = e.IDNo WHERE (a.PayrollID='.$payrollid.' AND r.DirectOrAgency=0) ';
 
 if ($payrollid%2==0 AND $payrollid<=24){ //SSS 
         
     $payrollwithsss=1;
-    $sql.=' 0 AS `SSS-EE`, `Philhealth-EE`, `PagIbig-EE`,0 as `WTax`, 0 AS `SSS-ER`, `Philhealth-ER`, 100 AS `PagIbig-ER`, IF(e.Resigned=1,0,IF((UBPATM IS NOT NULL AND UBPATM<>0),3,0)) AS `DisburseVia`, \''.$_SESSION['(ak0)'].'\' AS `EncodedByNo`,Now() as `TimeStamp` '.$sqlfrom.' UNION ALL SELECT '.$payrollid.', r.IDNo, DefaultBranchAssignNo as BranchNo, 
-IF(a.`DefaultBranchAssignNo` IN (SELECT BranchNo FROM `1branches` WHERE CompanyNo=r.RCompanyNo),a.`DefaultBranchAssignNo`,(SELECT BranchNo FROM `1branches` WHERE PseudoBranch=1 AND BranchNo<>95 AND CompanyNo=r.RCompanyNo)) AS RecordInBranchNo, 1 as `DorSM`, LatestBasicRate  as `Basic`,LatestDeMinimisRate as `DeM`,LatestTaxShield as `TaxSh`,0 as OT,0 as `AbsenceBasic`,0 as `UndertimeBasic`,0 as `AbsenceTaxSh`,0 as `UndertimeTaxSh`, `SSS-EE`,`Philhealth-EE`,`PagIbig-EE`,0 as `WTax`,`SSS-ER`,`Philhealth-ER`,if(`SSS-ER`<>0,100,0) as `PagIbig-ER`, IF((UBPATM IS NOT NULL AND UBPATM<>0),3,0) as `DisburseVia`, \''.$_SESSION['(ak0)'].'\' as `EncodedByNo`,Now() as `TimeStamp` FROM `payroll_20latestrates` r JOIN `attend_1defaultbranchassign` a ON a.IDNo=r.IDNo JOIN 1employees e ON r.IDNo=e.IDNo WHERE r.IDNo IN (1001,1002)';
+  //  $sql.='UPDATE  ';
 // IF ($_SESSION['(ak0)']==1002){  echo $sql;  exit();}
-$stmt=$link->prepare($sql); $stmt->execute(); 
+//$stmt=$link->prepare($sql); $stmt->execute(); 
 
 include_once 'sssbasistemptable.php';
 
@@ -208,10 +232,10 @@ $stmt=$link->prepare($sql); $stmt->execute();
 
 } else { //WTax
     $payrollwithsss=0;
-    $sql.=' 0 as `SSS-EE`,0 as `Philhealth-EE`,0 as `PagIbig-EE`, 0 as `WTax`,0 as `SSS-ER`,0 as `Philhealth-ER`,0 as `PagIbig-ER`, IF(e.Resigned=1,0,IF((UBPATM IS NOT NULL AND UBPATM<>0),3,0)) as `DisburseVia`, \''.$_SESSION['(ak0)'].'\' as `EncodedByNo`,Now() as `TimeStamp` '.$sqlfrom.' UNION ALL SELECT '.$payrollid.', r.IDNo, DefaultBranchAssignNo as BranchNo, 
-IF(a.`DefaultBranchAssignNo` IN (SELECT BranchNo FROM `1branches` WHERE CompanyNo=r.RCompanyNo),a.`DefaultBranchAssignNo`,(SELECT BranchNo FROM `1branches` WHERE PseudoBranch=1 AND BranchNo<>95 AND CompanyNo=r.RCompanyNo)) AS RecordInBranchNo,  1 as `DorSM`, LatestBasicRate,LatestDeMinimisRate as `DeM`,LatestTaxShield as `TaxSh`,0,0,0,0,0, 0 as `SSS-EE`,0 as `Philhealth-EE`,0 as `PagIbig-EE`,`WTax`,0 as `SSS-ER`,0 as `Philhealth-ER`,0 as `PagIbig-ER`,IF((UBPATM IS NOT NULL AND UBPATM<>0),3,0) as `DisburseVia`, \''.$_SESSION['(ak0)'].'\' as `EncodedByNo`,Now() as `TimeStamp` FROM `payroll_20latestrates` r JOIN `attend_1defaultbranchassign` a ON a.IDNo=r.IDNo JOIN 1employees e ON r.IDNo=e.IDNo WHERE r.IDNo IN (1001,1002)'; 
-  // IF ($_SESSION['(ak0)']==1002){  echo $sql;  exit();}
-$stmt=$link->prepare($sql); $stmt->execute();
+//     $sql.=' 0 as `SSS-EE`,0 as `Philhealth-EE`,0 as `PagIbig-EE`, 0 as `WTax`,0 as `SSS-ER`,0 as `Philhealth-ER`,0 as `PagIbig-ER`, IF(e.Resigned=1,0,IF((UBPATM IS NOT NULL AND UBPATM<>0),3,0)) as `DisburseVia`, \''.$_SESSION['(ak0)'].'\' as `EncodedByNo`,Now() as `TimeStamp` '.$sqlfrom.' UNION ALL SELECT '.$payrollid.', r.IDNo, DefaultBranchAssignNo as BranchNo, 
+// IF(a.`DefaultBranchAssignNo` IN (SELECT BranchNo FROM `1branches` WHERE CompanyNo=r.RCompanyNo),a.`DefaultBranchAssignNo`,(SELECT BranchNo FROM `1branches` WHERE PseudoBranch=1 AND BranchNo<>95 AND CompanyNo=r.RCompanyNo)) AS RecordInBranchNo,  1 as `DorSM`, TRUNCATE(LatestBasicRate/13.04,2) AS EffectiveDailyRate, LatestBasicRate,LatestDeMinimisRate as `DeM`,LatestTaxShield as `TaxSh`,0,0,0,0,0, 0 as `SSS-EE`,0 as `Philhealth-EE`,0 as `PagIbig-EE`,`WTax`,0 as `SSS-ER`,0 as `Philhealth-ER`,0 as `PagIbig-ER`,IF((UBPATM IS NOT NULL AND UBPATM<>0),3,0) as `DisburseVia`, \''.$_SESSION['(ak0)'].'\' as `EncodedByNo`,Now() as `TimeStamp` FROM `payroll_20latestrates` r JOIN `attend_1defaultbranchassign` a ON a.IDNo=r.IDNo JOIN 1employees e ON r.IDNo=e.IDNo WHERE r.IDNo IN (1001,1002)'; 
+//   // IF ($_SESSION['(ak0)']==1002){  echo $sql;  exit();}
+// $stmt=$link->prepare($sql); $stmt->execute();
 
 $sql='UPDATE `payroll_25payroll'.$temp.'` p JOIN `1employees` as e ON e.IDNo = p.IDNo SET WTax=CalcTax(p.IDNo,'.$payrollid.') WHERE PayrollID='.$payrollid . '  and CalcTax(p.IDNo,'.$payrollid.')>0 AND e.Resigned=0 AND p.IDNo NOT IN  '.$zeroattend; //echo $sql;
 $stmt=$link->prepare($sql); $stmt->execute();
@@ -242,8 +266,8 @@ $stmt=$link->prepare($sql); $stmt->execute();
 }
 
 // Set fields to zero for zero attendance employees
-$sql='UPDATE `payroll_25payroll'.$temp.'` p SET Basic=0, DeM=0, TaxSh=0, OT=0, AbsenceBasic=0, UndertimeBasic=0, AbsenceTaxSh=0, UndertimeTaxSh=0, `SSS-EE`=0, `PhilHealth-EE`=0, `PagIbig-EE`=0, WTax=0, `SSS-ER`=0, `PhilHealth-ER`=0, `PagIbig-ER`=0, DisburseVia=0, Remarks="No attendance for payroll period." WHERE PayrollID='.$payrollid . ' AND p.IDNo IN  '.$zeroattend; //echo $sql;
-$stmt=$link->prepare($sql); $stmt->execute();
+// $sql='UPDATE `payroll_25payroll'.$temp.'` p SET Basic=0, DeM=0, TaxSh=0, OT=0, AbsenceBasic=0, UndertimeBasic=0, AbsenceTaxSh=0, UndertimeTaxSh=0, `SSS-EE`=0, `PhilHealth-EE`=0, `PagIbig-EE`=0, WTax=0, `SSS-ER`=0, `PhilHealth-ER`=0, `PagIbig-ER`=0, DisburseVia=0, Remarks="No attendance for payroll period." WHERE PayrollID='.$payrollid . ' AND p.IDNo IN  '.$zeroattend; //echo $sql;
+// $stmt=$link->prepare($sql); $stmt->execute();
 
  
 //All Adjustment Except OIC allowance,and loans
@@ -309,7 +333,7 @@ if($res0['Q']>0){
     //if($_SESSION['(ak0)']==1002) { echo $sqlins.'<br><br>'.$sqlupdate; exit();}
     $stmtadjq=$link->prepare($sqlupdate); $stmtadjq->execute();
 	
-    if($_SESSION['(ak0)']==1002) { echo $sqlupdate;}
+    //if($_SESSION['(ak0)']==1002) { echo $sqlupdate;}
     // DeMinimis and TaxShield
     $adjtypeno='22'; $rate='(LatestDeMinimisRate+LatestTaxShield)'; $thirteenth='13thTaxShCalc';
     $sqlins=$sqlins1.' '.$adjtypeno.' '.$sqlins2.$rate.','.$rate.$sqlins3.$sqlins4.$adjtypeno.$sqlins5.' AND (LatestDeMinimisRate+LatestTaxShield)<>0';
@@ -332,29 +356,28 @@ if (isset($_POST['submit']) AND (!isset($_POST['sortfield']))){
 	if (!allowedToOpen(817,'1rtc')) { echo 'No permission'; exit;}
 	
 	
-	$sql2="CREATE TEMPORARY TABLE `payroll_25payrolldatalookuptemp` AS select `p`.`PayrollID` AS `PayrollID`,`p`.`IDNo` AS `IDNo`,`p`.`RecordInBranchNo` AS `RecordInBranchNo`,`p`.`BranchNo` AS `BranchNo`,`p`.`DorSM` AS `DorSM`,`p`.`Basic` AS `Basic`,`p`.`DeM` AS `DeM`,`p`.`TaxSh` AS `TaxSh`,`p`.`OT` AS `OT`,`a`.`Remarks` AS `Remarks`,`p`.`AbsenceBasic` AS `AbsenceBasic`,`p`.`UndertimeBasic` AS `UndertimeBasic`,`p`.`AbsenceTaxSh` AS `AbsenceTaxSh`,`p`.`UndertimeTaxSh` AS `UndertimeTaxSh`"
-                . ($payrollwithsss==1? ", FORMAT(sb.Basis,0) AS SSSBasis,ss.SSECCredit,`p`.`SSS-EE` AS `SSS-EE`,`p`.`PhilHealth-EE` AS `PhilHealth-EE`,`p`.`PagIbig-EE` AS `PagIbig-EE`,`p`.`SSS-ER` AS `SSS-ER`,`p`.`PhilHealth-ER` AS `PhilHealth-ER`,`p`.`PagIbig-ER` AS `PagIbig-ER`":"")
-                .",`p`.`WTax` AS `WTax`,`p`.`EncodedByNo` AS `EncodedByNo`,`p`.`DisburseVia` AS `DisburseVia`, TRUNCATE((Basic-AbsenceBasic-UndertimeBasic)/(SELECT IF(LatestDorM=0,LatestBasicRate,LatestBasicRate/13.04) FROM `payroll_20latestrates` lr WHERE lr.IDNo=p.IDNo ),2) AS `DaysPaid Calculated`,`p`.`TxnID` AS `TxnID`,concat(`e`.`FirstName`,' ',`e`.`SurName`) AS `FullName`,ifnull(sum(`a`.`AdjustAmt`),0) AS `TotalAdj`,truncate((((((((((((((ifnull(`p`.`Basic`,0)) + ifnull(`p`.`DeM`,0)) + ifnull(`p`.`TaxSh`,0)) + ifnull(`p`.`OT`,0)) - ifnull(`p`.`AbsenceBasic`,0)) - ifnull(`p`.`AbsenceTaxSh`,0)) - ifnull(`p`.`UndertimeBasic`,0)) - ifnull(`p`.`UndertimeTaxSh`,0)) - ifnull(`p`.`SSS-EE`,0)) - ifnull(`p`.`PhilHealth-EE`,0)) - ifnull(`p`.`PagIbig-EE`,0)) - ifnull(`p`.`WTax`,0)) + ifnull(sum(`a`.`AdjustAmt`),0)),2) AS `NetPay` from ((`payroll_25payrolltemp` `p` left join `payroll_21paydayadjustmentstemp` `a` on(((`p`.`PayrollID` = `a`.`PayrollID`) and (`p`.`IDNo` = `a`.`IDNo`)))) join `1employees` `e` on((`p`.`IDNo` = `e`.`IDNo`))) "
-                . ($payrollwithsss==1? "JOIN sssbasis sb ON sb.IDNo=p.IDNo JOIN payroll_0ssstable ss ON `p`.`SSS-EE`=(SSEE+ECEE+MPFEE) ":"")." 
-				group by `p`.`PayrollID`,`p`.`IDNo`;";
-				// echo $sql2; exit();
+
+$sql2='CREATE TEMPORARY TABLE `payroll_25payrolldatalookuptemp` AS SELECT p.`TxnID`,
+    p.`PayrollID`,p.`IDNo`,p.`BranchNo`,`RecordInBranchNo`,p.`Remarks`,
+    `BasicRate`,`DeMRate`,`TaxShRate`,`DorSM`,
+    `RegDayBasic`,`RegDayDeM`,`RegDayTaxSh`,`VLBasic`,`VLDeM`,`VLTaxSh`,`SLBasic`,`SLDeM`,`SLTaxSh`,
+    `LWPBasic`,`LWPDeM`,`LWPTaxSh`,`RHBasicforDaily`,`RHDeMforDaily`,`RHTaxShforDaily`,
+    `AbsenceBasicforMonthly`,`AbsenceDeMforMonthly`,`AbsenceTaxShforMonthly`,
+    `UndertimeBasic`,`UndertimeDeM`,`UndertimeTaxSh`,`RegDayOT`,`RestDayOT`,`SpecOT`,`RHOT`
+    '. ($payrollwithsss==1? ', FORMAT(sb.Basis,0) AS SSSBasis,ss.SSECCredit, `SSS-EE`,`PhilHealth-EE`,`PagIbig-EE`':'')
+    .',`WTax`,`DisburseVia`,
+    TRUNCATE((`p`.`RegDayBasic` + `p`.`VLBasic` + `p`.`SLBasic` + `p`.`LWPBasic` + `p`.`RHBasicforDaily` - `p`.`AbsenceBasicforMonthly` - `p`.`UndertimeBasic`)/(SELECT IF(LatestDorM=0,LatestBasicRate,LatestBasicRate/13.04) FROM `payroll_20latestrates` lr WHERE lr.IDNo=p.IDNo ),2) AS `DaysPaid Calculated`,concat(`e`.`FirstName`," ",`e`.`SurName`) AS `FullName`,ifnull(sum(`a`.`AdjustAmt`),0) AS `TotalAdj`,
+    TRUNCATE((`RegDayBasic`+`RegDayDeM`+`RegDayTaxSh`+`VLBasic`+`VLDeM`+`VLTaxSh`+`SLBasic`+`SLDeM`+`SLTaxSh`+
+    `LWPBasic`+`LWPDeM`+`LWPTaxSh`+`RHBasicforDaily`+`RHDeMforDaily`+`RHTaxShforDaily`-
+    `AbsenceBasicforMonthly`-`AbsenceDeMforMonthly`-`AbsenceTaxShforMonthly`-
+    `UndertimeBasic`-`UndertimeDeM`-`UndertimeTaxSh`+`RegDayOT`+`RestDayOT`+`SpecOT`+`RHOT`-
+    `SSS-EE`-`PhilHealth-EE`-`PagIbig-EE`-`WTax`),2) AS NetPay 
+FROM `payroll_25payrolltemp` p left join `payroll_21paydayadjustmentstemp` `a` ON `p`.`PayrollID` = `a`.`PayrollID` and `p`.`IDNo` = `a`.`IDNo` join `1employees` `e` on `p`.`IDNo` = `e`.`IDNo` '
+                . ($payrollwithsss==1? 'JOIN sssbasis sb ON sb.IDNo=p.IDNo JOIN payroll_0ssstable ss ON `p`.`SSS-EE`=(SSEE+ECEE+MPFEE) ':'').' group by `p`.`PayrollID`,`p`.`IDNo`;';
+
 	$stmt2=$link->prepare($sql2); $stmt2->execute();
 	
-	/* 
-	// placed here bec of payroll_datalookuptemp
-	$stmtca=$link->prepare($sqlca); $stmtca->execute();
 	
-	
-	$stmtinsca=$link->prepare($sqlinsca); $stmtinsca->execute();
-	
-	
-	$sqlupdateplookup='UPDATE payroll_25payrolldatalookuptemp pdlt INNER JOIN (
- SELECT IDNo, IFNULL(SUM(AdjustAmt),0) as total
- FROM payroll_21paydayadjustmentstemp pdat WHERE PayrollID='.$payrollid.' AND AdjustTypeNo IN (21,22)
- GROUP BY IDNo
- ) temp ON pdlt.IDNo=temp.IDNo SET pdlt.TotalAdj=(pdlt.TotalAdj+(SELECT IFNULL(AdjustAmt,0) FROM payroll_21paydayadjustmentstemp WHERE IDNo=pdlt.IDNo AND PayrollID='.$payrollid.' AND AdjustTypeNo=11)),pdlt.NetPay=(pdlt.NetPay+(SELECT IFNULL(AdjustAmt,0) FROM payroll_21paydayadjustmentstemp WHERE IDNo=pdlt.IDNo AND PayrollID='.$payrollid.' AND AdjustTypeNo=11)) WHERE pdlt.PayrollID='.$payrollid.'';
-	$stmtupdateplookup=$link->prepare($sqlupdateplookup); $stmtupdateplookup->execute();
- */
 
 	$_SESSION['payperiod1']=$payrollid;
             $payrollid=(isset($payrollid)?$payrollid:((date('m')*2)+(date('d')<15?-1:0)));
@@ -372,8 +395,14 @@ if (isset($_POST['submit']) AND (!isset($_POST['sortfield']))){
 	    </form>
 	    <?php
 	    $columnnames=$payrollwithsss==1?
-                    array('RecordInBranch','Branch','FullName','IDNo','Basic','DeM','TaxSh','OT','Remarks','AbsenceBasic','UndertimeBasic','AbsenceTaxSh','UndertimeTaxSh','SSSBasis','SSECCredit','SSS-EE','PhilHealth-EE','PagIbig-EE','WTax','TotalAdj','NetPay','DisburseVia','DaysPaid Calculated'):
-                array('RecordInBranch','Branch','FullName','IDNo','Basic','DeM','TaxSh','OT','Remarks','AbsenceBasic','UndertimeBasic','AbsenceTaxSh','UndertimeTaxSh','WTax','TotalAdj','NetPay','DisburseVia','DaysPaid Calculated');
+                    array('RecordInBranch','Branch','FullName','IDNo','RegDayBasic','RegDayDeM','RegDayTaxSh','VLBasic','VLDeM','VLTaxSh','SLBasic','SLDeM','SLTaxSh',
+                    'LWPBasic','LWPDeM','LWPTaxSh','RHBasicforDaily','RHDeMforDaily','RHTaxShforDaily',
+                    'AbsenceBasicforMonthly','AbsenceDeMforMonthly','AbsenceTaxShforMonthly',
+                    'UndertimeBasic','UndertimeDeM','UndertimeTaxSh','RegDayOT','RestDayOT','SpecOT','RHOT','Remarks','SSSBasis','SSECCredit','SSS-EE','PhilHealth-EE','PagIbig-EE','WTax','TotalAdj','NetPay','DisburseVia','DaysPaid Calculated'):
+                array('RecordInBranch','Branch','FullName','IDNo','RegDayBasic','RegDayDeM','RegDayTaxSh','VLBasic','VLDeM','VLTaxSh','SLBasic','SLDeM','SLTaxSh',
+                'LWPBasic','LWPDeM','LWPTaxSh','RHBasicforDaily','RHDeMforDaily','RHTaxShforDaily',
+                'AbsenceBasicforMonthly','AbsenceDeMforMonthly','AbsenceTaxShforMonthly',
+                'UndertimeBasic','UndertimeDeM','UndertimeTaxSh','RegDayOT','RestDayOT','SpecOT','RHOT','Remarks','WTax','TotalAdj','NetPay','DisburseVia','DaysPaid Calculated');
             $columnsub=$columnnames; 
             
             if (!isset($_POST['submitIDNoforrecalc'])) { 

@@ -107,20 +107,24 @@ EncodedByNo SMALLINT(6) NOT NULL,
  AS
 Select b1.CompanyNo AS RCompanyNo, CONCAT("Payroll ", SUBSTR(d.FromDate,6), " to ", SUBSTR(d.ToDate,6), " - ",Entity) AS Particulars,IF(b.PseudoBranch=1,(800 + deptid),b.BranchNo) AS FromBudgetOf, p.RecordInBranchNo, p.BranchNo, 
 IF(ps.deptid IN ('.$invtypositions.'),821,901) as DebitAccountID, 
-ROUND(SUM(IFNULL(p.Basic,0)+IFNULL(p.DeM,0) -IFNULL(p.AbsenceBasic,0)-IFNULL(p.UndertimeBasic,0)),2) AS AmountValue,
-FORMAT(SUM(IFNULL(p.Basic,0)+IFNULL(p.DeM,0) -IFNULL(p.AbsenceBasic,0)-IFNULL(p.UndertimeBasic,0)),2) AS Amount, p.DisburseVia 
+ROUND(IFNULL(SUM(`RegDayBasic` + `p`.`VLBasic` + `p`.`SLBasic` + `p`.`LWPBasic` + `p`.`RHBasicforDaily` - `p`.`AbsenceBasicforMonthly` - `p`.`UndertimeBasic`+
+`RegDayDeM`+`VLDeM`+`SLDeM`+`LWPDeM`-`AbsenceDeMforMonthly`-`UndertimeDeM`),0),2) AS AmountValue,
+FORMAT(IFNULL(SUM(`RegDayBasic` + `p`.`VLBasic` + `p`.`SLBasic` + `p`.`LWPBasic` + `p`.`RHBasicforDaily` - `p`.`AbsenceBasicforMonthly` - `p`.`UndertimeBasic`+
+`RegDayDeM`+`VLDeM`+`SLDeM`+`LWPDeM`-`AbsenceDeMforMonthly`-`UndertimeDeM`),0),2)  AS Amount, p.DisburseVia 
 '.$sqlencby.' FROM '.$sqlfromwithdateposition.' GROUP BY p.PayrollID, b1.CompanyNo, p.BranchNo,EntityID,DebitAccountID, p.DisburseVia
 
  
 UNION ALL
 Select b1.CompanyNo AS RCompanyNo, CONCAT("Payroll (tax shield) ", SUBSTR(d.FromDate,6), " to ", SUBSTR(d.ToDate,6), " - ",Entity) AS Particulars,IF(b.PseudoBranch=1,(800 + deptid),b.BranchNo) AS FromBudgetOf, p.RecordInBranchNo, p.BranchNo, 914 as DebitAccountID, 
-ROUND(SUM(IFNULL(p.TaxSh,0) -IFNULL(p.AbsenceTaxSh,0)-IFNULL(p.UndertimeTaxSh,0)),2) AS AmountValue,
-FORMAT(SUM(IFNULL(p.TaxSh,0) -IFNULL(p.AbsenceTaxSh,0)-IFNULL(p.UndertimeTaxSh,0)),2) AS Amount, p.DisburseVia 
+ROUND(IFNULL(SUM(`RegDayTaxSh`+`VLTaxSh`+`SLTaxSh`+`LWPTaxSh`-`AbsenceTaxShforMonthly`-`UndertimeTaxSh`),0),2) AS AmountValue,
+FORMAT(IFNULL(SUM(`RegDayTaxSh`+`VLTaxSh`+`SLTaxSh`+`LWPTaxSh`-`AbsenceTaxShforMonthly`-`UndertimeTaxSh`),0),2) AS Amount, p.DisburseVia 
 '.$sqlencby.' FROM '.$sqlfromwithdateposition.' GROUP BY p.PayrollID, b1.CompanyNo, p.BranchNo,EntityID, DebitAccountID, p.DisburseVia HAVING AmountValue<>0
 
 
 UNION ALL
-Select b1.CompanyNo AS RCompanyNo, CONCAT("Overtime - ",Entity) AS Particulars,IF(b.PseudoBranch=1,(800 + deptid),b.BranchNo) AS FromBudgetOf, p.RecordInBranchNo, p.BranchNo, IF(ps.deptid IN ('.$invtypositions.'),823,903) AS DebitAccountID, ROUND(SUM(IFNULL(p.OT,0)),2) AS AmountValue, FORMAT(SUM(IFNULL(p.OT,0)),2) AS Amount, p.DisburseVia'.$sqlencby.'
+Select b1.CompanyNo AS RCompanyNo, CONCAT("Overtime - ",Entity) AS Particulars,IF(b.PseudoBranch=1,(800 + deptid),b.BranchNo) AS FromBudgetOf, p.RecordInBranchNo, p.BranchNo, IF(ps.deptid IN ('.$invtypositions.'),823,903) AS DebitAccountID, 
+ROUND(IFNULL(SUM(`RegDayOT`+`RestDayOT`+`SpecOT`+`RHOT`),0),2) AS AmountValue, 
+FORMAT(IFNULL(SUM(`RegDayOT`+`RestDayOT`+`SpecOT`+`RHOT`),0),2) AS Amount, p.DisburseVia'.$sqlencby.'
 FROM '.$sqlfromwithposition.'
  
  

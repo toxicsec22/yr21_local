@@ -149,10 +149,16 @@ case 'PayrollPerPayID':
             if ($payrollid%2==0 AND $payrollid<=24){ //SSS  
                 $temp=''; include_once 'sssbasistemptable.php';
                 $sqlsss=', FORMAT(sb.Basis,0) AS SSSBasis,ss.SSECCredit,CONCAT(esb.Nickname,\' \',esb.SurName) as EncodedBy,sb.TimeStamp '; $join='JOIN sssbasis sb ON sb.IDNo=p.IDNo left join 1employees esb on esb.IDNo=sb.EncodedByNo LEFT JOIN payroll_0ssstable ss ON `p`.`SSS-EE`=(SSEE+ECEE+MPFEE) ';
-                $columnnames=array('Branch','FullName','IDNo','Basic','DeM','TaxSh','OT','Remarks','AbsenceBasic','UndertimeBasic','AbsenceTaxSh','UndertimeTaxSh','SSS-EE','SSSBasis','SSECCredit','PhilHealth-EE','PagIbig-EE','WTax','TotalAdj','NetPay','DisburseVia','DaysPaid Calculated');
+                $columnnames=array('Branch','FullName','IDNo','RegDayBasic','RegDayDeM','RegDayTaxSh','VLBasic','VLDeM','VLTaxSh','SLBasic','SLDeM','SLTaxSh',
+                'LWPBasic','LWPDeM','LWPTaxSh','RHBasicforDaily','RHDeMforDaily','RHTaxShforDaily',
+                'AbsenceBasicforMonthly','AbsenceDeMforMonthly','AbsenceTaxShforMonthly',
+                'UndertimeBasic','UndertimeDeM','UndertimeTaxSh','RegDayOT','RestDayOT','SpecOT','RHOT','Remarks','SSS-EE','SSSBasis','SSECCredit','PhilHealth-EE','PagIbig-EE','WTax','TotalAdj','NetPay','DisburseVia','DaysPaid Calculated');
             } else { //Wtax
                 $sqlsss='';$join='';
-                $columnnames=array('Branch','FullName','IDNo','Basic','DeM','TaxSh','OT','Remarks','AbsenceBasic','UndertimeBasic','AbsenceTaxSh','UndertimeTaxSh','SSS-EE','PhilHealth-EE','PagIbig-EE','WTax','TotalAdj','NetPay','DisburseVia','DaysPaid Calculated');
+                $columnnames=array('Branch','FullName','IDNo','RegDayBasic','RegDayDeM','RegDayTaxSh','VLBasic','VLDeM','VLTaxSh','SLBasic','SLDeM','SLTaxSh',
+                'LWPBasic','LWPDeM','LWPTaxSh','RHBasicforDaily','RHDeMforDaily','RHTaxShforDaily',
+                'AbsenceBasicforMonthly','AbsenceDeMforMonthly','AbsenceTaxShforMonthly',
+                'UndertimeBasic','UndertimeDeM','UndertimeTaxSh','RegDayOT','RestDayOT','SpecOT','RHOT','Remarks','SSS-EE','PhilHealth-EE','PagIbig-EE','WTax','TotalAdj','NetPay','DisburseVia','DaysPaid Calculated');
             }
             
             $sql0='SELECT SUM(NetPay) AS NetPay FROM `payroll_25payrolldatalookup` WHERE PayrollID='.$payrollid; $stmt0=$link->query($sql0); $res0=$stmt0->fetch();
@@ -195,7 +201,10 @@ case 'PayrollPerPayID':
 	    JOIN `1branches` b ON b.BranchNo=p.BranchNo JOIN `1branches` b1 ON b1.BranchNo=p.RecordInBranchNo WHERE (TxnID)=\''.$txnid.'\'';
 	    $sql=$sql.((!allowedToOpen(8173,'1rtc'))?' AND p.IDNo>1002':'');
             $action='prpayrolldata.php?edit=2&w=PayrollPerPayID&TxnID='.$txnid;
-	    $columnstoedit=array('BranchNo','Basic','DeM','TaxSh','OT','Remarks','AbsenceBasic','UndertimeBasic','AbsenceTaxSh','UndertimeTaxSh','SSS-EE','SSS-ER','PhilHealth-EE','PhilHealth-ER','PagIbig-EE','PagIbig-ER','WTax','DisburseVia');
+	    $columnstoedit=array('BranchNo','RegDayBasic','RegDayDeM','RegDayTaxSh','VLBasic','VLDeM','VLTaxSh','SLBasic','SLDeM','SLTaxSh',
+        'LWPBasic','LWPDeM','LWPTaxSh','RHBasicforDaily','RHDeMforDaily','RHTaxShforDaily',
+        'AbsenceBasicforMonthly','AbsenceDeMforMonthly','AbsenceTaxShforMonthly',
+        'UndertimeBasic','UndertimeDeM','UndertimeTaxSh','RegDayOT','RestDayOT','SpecOT','RHOT','Remarks','SSS-EE','SSS-ER','PhilHealth-EE','PhilHealth-ER','PagIbig-EE','PagIbig-ER','WTax','DisburseVia');
    	    if (allowedToOpen(8174,'1rtc')){ $columnstoedit=array(); }
 	    include('../backendphp/layout/rendersubform.php');
 	    } else {
@@ -220,7 +229,7 @@ case 'PayrollPerPayID':
             // $stmtapproved=$link->query('SELECT IFNULL(SUM(Approved),0) AS Approval FROM `payroll_26approval` a WHERE PayrollID='.$_SESSION['payrollidses'].' AND a.CompanyNo='.$co['CompanyNo']); $resultapproved=$stmtapproved->fetch();}
             $approvestatus=($resultapproved['Approval']<>0?'<h4 style="color: blue">APPROVED</h4>':'<h4 style="color: red">FOR APPROVAL</h4>');
             echo $approvestatus.'<br><br>'; }
-	    $sql='SELECT b1.Branch AS RecordInBranch, b.Branch, p.*'.$sqlsss.', TRUNCATE((Basic-AbsenceBasic-UndertimeBasic)/(SELECT IF(LatestDorM=0,LatestBasicRate,LatestBasicRate/13.04) FROM `payroll_20latestrates` lr WHERE lr.IDNo=p.IDNo ),2) AS `DaysPaid Calculated` FROM `payroll_25payrolldatalookup` p JOIN `1employees` `e` ON `p`.`IDNo` = `e`.`IDNo`
+	    $sql='SELECT b1.Branch AS RecordInBranch, b.Branch, p.*'.$sqlsss.', TRUNCATE((`p`.`RegDayBasic` + `p`.`VLBasic` + `p`.`SLBasic` + `p`.`LWPBasic` + `p`.`RHBasicforDaily` - `p`.`AbsenceBasicforMonthly` - `p`.`UndertimeBasic`)/(SELECT IF(LatestDorM=0,LatestBasicRate,LatestBasicRate/13.04) FROM `payroll_20latestrates` lr WHERE lr.IDNo=p.IDNo ),2) AS `DaysPaid Calculated` FROM `payroll_25payrolldatalookup` p JOIN `1employees` `e` ON `p`.`IDNo` = `e`.`IDNo`
 	    JOIN `1branches` b ON b.BranchNo=p.BranchNo
 	    JOIN `1branches` b1 ON b1.BranchNo=p.RecordInBranchNo '.$join.'
 	    WHERE PayrollID='.$_SESSION['payrollidses'].' AND e.RCompanyNo='.$co['CompanyNo']
