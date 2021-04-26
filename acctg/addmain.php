@@ -305,6 +305,7 @@ case 'Purchase':
 
 case 'CV':
       if (!allowedToOpen(5401,'1rtc')) { echo 'No permission'; exit;} 
+      header('Location: formcv.php?w=AddMain'); exit;
 case 'FutureCV':
       if (!allowedToOpen(5401,'1rtc')) { echo 'No permission'; exit;} 
 if ($whichqry=='FutureCV'){
@@ -342,20 +343,22 @@ echo comboBox($link,'SELECT PaymentModeID,PaymentMode FROM `acctg_0paymentmodes`
 
 case 'JV':
    if (!allowedToOpen(5921,'1rtc')) { echo 'No permission'; exit;} 
+
+   header('Location: formjv.php?w=AddMain'); exit;
    
-   $title='Add Journal Voucher'; $adjdate=strtotime((date('Y')==$currentyr?"today":''.$currentyr.'-01-01'));
-   include_once $path.'/acrossyrs/commonfunctions/lastnum.php'; 
-   $jvno=lastNum('JVNo','acctg_2jvmain',((date('Y',strtotime($currentyr.'-01-01')))-2000)*10000+1000000)+1;
+//    $title='Add Journal Voucher'; $adjdate=strtotime((date('Y')==$currentyr?"today":''.$currentyr.'-01-01'));
+//    include_once $path.'/acrossyrs/commonfunctions/lastnum.php'; 
+//    $jvno=lastNum('JVNo','acctg_2jvmain',((date('Y',strtotime($currentyr.'-01-01')))-2000)*10000+1000000)+1;
    
     
-    $columnnames=array(
-                    array('field'=>'JVDate', 'type'=>'date','size'=>20,'required'=>true,'value'=>date('Y-m-d',$adjdate)),
-                    array('field'=>'JVNo','type'=>'hidden','size'=>00,'value'=>$jvno),
-                    array('field'=>'Remarks', 'type'=>'text','size'=>50, 'required'=>false));
+//     $columnnames=array(
+//                     array('field'=>'JVDate', 'type'=>'date','size'=>20,'required'=>true,'value'=>date('Y-m-d',$adjdate)),
+//                     array('field'=>'JVNo','type'=>'hidden','size'=>00,'value'=>$jvno),
+//                     array('field'=>'Remarks', 'type'=>'text','size'=>50, 'required'=>false));
     
-    $action='praddmain.php?w='.$whichqry;
-    $liststoshow=array(); 
-     include('../backendphp/layout/inputmainform.php');
+//     $action='praddmain.php?w='.$whichqry;
+//     $liststoshow=array(); 
+//      include('../backendphp/layout/inputmainform.php');
      break;
 
      }
