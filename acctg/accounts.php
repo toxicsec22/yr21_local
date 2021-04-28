@@ -6,6 +6,18 @@ include_once('../switchboard/contents.php');
   
 include_once $path.'/acrossyrs/commonfunctions/listoptions.php';
 ?><br><div id="section" style="display: block;"><?php
+
+include_once('../backendphp/layout/linkstyle.php');
+
+
+if (allowedToOpen(5121,'1rtc')){
+echo '<div>';
+		echo '<a id=\'link\' href="accounts.php">Chart of Accounts</a> ';
+		echo '<a id=\'link\' href="accounts.php?w=ChooseAccount&a=0">Assign Account To Branches</a> ';
+		echo '<a id=\'link\' href="accounts.php?w=ChooseAccount&a=1">Delete Assignment of Account</a> ';
+echo '</div>';
+}
+
 $which=(!isset($_GET['w'])?'List':$_GET['w']);
 
 $columnstoadd=array('AccountID', 'ShortAcctID', 'AccountDescription', 'OrderNo', 'Remarks', 'NormBal','AccumDepAcctOf','ContraAccountOf','Fcy');
@@ -25,6 +37,8 @@ if (in_array($which,array('List','EditSpecifics'))){
    $columnnameslist=array('AcctTypeDescription', 'AccountID', 'ShortAcctID', 'AccountDescription', 'OrderNo', 'Remarks', 'NormBal','AccountGroup','Department', 'AccumDepAcctOf','ContraAccountOf','CompleteDescription','Fcy', 'OwnedByCoNo');//,'EncodedBy','TimeStamp');
    
 } 
+
+
 
 if (in_array($which,array('Add','Edit'))){
    $accttype=comboBoxValue($link,'`acctg_1accounttype`','AcctTypeDescription',addslashes($_POST['AcctTypeDescription']),'AccountType');
@@ -58,7 +72,7 @@ switch ($which){
       if (allowedToOpen(5121,'1rtc')){
 	 include('../backendphp/layout/inputmainform.php');
 	 $delprocess='accounts.php?w=Delete&AccountID=';
-         $addlprocess='accounts.php?w=Distri&AccountID='; $addlprocesslabel='AssignToBranches';
+        //  $addlprocess='accounts.php?w=Distri&AccountID='; $addlprocesslabel='AssignToBranches';
          $columnstoedit=array('AcctTypeDescription', 'AccountID', 'ShortAcctID', 'AccountDescription', 'OrderNo', 'Remarks', 'NormBal');
 	 } else { $columnstoedit=array('CompleteDescription');}
       
@@ -92,16 +106,210 @@ switch ($which){
 	}
         header("Location:".$_SERVER['HTTP_REFERER']);
         break;   
-    case 'Distri':
-        if (allowedToOpen(5121,'1rtc')){
-        require_once $path.'/acrossyrs/logincodes/confirmtoken.php';
-        $sql='INSERT INTO `acctg_1begbal` (`AccountID`,`BegBalance`,`BranchNo`, `EncodedByNo`, `TimeStamp`)
-            SELECT '.$_GET['AccountID'].',0,b.BranchNo,'.$_SESSION['(ak0)'].',Now() FROM `1branches` b 
-            WHERE BranchNo NOT IN (SELECT BranchNo FROM `acctg_1begbal` WHERE AccountID='.$_GET['AccountID'].') AND b.BranchNo NOT IN (95,999) AND b.Active=1;';
-        $stmt=$link->prepare($sql); $stmt->execute();
-	}
-        header("Location:".$_SERVER['HTTP_REFERER']);
+
+
+        case 'ChooseAccount':
+            if (allowedToOpen(5121,'1rtc')){
+            include_once $path.'/acrossyrs/commonfunctions/listoptions.php';
+        echo comboBox($link,'SELECT * FROM `acctg_1chartofaccounts` ORDER BY `AccountID`;','ShortAcctID','AccountID','accountslist');
+        if($_GET['a']==1){
+            $title='Delete Assignment of Account';
+            $buttonval='Delete';
+        } else {
+            $title='Assign Account To Branches';
+            $buttonval='Assign';
+        }
+        echo '<title>'.$title.'</title>';
+        echo '<br><br><h3>'.$title.'</h3>';
+         echo '<form action="accounts.php?w=AddDeleteAssignment" method="POST">
+         <input type="hidden" value="'.$_GET['a'].'" name="a">
+         Account: <input type="text" name="AccountID" list="accountslist">
+         <input type="submit" value="'.$buttonval.'" name="btn'.$buttonval.'">
+         </form>';
+    }
         break;
+        
+        
+        
+        case 'AddDeleteAssignment':
+            if (allowedToOpen(5121,'1rtc')){
+
+                
+                $accountid = intval($_REQUEST['AccountID']);
+                if($_REQUEST['a']==1){
+                    $title='Delete Assignment of Account';
+                    $buttonval='Delete';
+                    $bgcolor='green';
+                    // $path = 'UpdateAssignment&AccountID='.$accountid.'';
+                    $sqladdl=' AND BranchNo NOT IN (SELECT BranchNo FROM '.$currentyr.'_static.acctg_unialltxns WHERE AccountID='.$accountid.' AND BranchNo=bb.BranchNo) AND BranchNo IN (SELECT BranchNo FROM acctg_1begbal WHERE BranchNo=bb.BranchNo AND AccountID='.$accountid.')';
+                } else {
+                    $title='Assign Account To Branches';
+                    $buttonval='Assign';
+                    $bgcolor='blue';
+                    $path = 'AddAssignment&AccountID='.$accountid.'';
+                    $sqladdl='';
+                }	
+    
+                    echo '<title>'.$title.'</title>';
+                    
+                    $sqlvalue ='SELECT ca.*, AcctTypeDescription, IF(AccumDepAcctOf=0,"",AccumDepAcctOf) AS AccumDepAcctOf, IF(ContraAccountOf=0,"",ContraAccountOf) AS ContraAccountOf, if(Budgeted=1,"Yes","No") as Budgeted,
+                    CompleteDescription, AccountGroup, department AS Department, IF(Fcy=0,"","USD") AS Fcy, OwnedByCoNo FROM acctg_1chartofaccounts ca
+                     JOIN `acctg_1accounttype` t ON t.AccountType=ca.AccountType JOIN 1departments d ON ca.DeptID=d.deptid LEFT JOIN `acctg_0descriptionofaccts` da ON ca.AccountID=da.AccountID
+                     JOIN `acctg_1accountgroup` a ON a.GroupID=ca.GroupID
+                      WHERE ca.AccountID='.$accountid.';';
+                    $stmtvalue=$link->query($sqlvalue); $rowvalue=$stmtvalue->fetch();
+                    
+                    $AccountID = $rowvalue['AccountID'];
+                    $AcctgTypeDescription = $rowvalue['AcctTypeDescription'];
+    
+                    
+                    $ShortAcctID = $rowvalue['ShortAcctID'];
+                    $AccountDescription = $rowvalue['AccountDescription'];
+                    $OrderNo = $rowvalue['OrderNo'];
+                    $Remarks = $rowvalue['Remarks'];
+                    $NormBal = $rowvalue['NormBal'];
+                    $AccountGroup = $rowvalue['AccountGroup'];
+                    $Department = $rowvalue['Department'];
+                    $AccumDepAcctOf = $rowvalue['AccumDepAcctOf'];
+                    $ContraAccountOf = $rowvalue['ContraAccountOf'];
+                    $CompleteDescription = $rowvalue['CompleteDescription'];
+                    $Fcy = $rowvalue['Fcy'];
+                    $OwnedByCoNo = $rowvalue['OwnedByCoNo'];
+                    
+                    $sqlbranchnobegbal='SELECT GROUP_CONCAT(BranchNo) AS BranchNos FROM acctg_1begbal bb WHERE AccountID='.intval($AccountID).' ';
+                    $stmtbranchnobegbal=$link->query($sqlbranchnobegbal); $rowbranchnos=$stmtbranchnobegbal->fetch();
+    
+                    $Branches = ($rowbranchnos['BranchNos']<>''?$rowbranchnos['BranchNos']:'-999');
+                   
+                    $submitlabel = "Update menu";
+                    
+                
+                    
+                echo '<br><h2>'.$title.'</h2><br/>';
+                
+                echo '<div>';
+                echo '<div style="float:left;">';
+                if($_REQUEST['a']<>1){
+                    echo '<form action="accounts.php?w='.$path.'" method="post">';
+                }
+                echo '<table style="background-color:white;padding:5px;"><div>';
+                echo '<tr><td>AccountID:</td><td><input name="ProcessID" type="text" size="20" placeholder="" value="'.$AccountID.'" readonly /></td></tr>';
+                echo '<tr><td>AcctgTypeDescription:</td><td>'.$AcctgTypeDescription.'</td></tr>';
+                echo '<tr><td>ShortAcctID:</td><td>'.$ShortAcctID.'</td></tr>';
+                echo '<tr><td>AccountDescription:</td><td>'.$AccountDescription.'</td></tr>';
+                echo '<tr><td>OrderNo:</td><td>'.$OrderNo.'</td></tr>';
+                echo '<tr><td>Remarks:</td><td>'.$Remarks.'</td></tr>';
+                echo '<tr><td>NormBal:</td><td>'.$NormBal.'</td></tr>';
+                echo '<tr><td>AccountGroup:</td><td>'.$AccountGroup.'</td></tr>';
+                echo '<tr><td>Department:</td><td>'.$Department.'</td></tr>';
+                echo '<tr><td>AccumDepAcctOf:</td><td>'.$AccumDepAcctOf.'</td></tr>';
+                echo '<tr><td>ContraAccountOf:</td><td>'.$ContraAccountOf.'</td></tr>';
+                echo '<tr><td>CompleteDescription:</td><td>'.$CompleteDescription.'</td></tr>';
+                echo '<tr><td>Fcy:</td><td>'.$Fcy.'</td></tr>';
+                echo '<tr><td>OwnedByCoNo:</td><td>'.$OwnedByCoNo.'</td></tr>';
+                echo '</div>';
+    
+                
+    if($_REQUEST['a']<>1){
+                echo '<tr><td colspan=2 align="center"><input type="submit" style="background-color:'.$bgcolor.';color:white;padding:3px;" value="'.$buttonval.' Account" name="btnSubmit" OnClick="return confirm(\'Are you sure you want to Assign Account?\');"></td></tr>';
+                echo '<tr><td colspan=2 align="left"><b>Check All?</b> <input type="checkbox" class="chk_boxes" onclick="toggle(this);" /></td></tr>';
+            }
+                echo '<tr><td valign="top">Branches:</td><td>';
+                echo '<div style="float:left;">'; 
+                
+                $sql0='SELECT CompanyNo, Company FROM 1companies WHERE CompanyNo<=6;';
+                $stmt0=$link->query($sql0); $row0=$stmt0->fetchAll();
+    
+    
+                echo '<table><tr>';
+                foreach($row0 as $area){
+                        $sql1='SELECT Branch, BranchNo FROM 1branches bb WHERE CompanyNo='.$area['CompanyNo'].' AND Active=1 AND BranchNo>=0 '.$sqladdl.' ORDER BY CompanyNo,Branch ';
+                        $stmt1=$link->query($sql1); $row1=$stmt1->fetchAll();
+                        
+                        if($stmt1->rowCount()>0){
+                            echo '<td valign="top">';
+                        echo '<h4>'.$area['Company'].'</h4>';
+                        
+                            $companylist='<table>';
+                        
+                        foreach($row1 as $row2){
+                            if($_REQUEST['a']==1){
+                                $companylist.='<tr><td><form action="accounts.php?w=DeleteAssignment&BranchNo='.$row2['BranchNo'].'&AccountID='.$accountid.'" method="POST"><input type="submit" value="Delete" name="btnDelete" style="color:white;background-color:red;" OnClick="return confirm(\'Really delete this?\');"></td><td>'.$row2['Branch'].' ('.$row2['BranchNo'].')</form></td>';
+                            } else {
+                                $companylist.='<tr><td>'.(in_array($row2['BranchNo'],explode(",",$Branches)) !== false ?'<font color="green">&#x2713;</font>':'<input type="checkbox" name="allowed[]"  value="'.$row2['BranchNo'].'"
+                                />').'<td>'.$row2['Branch'].' ('.$row2['BranchNo'].')</td>';
+                            }
+                        }  
+                         echo $companylist.'</table></td>';
+                    }
+                    
+                   
+                }
+                echo '</tr></table>';
+    
+                echo '</div>';
+                echo '</td></tr>';
+                
+               
+                    echo '</table>';
+               
+                if($_REQUEST['a']<>1){
+                    echo '</form>'; 
+                }
+                echo '</div>';
+                
+                
+            }
+            
+        break;
+
+        case 'AddAssignment':
+            if (allowedToOpen(5121,'1rtc')){
+    
+
+            if (isset($_POST['allowed'])){
+                foreach($_POST['allowed'] as $selected){
+                    $sql='INSERT INTO `acctg_1begbal` (`AccountID`,`BegBalance`,`BranchNo`, `EncodedByNo`, `TimeStamp`)
+                    SELECT '.$_GET['AccountID'].',0,'.$selected.','.$_SESSION['(ak0)'].',Now() FROM `1branches` b 
+                    WHERE BranchNo NOT IN (SELECT BranchNo FROM `acctg_1begbal` WHERE AccountID='.$_GET['AccountID'].' AND BranchNo='.$selected.') AND b.BranchNo='.$selected.' AND b.BranchNo NOT IN (95,999) AND b.Active=1;';
+
+                    $stmt=$link->prepare($sql); $stmt->execute();
+                }
+            }
+
+                header("Location:accounts.php?w=AddDeleteAssignment&a=0&AccountID=".$_GET['AccountID']);
+            }
+            break;
+            
+            
+            case 'DeleteAssignment':
+            if (allowedToOpen(5121,'1rtc')){
+                
+                    $sql='DELETE FROM `acctg_1begbal` WHERE BranchNo NOT IN (SELECT BranchNo FROM '.$currentyr.'_static.acctg_unialltxns WHERE AccountID='.$_GET['AccountID'].' AND BranchNo='.$_GET['BranchNo'].') AND BranchNo='.$_GET['BranchNo'].' AND AccountID='.$_GET['AccountID'].'';
+
+                    $stmt=$link->prepare($sql); $stmt->execute();
+                }
+    
+                header("Location:accounts.php?w=AddDeleteAssignment&a=1&AccountID=".$_GET['AccountID']);
+
+            
+            break;
+
+//Not Use
+
+    // case 'Distri':
+    //     if (allowedToOpen(5121,'1rtc')){
+    //     require_once $path.'/acrossyrs/logincodes/confirmtoken.php';
+    //     $sql='INSERT INTO `acctg_1begbal` (`AccountID`,`BegBalance`,`BranchNo`, `EncodedByNo`, `TimeStamp`)
+    //         SELECT '.$_GET['AccountID'].',0,b.BranchNo,'.$_SESSION['(ak0)'].',Now() FROM `1branches` b 
+    //         WHERE BranchNo NOT IN (SELECT BranchNo FROM `acctg_1begbal` WHERE AccountID='.$_GET['AccountID'].') AND b.BranchNo NOT IN (95,999) AND b.Active=1;';
+    //     $stmt=$link->prepare($sql); $stmt->execute();
+	// }
+    //     header("Location:".$_SERVER['HTTP_REFERER']);
+    //     break;
+
+
+
     case 'EditSpecifics':
          $title='Edit Specifics'; $formdesc='OwnedByCoNo must be an array with no spaces. Leave blank if used by all companies. Fcy must have either 0 (PHP) or 1 (USD)';
 	 $txnid=$_GET['AccountID']; 
@@ -146,4 +354,13 @@ switch ($which){
   $link=null; $stmt=null;
 ?>
 </div> <!-- end section -->
+<script>
+	function toggle(source) {
+		var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+		for (var i = 0; i < checkboxes.length; i++) {
+			if (checkboxes[i] != source)
+				checkboxes[i].checked = source.checked;
+		}
+	}
+</script>
 </body></html>
