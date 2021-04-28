@@ -130,12 +130,37 @@ $txnidname='TxnID';
         case 'invty_3extrequest':
             if (!allowedToOpen(400,'1rtc')){ goto nopermission; }
             break;
+
         case 'invty_2transfer':
-            if (!allowedToOpen(401,'1rtc')){ goto nopermission;} 
-            break;
         case 'invty_2sale':
-            if (!allowedToOpen(401,'1rtc')){ goto nopermission; } 
+            if (!allowedToOpen(array(401,40101,40102),'1rtc')){ goto nopermission; }
+
+
+            if(allowedToOpen(40101,'1rtc')){ //handled branches of operations manager
+                
+                $sqla='SELECT `Date`,`BranchNo` FROM '.$_POST['Table'].' WHERE TxnID='.intval($_POST['TxnID']);
+                $stmta=$link->query($sqla); $resulta=$stmta->fetch();
+
+                if($resulta['Date']==date('Y-m-d') OR (date('Y-m-d')==date('Y-m-d', strtotime("+1 day", strtotime($resulta['Date']))) AND date('H:i')<='12:00')){
+                    $sqlcheckopsmanager='SELECT BranchNo FROM attend_1branchgroups WHERE BranchNo='.$resulta['BranchNo'].' AND OpsManager='.$_SESSION['(ak0)'].'';
+                    $stmtcheckopsmanager=$link->query($sqlcheckopsmanager);
+                    if($stmtcheckopsmanager->rowCount()>0){
+                        //allowed
+                    } else {
+                        goto nopermission;  
+                    }
+                } else {
+                    goto nopermission; 
+                }
+            } elseif(allowedToOpen(40102,'1rtc')){ //invty planners
+                if(1==1){ // no handled branches as of the moment
+                    
+                } else {
+                    goto nopermission; 
+                }
+            }
             break;
+
         case 'invty_2mrr':
             if (!allowedToOpen(402,'1rtc')){
                  goto nopermission;

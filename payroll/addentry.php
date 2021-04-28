@@ -42,10 +42,24 @@ include_once('../switchboard/contents.php');
 	       $remarks='';
 	       $action='addentry.php?w=Rates';
 	    } else {
+
+			$idno=$_POST['IDNo'];
+			$basic=$_POST['BasicRate'];
+
+			//check if max
+			//monthly condition only
+			$sqlmax='SELECT TRUNCATE(MinRate*(1+PercentMintoMed/100)*(1+PercentMedtoMax/100),2) AS MAXIMUM FROM attend_1joblevel jl JOIN attend_0jobclass jc ON jc.JobClassNo=jl.JobClassNo JOIN attend_0positions p ON jl.JobLevelNo=p.JobLevelNo AND p.PositionID=(SELECT NewPositionID FROM attend_2changeofpositions WHERE IDNo='.$idno.' ORDER BY DateofChange LIMIT 1)';
+			
+			$stmtmax=$link->query($sqlmax); $rowmax=$stmtmax->fetch();
+			if($basic>$rowmax['MAXIMUM']){
+				echo '<br><font color="red">
+				<b>ERROR! MAXIMUM LIMIT. Pls contact JYE if you want that salary rate. </b></font>
+				<br><br>Encoded Rate = '.$basic.'<br>Max Rate = '.$rowmax['MAXIMUM'].''; 
+				exit();
+			}
+
 	       $dateofchange=$_POST['DateofChange'];
-	       $idno=$_POST['IDNo'];
 	       $monthly=$_POST['DailyORMonthly'];
-	       $basic=$_POST['BasicRate'];
 	       // $cola=$_POST['ColaRate'];
 	       $dem=$_POST['DeMinimisRate'];
 	       $allow=$_POST['TaxShield'];
