@@ -42,7 +42,8 @@ switch ($table) {
 	case'acctg_2cvmain':
 		if (!allowedToOpen(20005,'1rtc')) { echo 'No permission'; exit();}
 		$datefield='Date';
-		$txnidfield='CVNo'; 
+		$txnidfield='CVNo';
+		$subtable='acctg_2cvsub'; 
 	break;
 	
 	case'acctg_4futurecvmain':
