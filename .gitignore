@@ -1,7 +1,7 @@
 # I added these -- JYE
 *.jpg
 *.png
-dbinit.*
+/dbinit/
 nbproject.*
 js.*
 ################################################
