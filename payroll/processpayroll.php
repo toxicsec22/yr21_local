@@ -191,18 +191,20 @@ $sqlfrom=' FROM `payroll_20fromattendance` as a INNER JOIN `payroll_20latestrate
 if ($payrollid%2==0 AND $payrollid<=24){ //SSS 
         
     $payrollwithsss=1;
-    $sql='UPDATE `payroll_25payroll'.$temp.'` p JOIN payroll_20latestrates r ON p.IDNo=r.IDNo 
-    SET p.`PhilHealth-EE`=r.`PhilHealth-EE`, p.`PhilHealth-ER`=r.`PhilHealth-ER`, p.`PagIbig-EE`=r.`PagIbig-EE`, p.`PagIbig-ER`=r.`PagIbig-EE`
-    WHERE p.PayrollID='.$payrollid.' AND p.IDNo NOT IN  '.$zeroattend;
- //IF ($_SESSION['(ak0)']==1002){  echo $sql;  exit();}
-    $stmt=$link->prepare($sql); $stmt->execute(); 
+    
 
 include_once 'sssbasistemptable.php';
 
 $sql='UPDATE `payroll_25payroll'.$temp.'` p JOIN sssbasis ss ON p.IDNo=ss.IDNo JOIN `1employees` as e ON e.IDNo = p.IDNo '
-        . ' SET `SSS-EE`=getContriEE(Basis,"sss"), `SSS-ER`=getContriEE(Basis,"sser") WHERE p.PayrollID='.$payrollid . '  AND p.IDNo NOT IN  '.$zeroattend;
+        . ' SET `SSS-EE`=getContriEE(Basis,"sss"), `SSS-ER`=getContriEE(Basis,"sser") WHERE p.PayrollID='.$payrollid . '  AND p.IDNo NOT IN  '.$zeroattend.' AND p.IDNo IN (SELECT IDNo FROM `payroll_25payroll` WHERE PayrollID='.($payrollid-1).')';
 //IF ($_SESSION['(ak0)']==1002){  echo $sql;  exit();}
 $stmt=$link->prepare($sql); $stmt->execute();
+
+$sql='UPDATE `payroll_25payroll'.$temp.'` p JOIN payroll_20latestrates r ON p.IDNo=r.IDNo 
+    SET p.`PhilHealth-EE`=r.`PhilHealth-EE`, p.`PhilHealth-ER`=r.`PhilHealth-ER`, p.`PagIbig-EE`=r.`PagIbig-EE`, p.`PagIbig-ER`=r.`PagIbig-EE` 
+    WHERE p.PayrollID='.$payrollid.' AND p.IDNo NOT IN  '.$zeroattend.' AND p.IDNo IN (SELECT IDNo FROM `payroll_25payroll` WHERE PayrollID='.($payrollid-1).')';
+ //IF ($_SESSION['(ak0)']==1002){  echo $sql;  exit();}
+    $stmt=$link->prepare($sql); $stmt->execute(); 
 
 
 } else { //WTax
@@ -344,7 +346,7 @@ $sql2='CREATE TEMPORARY TABLE `payroll_25payrolldatalookuptemp` AS SELECT p.`Txn
     `UndertimeBasic`-`UndertimeDeM`-`UndertimeTaxSh`+`RegDayOT`+`RestDayOT`+`SpecOT`+`RHOT`-
     `SSS-EE`-`PhilHealth-EE`-`PagIbig-EE`-`WTax`),2) AS NetPay 
 FROM `payroll_25payrolltemp` p left join `payroll_21paydayadjustmentstemp` `a` ON `p`.`PayrollID` = `a`.`PayrollID` and `p`.`IDNo` = `a`.`IDNo` join `1employees` `e` on `p`.`IDNo` = `e`.`IDNo` '
-                . ($payrollwithsss==1? 'JOIN sssbasis sb ON sb.IDNo=p.IDNo JOIN payroll_0ssstable ss ON `p`.`SSS-EE`=(SSEE+ECEE+MPFEE) ':'').' group by `p`.`PayrollID`,`p`.`IDNo`;';
+                . ($payrollwithsss==1? 'LEFT JOIN sssbasis sb ON sb.IDNo=p.IDNo LEFT JOIN payroll_0ssstable ss ON `p`.`SSS-EE`=(SSEE+ECEE+MPFEE) ':'').' group by `p`.`PayrollID`,`p`.`IDNo`;';
 
 	$stmt2=$link->prepare($sql2); $stmt2->execute();
 	
