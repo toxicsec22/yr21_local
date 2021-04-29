@@ -57,11 +57,11 @@ $addlmenu='<form method=post action="carpsched.php?w=AddSched">
     Details<input type=text name="Details">
     <input type=submit name=submit value="Submit">
 </form>';
-$addlmenu=$addlmenu.renderListWithCondition('employeesperposition','(3,141)');
+$addlmenu=$addlmenu.renderListWithCondition('employeesperposition','(3,141,142,143)');
 } else {
    $addlmenu='';
 }
-$sql0='SELECT e.IDNo, e.Nickname FROM attend_30currentpositions cp join `1employees` e on cp.IDNo=e.IDNo where PositionID in (3,141)';
+$sql0='SELECT e.IDNo, e.Nickname FROM attend_30currentpositions cp join `1employees` e on cp.IDNo=e.IDNo where PositionID in (3,141,142,143)';
 $stmt0=$link->query($sql0);
 $resultadmin=$stmt0->fetchAll();
 $sql='SELECT DateSchedule, ';
