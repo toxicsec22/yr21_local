@@ -146,25 +146,43 @@ skipsession:
 case 'PayrollPerPayID':
 	 if (!allowedToOpen(817,'1rtc')) { echo 'No permission'; exit;}
             $payrollid=(isset($_SESSION['payrollidses'])?$_SESSION['payrollidses']:((date('m')*2)+(date('d')<15?-1:0)));
+            $showall=!isset($_POST['showall'])?0:$_POST['showall'];
+            $formdesc='<br><br>
+            <form method=post action="#">
+            <input type=hidden name="showall" value='.($showall==1?0:1).'>
+            <input type=submit name=submit value="Show All / Show Default Columns">
+            </form>';
+            
+
+            $allcols=array('Branch','FullName','IDNo','RegDayBasic','RegDayDeM','RegDayTaxSh','VLBasic','VLDeM','VLTaxSh','SLBasic','SLDeM','SLTaxSh',
+            'LWPBasic','LWPDeM','LWPTaxSh','RHBasicforDaily','RHDeMforDaily','RHTaxShforDaily',
+            'AbsenceBasicforMonthly','AbsenceDeMforMonthly','AbsenceTaxShforMonthly',
+            'UndertimeBasic','UndertimeDeM','UndertimeTaxSh','RegDayOT','RestDayOT','SpecOT','RHOT','Remarks','SSS-EE','SSSBasis','SSECCredit','PhilHealth-EE','PagIbig-EE','WTax','TotalAdj','NetPay','DisburseVia','DaysPaid Calculated');
+
+            $colstohide=array('VLBasic','VLDeM','VLTaxSh','SLBasic','SLDeM','SLTaxSh','LWPDeM','LWPTaxSh','RHBasicforDaily','RHDeMforDaily','RHTaxShforDaily','AbsenceDeMforMonthly','AbsenceTaxShforMonthly','UndertimeDeM','UndertimeTaxSh','SpecOT','RHOT','SSECCredit','DaysPaid Calculated');
+
+            // $columnnames=array('Branch','FullName','IDNo','RegDayBasic','RegDayDeM','RegDayTaxSh','LWPBasic','AbsenceBasicforMonthly','UndertimeBasic','RegDayOT','RestDayOT','Remarks','SSS-EE','SSSBasis','PhilHealth-EE','PagIbig-EE','WTax','TotalAdj','NetPay','DisburseVia)';
+
             if ($payrollid%2==0 AND $payrollid<=24){ //SSS  
                 $temp=''; include_once 'sssbasistemptable.php';
                 $sqlsss=', FORMAT(sb.Basis,0) AS SSSBasis,ss.SSECCredit,CONCAT(esb.Nickname,\' \',esb.SurName) as EncodedBy,sb.TimeStamp '; $join='JOIN sssbasis sb ON sb.IDNo=p.IDNo left join 1employees esb on esb.IDNo=sb.EncodedByNo LEFT JOIN payroll_0ssstable ss ON `p`.`SSS-EE`=(SSEE+ECEE+MPFEE) ';
-                $columnnames=array('Branch','FullName','IDNo','RegDayBasic','RegDayDeM','RegDayTaxSh','VLBasic','VLDeM','VLTaxSh','SLBasic','SLDeM','SLTaxSh',
-                'LWPBasic','LWPDeM','LWPTaxSh','RHBasicforDaily','RHDeMforDaily','RHTaxShforDaily',
-                'AbsenceBasicforMonthly','AbsenceDeMforMonthly','AbsenceTaxShforMonthly',
-                'UndertimeBasic','UndertimeDeM','UndertimeTaxSh','RegDayOT','RestDayOT','SpecOT','RHOT','Remarks','SSS-EE','SSSBasis','SSECCredit','PhilHealth-EE','PagIbig-EE','WTax','TotalAdj','NetPay','DisburseVia','DaysPaid Calculated');
+                
+                
             } else { //Wtax
-                $sqlsss='';$join='';
-                $columnnames=array('Branch','FullName','IDNo','RegDayBasic','RegDayDeM','RegDayTaxSh','VLBasic','VLDeM','VLTaxSh','SLBasic','SLDeM','SLTaxSh',
-                'LWPBasic','LWPDeM','LWPTaxSh','RHBasicforDaily','RHDeMforDaily','RHTaxShforDaily',
-                'AbsenceBasicforMonthly','AbsenceDeMforMonthly','AbsenceTaxShforMonthly',
-                'UndertimeBasic','UndertimeDeM','UndertimeTaxSh','RegDayOT','RestDayOT','SpecOT','RHOT','Remarks','SSS-EE','PhilHealth-EE','PagIbig-EE','WTax','TotalAdj','NetPay','DisburseVia','DaysPaid Calculated');
+                $sqlsss='';$join=''; $allcols=array_diff($allcols,array('SSSBasis','SSECCredit'));
+                
+                // $columnnames=array('Branch','FullName','IDNo','RegDayBasic','RegDayDeM','RegDayTaxSh','VLBasic','VLDeM','VLTaxSh','SLBasic','SLDeM','SLTaxSh',
+                // 'LWPBasic','LWPDeM','LWPTaxSh','RHBasicforDaily','RHDeMforDaily','RHTaxShforDaily',
+                // 'AbsenceBasicforMonthly','AbsenceDeMforMonthly','AbsenceTaxShforMonthly',
+                // 'UndertimeBasic','UndertimeDeM','UndertimeTaxSh','RegDayOT','RestDayOT','SpecOT','RHOT','Remarks','SSS-EE','PhilHealth-EE','PagIbig-EE','WTax','TotalAdj','NetPay','DisburseVia','DaysPaid Calculated');
             }
+
+            $columnnames=($showall==1?$allcols:array_diff($allcols,$colstohide));
             
             $sql0='SELECT SUM(NetPay) AS NetPay FROM `payroll_25payrolldatalookup` WHERE PayrollID='.$payrollid; $stmt0=$link->query($sql0); $res0=$stmt0->fetch();
-            $formdesc='';
-            if (allowedToOpen(8171,'1rtc')){ $formdesc='<br><br></i>Total cash needed: '.number_format($res0['NetPay'], 2).'<i>';}
-            if (allowedToOpen(8164,'1rtc')){$formdesc=$formdesc.'<br><br><a href="prpayrolldata.php?w=ApprovePayrollAll&action_token='.$_SESSION['action_token'].'&PayrollID='.$payrollid.'">Approve Payroll ID '.$payrollid.'</a><br>';}
+            //$formdesc='';
+            if (allowedToOpen(8171,'1rtc')){ $formdesc.='<br><br></i>Total cash needed: '.number_format($res0['NetPay'], 2).'<i>';}
+            if (allowedToOpen(8164,'1rtc')){$formdesc.='<br><br><a href="prpayrolldata.php?w=ApprovePayrollAll&action_token='.$_SESSION['action_token'].'&PayrollID='.$payrollid.'">Approve Payroll ID '.$payrollid.'</a><br>';}
             $title='Payroll Data - '.$payrollid;
             $sortfield=(isset($_POST['sortfield'])?$_POST['sortfield']:'`BranchNo`,e.`FirstName`');
 	    include('../backendphp/layout/clickontabletoedithead.php');
