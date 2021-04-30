@@ -85,7 +85,7 @@ $defaultdate=!isset($_REQUEST['txndate'])?date('Y-m-d', time() - 60 * 60 * 24):$
         "</td><td>".number_format($row['AmountofCheck'],2)."</td>
         <td align='center' ><input type='radio' name='vchno' value='".$row['CVNo']."'>
       <input type='hidden' name='currentyr' value='".$row['CurrentYr']."'></td>"
-        . '<td><a href="../acctg/addeditsupplyside.php?w=CV&CVNo='.$row['TxnID'].'" target=_blank>Lookup</a></td></tr>';
+        . '<td><a href="../acctg/formcv.php?w=CV&CVNo='.$row['TxnID'].'" target=_blank>Lookup</a></td></tr>';
  
     }
  $link=null; $stmt=null; 	
