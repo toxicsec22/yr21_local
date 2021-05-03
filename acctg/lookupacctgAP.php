@@ -400,20 +400,24 @@ $stmt=$link->query($sql);
             $sub=$sub.'<td>'.$row[$colsub].'</td>';
         }
         $runtotal=$runtotal+((is_null($row['Debit']) or empty($row['Debit']))?0:($row['Debit']*-1))+((is_null($row['Credit']) or empty($row['Credit']))?0:($row['Credit']));
-        
+        $cvjvtxn='TxnID';
         switch ($row['w']){
          case 'Sales':
          case 'Collect':
          case 'Bounced':
          case 'Interbranch':
             $filetoopen='addeditclientside';
-            break;
-         Case 'Deposit':
+         break;
+         case 'Deposit':
             $filetoopen='addeditdep';
-            break;
-         Case 'Purchase':
-         CASE 'CV':
+         break;
+         case 'CV':
+            $filetoopen='formcv'; $cvjvtxn='CVNo';
+         break;
          case 'JV':
+            $filetoopen='formjv'; $cvjvtxn='JVNo';
+         break;
+         case 'Purchase':
          case 'Forex':
             $filetoopen='addeditsupplyside';
             break;
@@ -421,7 +425,7 @@ $stmt=$link->query($sql);
             $filetoopen='lookupgenacctg';
         }
         
-        $sub=$sub.'<td>'.number_format($runtotal,2).'</td><td><a href="'.$filetoopen.'.php?w='.$row['w'].'&TxnID='.$row['TxnID'].'"  target=_blank>Lookup</a></tr>';
+        $sub=$sub.'<td>'.number_format($runtotal,2).'</td><td><a href="'.$filetoopen.'.php?w='.$row['w'].'&'.$cvjvtxn.'='.$row['TxnID'].'"  target=_blank>Lookup</a></tr>';
         $colorcount++;
     }
     $sub='<table><tr>'.$subcol.'<td>Running Sum</td><td>Lookup?</td></tr><tbody>'.$sub.'</tbody></table>';
