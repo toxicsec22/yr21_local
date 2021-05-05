@@ -107,7 +107,7 @@ FROM
     LEFT JOIN `approvals_5ot` `ot` ON (`a`.`IDNo` = `ot`.`IDNo` AND `a`.`DateToday` = `ot`.`DateToday` AND `a`.`OTApproval` NOT IN (0,1))
     LEFT JOIN `attend_441legaldays` `l` ON (`l`.`IDNo` = `a`.`IDNo` AND `l`.`LegalHoliday` = `a`.`DateToday`)
     LEFT JOIN `443semimonthlyempnoattendance` `sm` ON (`sm`.`PayrollID` = `d`.`PayrollID` AND `sm`.`IDNo` = `a`.`IDNo`) 
-    WHERE `d`.`PayrollID`='. $_POST['payrollid'].'
+    WHERE `d`.`PayrollID`='. $_POST['payrollid'].(!isset($idno)?'':' AND a.IDNo='.$idno).'
 GROUP BY `d`.`PayrollID` , `a`.`IDNo` 
 HAVING IF(`e`.`Resigned` <> 0, `SLDays` + `VLDays` + `LWPDays` + `QDays` + `RegDaysPresent` <> 0, 1)';
 $stmt0=$link->prepare($sql0); $stmt0->execute();
