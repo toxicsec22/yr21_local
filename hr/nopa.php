@@ -49,6 +49,9 @@ include_once('../backendphp/layout/linkstyle.php');
         <a id='link' href="nopa.php?w=LateralTransfer">Lateral Transfer</a>
 	<?php } ?>
 	
+	<?php if (allowedToOpen(59025,'1rtc')) { ?>
+        <a id='link' href="nopa.php?w=EmailEmploymentStatus">Email Employment Status</a>
+	<?php } ?>
 	<?php if (allowedToOpen(59022,'1rtc')) { ?>
         &nbsp; &nbsp; &nbsp; &nbsp; <a id='link' href="coe.php">Certificate of Employment</a>
 	<?php } ?>
@@ -564,6 +567,79 @@ switch ($which)
 	
 	break;
 	
+
+	case 'EmailEmploymentStatus':
+
+		$title="Email Employment Status";
+		echo '<title>'.$title.'</title>';
+		echo '<h3>'.$title.'</h3>';
+		echo comboBox($link,'SELECT IDNo, FullName FROM `attend_30currentpositions` ORDER BY FullName;','IDNo','FullName','employeelist');
+
+		if(isset($_GET['done'])){
+			if($_GET['done']==1){
+				echo '<font color="green">Message has been sent.</font>';
+			} else {
+				echo '<font color="red">Message was not sent.</font>';
+			}
+		}
+		echo '<form action="nopa.php?w=EmailSend" method="POST" autocomplete="off"><input type="text" name="FullName" list="employeelist"> <input type="submit" value="Email Letter"></form>';
+	break;
+
+
+	case 'EmailSend':
+	
+	$IDNo=comboBoxValue($link,'`attend_30currentpositions`','FullName',addslashes($_POST['FullName']),'IDNo');
+	
+	//receiver
+	$sql='select id.Email,id.Nickname,id.SurName,IF(Gender=1,"Mr.","Ms.") AS Gder from 1_gamit.0idinfo id JOIN 1employees e ON id.IDNo=e.IDNo WHERE e.IDNo='.$IDNo;
+	$stmt=$link->query($sql); $res=$stmt->fetch();
+
+	require($path."/acrossyrs/downloadedphp/PHPMailer/class.phpmailer.php");
+
+		$msg='To: '.$res['Nickname'].' '.$res['SurName'].'<br>Re: Status of Employment<br><br>Dear '.$res['Gder'].' '.$res['SurName'].':<br><br>In response to your query about your employment status, you have been a <b><font style="font-size:12pt">regular employee</font></b> of the company upon reaching six (6) months tenure with the company. As such, you have been enjoying the benefits given to all regular employees since that time.<br><br>Sincerely,<br><br>HR Dept';
+		
+		 
+		$mail = new PHPMailer();
+		$mail->IsSMTP();  // telling the class to use SMTP
+		$mail->SMTPDebug = 2; // debugging: 1 = errors and messages, 2 = messages only
+		$mail->Host = "smtp.gmail.com"; // SMTP server
+		$mail->Port = '587';//'465';
+		$mail->IsHTML(true);
+		$mail->SMTPAuth = true;                               // Enable SMTP authentication
+		$mail->SMTPSecure = 'tls';//'ssl';
+		$mail->Username = '1rtcicon@gmail.com';                            // SMTP username
+		$mail->Password = '1RotaRy1003$';                           // SMTP password
+
+		$mail->From = '1rtcicon@gmail.com';
+		$mail->FromName = 'HR Department';
+
+		$mail->Subject  = "Employment Status";
+		$mail->WordWrap = 50;
+
+		
+		
+		
+		
+		
+			$mail->AddAddress($res['Email']);
+			$mail->Body     = $msg;
+			$mail->AltBody     = $msg; 
+			if(!$mail->Send()) {
+				echo 'Message was not sent.';
+				echo 'Mailer error: ' . $mail->ErrorInfo;
+				$done=0;
+			} else {
+				echo 'Message has been sent.';
+				$done=1;
+			}
+			 $mail->ClearAddresses(); 
+	
+
+	
+		header("Location:nopa.php?w=EmailEmploymentStatus&done=".$done."");
+
+
+	break;
 	
 }
   $link=null; $stmt=null;
