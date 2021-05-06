@@ -368,24 +368,24 @@ SELECT `BranchNo`,m.`PrepaidID`,IFNULL(SUM(CASE WHEN Year(`AmortDate`)<=' . $cur
         $sql0='INSERT INTO `' . $nextyr . '_1rtc`.`acctg_2cvmain` (`TxnID`,`VoucherNo`,`CheckNo`,`Date`,`DateofCheck`,`PayeeNo`,`Payee`,`CreditAccountID`,`Remarks`,
 `TimeStamp`,`EncodedByNo`,`PostedByNo`,`Posted`) 
 SELECT `TxnID`,`VoucherNo`,`CheckNo`,`Date`,`DateofCheck`,`PayeeNo`,`Payee`,`CreditAccountID`,`Remarks`,
-`TimeStamp`,`EncodedByNo`,`PostedByNo`,`Posted` FROM `' . $currentyr . '_1rtc`.`acctg_4futurevouchermain` WHERE YEAR(`Date`)=' . $nextyr . ';';
+`TimeStamp`,`EncodedByNo`,`PostedByNo`,`Posted` FROM `' . $currentyr . '_1rtc`.`acctg_4futurecvmain` WHERE YEAR(`Date`)=' . $nextyr . ';';
         if($_SESSION['(ak0)']==1002) { echo $sql0.'<br>';}
         $stmt=$link->prepare($sql0); $stmt->execute();
 
-        $sql0='INSERT INTO `' . $nextyr . '_1rtc`.`acctg_2cvsub` (`TxnID`,`Particulars`,`ForInvoiceNo`,`TIN`,`DebitAccountID`,`Amount`,`TimeStamp`,`BranchNo`,`EncodedByNo`) '
-                . 'SELECT fvs.`TxnID`,`Particulars`,`ForInvoiceNo`,`TIN`,`DebitAccountID`,`Amount`,fvs.`TimeStamp`,`BranchNo`,fvs.`EncodedByNo` FROM `' . $currentyr . '_1rtc`.`acctg_4futurevouchersub`  fvs JOIN `' . $currentyr . '_1rtc`.`acctg_4futurevouchermain` fvm ON fvm.TxnID=fvs.TxnID WHERE YEAR(`Date`)=' . $nextyr . ';';
+        $sql0='INSERT INTO `' . $nextyr . '_1rtc`.`acctg_2cvsub` (`TxnID`,`Particulars`,`ForInvoiceNo`,`TIN`,`DebitAccountID`,`Amount`,`TimeStamp`,`FromBudgetOf`,`BranchNo`,`EncodedByNo`) '
+                . 'SELECT fvs.`TxnID`,`Particulars`,`ForInvoiceNo`,`TIN`,`DebitAccountID`,`Amount`,fvs.`TimeStamp`,`FromBudgetOf`,`BranchNo`,fvs.`EncodedByNo` FROM `' . $currentyr . '_1rtc`.`acctg_4futurevouchersub`  fvs JOIN `' . $currentyr . '_1rtc`.`acctg_4futurecvmain` fvm ON fvm.TxnID=fvs.TxnID WHERE YEAR(`Date`)=' . $nextyr . ';';
         if($_SESSION['(ak0)']==1002) { echo $sql0.'<br>';}
         $stmt=$link->prepare($sql0); $stmt->execute();
         
         break;
     
-    case 'acctg_4futurevouchermain':
+    case 'acctg_4futurecvmain':
         
-        $sql0='INSERT INTO `' . $nextyr . '_1rtc`.`acctg_4futurevouchermain` SELECT * FROM `' . $currentyr . '_1rtc`.`acctg_4futurevouchermain` WHERE YEAR(`Date`)>' . $nextyr . ';';
+        $sql0='INSERT INTO `' . $nextyr . '_1rtc`.`acctg_4futurecvmain` SELECT * FROM `' . $currentyr . '_1rtc`.`acctg_4futurecvmain` WHERE YEAR(`Date`)>' . $nextyr . ';';
         if($_SESSION['(ak0)']==1002) { echo $sql0.'<br>';}
         $stmt=$link->prepare($sql0); $stmt->execute();
 
-        $sql0='INSERT INTO `' . $nextyr . '_1rtc`.`acctg_4futurevouchersub` SELECT fvs.* FROM `' . $currentyr . '_1rtc`.`acctg_4futurevouchersub`  fvs JOIN `' . $currentyr . '_1rtc`.`acctg_4futurevouchermain` fvm ON fvm.TxnID=fvs.TxnID WHERE YEAR(`Date`)>' . $nextyr . ';';
+        $sql0='INSERT INTO `' . $nextyr . '_1rtc`.`acctg_4futurevouchersub` SELECT fvs.* FROM `' . $currentyr . '_1rtc`.`acctg_4futurevouchersub`  fvs JOIN `' . $currentyr . '_1rtc`.`acctg_4futurecvmain` fvm ON fvm.TxnID=fvs.TxnID WHERE YEAR(`Date`)>' . $nextyr . ';';
         if($_SESSION['(ak0)']==1002) { echo $sql0.'<br>';}
         $stmt=$link->prepare($sql0); $stmt->execute();
         
