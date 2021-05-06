@@ -537,7 +537,7 @@ switch ($which)
 		if (!allowedToOpen(6507,'1rtc')){ echo 'No Permission'; exit(); }
 		$txnid=intval($_GET['TxnID']);
 		
-		$sql = 'SELECT s.*,Statement, WeightinPoints, ss.stmtcat, Decision, CONCAT(e1.Nickname, " ", e1.Surname, " - ", IF(cp.deptid<>10,dept,Branch)) AS Reportee, CONCAT(e2.Nickname, " ", e2.Surname) AS ReportedBy, CONCAT(e3.Nickname, " ", e3.Surname) AS ReporterHead, CONCAT(e4.Nickname, " ", e4.Surname) AS ReporteeHead FROM hr_72scores s JOIN `1employees` e1 ON s.ReporteeNo=e1.IDNo JOIN `1employees` e2 ON s.EncodedByNo=e2.IDNo JOIN `1employees` e3 ON s.ReporterHeadNo=e3.IDNo JOIN `1employees` e4 ON s.ReporteeHeadNo=e4.IDNo JOIN attend_30currentpositions cp ON s.ReporteeNo=cp.IDNo JOIN hr_71scorestmt ss ON s.SSID=ss.SSID JOIN hr_70points p ON ss.PointID=p.PointID WHERE s.TxnID = '.$txnid; 
+		$sql = 'SELECT s.*,Statement, WeightinPoints, ss.stmtcat, Decision, CONCAT(e1.Nickname, " ", e1.Surname, " - ", IF(cp.deptid<>10,dept,Branch)) AS Reportee, CONCAT(e2.Nickname, " ", e2.Surname) AS ReportedBy, CONCAT(e3.Nickname, " ", e3.Surname) AS ReporterHead, CONCAT(e4.Nickname, " ", e4.Surname) AS ReporteeHead,CONCAT(e5.Nickname, " ", e5.Surname) AS DecisionBy FROM hr_72scores s JOIN `1employees` e1 ON s.ReporteeNo=e1.IDNo JOIN `1employees` e2 ON s.EncodedByNo=e2.IDNo JOIN `1employees` e3 ON s.ReporterHeadNo=e3.IDNo JOIN `1employees` e4 ON s.ReporteeHeadNo=e4.IDNo JOIN `1employees` e5 ON s.DecisionByNo=e5.IDNo JOIN attend_30currentpositions cp ON s.ReporteeNo=cp.IDNo JOIN hr_71scorestmt ss ON s.SSID=ss.SSID JOIN hr_70points p ON ss.PointID=p.PointID WHERE s.TxnID = '.$txnid; 
 		$stmt=$link->query($sql); $res=$stmt->fetch();
 		
 		$title = 'Lookup Report';
@@ -603,7 +603,7 @@ switch ($which)
 						
 						<?php if (($res['DecisionStatus']<>0)){?>
 						<tr><td style="height:30px;"></td></tr>
-						<tr><td colspan="4"><b>Rationale<br><?php if ($res['DecisionStatus']==2) { echo ' (NO GO)'; }?></b></td></tr><tr><td colspan="4">(<?php echo $res['ReporterHead'];?>): <?php echo $res['Decision'];?></td></tr>
+						<tr><td colspan="4"><b>Rationale<br><?php if ($res['DecisionStatus']==2) { echo ' (NO GO)'; }?></b></td></tr><tr><td colspan="4">(<?php echo $res['DecisionBy'];?>): <?php echo $res['Decision'];?></td></tr>
 						<tr><td style="height:20px;"></td></tr>
 						<tr><td><h4>Final Decision: <?php if ($res['DecisionStatus']==1){ echo '<font color="blue">COUNTED</font>'; } else if ($res['DecisionStatus']==2) { echo '<font color="brown">NOT COUNTED</font>'; } ?></h4></td></tr>
 						<?php 
