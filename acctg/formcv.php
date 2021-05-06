@@ -292,7 +292,7 @@ switch ($w){
         $processblank=''; $processlabelblank='';
       
         $columnnames=$columnnamesmain;
-        $columnstoedit=array_diff($columnnamesmain,array('PayeeNo','Posted'));
+        $columnstoedit=array_diff($columnnamesmain,array('PayeeNo','ReleaseDate','CheckReceivedBy','Posted','Cleared'));
                 
         $columnslist=array('PaymentMode','CreditAccount','Payee');
         $listsname=array('PaymentMode'=>'pmlist','CreditAccount'=>'accounts','Payee'=>'suppliers');
