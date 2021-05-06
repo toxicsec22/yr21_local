@@ -3,10 +3,13 @@ $per=!isset($_REQUEST['per'])?0:$_REQUEST['per'];
 $fieldname=($per==0?'Month':'Date');
 
 $defaultdate=!isset($_REQUEST['Date'])?date('Y-m-d'):$_REQUEST['Date'];
-if(!isset($_GET['Date']))
-  $txndate = "m.Date = '{$defaultdate}'";
-else
-  $txndate = "m.Date = '{$_GET['Date']}'";
+$defaultmonth=!isset($_REQUEST['Month'])?date('m'):$_REQUEST['Month'];
+// if(!isset($_GET['Date']))
+//   $txndate = "m.Date = '{$defaultdate}'";
+// else
+//   $txndate = "m.Date = '{$_GET['Date']}'";
+
+$txndate = 'm.Date=\''.$defaultdate.'\''
 
 ?>
   <form method="post" style="display:inline"
@@ -17,7 +20,7 @@ else
    
   <form method="post" style="display:inline"
         action="<?php echo $file.'?per=0&Date='.(!isset($_REQUEST['Month'])?$defaultdate:$_REQUEST['Month']); ?>" enctype="multipart/form-data">
-                  Choose Month (1 - 12):  <input type="text" name="Month" value="<?php echo date('m'); ?>"></input>
+                  Choose Month (1 - 12):  <input type="text" name="Month" value="<?php echo $defaultmonth; ?>"></input>
                   <input type="submit" name="lookup" value="Lookup Per Month">
   </form>
   <?php echo str_repeat('<br>',2); ?><a href='<?php echo $file.'?w=AddMain'; ?>'  target=_blank>Add <?php echo $form; ?></a>
