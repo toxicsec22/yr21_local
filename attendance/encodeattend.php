@@ -697,7 +697,7 @@ case 'SetShiftByDept':
 		echo '<br><br><form action="encodeattend.php?w=SetShiftMultipleProcess&DateFrom='.$_GET['DateFrom'].'&DateTo='.$_GET['DateTo'].'" method="POST">';
 		echo '<b><font color="maroon">'.$_GET['Branch'].'</font> From <font color="blue">'.$_GET['DateFrom'].'</font> To <font color="blue">'.$_GET['DateTo'].'</font></b>';
 		echo '<table border="1px solid black" style="border-collapse:collapse">';
-		echo '<tr style="background-color:white;"><th style="padding:7px;">Employee</th><th style="padding:7px;">Shift 7</th><th style="padding:7px;">Shift 8</th><th style="padding:7px;">Shift 9</th></tr>';
+		echo '<tr style="background-color:white;"><th style="padding:7px;">Employee</th><th style="padding:7px;">Shift 8</th><th style="padding:7px;">Shift 9</th></tr>';
 
 		$padding='style="padding:7px;"';
 		$rcolor[0]=(!isset($_REQUEST['print'])?(isset($alternatecolor)?$alternatecolor:"FFFFCC"):"FFFFFF");
@@ -707,7 +707,7 @@ $colorcount=0;
 		foreach($rows AS $row){
 			echo '<tr bgcolor="'. $rcolor[$colorcount%2].'">';
 			echo '<td '.$padding.'>'.$row['FullName'].'<input type="hidden" name="IDNo'.$colorcount.'" value="'.$row['IDNo'].'" /></td>';
-			echo '<td '.$padding.'><input type="radio" name="Shift'.$colorcount.'" value="7" '.($row['Shift']==7?'checked':'').'> 7 am - 4 pm</td>';
+			// echo '<td '.$padding.'><input type="radio" name="Shift'.$colorcount.'" value="7" '.($row['Shift']==7?'checked':'').'> 7 am - 4 pm</td>';
 			echo '<td '.$padding.'><input type="radio" name="Shift'.$colorcount.'" value="8" '.($row['Shift']==8?'checked':'').'> 8 am - 5 pm</td>';
 			echo '<td '.$padding.'><input type="radio" name="Shift'.$colorcount.'" value="9" '.($row['Shift']==9?'checked':'').'> 9 am - 6 pm</td>';
 			echo '</tr>';
@@ -715,7 +715,7 @@ $colorcount=0;
 		}
 		echo '<input type="hidden" name="shifcnt" value="'.($colorcount).'">';
 		echo '<input type="hidden" name="action_token" value="'.$_SESSION['action_token'].'">';
-		echo '<tr><td colspan="4" align="center" '.$padding.'><input style="width:150px;background-color:green;color:white;" type="submit" name="btnSetShift" value="Set Shifts" onclick="return confirm(\'Are you sure?\')"></td></tr>';
+		echo '<tr><td colspan="3" align="center" '.$padding.'><input style="width:150px;background-color:green;color:white;" type="submit" name="btnSetShift" value="Set Shifts" onclick="return confirm(\'Are you sure?\')"></td></tr>';
 		echo '</table>';
 		echo '</form>';
 		echo '</div>';
