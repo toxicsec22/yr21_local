@@ -201,20 +201,38 @@ if (allowedToOpen(6503,'1rtc')){
 if (allowedToOpen(6505,'1rtc')){
     if (allowedToOpen(217,'1rtc')) { $condition=' WHERE 1=1 ';}
         else { $condition=' JOIN `attend_30currentpositions` cp ON cr.ReIDNo=cp.IDNo WHERE deptheadpositionid='.$_SESSION['&pos'];}
-    $sqlsp='SELECT cr.TxnID,DateofIncident,cr.Summary AS Report, IFNULL(ReIDNo,"0") AS Re_IDNo, IFNULL(CONCAT(eb.Nickname, " ",eb.SurName),"Others") AS Regarding, b.Branch, 
-        CONCAT(e.Nickname, " ",e.SurName) AS ReportedBy,2 AS ReportType FROM `hr_3incidentreports` cr 
-            LEFT JOIN `1employees` `eb` ON `eb`.`IDNo` = `cr`.`ReIDNo`
-            LEFT JOIN `attend_1defaultbranchassign` `db` ON `cr`.`ReIDNo`=db.IDNo
-            LEFT JOIN `1branches` `b` ON `db`.`DefaultBranchAssignNo` = `b`.`BranchNo`
-            LEFT JOIN `1employees` e ON e.IDNo=cr.EncodedByNo '.$condition.'
-            AND ReadbyHR=0 ';
+    $sqlmain='SELECT cr.TxnID,DateofIncident,cr.Summary AS Report, IFNULL(ReIDNo,"0") AS Re_IDNo, IFNULL(CONCAT(eb.Nickname, " ",eb.SurName),"Others") AS Regarding, b.Branch, 
+    CONCAT(e.Nickname, " ",e.SurName) AS ReportedBy,2 AS ReportType FROM `hr_3incidentreports` cr 
+        LEFT JOIN `1employees` `eb` ON `eb`.`IDNo` = `cr`.`ReIDNo`
+        LEFT JOIN `attend_1defaultbranchassign` `db` ON `cr`.`ReIDNo`=db.IDNo
+        LEFT JOIN `1branches` `b` ON `db`.`DefaultBranchAssignNo` = `b`.`BranchNo`
+        LEFT JOIN `1employees` e ON e.IDNo=cr.EncodedByNo '.$condition.'';
+    
+    //Unresolved
+    $sqlsp=$sqlmain.' AND Resolved=0 ';
+    // echo $sqlsp;
+    $stmtsp=$link->query($sqlsp);
+    $datatoshowsp=$stmtsp->fetchAll(PDO::FETCH_ASSOC);    
+    $countsp=0;
+    if ($stmtsp->rowCount()>0){
+        $msgsp='<div><br>Unresolved incident reports (<b>'.$stmtsp->rowCount().'</b>): <a href="/yr21/hr/incidentreporthr.php">Open List</a></div>';
+
+        $switchboard = $switchboard . $msgsp;
+
+        $cntres=$cntres + $countsp;
+        $stmtsp=null;
+    }
+    
+
+    //last 5days unresolved
+    $sqlsp=$sqlmain.' AND DATE(cr.`TimeStamp`) > (CURDATE() - INTERVAL 5 DAY) AND Resolved=0 ';
     $stmtsp=$link->query($sqlsp);
     $datatoshowsp=$stmtsp->fetchAll(PDO::FETCH_ASSOC);    
     $countsp=0;
    if ($stmtsp->rowCount()>0){
     $cols=array('Re_IDNo', 'Regarding', 'Branch', 'Report','DateofIncident', 'ReportedBy'); 
     $coltitle=''; foreach ($cols as $col) { $coltitle=$coltitle.'<td>'.$col.'</td>';}
-    $msgsp='<div><br>Unread incident reports: <a href="/yr21/hr/incidentreporthr.php">Open List</a> <table bgcolor="FFFFF"><tr>'.$coltitle.'</tr><tr>'; //<td>Mark as Read</td>
+    $msgsp='<div><table bgcolor="FFFFF"><tr>'.$coltitle.'</tr><tr>'; //<td>Mark as Read</td>
     foreach($datatoshowsp as $rows){
         $countsp++;
         $colsql=''; foreach ($cols as $col) { $colsql=$colsql.'<td style="font-size: small;">'.htmlcharwithbr($fromBRtoN,$rows[$col]).'</td>';}
@@ -782,6 +800,24 @@ if (allowedToOpen(5353,'1rtc') or allowedToOpen(5354,'1rtc') or allowedToOpen(53
     }
 	$cntres=$cntres + $sp;
 }
+
+//shoutout
+if(allowedToOpen(5363,'1rtc')){
+$sql='SELECT COUNT(TxnID) AS cntreq FROM mktg_2shoutouts WHERE ShoutStat=0;';
+$stmt=$link->query($sql); $res=$stmt->fetch();
+
+   if ($res['cntreq']>0){ 
+   $msgcb='<br><div id="table-wrapper" style="width:80%;">Shoutout For Approval:<div><table bgcolor="FFFFF">'
+        .'';
+               $sp++;
+               $msgcb.='<tr><td><a href = "mktg/shoutout.php?w=List">Look up '.$res['cntreq'].' shoutout(s).</a>'.'</td>'
+                       .'</tr>';
+         $switchboard = $switchboard . $msgcb.'<br></table></div></div>';
+   }
+   $cntres=$cntres + $sp;
+}
+//end shoutout
+
 
  $sql='SELECT COUNT(IDNo) AS cntreq FROM approvals_5ot ot WHERE Approved=0 AND (IDNo='.$_SESSION['(ak0)'].' OR RequestedByNo='.$_SESSION['(ak0)'].' OR '.$_SESSION['&pos'].'=(SELECT deptheadpositionid FROM attend_30currentpositions cp WHERE cp.IDNo=ot.IDNo));';
  $stmt=$link->query($sql); $res=$stmt->fetch();
