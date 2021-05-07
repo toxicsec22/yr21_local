@@ -20,7 +20,7 @@ echo '<title>'.$title.'</title>';
 $stmt=$link->query($sqlmain); $result=$stmt->fetch();
 if (!isset($nopost)){
     $postvalue=($result['Posted']==1?0:1); $postfield='Posted'; $txnid=!isset($txnidname)?$txnid:$txnidname;
-    include($path.'/acrossyrs/commonfunctions/postunpostformgeneric.php');
+    include('../backendphp/layout/postunpostformgeneric.php');
 }
 
 $main='';

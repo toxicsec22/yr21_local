@@ -38,8 +38,8 @@ else {
 }
 
 include_once $path.'/acrossyrs/commonfunctions/editokfromposted.php';
-$postfield=(!isset($postfield)?'Posted':$postfield);
-$txnidname=(!isset($txnidname)?'TxnID':$txnidname);
+// $postfield=(!isset($postfield)?'Posted':$postfield);
+// $txnidname=(!isset($txnidname)?'TxnID':$txnidname);
 $editok=editOkfromPosted($link,$table,$txnidname,$txnid,$postfield);
 //to make alternating rows have different colors
         $colorcount=0;
@@ -52,7 +52,7 @@ echo '<title>'.$title.'</title>';
 $stmt=$link->query($sqlmain); $result=$stmt->fetch();
 if (!isset($nopost)){
     $postvalue=($result[$postfield]==1?0:1); $main=$table; 
-    include($path.'/acrossyrs/commonfunctions/postunpostformgeneric.php');
+    include('../backendphp/layout/postunpostformgeneric.php');
 }
 ?>
 <div id="wrap"><div id="main">
