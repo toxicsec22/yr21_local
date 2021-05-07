@@ -24,9 +24,9 @@ if (isset($_GET[$txnidname])){
    $txnid=intval($_GET[$txnidname]); 
    $columnnamesmain=array('Date','CVNo','DueDate','DateofCheck','PaymentMode','CheckNo','CreditAccount','PayeeNo','Payee','Remarks','ReleaseDate','CheckReceivedBy','Posted','Cleared');
    $columnsub=array('Particulars','Branch','FromBudgetOf','ForInvoiceNo','TIN','DebitAccount','Amount','Forex','PHPAmount');     
-   $sqlmain='Select m.*, ca.ShortAcctID as CreditAccount, e.Nickname AS EncodedBy, PaymentMode FROM `'.$table.'` m JOIN acctg_1chartofaccounts ca ON ca.AccountID=m.CreditAccountID
+   $sqlmain='Select m.*, ca.ShortAcctID as CreditAccount, CONCAT(e.Nickname," ",e.SurName) AS EncodedBy, CONCAT(e1.Nickname," ",e1.SurName) AS PostedBy, PaymentMode FROM `'.$table.'` m JOIN acctg_1chartofaccounts ca ON ca.AccountID=m.CreditAccountID
                 LEFT JOIN acctg_0paymentmodes pm ON m.PaymentModeID=pm.PaymentModeID
-	        LEFT JOIN `1employees` e ON e.IDNo=m.EncodedByNo WHERE m.CVNo='.$txnid;
+	        LEFT JOIN `1employees` e ON e.IDNo=m.EncodedByNo LEFT JOIN `1employees` e1 ON e1.IDNo=m.PostedByNo WHERE m.CVNo='.$txnid;
    $sqlsub='Select s.*, (Amount*Forex) AS PHPVal, FORMAT(Amount*Forex,2) AS PHPAmount, b.Branch, ca.ShortAcctID as DebitAccount, e.Nickname as EncodedBy,Entity as FromBudgetOf from '.$subtable.' s join acctg_1chartofaccounts ca on ca.AccountID=s.DebitAccountID  LEFT JOIN `1employees` e ON e.IDNo=s.EncodedByNo LEFT JOIN `acctg_1budgetentities` be on be.EntityID=s.FromBudgetOf
                join `1branches` b on b.BranchNo=s.BranchNo join '.$table.' m on m.CVNo=s.CVNo
                WHERE m.CVNo='.$txnid.' ';
@@ -190,7 +190,7 @@ switch ($w){
             $columnstoeditmain=array('Date','Particulars','Branch','FromBudgetOf','DebitAccount','CreditAccount','Amount','Forex');
            
             if ($showenc==1) {
-              array_push($columnnamesmain,'EncodedBy','TimeStamp','PostedByNo');
+              array_push($columnnamesmain,'EncodedBy','TimeStamp','PostedBy');
               array_push($columnsub,'EncodedBy','TimeStamp');
               } 
             

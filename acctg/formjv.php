@@ -132,11 +132,11 @@ include_once('../backendphp/layout/displayastable.php');
         
         $title='Add/Edit '.$form; $coltototal='Amount';         
         
-            $sqlmain='SELECT m.*, CONCAT(e.Nickname," ",e.SurName) as EncodedBy FROM `'.$table.'` m left join `1employees` as e on e.IDNo=m.EncodedByNo WHERE m.JVNo='.$txnid;
+            $sqlmain='SELECT m.*, CONCAT(e.Nickname," ",e.SurName) as EncodedBy, CONCAT(e1.Nickname," ",e1.SurName) AS PostedBy FROM `'.$table.'` m LEFT JOIN `1employees` e ON e.IDNo=m.EncodedByNo LEFT JOIN `1employees` e1 ON e1.IDNo=m.PostedByNo WHERE m.JVNo='.$txnid;
             $columnstoeditmain=array('Date','Particulars','Branch','FromBudgetOf','DebitAccount','CreditAccount','Amount','Forex');
            
             if ($showenc==1) {
-              array_push($columnnamesmain,'EncodedBy','TimeStamp','PostedByNo');
+              array_push($columnnamesmain,'EncodedBy','TimeStamp','PostedBy');
               array_push($columnsub,'EncodedBy','TimeStamp');
               } 
             
