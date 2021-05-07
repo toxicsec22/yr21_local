@@ -81,8 +81,8 @@ include_once('../backendphp/layout/clickontabletoedithead.php');
     <form method="post" action="encodeattend.php?w=EncodeAttend" enctype="multipart/form-data">
     Choose Date:  <input type="date" name="AttendDate" value=<?php echo $attenddate?>></input> 
     <input type="submit" name="lookup" value="Lookup"> <!--Unposted Data Only--><?php echo str_repeat('&nbsp',20); ?>
-    <div style="float:right; width:20%;"><font size="1">Grace Period for Office Personnel:<br>Casimiro, Imus, Molino, Noveleta, AbadSantos - 30 min<br>
-Dasmarinas, Fairview, QCMIndanaoAve, Binangonan, Roosevelt, Valenzuela, Zabarte - 1 hr</font></div>
+    <div style="float:right; width:20%;"><font size="1">Grace Period for Office Personnel:<br>30 min:  Casimiro, Imus, MarcosAlvarez, Molino, Noveleta, SumulongOne, SumulongTwo<br>
+1 hr: Antipolo, Binangonan, CaviteWH, Dasmarinas, Fairview, GenTrias, GMA, QCMindanaoAve, Roosevelt, Tanza, Valenzuela, Zabarte</font></div>
 
     <div style="float:right; width:12%;"><font size="1">Overtime Approval<br>0 - No Overtime<br>1 - HR Approved OT<br>2 - Pre-Approved OT<br></font></div>
 
