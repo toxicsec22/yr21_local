@@ -280,27 +280,28 @@ if (!allowedToOpen(5951,'1rtc')) { echo 'No permission'; exit; }
      
 case 'Purchase':
       if($_SESSION['bnum']==999){ $allowed=999;} else { $allowed=5962;}
-        if (!allowedToOpen($allowed,'1rtc')) { echo 'No permission'; exit;}         
-    $title='Add Purchase';
-    $columnnames=array(
-                    array('field'=>'Date', 'type'=>'date','size'=>20,'required'=>true,'value'=>date('Y-m-d')),
-                    array('field'=>'SupplierName','caption'=>'Supplier','type'=>'text','size'=>10,'required'=>true,'list'=>'suppliers'),
-                    array('field'=>'SupplierInv','caption'=>'Invoice Number','type'=>'text','size'=>10,'required'=>true),
-                    array('field'=>'DateofInv', 'type'=>'date','size'=>20,'required'=>true,'value'=>date('Y-m-d')),
-                    array('field'=>'MRRNo','type'=>'text','size'=>10,'required'=>true),
-                   // array('field'=>'DebitAccount','type'=>'text','size'=>10,'required'=>true,'list'=>'accounts'),
-                    array('field'=>'CreditAccount','type'=>'text','size'=>10,'required'=>true,'list'=>'accounts','value'=>'APTRADE'),
-                   // array('field'=>'Amount','type'=>'text','size'=>10,'required'=>true),
-                    array('field'=>'Remarks', 'type'=>'text','size'=>50, 'required'=>false),
-                    array('field'=>'Branch', 'type'=>'text','size'=>10,'required'=>true,'list'=>'branchnames', 'value'=>$_SESSION['@brn']),
-                    array('field'=>'RCompany', 'type'=>'text','size'=>10, 'required'=>false,'list'=>'companies'));
+        if (!allowedToOpen($allowed,'1rtc')) { echo 'No permission'; exit;}   
+        header('Location: formpurch.php?w=AddMain');      
+    // $title='Add Purchase';
+    // $columnnames=array(
+    //                 array('field'=>'Date', 'type'=>'date','size'=>20,'required'=>true,'value'=>date('Y-m-d')),
+    //                 array('field'=>'SupplierName','caption'=>'Supplier','type'=>'text','size'=>10,'required'=>true,'list'=>'suppliers'),
+    //                 array('field'=>'SupplierInv','caption'=>'Invoice Number','type'=>'text','size'=>10,'required'=>true),
+    //                 array('field'=>'DateofInv', 'type'=>'date','size'=>20,'required'=>true,'value'=>date('Y-m-d')),
+    //                 array('field'=>'MRRNo','type'=>'text','size'=>10,'required'=>true),
+    //                // array('field'=>'DebitAccount','type'=>'text','size'=>10,'required'=>true,'list'=>'accounts'),
+    //                 array('field'=>'CreditAccount','type'=>'text','size'=>10,'required'=>true,'list'=>'accounts','value'=>'APTRADE'),
+    //                // array('field'=>'Amount','type'=>'text','size'=>10,'required'=>true),
+    //                 array('field'=>'Remarks', 'type'=>'text','size'=>50, 'required'=>false),
+    //                 array('field'=>'Branch', 'type'=>'text','size'=>10,'required'=>true,'list'=>'branchnames', 'value'=>$_SESSION['@brn']),
+    //                 array('field'=>'RCompany', 'type'=>'text','size'=>10, 'required'=>false,'list'=>'companies'));
     
-    $action='praddmain.php?w=PurchaseMain';
-    $listcondition='';
-    $whichotherlist='acctg';
-    $otherlist=array('accounts');
-    $liststoshow=array('suppliers','companies','branchnames');
-     include('../backendphp/layout/inputmainform.php');
+    // $action='praddmain.php?w=PurchaseMain';
+    // $listcondition='';
+    // $whichotherlist='acctg';
+    // $otherlist=array('accounts');
+    // $liststoshow=array('suppliers','companies','branchnames');
+    //  include('../backendphp/layout/inputmainform.php');
      break;
 
 case 'CV':

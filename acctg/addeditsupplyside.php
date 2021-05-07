@@ -33,66 +33,66 @@ $txnid=intval($_REQUEST['TxnID']);
 if($_SESSION['bnum']==999){ $allowed=999;} else { $allowed=5962;}
         if (!allowedToOpen(array($allowed,596),'1rtc')) { echo 'No permission'; exit;} 
 $title='Add/Edit Purchase'; $showbranches=true;
-    $sqlmain='SELECT m.*,c.Company as RCompany,  s.SupplierName, ca.ShortAcctID as CreditAccount, b.Branch as Branch, e.Nickname as EncodedBy,
-    s1.SupplierName AS RegisteredSupplier FROM `acctg_2purchasemain` m 
-join `1branches` as b on b.BranchNo=m.BranchNo
-join `1suppliers` as s on s.SupplierNo=m.SupplierNo
-join acctg_1chartofaccounts ca on ca.AccountID=m.CreditAccountID
-left join `1employees` as e on e.IDNo=m.EncodedByNo 
-left join `1companies` as c on c.CompanyNo=m.RCompany
-LEFT join `1suppliers` s1 on s1.SupplierNo=m.RegisteredSupplierNo
-WHERE m.TxnID='.$txnid;
+//     $sqlmain='SELECT m.*,c.Company as RCompany,  s.SupplierName, ca.ShortAcctID as CreditAccount, b.Branch as Branch, e.Nickname as EncodedBy,
+//     s1.SupplierName AS RegisteredSupplier FROM `acctg_2purchasemain` m 
+// join `1branches` as b on b.BranchNo=m.BranchNo
+// join `1suppliers` as s on s.SupplierNo=m.SupplierNo
+// join acctg_1chartofaccounts ca on ca.AccountID=m.CreditAccountID
+// left join `1employees` as e on e.IDNo=m.EncodedByNo 
+// left join `1companies` as c on c.CompanyNo=m.RCompany
+// LEFT join `1suppliers` s1 on s1.SupplierNo=m.RegisteredSupplierNo
+// WHERE m.TxnID='.$txnid;
 
-    $stmt=$link->query($sqlmain);
-    $result=$stmt->fetch();
+//     $stmt=$link->query($sqlmain);
+//     $result=$stmt->fetch();
 
-    $columnnamesmain=array('Date','SupplierName','SupplierInv','DateofInv','MRRNo','Terms','CreditAccount','Branch','Remarks','RegisteredSupplier','RCompany','Posted');
-    $columnsub=array('DebitAccount','Amount','FromBudgetOf');
-    $main='';
+//     $columnnamesmain=array('Date','SupplierName','SupplierInv','DateofInv','MRRNo','Terms','CreditAccount','Branch','Remarks','RegisteredSupplier','RCompany','Posted');
+//     $columnsub=array('DebitAccount','Amount','FromBudgetOf');
+//     $main='';
     
     
-    if (editOk('acctg_2purchasemain',$txnid,$link,$whichqry) and (allowedToOpen(5962,'1rtc')) ){
-        $editmain='<td><a href="editspecificssupply.php?edit=2&w=PurchaseEdit&TxnID='.$txnid.'">Edit</a>'.str_repeat('&nbsp',8).'<a href=..\backendphp\functions\delrecords.php?TxnID='.$txnid.'&action_token='.$_SESSION['action_token'].'&w=acctg_2purchasemain&l=acctg OnClick="return confirm(\'Really delete this?\');">Delete</a></td>';
-        $editsub=true; $columnstoedit=array('Particulars','DebitAccount','Amount','FromBudgetOf'); $editok=true;
-    } else {
-        $editmain=''; $editsub=false;$editok=false; $columnstoedit=array();
-    }
-    if ($showenc==1) { array_push($columnnamesmain,'EncodedBy','TimeStamp','PostedByNo'); array_push($columnsub,'EncodedBy','TimeStamp');}
-      else {$columnnamesmain=$columnnamesmain; $columnsub=$columnsub;}
+//     if (editOk('acctg_2purchasemain',$txnid,$link,$whichqry) and (allowedToOpen(5962,'1rtc')) ){
+//         $editmain='<td><a href="editspecificssupply.php?edit=2&w=PurchaseEdit&TxnID='.$txnid.'">Edit</a>'.str_repeat('&nbsp',8).'<a href=..\backendphp\functions\delrecords.php?TxnID='.$txnid.'&action_token='.$_SESSION['action_token'].'&w=acctg_2purchasemain&l=acctg OnClick="return confirm(\'Really delete this?\');">Delete</a></td>';
+//         $editsub=true; $columnstoedit=array('Particulars','DebitAccount','Amount','FromBudgetOf'); $editok=true;
+//     } else {
+//         $editmain=''; $editsub=false;$editok=false; $columnstoedit=array();
+//     }
+//     if ($showenc==1) { array_push($columnnamesmain,'EncodedBy','TimeStamp','PostedByNo'); array_push($columnsub,'EncodedBy','TimeStamp');}
+//       else {$columnnamesmain=$columnnamesmain; $columnsub=$columnsub;}
     
-    $colno=0;
-    foreach ($columnnamesmain as $rowmain){
-        $colno=$colno+1;
-        $main=$main.'<td><font face="arial" size="2">'.$rowmain.'</font>: '.$result[$rowmain].str_repeat('&nbsp',5).'</td>'.($colno%4==0?'</tr><tr>':'');
-    }
-    $main='<table><tr>'.$main.$editmain.'</tr></table>';
+//     $colno=0;
+//     foreach ($columnnamesmain as $rowmain){
+//         $colno=$colno+1;
+//         $main=$main.'<td><font face="arial" size="2">'.$rowmain.'</font>: '.$result[$rowmain].str_repeat('&nbsp',5).'</td>'.($colno%4==0?'</tr><tr>':'');
+//     }
+//     $main='<table><tr>'.$main.$editmain.'</tr></table>';
     
-    $sqlsub='Select s.*, Entity AS FromBudgetOf, ca.ShortAcctID as DebitAccount, e.Nickname as EncodedBy from acctg_2purchasesub s join acctg_1chartofaccounts ca on ca.AccountID=s.DebitAccountID left join `1employees` as e on s.EncodedByNo=e.IDNo
-    join acctg_2purchasemain m on m.TxnID=s.TxnID LEFT JOIN `acctg_1budgetentities` be on be.EntityID=s.FromBudgetOf WHERE m.TxnID='.$txnid;
+//     $sqlsub='Select s.*, Entity AS FromBudgetOf, ca.ShortAcctID as DebitAccount, e.Nickname as EncodedBy from acctg_2purchasesub s join acctg_1chartofaccounts ca on ca.AccountID=s.DebitAccountID left join `1employees` as e on s.EncodedByNo=e.IDNo
+//     join acctg_2purchasemain m on m.TxnID=s.TxnID LEFT JOIN `acctg_1budgetentities` be on be.EntityID=s.FromBudgetOf WHERE m.TxnID='.$txnid;
     
-    $stmt=$link->query($sqlsub);
-    $result=$stmt->fetchAll();
+//     $stmt=$link->query($sqlsub);
+//     $result=$stmt->fetchAll();
 
-    $sqlsum='Select sum(Amount) as Total from  `acctg_2purchasesub` s join `acctg_2purchasemain` m on m.TxnID=s.TxnID
-Where m.TxnID='.$txnid;
+//     $sqlsum='Select sum(Amount) as Total from  `acctg_2purchasesub` s join `acctg_2purchasemain` m on m.TxnID=s.TxnID
+// Where m.TxnID='.$txnid;
    
-    $stmt=$link->query($sqlsum);
-    $result=$stmt->fetch();
-    $addlinfo='Total:  '.number_format($result['Total'],2).str_repeat('&nbsp',10).'<a href="addmain.php?w='. $whichqry.'">Add '. $whichqry.'</a>';
-      $editok=$editsub;//$columnnames=$columnsub;
-    $columnnames=array(
-                    array('field'=>'DebitAccount','type'=>'text','size'=>15,'required'=>true,'list'=>'accounts'),
-                    array('field'=>'Amount','type'=>'text','size'=>15,'required'=>true),
-                    array('field'=>'FromBudgetOf','type'=>'text','size'=>15,'value'=>$_SESSION['@brn'],'required'=>true,'list'=>'entities'));
-    $action='praddsub.php?w=PurchaseSubAdd&TxnID='.$txnid;
-    $editprocess='preditsupplyside.php?w=PurchaseSubEdit&TxnID='.$txnid.'&TxnSubId='; $editprocesslabel='Enter';
-    $delprocess='..\backendphp\functions\delrecordssub.php?TxnID='.$txnid.'&w=acctg_2purchasesub&l=acctg'.'&TxnSubId=';
-    $txnsubid='TxnSubId'; $showgrandtotal=true; $coltototal='Amount';
-    $liststoshow=array(); $whichotherlist='acctg'; $otherlist=array('accounts'); 
-    // info for posting:
-    $post='1'; $table='acctg_2purchasemain'; $txntype='purchase'; 
-    $withsub=true; $left='100%'; $leftmargin='101%'; $right='9%';
-    include('../backendphp/layout/inputsubform.php');
+//     $stmt=$link->query($sqlsum);
+//     $result=$stmt->fetch();
+//     $addlinfo='Total:  '.number_format($result['Total'],2).str_repeat('&nbsp',10).'<a href="addmain.php?w='. $whichqry.'">Add '. $whichqry.'</a>';
+//       $editok=$editsub;//$columnnames=$columnsub;
+//     $columnnames=array(
+//                     array('field'=>'DebitAccount','type'=>'text','size'=>15,'required'=>true,'list'=>'accounts'),
+//                     array('field'=>'Amount','type'=>'text','size'=>15,'required'=>true),
+//                     array('field'=>'FromBudgetOf','type'=>'text','size'=>15,'value'=>$_SESSION['@brn'],'required'=>true,'list'=>'entities'));
+//     $action='praddsub.php?w=PurchaseSubAdd&TxnID='.$txnid;
+//     $editprocess='preditsupplyside.php?w=PurchaseSubEdit&TxnID='.$txnid.'&TxnSubId='; $editprocesslabel='Enter';
+//     $delprocess='..\backendphp\functions\delrecordssub.php?TxnID='.$txnid.'&w=acctg_2purchasesub&l=acctg'.'&TxnSubId=';
+//     $txnsubid='TxnSubId'; $showgrandtotal=true; $coltototal='Amount';
+//     $liststoshow=array(); $whichotherlist='acctg'; $otherlist=array('accounts'); 
+//     // info for posting:
+//     $post='1'; $table='acctg_2purchasemain'; $txntype='purchase'; 
+//     $withsub=true; $left='100%'; $leftmargin='101%'; $right='9%';
+//     include('../backendphp/layout/inputsubform.php');
     if (allowedToOpen(5962,'1rtc')) {
     ?><div style="margin-left:50%;">Transactions in this form are as follows:
     <table>

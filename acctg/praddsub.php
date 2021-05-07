@@ -374,24 +374,24 @@ case 'TxfrSubAdd':
 	break;
 
 case 'PurchaseSubAdd':
-        if($_SESSION['bnum']==999){ $allowed=999;} else { $allowed=5962;}
-        if (!allowedToOpen($allowed,'1rtc')) { echo 'No permission'; exit;} 
-        //to check if editable
-	if (editOk('acctg_2purchasemain',$txnid,$link,$whichqry)){
-	$drid=getNumber('Account',$_POST['DebitAccount']);//,	
-	$sqlinsert='INSERT INTO `acctg_2purchasesub` SET FromBudgetOf='.$frombudgetof.',TxnID='.$txnid.', DebitAccountID='.$drid.', ';
-	$sql='';
-        $columnstoadd=array('Amount');
+    //     if($_SESSION['bnum']==999){ $allowed=999;} else { $allowed=5962;}
+    //     if (!allowedToOpen($allowed,'1rtc')) { echo 'No permission'; exit;} 
+    //     //to check if editable
+	// if (editOk('acctg_2purchasemain',$txnid,$link,$whichqry)){
+	// $drid=getNumber('Account',$_POST['DebitAccount']);//,	
+	// $sqlinsert='INSERT INTO `acctg_2purchasesub` SET FromBudgetOf='.$frombudgetof.',TxnID='.$txnid.', DebitAccountID='.$drid.', ';
+	// $sql='';
+    //     $columnstoadd=array('Amount');
 	
-	foreach ($columnstoadd as $field) {
-		$sql=$sql.' `' . $field. '`=\''.$_POST[$field].'\', '; 
-	}
-	$sql=$sqlinsert.$sql.' EncodedByNo=\''.$_SESSION['(ak0)'].'\', TimeStamp=Now();'; 
-	// echo $sql;
-        $stmt=$link->prepare($sql);
-	$stmt->execute();
-	}
-	header("Location:addeditsupplyside.php?w=Purchase&TxnID=".$txnid);
+	// foreach ($columnstoadd as $field) {
+	// 	$sql=$sql.' `' . $field. '`=\''.$_POST[$field].'\', '; 
+	// }
+	// $sql=$sqlinsert.$sql.' EncodedByNo=\''.$_SESSION['(ak0)'].'\', TimeStamp=Now();'; 
+	// // echo $sql;
+    //     $stmt=$link->prepare($sql);
+	// $stmt->execute();
+	// }
+	// header("Location:addeditsupplyside.php?w=Purchase&TxnID=".$txnid);
         break;
 	
 case 'CVSubAdd':
@@ -426,46 +426,46 @@ case 'FutureSubAdd':
 
 
 case 'CVSubAutoAdd':
-        if (!allowedToOpen(5401,'1rtc')) { echo 'No permission'; exit;}
-	//to check if editable
-	if (editOk('acctg_2cvmain',$txnid,$link,$whichqry)){
-		$sql0='Select SupplierInv, PayBalance, BranchNo, CreditAccountID from acctg_23balperinv i  where SupplierInv like \''.$_REQUEST['SupplierInv'].'\' and i.SupplierNo='.$_REQUEST['SupplierNo'];
-		$stmt=$link->query($sql0);
-		$result=$stmt->fetch();
-	$sql='INSERT INTO `acctg_2cvsub` SET `CVNo`=\''.$txnid.'\', DebitAccountID='.$result['CreditAccountID'].', ForInvoiceNo=\''.$result['SupplierInv'].'\', Amount='.$result['PayBalance'].', BranchNo='.$result['BranchNo'].', EncodedByNo=\''.$_SESSION['(ak0)'].'\', TimeStamp=Now()'; 
-	// echo $sql;break;
-        $stmt=$link->prepare($sql);
-	$stmt->execute();	
-		} 
-			header("Location:addeditsupplyside.php?w=CV&CVNo=".$txnid);
+    //     if (!allowedToOpen(5401,'1rtc')) { echo 'No permission'; exit;}
+	// //to check if editable
+	// if (editOk('acctg_2cvmain',$txnid,$link,$whichqry)){
+	// 	$sql0='Select SupplierInv, PayBalance, BranchNo, CreditAccountID from acctg_23balperinv i  where SupplierInv like \''.$_REQUEST['SupplierInv'].'\' and i.SupplierNo='.$_REQUEST['SupplierNo'];
+	// 	$stmt=$link->query($sql0);
+	// 	$result=$stmt->fetch();
+	// $sql='INSERT INTO `acctg_2cvsub` SET `CVNo`=\''.$txnid.'\', DebitAccountID='.$result['CreditAccountID'].', ForInvoiceNo=\''.$result['SupplierInv'].'\', Amount='.$result['PayBalance'].', BranchNo='.$result['BranchNo'].', EncodedByNo=\''.$_SESSION['(ak0)'].'\', TimeStamp=Now()'; 
+	// // echo $sql;break;
+    //     $stmt=$link->prepare($sql);
+	// $stmt->execute();	
+	// 	} 
+	// 		header("Location:addeditsupplyside.php?w=CV&CVNo=".$txnid);
 	break;
 
 case 'JVSubAdd':
-        if (!allowedToOpen(5921,'1rtc')) { echo 'No permission'; exit;}
-        $table='acctg_2jvmain'; $subtable='acctg_2jvsub'; 
-		$txnid=intval($_GET['JVNo']);
+    //     if (!allowedToOpen(5921,'1rtc')) { echo 'No permission'; exit;}
+    //     $table='acctg_2jvmain'; $subtable='acctg_2jvsub'; 
+	// 	$txnid=intval($_GET['JVNo']);
     
-    	//to check if editable
-	if (editOk($table,$txnid,$link,$whichqry)){
-	$branchno=getNumber('Branch',addslashes($_POST['Branch']));
-	$drid=getNumber('Account',addslashes($_POST['DebitAccount']));
-	$crid=getNumber('Account',addslashes($_POST['CreditAccount']));
-	$sqlinsert='INSERT INTO `'.$subtable.'` SET `JVNo`=\''.$txnid.'\', BranchNo='. $branchno .', FromBudgetOf='. $frombudgetof .', DebitAccountID='.$drid.', CreditAccountID='.$crid.', ';
-        $sql='';
+    // 	//to check if editable
+	// if (editOk($table,$txnid,$link,$whichqry)){
+	// $branchno=getNumber('Branch',addslashes($_POST['Branch']));
+	// $drid=getNumber('Account',addslashes($_POST['DebitAccount']));
+	// $crid=getNumber('Account',addslashes($_POST['CreditAccount']));
+	// $sqlinsert='INSERT INTO `'.$subtable.'` SET `JVNo`=\''.$txnid.'\', BranchNo='. $branchno .', FromBudgetOf='. $frombudgetof .', DebitAccountID='.$drid.', CreditAccountID='.$crid.', ';
+    //     $sql='';
         
-	$columnstoadd=array('Date','Particulars','Amount');
+	// $columnstoadd=array('Date','Particulars','Amount');
 	       
-	foreach ($columnstoadd as $field) {
-		$sql=$sql.' `' . $field. '`=\''.$_POST[$field].'\', '; 
-	}
-	$sql=$sql.($whichqry=='ForexSubAdd'?'`PhpAmount`='.$_POST['$Amount']*$_POST['Forex'].', ':'');
-	$sql=$sqlinsert.$sql.' EncodedByNo=\''.$_SESSION['(ak0)'].'\', TimeStamp=Now()'; 
-	if ($_SESSION['(ak0)']==1002){ echo $sql;}
-        $stmt=$link->prepare($sql);
-	$stmt->execute();
+	// foreach ($columnstoadd as $field) {
+	// 	$sql=$sql.' `' . $field. '`=\''.$_POST[$field].'\', '; 
+	// }
+	// $sql=$sql.($whichqry=='ForexSubAdd'?'`PhpAmount`='.$_POST['$Amount']*$_POST['Forex'].', ':'');
+	// $sql=$sqlinsert.$sql.' EncodedByNo=\''.$_SESSION['(ak0)'].'\', TimeStamp=Now()'; 
+	// if ($_SESSION['(ak0)']==1002){ echo $sql;}
+    //     $stmt=$link->prepare($sql);
+	// $stmt->execute();
 	
-		} 
-			header("Location:addeditsupplyside.php?w=".substr($whichqry,0,-6)."&JVNo=".$txnid);
+	// 	} 
+	// 		header("Location:addeditsupplyside.php?w=".substr($whichqry,0,-6)."&JVNo=".$txnid);
 		   
 	break;
 

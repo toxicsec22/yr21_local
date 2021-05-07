@@ -475,63 +475,63 @@ case 'PurchaseMain':
     if($_SESSION['bnum']==999){ $allowed=999;} else { $allowed=5962;}
         if (!allowedToOpen($allowed,'1rtc')) { echo 'No permission'; exit;}
 	//to check if editable
-	include('../backendphp/functions/checkeditablemainacctg.php');
-        include_once $path.'/acrossyrs/commonfunctions/listoptions.php';
-        $branchno=getNumber('Branch',addslashes($_POST['Branch']));
+	//include('../backendphp/functions/checkeditablemainacctg.php');
+        // include_once $path.'/acrossyrs/commonfunctions/listoptions.php';
+        // $branchno=getNumber('Branch',addslashes($_POST['Branch']));
 	// to get supp no
-	$suppno=getNumber('Supplier',addslashes($_POST['SupplierName']));
-	$terms=getValue($link,'1suppliers','`SupplierName`',$_POST['SupplierName'],'Terms');
-	if (!isset($_POST['RCompany']) or empty($_POST['RCompany'])){$co='';}
-        else{$co='RCompany='.comboBoxValue ($link,'`1companies`','CompanyName',addslashes($_POST['RCompany']),'CompanyNo').', ';}
-	//$drid=getNumber('Account',$_POST['DebitAccount']);DebitAccountID='.$drid.','Amount',
-	$crid=getNumber('Account',$_POST['CreditAccount']);;
-	$sqlinsert='INSERT INTO `acctg_2purchasemain` SET SupplierNo='.$suppno.',  `Posted`=0, Terms='.$terms.',  CreditAccountID='.$crid.', '.$co;
-	$sql='';
-        $columnstoadd=array('Date','SupplierInv','DateofInv','MRRNo','Remarks');
+	// $suppno=getNumber('Supplier',addslashes($_POST['SupplierName']));
+	// $terms=getValue($link,'1suppliers','`SupplierName`',$_POST['SupplierName'],'Terms');
+	// if (!isset($_POST['RCompany']) or empty($_POST['RCompany'])){$co='';}
+    //     else{$co='RCompany='.comboBoxValue ($link,'`1companies`','CompanyName',addslashes($_POST['RCompany']),'CompanyNo').', ';}
 	
-	foreach ($columnstoadd as $field) {
-		$sql=$sql.' `' . $field. '`=\''.$_POST[$field].'\', '; 
-	}
-	$sql=$sqlinsert.$sql.' BranchNo='.$branchno.', EncodedByNo=\''.$_SESSION['(ak0)'].'\', PostedByNo=\''.$_SESSION['(ak0)'].'\',TimeStamp=Now();'; 
-	// echo $sql;
-        $stmt=$link->prepare($sql);
-	$stmt->execute();
+	// $crid=getNumber('Account',$_POST['CreditAccount']);;
+	// $sqlinsert='INSERT INTO `acctg_2purchasemain` SET SupplierNo='.$suppno.',  `Posted`=0, Terms='.$terms.',  CreditAccountID='.$crid.', '.$co;
+	// $sql='';
+    //     $columnstoadd=array('Date','SupplierInv','DateofInv','MRRNo','Remarks');
 	
-	$sql='Select TxnID from `acctg_2purchasemain` where SupplierInv=\''.$_POST['SupplierInv'].'\' and SupplierNo='.$suppno;
-	$stmt=$link->query($sql);
-	$result=$stmt->fetch();
-	header("Location:addeditsupplyside.php?w=Purchase&TxnID=".$result['TxnID']);
+	// foreach ($columnstoadd as $field) {
+	// 	$sql=$sql.' `' . $field. '`=\''.$_POST[$field].'\', '; 
+	// }
+	// $sql=$sqlinsert.$sql.' BranchNo='.$branchno.', EncodedByNo=\''.$_SESSION['(ak0)'].'\', PostedByNo=\''.$_SESSION['(ak0)'].'\',TimeStamp=Now();'; 
+	// // echo $sql;
+    //     $stmt=$link->prepare($sql);
+	// $stmt->execute();
+	
+	// $sql='Select TxnID from `acctg_2purchasemain` where SupplierInv=\''.$_POST['SupplierInv'].'\' and SupplierNo='.$suppno;
+	// $stmt=$link->query($sql);
+	// $result=$stmt->fetch();
+	// header("Location:addeditsupplyside.php?w=Purchase&TxnID=".$result['TxnID']);
         break;
 
 
 case 'CVMain':
 	if (!allowedToOpen(5401,'1rtc')) { echo 'No permission'; exit;} 
         //to check if editable
-	include('../backendphp/functions/checkeditablemainacctg.php');
-	// to get supp no
-	$suppno=getNumber('Supplier',addslashes($_POST['Payee']));
-	$suppno=($suppno>1?$suppno:'null');
-	$crid=getNumber('Account',$_POST['CreditAccount']);
-	$pmid=comboBoxValue($link,'acctg_0paymentmodes','PaymentMode',addslashes($_POST['PaymentMode']),'PaymentModeID');
+	// include('../backendphp/functions/checkeditablemainacctg.php');
+	// // to get supp no
+	// $suppno=getNumber('Supplier',addslashes($_POST['Payee']));
+	// $suppno=($suppno>1?$suppno:'null');
+	// $crid=getNumber('Account',$_POST['CreditAccount']);
+	// $pmid=comboBoxValue($link,'acctg_0paymentmodes','PaymentMode',addslashes($_POST['PaymentMode']),'PaymentModeID');
 	
-	$sqlinsert='INSERT INTO `acctg_2cvmain` SET PaymentModeID='.$pmid.',PayeeNo='.$suppno.', Payee=\''.$_POST['Payee'].'\', `Posted`=0, CreditAccountID='.$crid.', ';
-	$sql='';
-        $columnstoadd=array('Date','DueDate','CVNo','CheckNo','DateofCheck','Remarks');
+	// $sqlinsert='INSERT INTO `acctg_2cvmain` SET PaymentModeID='.$pmid.',PayeeNo='.$suppno.', Payee=\''.$_POST['Payee'].'\', `Posted`=0, CreditAccountID='.$crid.', ';
+	// $sql='';
+    //     $columnstoadd=array('Date','DueDate','CVNo','CheckNo','DateofCheck','Remarks');
 	
-	foreach ($columnstoadd as $field) {
-		$sql=$sql.' `' . $field. '`=\''.$_POST[$field].'\', '; 
-	}
-	//adjustments
-	if($pmid==2){
-		$sql.='ReleaseDate=CURDATE(),ReleaseDateByNo='.$_SESSION['(ak0)'].',ReleaseDateTS=NOW(),';
-	}
-	$sql=$sqlinsert.$sql.' EncodedByNo=\''.$_SESSION['(ak0)'].'\', PostedByNo=\''.$_SESSION['(ak0)'].'\',TimeStamp=Now();'; 
-	// echo $sql; break;
-        $stmt=$link->prepare($sql);
-	$stmt->execute();
+	// foreach ($columnstoadd as $field) {
+	// 	$sql=$sql.' `' . $field. '`=\''.$_POST[$field].'\', '; 
+	// }
+	// //adjustments
+	// if($pmid==2){
+	// 	$sql.='ReleaseDate=CURDATE(),ReleaseDateByNo='.$_SESSION['(ak0)'].',ReleaseDateTS=NOW(),';
+	// }
+	// $sql=$sqlinsert.$sql.' EncodedByNo=\''.$_SESSION['(ak0)'].'\', PostedByNo=\''.$_SESSION['(ak0)'].'\',TimeStamp=Now();'; 
+	// // echo $sql; break;
+    //     $stmt=$link->prepare($sql);
+	// $stmt->execute();
 	
 
-	header("Location:addeditsupplyside.php?w=CV&CVNo=".$_POST['CVNo']);
+	// header("Location:addeditsupplyside.php?w=CV&CVNo=".$_POST['CVNo']);
         break;
 case 'FutureCV':
         if (!allowedToOpen(5401,'1rtc')) { echo 'No permission'; exit;} 
@@ -569,24 +569,24 @@ case 'JV':
 
     if (!allowedToOpen(5921,'1rtc')) { echo 'No permission'; exit;}
 	
-        $table='acctg_2jvmain'; 
-				//to check if editable
-				$date='JVDate';
-                include('../backendphp/functions/checkeditablemainacctg.php');
-	$sqlinsert='INSERT INTO `'.$table.'` SET  Posted=0, ';
-	$sql='';
-        $columnstoadd=array('JVDate','JVNo','Remarks');
+    //     $table='acctg_2jvmain'; 
+	// 			//to check if editable
+	// 			$date='JVDate';
+    //             include('../backendphp/functions/checkeditablemainacctg.php');
+	// $sqlinsert='INSERT INTO `'.$table.'` SET  Posted=0, ';
+	// $sql='';
+    //     $columnstoadd=array('JVDate','JVNo','Remarks');
 	
-	foreach ($columnstoadd as $field) {
-		$sql=$sql.' `' . $field. '`=\''.$_POST[$field].'\', '; 
-	}
-	$sql=$sqlinsert.$sql.' EncodedByNo=\''.$_SESSION['(ak0)'].'\', PostedByNo=\''.$_SESSION['(ak0)'].'\',TimeStamp=Now();'; 
-	// echo $sql; break;
-        $stmt=$link->prepare($sql);
-	$stmt->execute();
+	// foreach ($columnstoadd as $field) {
+	// 	$sql=$sql.' `' . $field. '`=\''.$_POST[$field].'\', '; 
+	// }
+	// $sql=$sqlinsert.$sql.' EncodedByNo=\''.$_SESSION['(ak0)'].'\', PostedByNo=\''.$_SESSION['(ak0)'].'\',TimeStamp=Now();'; 
+	// // echo $sql; break;
+    //     $stmt=$link->prepare($sql);
+	// $stmt->execute();
 	
 
-	header("Location:addeditsupplyside.php?w=$whichqry&JVNo=".$_POST['JVNo']);
+	// header("Location:addeditsupplyside.php?w=$whichqry&JVNo=".$_POST['JVNo']);
         break;
 
 case 'Encashments':
