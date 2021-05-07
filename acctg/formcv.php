@@ -15,7 +15,7 @@ if (!allowedToOpen($lookupallow,'1rtc')) { echo 'No permission'; exit;}
 ?><br><div id="section" style="display: block;"><?php
 $file=basename($_SERVER['SCRIPT_FILENAME']);
 $w=(!isset($_GET['w'])?'List':$_GET['w']);
-$txnid='CVNo'; $txnidname='CVNo'; $form='CV'; $postfield='Posted';
+$txnidname='CVNo'; $form='CV'; $postfield='Posted';
 include_once $path.'/acrossyrs/commonfunctions/listoptions.php';
 
 $table='acctg_2cvmain'; $subtable='acctg_2cvsub'; 
