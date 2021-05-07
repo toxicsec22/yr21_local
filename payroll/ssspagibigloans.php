@@ -8,7 +8,12 @@ include_once('../switchboard/contents.php');
 
 include_once $path.'/acrossyrs/commonfunctions/listoptions.php';
 //DEFAULT TIMEZONE
-date_default_timezone_set('Asia/Manila'); $diraddress='../';
+if (!empty($_SERVER['HTTPS'])) {
+	$https='s';
+  } else {
+	$https='';
+  }
+  $diraddress='../';
 ?>
 
 
@@ -179,9 +184,9 @@ switch ($which)
 
 		echo '<title>Payment History</title>';
 	
-	echo '<body style="background-color:#afcecf;"><link rel="stylesheet" type="text/css" href="https://'.$_SERVER['HTTP_HOST'].'/acrossyrs/js/bootstrapCOLLAPSE/css/bootstrap.min.css" />
-    <script type="text/javascript" src="https://'.$_SERVER['HTTP_HOST'].'/acrossyrs/js/bootstrapCOLLAPSE/js/jquery-1.10.2.min.js"></script>
-    <script type="text/javascript" src="https://'.$_SERVER['HTTP_HOST'].'/acrossyrs/js/bootstrapCOLLAPSE/js/bootstrap.min.js"></script>
+	echo '<body style="background-color:#afcecf;"><link rel="stylesheet" type="text/css" href="http'.$https.'://'.$_SERVER['HTTP_HOST'].'/acrossyrs/js/bootstrapCOLLAPSE/css/bootstrap.min.css" />
+    <script type="text/javascript" src="http'.$https.'://'.$_SERVER['HTTP_HOST'].'/acrossyrs/js/bootstrapCOLLAPSE/js/jquery-1.10.2.min.js"></script>
+    <script type="text/javascript" src="http'.$https.'://'.$_SERVER['HTTP_HOST'].'/acrossyrs/js/bootstrapCOLLAPSE/js/bootstrap.min.js"></script>
 
 
 
