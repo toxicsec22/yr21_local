@@ -31,3 +31,12 @@ $path=$_SERVER['DOCUMENT_ROOT']; include_once $path.'/acrossyrs/logincodes/check
     <li>database users (grant privileges)</li>
     <li>always check all file folders</li>
 </ol>
+
+<br>
+<h4>Common Variable Names</h4>
+<ol>
+    <li>$txnidname = field name of the primary key or unique identifier</li>
+    <li>$txnid = value of $tnxidname</li>
+    <li>$sql = sql statement to be passed to the layout files</li>
+    <li>$columnnames = array of field names for display as table</li>
+</ol>
