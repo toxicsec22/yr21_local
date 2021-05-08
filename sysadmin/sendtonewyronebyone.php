@@ -203,7 +203,7 @@ AND IDNo NOT IN (SELECT IDNo FROM 2021_1rtc.payroll_2requestoicallowance);';
      case '1employeesSIL':
         
          // this must be changed for Yr21 since some fields are no longer the same.
-         $sql0='UPDATE `' . $nextyr . '_1rtc`.`1employees` e LEFT JOIN `' . $$currentyr . '_1rtc`.`attend_61silbal` a ON e.IDNo=a.IDNo JOIN `' . $nextyr . '_1rtc`.`attend_30currentpositions` cp ON e.IDNo=cp.IDNo JOIN `' . $nextyr . '_1rtc`.`attend_0positions` p ON p.PositionID=cp.PositionID JOIN `' . $$currentyr . '_1rtc`.`attend_howlongwithus` h ON e.IDNo=h.IDNo 
+         $sql0='UPDATE `' . $nextyr . '_1rtc`.`1employees` e LEFT JOIN `' . $currentyr . '_1rtc`.`attend_61silbal` a ON e.IDNo=a.IDNo JOIN `' . $nextyr . '_1rtc`.`attend_30currentpositions` cp ON e.IDNo=cp.IDNo JOIN `' . $nextyr . '_1rtc`.`attend_0positions` p ON p.PositionID=cp.PositionID JOIN `' . $currentyr . '_1rtc`.`attend_howlongwithus` h ON e.IDNo=h.IDNo 
 SET e.SLDays=IF(InYears>=0.5,5,0), e.VLfromPosition=IF(InYears>=0.5,VLfromPosition,0), e.SLBalDecCutoff=IFNULL(IF(a.SILBal>5,5,a.SILBal),0), e.PaidSLBenefit=0, e.VLfromTenure=IF(InYears>1,IF((TRUNCATE(InYears,0)-1)>MaxVLfromTenure,MaxVLfromTenure,TRUNCATE(InYears,0)-1),0) ;';
         echo $sql0;
         $stmt=$link->prepare($sql0); $stmt->execute();
