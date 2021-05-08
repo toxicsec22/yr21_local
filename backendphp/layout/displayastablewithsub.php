@@ -93,7 +93,7 @@ foreach($datatoshow2 as $rows2){
     $textfordisplay=$textfordisplay.((key($rows2)!=$keyoflast)?"":(isset($runtotal)?"<td>".number_format($total,2)."</td>":"")
         .(isset($tdform)?'<td><input type="hidden" name="action_token" value="'.$_SESSION['action_token'].'">'
                 .(isset($tdforminput)?$tdforminput:''). '<input type="submit" value="'.$editprocesslabel1.'"></form></td>':'')
-        .(isset($tdform1)?'<td><input type="hidden" name="action_token" value="'.$_SESSION['action_token'].'"><input type="submit" value="'.$editprocesslabel2.'"></form></td>':'').(isset($editprocess)?'<td><a href="'.$editprocess.$rows2[$txnidname].'">'.$editprocesslabel."</a></td>":"").(isset($newwindowprocess)?'<td><a style="text-decoration:none;" href="" onclick="window.open(\''.$newwindowprocess.$rows2[$txnidname].(isset($txnid2)?'&'.$txnid2.'='.$rows2[$txnid2]:'').'\', 
+        .(isset($tdform1)?'<td><input type="hidden" name="action_token" value="'.$_SESSION['action_token'].'"><input type="submit" value="'.$editprocesslabel2.'"></form></td>':'').(isset($editprocess)?'<td><a href="'.$editprocess.$rows2[$txnidname].'">'.$editprocesslabel."</a></td>":"").(isset($newwindowprocess)?'<td><a style="text-decoration:none;" href="" onclick="window.open(\''.$newwindowprocess.$rows2[$txnidname].(isset($txnidname2)?'&'.$txnidname2.'='.$rows2[$txnidname2]:'').'\', 
                          \'newwindow\', 
                          \'width='.(isset($newwindowwidth)?$newwindowwidth:'500').',height='.(isset($newwindowheight)?$newwindowheight:'500').'\'); 
               return false;">'.$newwindowprocesslabel."</a></td>":"")

@@ -147,7 +147,7 @@ SELECT BranchNo,a.ItemCode, SUM(Qty) as Defective,Sum(Qty) as EndInvToday FROM i
     $columnnames1=array('Branch');
     $columnnames2=array('Category','ItemCode','Description','Defective','EndInvToday','Unit');
     $newwindowprocess='lookupperitemdetails.php?w=Item_Activity_Defective&ItemCode=';
-    $newwindowprocesslabel='Lookup Activity'; $txnidname='ItemCode'; $txnid2='BranchNo'; $newwindowwidth='800'; $newwindowheight='600';
+    $newwindowprocesslabel='Lookup Activity'; $txnidname='ItemCode'; $txnidname2='BranchNo'; $newwindowwidth='800'; $newwindowheight='600';
     include('../backendphp/layout/displayastablewithsub.php');
    break;
 
