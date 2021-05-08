@@ -133,8 +133,8 @@ $stmt=$link->query($sql);   $result=$stmt->fetchAll();
         $which=$row['w'];
         
          include('acctglayout/openfromacctsched.php');
-         $txnid=!isset($txnid)?'TxnID':$txnid;
-        $sub=$sub.'<td>'.number_format($runtotal,2).'</td><td><a href="'.$filetoopen.'.php?w='.$which.'&'.$txnid.'='.$row['TxnID'].'"  target=_blank>Lookup</a></tr>';
+         $txnidname=!isset($txnidname)?'TxnID':$txnidname;
+        $sub=$sub.'<td>'.number_format($runtotal,2).'</td><td><a href="'.$filetoopen.'.php?w='.$which.'&'.$txnidname.'='.$row['TxnID'].'"  target=_blank>Lookup</a></tr>';
         $colorcount++;
         $downloadsub=$downloadsub.$runtotal;
     }
@@ -231,8 +231,8 @@ $stmt=$link->query($sql);
         $which=$row['w'];
         
         include('acctglayout/openfromacctsched.php');
-        $txnid=!isset($txnid)?'TxnID':$txnid;
-        $sub=$sub.'<td>'.number_format($runtotal,2).'</td><td><a href="'.$filetoopen.'.php?w='.$which.'&'.$txnid.'='.$row['TxnID'].'"  target=_blank>Lookup</a></tr>';
+        $txnidname=!isset($txnidname)?'TxnID':$txnidname;
+        $sub=$sub.'<td>'.number_format($runtotal,2).'</td><td><a href="'.$filetoopen.'.php?w='.$which.'&'.$txnidname.'='.$row[$txnidname].'"  target=_blank>Lookup</a></tr>';
         $colorcount++;
       
     }
