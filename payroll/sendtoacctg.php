@@ -407,7 +407,6 @@ switch ($_POST['submit']){
 	EncodedByNo=\''.$_SESSION['(ak0)'].'\', PostedByNo=\''.$_SESSION['(ak0)'].'\',TimeStamp=Now();'; // echo $sqlinsert;
     
         $stmt=$link->prepare($sqlinsert); $stmt->execute();
-       // $txnid=getVchTxnID($cvno,$payrollprefix);
     
     
     // insert voucher sub - payroll
@@ -432,7 +431,6 @@ foreach ($resultsssmain as $row){
    $sqlinsert='INSERT INTO `acctg_2cvmain` SET PayeeNo=800, Payee="Social Security System", `Posted`=0, CreditAccountID='.$row['AccountID'].', Date=LAST_DAY(\''.date("Y-m-d").'\'), CVNo='.$cvno.', DateofCheck=LAST_DAY(\''.date("Y-m-d").'\'), CheckNo=CONCAT("SSS-",LEFT(MONTHNAME(\''.$paydate.'\'),3),"-'.$row['Company'].'"), Remarks=\''.$row['Company'].'\', EncodedByNo=\''.$_SESSION['(ak0)'].'\', PostedByNo=\''.$_SESSION['(ak0)'].'\',TimeStamp=Now();'; 
 	// echo $sqlinsert; break;
         $stmt=$link->prepare($sqlinsert); $stmt->execute();
-    //    $txnid=getVchTxnID($cvno,$payrollprefix);
     
     $sqlsss='SELECT PayrollID, Company, g.CompanyNo, RecordInBranchNo, IF(b.PseudoBranch=1,(800 + d.deptid),b.BranchNo) AS FromBudgetOf, IF(b.PseudoBranch=1,dept,b.Branch) AS From_Budget_Of,
         ROUND(Sum(`SSS-EE`),2) as `SSS-EE`,ROUND(Sum(`SSS-ERTotal`),2) as `SSS-ERTotal`  FROM payroll_40sss g '.$sqlfromgovt1.$row['CompanyNo'].$sqlfromgovt2;
@@ -458,7 +456,6 @@ foreach ($resultphicmain as $row){
    $sqlinsert='INSERT INTO `acctg_2cvmain` SET PayeeNo=801, Payee="Phil Health", `Posted`=0, CreditAccountID='.$row['AccountID'].', Date=LAST_DAY(\''.date("Y-m-d").'\'), CVNo='.$cvno.', DateofCheck=LAST_DAY(\''.date("Y-m-d").'\'), CheckNo=CONCAT("PHIC-",LEFT(MONTHNAME(\''.$paydate.'\'),3),"-'.$row['Company'].'"), Remarks=\''.$row['Company'].'\', EncodedByNo=\''.$_SESSION['(ak0)'].'\', PostedByNo=\''.$_SESSION['(ak0)'].'\',TimeStamp=Now();'; 
 	// echo $sqlinsert; break;
         $stmt=$link->prepare($sqlinsert); $stmt->execute();
-    //    $txnid=getVchTxnID($cvno,$payrollprefix);
      
     $sqlphic='SELECT PayrollID, c.Company, g.CompanyNo, RecordInBranchNo, IF(b.PseudoBranch=1,(800 + d.deptid),b.BranchNo) AS FromBudgetOf, IF(b.PseudoBranch=1,dept,b.Branch) AS From_Budget_Of,
     ROUND(Sum(`PHIC-EE`),2) as `PHIC-EE`, ROUND(Sum(`PHIC-ER`),2) as `PHIC-ER`  FROM payroll_41phic g '.$sqlfromgovt1.$row['CompanyNo'].$sqlfromgovt2;
@@ -484,7 +481,6 @@ foreach ($resultpagibigmain as $row){
    $sqlinsert='INSERT INTO `acctg_2cvmain` SET PayeeNo=802, Payee="Pag-Ibig Fund", `Posted`=0, CreditAccountID='.$row['AccountID'].', Date=LAST_DAY(\''.date("Y-m-d").'\'), CVNo='.$cvno.', DateofCheck=LAST_DAY(\''.date("Y-m-d").'\'), CheckNo=CONCAT("Pagibig-",LEFT(MONTHNAME(\''.$paydate.'\'),3),"-'.$row['Company'].'"), Remarks=\''.$row['Company'].'\', EncodedByNo=\''.$_SESSION['(ak0)'].'\', PostedByNo=\''.$_SESSION['(ak0)'].'\',TimeStamp=Now();'; 
 	// echo $sqlinsert; break;
         $stmt=$link->prepare($sqlinsert); $stmt->execute();
-     //   $txnid=getVchTxnID($cvno,$payrollprefix);
         
     $sqlpagibig='SELECT PayrollID, c.Company, g.CompanyNo, RecordInBranchNo, IF(b.PseudoBranch=1,(800 + d.deptid),b.BranchNo) AS FromBudgetOf, IF(b.PseudoBranch=1,dept,b.Branch) AS From_Budget_Of,
     ROUND(Sum(`PagIbig-EE`),2) as `PagIbig-EE`,ROUND(Sum(`PagIbig-ER`),2) as `PagIbig-ER` FROM payroll_42pagibig g '.$sqlfromgovt1.$row['CompanyNo'].$sqlfromgovt2;
@@ -511,7 +507,6 @@ foreach ($resultwtaxmain as $row){
    $sqlinsert='INSERT INTO `acctg_2cvmain` SET PayeeNo=309, Payee="Bureau of Internal Revenue", `Posted`=0, CreditAccountID='.$row['AccountID'].', Date=LAST_DAY(\''.date("Y-m-d").'\'), CVNo='.$cvno.', DateofCheck=LAST_DAY(\''.date("Y-m-d").'\'), CheckNo=CONCAT("WTax-",LEFT(MONTHNAME(\''.$paydate.'\'),3),"-'.$row['Company'].'"), Remarks=\''.$row['Company'].'\', EncodedByNo=\''.$_SESSION['(ak0)'].'\', PostedByNo=\''.$_SESSION['(ak0)'].'\',TimeStamp=Now();'; 
 	// echo $sqlinsert; break;
         $stmt=$link->prepare($sqlinsert); $stmt->execute();
-       // $txnid=getVchTxnID($cvno,$payrollprefix);
         
     $sqlwtax='SELECT PayrollID, c.Company, g.CompanyNo, RecordInBranchNo,IF(b.PseudoBranch=1,(800 + d.deptid),b.BranchNo) AS FromBudgetOf, IF(b.PseudoBranch=1,dept,b.Branch) AS From_Budget_Of, ROUND(Sum(`WTax`),2) as `WTax`
     FROM payroll_43wtax g '.$sqlfromgovt1.$row['CompanyNo'].$sqlfromgovt2;
@@ -534,7 +529,6 @@ foreach($resultsssloanmain as $mainrow){
    $cvno=$cvno+1; 
    $sqlinsert='INSERT INTO `acctg_2cvmain` SET PayeeNo=800, Payee="Social Security System", `Posted`=0, CreditAccountID='.$mainrow['AccountID'].', Date=LAST_DAY(\''.date("Y-m-d").'\'), CVNo='.$cvno.', DateofCheck=LAST_DAY(\''.date("Y-m-d").'\'), CheckNo=CONCAT("SSSLoansSalary-",LEFT(MONTHNAME(\''.$paydate.'\'),3),"-'.$mainrow['Company'].'"), Remarks=\''.$mainrow['Company'].'  - Loans\', EncodedByNo=\''.$_SESSION['(ak0)'].'\', PostedByNo=\''.$_SESSION['(ak0)'].'\',TimeStamp=Now();'; 	
         $stmt=$link->prepare($sqlinsert); $stmt->execute();
-      //  $txnid=getVchTxnID($cvno,$payrollprefix);
    $sqlsssloan='SELECT g.CompanyNo,concat(FirstName, " ", SurName) as FullName, RecordInBranchNo, IF(b.PseudoBranch=1,(800 + d.deptid),b.BranchNo) AS FromBudgetOf, IF(b.PseudoBranch=1,dept,b.Branch) AS From_Budget_Of, ROUND(Sum(`SSSLoan`),2) as `SSSLoan`  FROM payroll_44sssloan g JOIN `1branches` b ON b.BranchNo=g.RecordInBranchNo  JOIN attend_30latestpositionsinclresigned cp ON g.IDNo=cp.IDNo 
 JOIN attend_0positions ps ON cp.PositionID=ps.PositionID JOIN 1departments d ON ps.deptid=d.deptid  where PayrollID=' .$payrollid. ' AND g.CompanyNo='.$mainrow['CompanyNo'].' Group By g.IDNo;';
    $stmt=$link->query($sqlsssloan); $resultsssloan=$stmt->fetchAll();
@@ -560,7 +554,6 @@ foreach($resultsssloanmain as $mainrow){
    $cvno=$cvno+1; 
    $sqlinsert='INSERT INTO `acctg_2cvmain` SET PayeeNo=800, Payee="Social Security System", `Posted`=0, CreditAccountID='.$mainrow['AccountID'].', Date=LAST_DAY(\''.date("Y-m-d").'\'), CVNo='.$cvno.', DateofCheck=LAST_DAY(\''.date("Y-m-d").'\'), CheckNo=CONCAT("SSSLoansCalamity-",LEFT(MONTHNAME(\''.$paydate.'\'),3),"-'.$mainrow['Company'].'"), Remarks=\''.$mainrow['Company'].'  - Loans\', EncodedByNo=\''.$_SESSION['(ak0)'].'\', PostedByNo=\''.$_SESSION['(ak0)'].'\',TimeStamp=Now();'; 	
         $stmt=$link->prepare($sqlinsert); $stmt->execute();
-     //   $txnid=getVchTxnID($cvno,$payrollprefix);
    $sqlsssloan='SELECT g.CompanyNo,concat(FirstName, " ", SurName) as FullName, RecordInBranchNo, IF(b.PseudoBranch=1,(800 + d.deptid),b.BranchNo) AS FromBudgetOf, IF(b.PseudoBranch=1,dept,b.Branch) AS From_Budget_Of, ROUND(Sum(`SSSLoan`),2) as `SSSLoan`  FROM payroll_44sssloancalamity g JOIN `1branches` b ON b.BranchNo=g.RecordInBranchNo  JOIN attend_30latestpositionsinclresigned cp ON g.IDNo=cp.IDNo JOIN attend_0positions ps ON cp.PositionID=ps.PositionID JOIN 1departments d ON ps.deptid=d.deptid  where PayrollID=' .$payrollid. ' AND g.CompanyNo='.$mainrow['CompanyNo'].' Group By g.IDNo;';
    $stmt=$link->query($sqlsssloan); $resultsssloan=$stmt->fetchAll();
    
@@ -586,7 +579,6 @@ foreach ($resultpagibigloanmain as $mainrow){
    $sqlinsert='INSERT INTO `acctg_2cvmain` SET PayeeNo=802, Payee="Pag-Ibig Fund", `Posted`=0, CreditAccountID='.$mainrow['AccountID'].', Date=LAST_DAY(\''.date("Y-m-d").'\'), CVNo='.$cvno.', DateofCheck=LAST_DAY(\''.date("Y-m-d").'\'), CheckNo=CONCAT("PagIbigLoansSalary-",LEFT(MONTHNAME(\''.$paydate.'\'),3),"-'.$mainrow['Company'].'"), Remarks=\''.$mainrow['Company'].'  - Loans\', EncodedByNo=\''.$_SESSION['(ak0)'].'\', PostedByNo=\''.$_SESSION['(ak0)'].'\',TimeStamp=Now();'; 
 	// echo $sqlinsert; break;
         $stmt=$link->prepare($sqlinsert); $stmt->execute();
-     //   $txnid=getVchTxnID($cvno,$payrollprefix);
 $sqlpagibigloan='SELECT g.CompanyNo,concat(FirstName, " ", SurName) as FullName, RecordInBranchNo, IF(b.PseudoBranch=1,(800 + d.deptid),b.BranchNo) AS FromBudgetOf, IF(b.PseudoBranch=1,dept,b.Branch) AS From_Budget_Of, ROUND(Sum(`PagibigLoan`),2) as `PagibigLoan`  FROM payroll_45pagibigloan g JOIN `1branches` b ON b.BranchNo=g.RecordInBranchNo  JOIN attend_30latestpositionsinclresigned cp ON g.IDNo=cp.IDNo 
 JOIN attend_0positions ps ON cp.PositionID=ps.PositionID JOIN 1departments d ON ps.deptid=d.deptid where PayrollID=' .$payrollid. ' AND g.CompanyNo='.$mainrow['CompanyNo'].' Group By g.IDNo;';
    $stmt=$link->query($sqlpagibigloan); $resultpagibigloan=$stmt->fetchAll();
@@ -613,7 +605,6 @@ foreach ($resultpagibigloanmain as $mainrow){
    $sqlinsert='INSERT INTO `acctg_2cvmain` SET PayeeNo=802, Payee="Pag-Ibig Fund", `Posted`=0, CreditAccountID='.$mainrow['AccountID'].', Date=LAST_DAY(\''.date("Y-m-d").'\'), CVNo='.$cvno.', DateofCheck=LAST_DAY(\''.date("Y-m-d").'\'), CheckNo=CONCAT("PagIbigLoansCalamity-",LEFT(MONTHNAME(\''.$paydate.'\'),3),"-'.$mainrow['Company'].'"), Remarks=\''.$mainrow['Company'].'  - Loans\', EncodedByNo=\''.$_SESSION['(ak0)'].'\', PostedByNo=\''.$_SESSION['(ak0)'].'\',TimeStamp=Now();'; 
 	// echo $sqlinsert; break;
         $stmt=$link->prepare($sqlinsert); $stmt->execute();
-    //    $txnid=getVchTxnID($cvno,$payrollprefix);
 $sqlpagibigloan='SELECT g.CompanyNo,concat(FirstName, " ", SurName) as FullName, RecordInBranchNo, IF(b.PseudoBranch=1,(800 + d.deptid),b.BranchNo) AS FromBudgetOf, IF(b.PseudoBranch=1,dept,b.Branch) AS From_Budget_Of, ROUND(Sum(`PagibigLoan`),2) as `PagibigLoan`  FROM payroll_45pagibigloancalamity g JOIN `1branches` b ON b.BranchNo=g.RecordInBranchNo  JOIN attend_30latestpositionsinclresigned cp ON g.IDNo=cp.IDNo 
 JOIN attend_0positions ps ON cp.PositionID=ps.PositionID JOIN 1departments d ON ps.deptid=d.deptid where PayrollID=' .$payrollid. ' AND g.CompanyNo='.$mainrow['CompanyNo'].' Group By g.IDNo;';
    $stmt=$link->query($sqlpagibigloan); $resultpagibigloan=$stmt->fetchAll();
