@@ -11,7 +11,7 @@ $link=!isset($link)?connect_db($currentyr.'_1rtc',0):$link;
 
 $prog=$_REQUEST['l'];
 if ($prog=='acctg'){ $closedbydate=$_SESSION['nb4A'];}else{ $closedbydate=$_SESSION['nb4'];}
-$txnidfield=!isset($txnidfield)?'TxnID':$txnidfield;
+$txnidname=!isset($txnidname)?'TxnID':$txnidname;
 include_once('../../'.$prog.'/trail'.$prog.'.php');
 $txnid=intval($_REQUEST['TxnID']); 
 $table=strtolower($_REQUEST['w']);
@@ -42,14 +42,14 @@ switch ($table) {
 	case'acctg_2cvmain':
 		if (!allowedToOpen(20005,'1rtc')) { echo 'No permission'; exit();}
 		$datefield='Date';
-		$txnidfield='CVNo';
+		$txnidname='CVNo';
 		$subtable='acctg_2cvsub'; 
 	break;
 	
 	case'acctg_4futurecvmain':
 		if (!allowedToOpen(20006,'1rtc')) { echo 'No permission'; exit();}
 		$datefield='Date';
-		$txnidfield='CVNo'; 
+		$txnidname='CVNo'; 
 	break;
 	
 	case'acctg_2purchasemain':
@@ -65,7 +65,7 @@ switch ($table) {
 	case'acctg_2jvmain':
 		if (!allowedToOpen(20009,'1rtc')) { echo 'No permission'; exit();}
 		$datefield='JVDate';
-		$txnidfield='JVNo'; 
+		$txnidname='JVNo'; 
 		$subtable='acctg_2jvsub';
 	break;
 	
@@ -109,7 +109,7 @@ switch ($table) {
 	case'acctg_3undepositedpdcfromlastperiodbounced':
 		if (!allowedToOpen(20018,'1rtc')) { echo 'No permission'; exit();}
 		$datefield='DateBounced'; 
-		$txnidfield='UndepPDCId'; 
+		$txnidname='UndepPDCId'; 
 	break;
 	
 	default : $datefield='Date';
@@ -126,13 +126,13 @@ switch ($table) {
     
 	//delete sub first before main
 	if($subtable<>''){
-		$sqlsub='Delete '.$subtable.'.* from `'.$subtable.'` JOIN '.$table.' ON '.$subtable.'.'.$txnidfield.'='.$table.'.'.$txnidfield.' WHERE Posted=0 AND `'.$datefield.'`>\''.$closedbydate.'\' AND '.$subtable.'.`'.$txnidfield.'`='.$txnid;
+		$sqlsub='Delete '.$subtable.'.* from `'.$subtable.'` JOIN '.$table.' ON '.$subtable.'.'.$txnidname.'='.$table.'.'.$txnidname.' WHERE Posted=0 AND `'.$datefield.'`>\''.$closedbydate.'\' AND '.$subtable.'.`'.$txnidname.'`='.$txnid;
 		// echo $sqlsub;
 		$stmtsub=$link->prepare($sqlsub); $stmtsub->execute();
 	}
 
 	//main	
-	$sql='Delete from `'.$table.'` WHERE Posted=0 AND `'.$datefield.'`>\''.$closedbydate.'\' AND `'.$txnidfield.'`='.$txnid;
+	$sql='Delete from `'.$table.'` WHERE Posted=0 AND `'.$datefield.'`>\''.$closedbydate.'\' AND `'.$txnidname.'`='.$txnid;
 
         if($_SESSION['(ak0)']==1002){ echo '<br><br>'.$sql.'<br><br>'.strrchr($table,'_').str_replace('main','',substr(strrchr($table,'_'),2));}
 	$stmt=$link->prepare($sql); $stmt->execute();

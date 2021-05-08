@@ -6,22 +6,22 @@ global $currentyr;
 //if((strpos($table,'sub') !== false) OR ($editordel==2)){ goto sub;}
 switch($table){
     case '1employees':
-        $target='employeeedits'; $txnidfield='IDNo';
+        $target='employeeedits'; $txnidname='IDNo';
         break;    
     case '1_gamit.0idinfo':
-        $target='idinfoedits'; $txnidfield='IDNo';
+        $target='idinfoedits'; $txnidname='IDNo';
         break;
 	case '1suppliers':
-        $target='supplieredits'; $txnidfield='SupplierNo';
+        $target='supplieredits'; $txnidname='SupplierNo';
         break;
     case '1clients':
-        $target='clientedits'; $txnidfield='ClientNo';
+        $target='clientedits'; $txnidname='ClientNo';
         break;
     case 'acctg_4blotterassign':
-        $target='blotteredits'; $txnidfield='TxnID';
+        $target='blotteredits'; $txnidname='TxnID';
         break;
 	case 'budget_1budgets':
-        $target='budgetedits'; $txnidfield='TxnID';
+        $target='budgetedits'; $txnidname='TxnID';
         break;
 }
 
@@ -31,7 +31,7 @@ $sql0='';
 foreach( $res as $col  ) { $sql0.='`'.$col['Field']. '`,';}
 
 $sqltrail='INSERT INTO `'.$currentyr.'_trail`.`'.$target.'` ('.$sql0.'EditOrDel,`EditOrDelByNo`,`EditOrDelTS`) SELECT '.$sql0
-        .$editordel.' AS EditOrDel, '.$_SESSION['(ak0)'].' AS `EditOrDelByNo`, Now() AS `EditOrDelTS` FROM '.$table.' WHERE `'.$txnidfield.'`='.$txnid;
+        .$editordel.' AS EditOrDel, '.$_SESSION['(ak0)'].' AS `EditOrDelByNo`, Now() AS `EditOrDelTS` FROM '.$table.' WHERE `'.$txnidname.'`='.$txnid;
 goto skipsub;
 
 skipsub:

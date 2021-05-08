@@ -167,7 +167,7 @@ switch ($which)
     //End Of Case Edit
     
         case 'AssignList':
-            $title='List of Assignments'; $txnidfield='PropID';
+            $title='List of Assignments'; $txnidname='PropID';
             $columnnames=array('Department','CurrentlyAssignedTo','PropertyID','PropertyDesc','AssignDate','AssignRemarks','BookValueAsOfIssueDate','Active','EncodedBy','TimeStamp');
             $sql='SELECT a.*,IF(p.Active=1,"Yes","No") AS Active,PropertyID,PropertyDesc,CONCAT(id.FirstName, " ",id.Surname) AS CurrentlyAssignedTo, IF(a.DeptID=10,Branch,Department) AS Department, 
                 CONCAT(id2.Nickname, " ",id2.Surname) AS EncodedBy, FORMAT(BookValueAsOfIssueDate,0) AS BookValueAsOfIssueDate FROM admin_2propertyassign a 
@@ -179,7 +179,7 @@ switch ($which)
             break;
 			
 		case 'Unassigned':
-		$title='Unassigned Properties'; $txnidfield='PropID';
+		$title='Unassigned Properties'; $txnidname='PropID';
 		$addlprocess='propertyassign.php?w=List&PropID=';
 		$addlprocesslabel='Assign To';
 	

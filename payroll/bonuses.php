@@ -174,7 +174,7 @@ break;
         
         $list='EditBonusSpecifics';
         $which=!isset($_GET['b'])?'EditBonusSpecifics':$_GET['b'];
-        $table='payroll_21plannedbonuses'; $txnidname='AdjID'; $txnidfield='AdjID'; 
+        $table='payroll_21plannedbonuses'; $txnidname='AdjID'; 
         
         $columnnameslist=array('PayrollID','FirstName', 'Surname', 'AdjustType','AdjustTypeNo', 'AdjustAmt', 'Remarks', 'AdjID', 'Evaluation'); 
         $columnstoedit=array('PayrollID','AdjustTypeNo', 'AdjustAmt', 'Remarks'); 
