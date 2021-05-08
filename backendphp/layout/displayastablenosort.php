@@ -39,7 +39,7 @@ if (isset($_REQUEST['print'])){ include ($diraddress.'backendphp/layout/standard
     <?php
 echo (isset($subtitle) and !is_null($subtitle))?'<h4>'.$subtitle.'</h4><br>':'';
 IF (isset($sortfield)){include($diraddress.'backendphp/layout/sortbyform.php');echo '<br><br>';} 
-$txnid=(!isset($txnidname)?'TxnID':$txnidname);
+$txnidname=(!isset($txnidname)?'TxnID':$txnidname);
 $numcols = 0;
 $num=0; $runsum=0;
 $fields=array();
@@ -78,25 +78,25 @@ if(isset($changecolorfield)){
           $textfordisplay=$textfordisplay."<td>". nl2br(htmlspecialchars(str_replace($fromBRtoN,"\n",addslashes($rows[$col])))) . "</td>";
         }
 	$total=(isset($coltototal)?$total+$rows[$coltototal]:0);  
-        $textfordisplay=$textfordisplay.((key($rows)!=$keyoflast)?"":(isset($formprocess)?'<td><form action="'.$formprocess.'">'.$formprocessfields.'<input type=hidden name='.$txnid.' value='.$rows[$txnid].'><input type=submit name=submit value="'.$submitlabel.'"></form></td>':'')
+        $textfordisplay=$textfordisplay.((key($rows)!=$keyoflast)?"":(isset($formprocess)?'<td><form action="'.$formprocess.'">'.$formprocessfields.'<input type=hidden name='.$txnid.' value='.$rows[$txnidname].'><input type=submit name=submit value="'.$submitlabel.'"></form></td>':'')
             
-	.(isset($editprocess)?'<td><a href="'.$editprocess.$rows[$txnid].(isset($addlfield)?'&'.$addlfield.'='.$rows[$addlfield]:'').'" '.(isset($editprocessonclick)?$editprocessonclick:'').'>'.$editprocesslabel.'</a></td>':'')
+	.(isset($editprocess)?'<td><a href="'.$editprocess.$rows[$txnidname].(isset($addlfield)?'&'.$addlfield.'='.$rows[$addlfield]:'').'" '.(isset($editprocessonclick)?$editprocessonclick:'').'>'.$editprocesslabel.'</a></td>':'')
 	
-        .(isset($editprocess2)?'<td><a href="'.$editprocess2.$rows[$txnid].(isset($addlfield)?'&'.$addlfield.'='.$rows[$addlfield]:'').'" '.(isset($editprocess2onclick)?$editprocess2onclick:'').'>'.$editprocesslabel2.'</a></td>':'')
+        .(isset($editprocess2)?'<td><a href="'.$editprocess2.$rows[$txnidname].(isset($addlfield)?'&'.$addlfield.'='.$rows[$addlfield]:'').'" '.(isset($editprocess2onclick)?$editprocess2onclick:'').'>'.$editprocesslabel2.'</a></td>':'')
             
-	.(isset($editprocess4)?'<td><a href="'.$editprocess4.$rows[$txnid].(isset($addlfield)?'&'.$addlfield.'='.$rows[$addlfield]:'').'" '.(isset($editprocess4onclick)?$editprocess4onclick:'').'>'.$editprocesslabel4.'</a></td>':'')
+	.(isset($editprocess4)?'<td><a href="'.$editprocess4.$rows[$txnidname].(isset($addlfield)?'&'.$addlfield.'='.$rows[$addlfield]:'').'" '.(isset($editprocess4onclick)?$editprocess4onclick:'').'>'.$editprocesslabel4.'</a></td>':'')
             
-	.(isset($editprocess5)?'<td><a href="'.$editprocess5.$rows[$txnid].(isset($addlfield)?'&'.$addlfield.'='.$rows[$addlfield]:'').'" '.(isset($editprocess5onclick)?$editprocess5onclick:'').'>'.$editprocesslabel5.'</a></td>':'')
+	.(isset($editprocess5)?'<td><a href="'.$editprocess5.$rows[$txnidname].(isset($addlfield)?'&'.$addlfield.'='.$rows[$addlfield]:'').'" '.(isset($editprocess5onclick)?$editprocess5onclick:'').'>'.$editprocesslabel5.'</a></td>':'')
 					  
-	.(isset($addlprocess)?'<td><a href='.$addlprocess.$rows[$txnid].'&action_token='.$_SESSION['action_token'].' '.(isset($addlprocessonclick)?$addlprocessonclick:'').'>'.$addlprocesslabel.'</a></td>':'')
+	.(isset($addlprocess)?'<td><a href='.$addlprocess.$rows[$txnidname].'&action_token='.$_SESSION['action_token'].' '.(isset($addlprocessonclick)?$addlprocessonclick:'').'>'.$addlprocesslabel.'</a></td>':'')
             
-        .(isset($addlprocess2)?'<td><a href='.$addlprocess2.$rows[$txnid].'&action_token='.$_SESSION['action_token'].'>'.$addlprocesslabel2.'</a></td>':'')
+        .(isset($addlprocess2)?'<td><a href='.$addlprocess2.$rows[$txnidname].'&action_token='.$_SESSION['action_token'].'>'.$addlprocesslabel2.'</a></td>':'')
 					 
-        .(isset($delprocess)?'<td><form method="post" action='.$delprocess.$rows[$txnid].' style="display:inline"  OnClick="return confirm(\'Really delete this?\');"><input type="hidden" name="action_token" value="'.$_SESSION['action_token'].'"><input type="submit" value="Delete"></form></td>':'')
+        .(isset($delprocess)?'<td><form method="post" action='.$delprocess.$rows[$txnidname].' style="display:inline"  OnClick="return confirm(\'Really delete this?\');"><input type="hidden" name="action_token" value="'.$_SESSION['action_token'].'"><input type="submit" value="Delete"></form></td>':'')
 					  
-        .(isset($editprocess3)?'<td><a href="'.$editprocess3.$rows[$txnid].(isset($addlfield)?'&'.$addlfield.'='.$rows[$addlfield]:'').'">'.$editprocesslabel3.'</a></td>':'')
+        .(isset($editprocess3)?'<td><a href="'.$editprocess3.$rows[$txnidname].(isset($addlfield)?'&'.$addlfield.'='.$rows[$addlfield]:'').'">'.$editprocesslabel3.'</a></td>':'')
                                          
-        .(!isset($inputprocess)?"":"<td><form method=post action='" . $inputprocess.$txnid."=".$rows[$txnid].'&action_token='.$_SESSION['action_token']."'>". $inputprocesslabel 
+        .(!isset($inputprocess)?"":"<td><form method=post action='" . $inputprocess.$txnid."=".$rows[$txnidname].'&action_token='.$_SESSION['action_token']."'>". $inputprocesslabel 
                 
         . "<input type='".(!isset($inputtype)?"text":$inputtype)."' name='".$inputname."' size=10 ".(!isset($inputdefault)?"":"value='".$inputdefault."'")."><input type=submit value='Enter' name='submit'></form></td>")
                 

@@ -216,7 +216,7 @@ left join `1employees` as e on e.IDNo=cc.EncodedByNo WHERE cc.CreditCardNo='.$cc
             foreach($columnnames as $col){
             $cctxnlist=$cctxnlist.'<td>'.$txn[$col]."</td>";
             }
-            $cctxnlist=$cctxnlist."<td><a href='".$autoprocess.addslashes($txn[$txnid])."&action_token=".$_SESSION['action_token']."'>Reconcile</a></td><td><a href='".$editprocess.addslashes($txn[$txnid])."'>Edit</a></td><td><a href='".$delprocess.addslashes($txn[$txnid])."&action_token=".$_SESSION['action_token']."' OnClick=\" return confirm('Really delete this?');\"'>Del</a></td></tr>"; 
+            $cctxnlist=$cctxnlist."<td><a href='".$autoprocess.addslashes($txn[$txnidname])."&action_token=".$_SESSION['action_token']."'>Reconcile</a></td><td><a href='".$editprocess.addslashes($txn[$txnidname])."'>Edit</a></td><td><a href='".$delprocess.addslashes($txn[$txnidname])."&action_token=".$_SESSION['action_token']."' OnClick=\" return confirm('Really delete this?');\"'>Del</a></td></tr>"; 
             $totalpercard=$totalpercard+$txn['Amount'];
             $percardunreconciled=$percardunreconciled+($txn['Reconciled']==0?$txn['Amount']:0);
             $percardreconciled=$percardreconciled+($txn['Reconciled']<>0?$txn['Amount']:0);

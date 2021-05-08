@@ -110,7 +110,7 @@ foreach($datatoshow2 as $sub){
 	} // end foreach 2
 	
     $total=(isset($coltototal)?$total+$sub[$coltototal]:0);
-    $textfordisplay=$textfordisplay.((key($sub)!=$keyoflast)?"":(isset($runtotal)?"<td>".number_format($total,2)."</td>":"").(isset($editprocess)?'<td><a href="'.$editprocess.$sub[$txnid].'">'.$editprocesslabel.'</a></td></tr>':'</tr>'));
+    $textfordisplay=$textfordisplay.((key($sub)!=$keyoflast)?"":(isset($runtotal)?"<td>".number_format($total,2)."</td>":"").(isset($editprocess)?'<td><a href="'.$editprocess.$sub[$txnidname].'">'.$editprocesslabel.'</a></td></tr>':'</tr>'));
     } // end checking if there are records in sub
 } //end foreach data 2
 $textfordisplay=$textfordisplay."</tr></tbody></table><br>";

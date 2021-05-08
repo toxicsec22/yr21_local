@@ -3,6 +3,6 @@ function checkExists($stringtomatch,$field,$table,$txnid,$link){
     $sql='SELECT `'.$txnid.'` FROM `'.$table.'` WHERE '.$field.' LIKE \'%'.$stringtomatch.'%\'';	
     $stmt=$link->query($sql);
     $result=$stmt->fetch();
-    if ($stmt->rowCount()>0){ return $result[$txnid]; } else {   return 0;	}
+    if ($stmt->rowCount()>0){ return $result[$txnidname]; } else {   return 0;	}
 }
 ?>

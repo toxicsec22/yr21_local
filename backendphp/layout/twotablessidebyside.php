@@ -60,7 +60,7 @@ foreach ($link->query($sqlleft) as $row){
 		foreach($columnnamesleft as $col){
 		$colsleft=$colsleft.'<td'.($row[$col]<0?' bgcolor=ffb3b3 ':'').'>'.nl2br(htmlspecialchars(str_replace($fromBRtoN,"\n",$row[$col]))).'</td>';
 		}
-	echo $colsleft.(isset($lefteditprocess)?'<td><a href="'.$lefteditprocess.$row[$txnid].'">'.$lefteditprocesslabel.'</a></td>':'').'</tr>';
+	echo $colsleft.(isset($lefteditprocess)?'<td><a href="'.$lefteditprocess.$row[$txnidname].'">'.$lefteditprocesslabel.'</a></td>':'').'</tr>';
 	$colorcount++;
 }      
 ?>
@@ -97,7 +97,7 @@ foreach ($link->query($sqlright) as $row){
 		foreach($columnnamesright as $col){
 		$colsright=$colsright.'<td'.($row[$col]<0?' bgcolor=ffb3b3 ':'').'>'.nl2br(htmlspecialchars(str_replace($fromBRtoN,"\n",$row[$col]))).'</td>';
 		}
-	echo $colsright.(isset($righteditprocess)?'<td><a href="'.$righteditprocess.$row[$txnid].'">'.$righteditprocesslabel.'</a></td>':'')
+	echo $colsright.(isset($righteditprocess)?'<td><a href="'.$righteditprocess.$row[$txnidname].'">'.$righteditprocesslabel.'</a></td>':'')
                 .(isset($runtotalrightcol)?"<td>".number_format($runtotalright,2)."</td></tr>":"</tr>").'</tr>';
 	$colorcount++;
 }      

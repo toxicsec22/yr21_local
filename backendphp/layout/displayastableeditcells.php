@@ -51,7 +51,7 @@ $fromBRtoN = array("<br>", "<br/>", "<br />", "<BR>", "<BR/>", "<BR />");
 $columnstoeditselect=!isset($columnstoeditselect)?array():$columnstoeditselect;
 foreach($datatoshow as $rows){
 
-        $textfordisplay=$textfordisplay."<tr bgcolor=". $rcolor[$colorcount%2]."><form method='post' action='".$editprocess.$rows[$txnid]."'>";
+        $textfordisplay=$textfordisplay."<tr bgcolor=". $rcolor[$colorcount%2]."><form method='post' action='".$editprocess.$rows[$txnidname]."'>";
         $colorcount++;
         //$textfordisplay=$textfordisplay."<tr>";
         foreach($fields as $col){
@@ -70,9 +70,9 @@ foreach($datatoshow as $rows){
         }
 	$total=(isset($coltototal)?$total+$rows[$coltototal]:0);  
         $textfordisplay=$textfordisplay.((key($rows)!=$keyoflast)?"":(isset($runtotal)?"<td>".number_format($total,2)."</td>":'').'<td><input type="hidden" name="action_token" value="'.$_SESSION['action_token'].'"><input type="submit" value="'.$editprocesslabel.'"></td></form>'
-	 .(isset($addlprocess)?'<td><a href='.$addlprocess.$rows[$txnid].'&action_token='.$_SESSION['action_token'].'>'.$addlprocesslabel.'</a></td>':'') 
-         .(isset($addlprocess2)?'<td><a href='.$addlprocess2.$rows[$txnid].'&action_token='.$_SESSION['action_token'].'>'.$addlprocess2label.'</a></td>':'')
-	 .(isset($delprocess)?'<td><form method="post" action='.$delprocess.$rows[$txnid].' style="display:inline"><input type="hidden" name="action_token" value="'.$_SESSION['action_token'].'"><input type="submit" value="'.(!isset($delprocesslabel)?'Delete':$delprocesslabel).'"  OnClick="return confirm(\'Really delete this?\');"></form></td>':'')."</tr>");
+	 .(isset($addlprocess)?'<td><a href='.$addlprocess.$rows[$txnidname].'&action_token='.$_SESSION['action_token'].'>'.$addlprocesslabel.'</a></td>':'') 
+         .(isset($addlprocess2)?'<td><a href='.$addlprocess2.$rows[$txnidname].'&action_token='.$_SESSION['action_token'].'>'.$addlprocess2label.'</a></td>':'')
+	 .(isset($delprocess)?'<td><form method="post" action='.$delprocess.$rows[$txnidname].' style="display:inline"><input type="hidden" name="action_token" value="'.$_SESSION['action_token'].'"><input type="submit" value="'.(!isset($delprocesslabel)?'Delete':$delprocesslabel).'"  OnClick="return confirm(\'Really delete this?\');"></form></td>':'')."</tr>");
 	//$grandtotal=$grandtotal+$total;
 } //end foreach
 $textfordisplay=$textfordisplay."</tbody></table><br>";

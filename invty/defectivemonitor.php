@@ -67,7 +67,7 @@ switch ($which){
       if ($which=='EditReturn'){ $table='approvals_2salesreturns'; $txnidname='TxnID'; } else { $table='approvals_2setasdefective'; $txnidname='ApprovalID'; }
       $columnstoadd=array('RequestNo','TransferNo'); $sql='';
 	foreach ($columnstoadd as $field) { $sql=$sql.' `' . $field. '`=\''.addslashes($_POST[$field]).'\', '; 	}
-      $sql='UPDATE '.$table.' SET '.$sql.' ReqTxfrTS=Now() WHERE '.$txnid.'='.$_GET[$txnid];
+      $sql='UPDATE '.$table.' SET '.$sql.' ReqTxfrTS=Now() WHERE '.$txnidname.'='.$_GET[$txnidname];
       $stmt=$link->prepare($sql); $stmt->execute();
       header('Location:defectivemonitor.php');
       break;

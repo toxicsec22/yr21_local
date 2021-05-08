@@ -23,7 +23,7 @@ if (isset($_REQUEST['print'])){ include $path.'/'.$url_folder.'/backendphp/layou
 		<div class="content" style="width:<?php echo isset($width)?$width:'100%'; ?>">
     <?php
 echo (isset($subtitle) and !is_null($subtitle))?'<h4>'.$subtitle.'</h4><br>':'';
-$txnid=(!isset($txnidname)?'TxnID':$txnidname);
+$txnidname=(!isset($txnidname)?'TxnID':$txnidname);
 $numcols = 0;
 $num=0; $runsum=0;
 $fields=array();
@@ -62,12 +62,12 @@ foreach($datatoshow as $rows){
           $textfordisplay=$textfordisplay."<td>". nl2br(htmlspecialchars(str_replace($fromBRtoN,"\n",addslashes($rows[$col])))) . "</td>";
         }
 	$total=(isset($coltototal)?$total+$rows[$coltototal]:0);  
-        $textfordisplay=$textfordisplay.((key($rows)!=$keyoflast)?"":(isset($formprocess)?'<td><form action="'.$formprocess.'">'.$formprocessfields.'<input type=hidden name='.$txnid.' value='.$rows[$txnid].'><input type=submit name=submit value="'.$submitlabel.'"></form></td>':'')
-					 .(isset($editprocess)?'<td><a href="'.$editprocess.$rows[$txnid].(isset($addlfield)?'&'.$addlfield.'='.$rows[$addlfield]:'').'">'.$editprocesslabel.'</a></td>':'')
+        $textfordisplay=$textfordisplay.((key($rows)!=$keyoflast)?"":(isset($formprocess)?'<td><form action="'.$formprocess.'">'.$formprocessfields.'<input type=hidden name='.$txnidname.' value='.$rows[$txnidname].'><input type=submit name=submit value="'.$submitlabel.'"></form></td>':'')
+					 .(isset($editprocess)?'<td><a href="'.$editprocess.$rows[$txnidname].(isset($addlfield)?'&'.$addlfield.'='.$rows[$addlfield]:'').'">'.$editprocesslabel.'</a></td>':'')
 					 .(isset($sendsmsprocess)?'<td><a href="sms:'.(isset($smsbody)?$rows[$smsbody]:'').'">'.$sendsmsprocesslabel.'</a></td>':'')
-					 .(isset($addlprocess)?'<td><a href='.$addlprocess.$rows[$txnid].'&action_token='.$_SESSION['action_token'].'>'.$addlprocesslabel.'</a></td>':'').(isset($addlprocess2)?'<td><a href='.$addlprocess2.$rows[$txnid].'&action_token='.$_SESSION['action_token'].'>'.$addlprocesslabel2.'</a></td>':'')
-					 .(isset($delprocess)?'<td><form method="post" action='.$delprocess.$rows[$txnid].' style="display:inline"  OnClick="return confirm(\'Really delete this?\');"><input type="hidden" name="action_token" value="'.$_SESSION['action_token'].'"><input type="submit" value="Delete"></form></td>':'')
-                                         .(!isset($inputprocess)?"":"<td><form method=post action='" . $inputprocess.$txnid."=".$rows[$txnid].'&action_token='.$_SESSION['action_token']."'>". $inputprocesslabel .
+					 .(isset($addlprocess)?'<td><a href='.$addlprocess.$rows[$txnidname].'&action_token='.$_SESSION['action_token'].'>'.$addlprocesslabel.'</a></td>':'').(isset($addlprocess2)?'<td><a href='.$addlprocess2.$rows[$txnidname].'&action_token='.$_SESSION['action_token'].'>'.$addlprocesslabel2.'</a></td>':'')
+					 .(isset($delprocess)?'<td><form method="post" action='.$delprocess.$rows[$txnidname].' style="display:inline"  OnClick="return confirm(\'Really delete this?\');"><input type="hidden" name="action_token" value="'.$_SESSION['action_token'].'"><input type="submit" value="Delete"></form></td>':'')
+                                         .(!isset($inputprocess)?"":"<td><form method=post action='" . $inputprocess.$txnidname."=".$rows[$txnidname].'&action_token='.$_SESSION['action_token']."'>". $inputprocesslabel .
 				      "<input type='".(!isset($inputtype)?"text":$inputtype)."' name='".$inputname."' size=10 ".(!isset($inputdefault)?"":"value='".$inputdefault."'")."><input type=submit value='Enter' name='submit'></form></td>")
 					 .(isset($runtotal)?"<td>".number_format($total,2)."</td></tr>":"</tr>"));
 	//$grandtotal=$grandtotal+$total;

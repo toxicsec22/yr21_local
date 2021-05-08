@@ -45,7 +45,7 @@ $total=0; $grandtotal=0;
 $fromBRtoN = array("<br>", "<br/>", "<br />", "<BR>", "<BR/>", "<BR />");
 foreach($datatoshow as $rows){
 
-        $textfordisplay=$textfordisplay."<tr bgcolor=". $rcolor[$colorcount%2]."><form method='post' action=".$editprocess.$rows[$txnid].">";
+        $textfordisplay=$textfordisplay."<tr bgcolor=". $rcolor[$colorcount%2]."><form method='post' action=".$editprocess.$rows[$txnidname].">";
         $colorcount++;
         //$textfordisplay=$textfordisplay."<tr>";
         foreach($fields as $col){
@@ -56,7 +56,7 @@ foreach($datatoshow as $rows){
 	    }
         }
 	$total=(isset($coltototal)?$total+$rows[$coltototal]:0);  
-        $textfordisplay=$textfordisplay.((key($rows)!=$keyoflast)?"":'<td><input type="hidden" name="action_token" value="'.$_SESSION['action_token'].'"><input type="submit" value="'.$editprocesslabel.'"></td>'.(isset($runtotal)?"<td>".number_format($total,2)."</td></form>":"</form>").(isset($addlprocess)?"<td><a href='".$addlprocess.addslashes($rows[$txnid])."'>".$addlprocesslabel."</a></td>":"")."</tr>");
+        $textfordisplay=$textfordisplay.((key($rows)!=$keyoflast)?"":'<td><input type="hidden" name="action_token" value="'.$_SESSION['action_token'].'"><input type="submit" value="'.$editprocesslabel.'"></td>'.(isset($runtotal)?"<td>".number_format($total,2)."</td></form>":"</form>").(isset($addlprocess)?"<td><a href='".$addlprocess.addslashes($rows[$txnidname])."'>".$addlprocesslabel."</a></td>":"")."</tr>");
 	//$grandtotal=$grandtotal+$total;
 } //end foreach
 

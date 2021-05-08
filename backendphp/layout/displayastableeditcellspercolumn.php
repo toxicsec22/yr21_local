@@ -63,7 +63,7 @@ $fromBRtoN = array("<br>", "<br/>", "<br />", "<BR>", "<BR/>", "<BR />");
 $columnstoeditselect=!isset($columnstoeditselect)?array():$columnstoeditselect;
 foreach($datatoshow as $rows){
 
-		$textfordisplay=$textfordisplay."<tr bgcolor=". $rcolor[$colorcount%2].">".(isset($tdform)?'':"<form method='post' action='".$editprocess.$rows[$txnid]."'>")."";
+		$textfordisplay=$textfordisplay."<tr bgcolor=". $rcolor[$colorcount%2].">".(isset($tdform)?'':"<form method='post' action='".$editprocess.$rows[$txnidname]."'>")."";
 		
 		
         $colorcount++;
@@ -71,12 +71,12 @@ foreach($datatoshow as $rows){
         foreach($fields as $col){
 	    if (isset($columnstoedit) AND (in_array($col,$columnstoedit))){
 			
-          $textfordisplay=$textfordisplay."<td>".(isset($tdform)?'<form method="post" action='.$editprocess2.$rows[$txnid].'&act='.$col.''.'>':'')."<input type='".(isset($type)?$type:"text")."' size=10 name='".$col."' value='". addslashes($rows[$col]) . "' ".(isset($disablefield)?(($rows[$triggercolumn]==$txtshouldbe)?'disabled':''):'')." >".(isset($tdform)?"<input type='hidden' name='action_token' value='".$_SESSION['action_token']."'><input type='submit' value='".$col."'></form>":'')."</td>";
+          $textfordisplay=$textfordisplay."<td>".(isset($tdform)?'<form method="post" action='.$editprocess2.$rows[$txnidname].'&act='.$col.''.'>':'')."<input type='".(isset($type)?$type:"text")."' size=10 name='".$col."' value='". addslashes($rows[$col]) . "' ".(isset($disablefield)?(($rows[$triggercolumn]==$txtshouldbe)?'disabled':''):'')." >".(isset($tdform)?"<input type='hidden' name='action_token' value='".$_SESSION['action_token']."'><input type='submit' value='".$col."'></form>":'')."</td>";
 
 	    } else if (in_array($col,$columnstoeditselect)){
-			$textfordisplay=$textfordisplay."<form method='post' action='".$editprocess.$rows[$txnid]."'>"."<td><select name='".$col."'><option  value='". addslashes($rows[$col]) . "'>".$rows[$col]."</option>".$options."</select></td>";
+			$textfordisplay=$textfordisplay."<form method='post' action='".$editprocess.$rows[$txnidname]."'>"."<td><select name='".$col."'><option  value='". addslashes($rows[$col]) . "'>".$rows[$col]."</option>".$options."</select></td>";
 		} else if (isset($columnstoedit2) AND (in_array($col,$columnstoedit2))){
-			$textfordisplay=$textfordisplay."<form method='post' action='".$editprocess.$rows[$txnid]."'>"."<td><input type='".(isset($type)?$type:"text")."' size=10 name='".$col."' value='". addslashes($rows[$col]) . "' ".(isset($disablefield)?(($rows[$triggercolumn]==$txtshouldbe)?'disabled':''):'')." ></input></td>";
+			$textfordisplay=$textfordisplay."<form method='post' action='".$editprocess.$rows[$txnidname]."'>"."<td><input type='".(isset($type)?$type:"text")."' size=10 name='".$col."' value='". addslashes($rows[$col]) . "' ".(isset($disablefield)?(($rows[$triggercolumn]==$txtshouldbe)?'disabled':''):'')." ></input></td>";
 		}
 		
 		else{	
@@ -87,10 +87,10 @@ foreach($datatoshow as $rows){
 		$textfordisplay=$textfordisplay.((key($rows)!=$keyoflast)?"":(isset($runtotal)?"<td>".number_format($total,2)."</td>":'').(isset($tdform)?'<td><input type="hidden" name="action_token" value="'.$_SESSION['action_token'].'"><input type="submit" value="'.$editprocesslabel.'"></td></form>':'')
 		
 		
-	 .(isset($addlprocess)?'<td><a href='.$addlprocess.$rows[$txnid].'&action_token='.$_SESSION['action_token'].'>'.$addlprocesslabel.'</a></td>':'') 
-         .(isset($addlprocess2)?'<td><a href='.$addlprocess2.$rows[$txnid].'&action_token='.$_SESSION['action_token'].'>'.$addlprocess2label.'</a></td>':'')
+	 .(isset($addlprocess)?'<td><a href='.$addlprocess.$rows[$txnidname].'&action_token='.$_SESSION['action_token'].'>'.$addlprocesslabel.'</a></td>':'') 
+         .(isset($addlprocess2)?'<td><a href='.$addlprocess2.$rows[$txnidname].'&action_token='.$_SESSION['action_token'].'>'.$addlprocess2label.'</a></td>':'')
 		 .(isset($editprocess2)?'<td></td>':'')
-	 .(isset($delprocess)?'<td><form method="post" action='.$delprocess.$rows[$txnid].' style="display:inline"><input type="hidden" name="action_token" value="'.$_SESSION['action_token'].'"><input type="submit" value="'.(!isset($delprocesslabel)?'Delete':$delprocesslabel).'"  OnClick="return confirm(\'Really delete this?\');"></form></td>':'')."</tr>");
+	 .(isset($delprocess)?'<td><form method="post" action='.$delprocess.$rows[$txnidname].' style="display:inline"><input type="hidden" name="action_token" value="'.$_SESSION['action_token'].'"><input type="submit" value="'.(!isset($delprocesslabel)?'Delete':$delprocesslabel).'"  OnClick="return confirm(\'Really delete this?\');"></form></td>':'')."</tr>");
 	//$grandtotal=$grandtotal+$total;
 } //end foreach
 $textfordisplay=$textfordisplay."</tbody></table><table id='header-fixed' style='100%'></table><br>";

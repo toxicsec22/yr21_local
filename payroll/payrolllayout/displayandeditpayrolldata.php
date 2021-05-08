@@ -83,8 +83,8 @@ foreach($datatoshow as $rows){
           $textfordisplay=$textfordisplay."<td>". htmlspecialchars(addslashes($rows[$col])) . "</td>";
         }
 	$textfordisplay=$textfordisplay.((key($rows)!=$keyoflast)?"":
-                (isset($delprocess)?'<td><form method="post" action='.$delprocess.$rows[$txnid].' style="display:inline"  OnClick="return confirm(\'Really delete this?\');"><input type="hidden" name="action_token" value="'.$_SESSION['action_token'].'"><input type="submit" value="Delete"></form></td>':'')
-                 .(isset($editprocess)?"<td><a href='".$editprocess.addslashes($rows[$txnid])."'>Edit</a></td>":"")."</tr>");      
+                (isset($delprocess)?'<td><form method="post" action='.$delprocess.$rows[$txnidname].' style="display:inline"  OnClick="return confirm(\'Really delete this?\');"><input type="hidden" name="action_token" value="'.$_SESSION['action_token'].'"><input type="submit" value="Delete"></form></td>':'')
+                 .(isset($editprocess)?"<td><a href='".$editprocess.addslashes($rows[$txnidname])."'>Edit</a></td>":"")."</tr>");      
 } //end foreach
 $textfordisplay=$textfordisplay."</tbody></table><br>";
 echo $textfordisplay;

@@ -83,7 +83,7 @@ foreach($datatoshow1 as $rows){
 	  
 	$textfordisplay=$textfordisplay."<table style=\"display: inline-block; border: 1px solid\">". $fieldlist2 ."</thead><tbody>";
 foreach($datatoshow2 as $rows2){
-	$textfordisplay=$textfordisplay."<tr bgcolor=". $rcolor[$colorcount%2].">".(isset($tdform)?"<form method='post' action='".$editprocess1.$rows2[$txnid]."'>":"").(isset($tdform1)?"<form method='post' action='".$editprocess2.$rows2[$txnid]."'>":"");
+	$textfordisplay=$textfordisplay."<tr bgcolor=". $rcolor[$colorcount%2].">".(isset($tdform)?"<form method='post' action='".$editprocess1.$rows2[$txnidname]."'>":"").(isset($tdform1)?"<form method='post' action='".$editprocess2.$rows2[$txnidname]."'>":"");
 	foreach($fields2 as $col2){
 	$textfordisplay=$textfordisplay."<td>". nl2br(htmlspecialchars(str_replace($fromBRtoN,"\n",addslashes($rows2[$col2])))) . "</td>";
 	
@@ -93,14 +93,14 @@ foreach($datatoshow2 as $rows2){
     $textfordisplay=$textfordisplay.((key($rows2)!=$keyoflast)?"":(isset($runtotal)?"<td>".number_format($total,2)."</td>":"")
         .(isset($tdform)?'<td><input type="hidden" name="action_token" value="'.$_SESSION['action_token'].'">'
                 .(isset($tdforminput)?$tdforminput:''). '<input type="submit" value="'.$editprocesslabel1.'"></form></td>':'')
-        .(isset($tdform1)?'<td><input type="hidden" name="action_token" value="'.$_SESSION['action_token'].'"><input type="submit" value="'.$editprocesslabel2.'"></form></td>':'').(isset($editprocess)?'<td><a href="'.$editprocess.$rows2[$txnid].'">'.$editprocesslabel."</a></td>":"").(isset($newwindowprocess)?'<td><a style="text-decoration:none;" href="" onclick="window.open(\''.$newwindowprocess.$rows2[$txnid].(isset($txnid2)?'&'.$txnid2.'='.$rows2[$txnid2]:'').'\', 
+        .(isset($tdform1)?'<td><input type="hidden" name="action_token" value="'.$_SESSION['action_token'].'"><input type="submit" value="'.$editprocesslabel2.'"></form></td>':'').(isset($editprocess)?'<td><a href="'.$editprocess.$rows2[$txnidname].'">'.$editprocesslabel."</a></td>":"").(isset($newwindowprocess)?'<td><a style="text-decoration:none;" href="" onclick="window.open(\''.$newwindowprocess.$rows2[$txnidname].(isset($txnid2)?'&'.$txnid2.'='.$rows2[$txnid2]:'').'\', 
                          \'newwindow\', 
                          \'width='.(isset($newwindowwidth)?$newwindowwidth:'500').',height='.(isset($newwindowheight)?$newwindowheight:'500').'\'); 
               return false;">'.$newwindowprocesslabel."</a></td>":"")
-        .(isset($delprocess)?'<td><a href="'.$delprocess.$rows2[$txnid].'">'.$delprocesslabel."</a></td>":"")
-        .(isset($addprocess)?'<td><a href="'.$addprocess.$rows2[$txnid].'">'.$addprocesslabel.'</a></td>':'')
+        .(isset($delprocess)?'<td><a href="'.$delprocess.$rows2[$txnidname].'">'.$delprocesslabel."</a></td>":"")
+        .(isset($addprocess)?'<td><a href="'.$addprocess.$rows2[$txnidname].'">'.$addprocesslabel.'</a></td>':'')
 		
-		 .(isset($addlfield)?'<td>'.(($rows2[$addlfield]==1)?'<a href="'.$addprocess1.$rows2[$txnid].'">'.$addprocesslabel1.'</a></td></tr>':'<a href="'.$addprocess2.$rows2[$txnid].'">'.$addprocesslabel2.'</a></td></tr>'):'</tr>')
+		 .(isset($addlfield)?'<td>'.(($rows2[$addlfield]==1)?'<a href="'.$addprocess1.$rows2[$txnidname].'">'.$addprocesslabel1.'</a></td></tr>':'<a href="'.$addprocess2.$rows2[$txnidname].'">'.$addprocesslabel2.'</a></td></tr>'):'</tr>')
 		 );
     } // end checking if there are records in sub
 } //end foreach data 2

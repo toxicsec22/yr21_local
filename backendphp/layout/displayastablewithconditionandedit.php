@@ -71,7 +71,7 @@ foreach($datatoshow as $rows){
             
           $textfordisplay=$textfordisplay."<td>". nl2br(htmlspecialchars(str_replace($fromBRtoN,"\n",addslashes($rows[$col])))) . "</td>";
         }
-        $textfordisplay=$textfordisplay.((key($rows)!=$keyoflast)?"":(isset($delprocess)?"<td><a href='".$delprocess.addslashes($rows[$txnid])."&action_token=".$_SESSION['action_token']."' OnClick=\" return confirm('Really delete this?');\"'>Del</a></td>":"")."<td><a href='".$editprocess.addslashes($rows[$txnid])."'>Edit</a></td></tr>");
+        $textfordisplay=$textfordisplay.((key($rows)!=$keyoflast)?"":(isset($delprocess)?"<td><a href='".$delprocess.addslashes($rows[$txnidname])."&action_token=".$_SESSION['action_token']."' OnClick=\" return confirm('Really delete this?');\"'>Del</a></td>":"")."<td><a href='".$editprocess.addslashes($rows[$txnidname])."'>Edit</a></td></tr>");
        
 } //end foreach
 $textfordisplay=$textfordisplay."</tbody></table><br>";

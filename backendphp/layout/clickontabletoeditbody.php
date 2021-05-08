@@ -47,10 +47,10 @@ foreach($datatoshow as $rows){
           $textfordisplay=$textfordisplay."<td>". nl2br(htmlspecialchars(str_replace($fromBRtoN,"\n",addslashes($rows[$col])))) . "</td>";
         }
 	
-        $textfordisplay=$textfordisplay.((key($rows)!=$keyoflast)?"":"<td><a href='" . $process1 .$txnid."=".$rows[$txnid]
+        $textfordisplay=$textfordisplay.((key($rows)!=$keyoflast)?"":"<td><a href='" . $process1 .$txnidname."=".$rows[$txnidname]
 					 .(isset($addlfield)?'&'.$addlfield.'='.$rows[$addlfield]:'')."'> " . $processlabel1 . "</td>")
-				    .(!isset($processlabel2)?"":"<td><a href='" . $process2 .$txnid."=".$rows[$txnid].'&action_token='.$_SESSION['action_token']."'> " . $processlabel2 . "</td>")
-				    .(!isset($inputprocess)?"":"<td><form method=post action='" . $inputprocess.$txnid."=".$rows[$txnid].'&action_token='.$_SESSION['action_token']."'>". $inputprocesslabel .
+				    .(!isset($processlabel2)?"":"<td><a href='" . $process2 .$txnidname."=".$rows[$txnidname].'&action_token='.$_SESSION['action_token']."'> " . $processlabel2 . "</td>")
+				    .(!isset($inputprocess)?"":"<td><form method=post action='" . $inputprocess.$txnidname."=".$rows[$txnidname].'&action_token='.$_SESSION['action_token']."'>". $inputprocesslabel .
 				      "<input type='".(!isset($inputtype)?"text":$inputtype)."' name='".$inputname."' size=10 ".(!isset($inputdefault)?"":"value='".$inputdefault."'")."><input type=submit value='Enter' name='submit'></form></td>")
 				    ."</tr>"; 
        

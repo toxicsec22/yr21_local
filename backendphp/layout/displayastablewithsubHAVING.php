@@ -89,7 +89,7 @@ foreach($datatoshow2 as $rows2){
 	} // end foreach 2
 	$colorcount++;
     $total=(isset($coltototal)?$total+$rows2[$coltototal]:0);
-    $textfordisplay=$textfordisplay.((key($rows2)!=$keyoflast)?"":(isset($runtotal)?"<td>".number_format($total,2)."</td>":"").(isset($editprocess)?'<td><a href="'.$editprocess.$rows2[$txnid].'">'.$editprocesslabel.'</a></td></tr>':'</tr>'));
+    $textfordisplay=$textfordisplay.((key($rows2)!=$keyoflast)?"":(isset($runtotal)?"<td>".number_format($total,2)."</td>":"").(isset($editprocess)?'<td><a href="'.$editprocess.$rows2[$txnidname].'">'.$editprocesslabel.'</a></td></tr>':'</tr>'));
     } // end checking if there are records in sub
 } //end foreach data 2
 $textfordisplay=$textfordisplay."</tr></tbody></table><br>";
