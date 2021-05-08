@@ -85,7 +85,7 @@ switch ($which){
 		//Processes
                 if (allowedToOpen(7031,'1rtc')) { $delprocess='propertyassign.php?w=Delete&TxnID=';}
 
-		$title=''; $formdesc=''; $txnid='TxnID';
+		$title=''; $formdesc=''; $txnidname='TxnID';
 		$columnnames=$columnnameslist;
 		$editprocess='propertyassign.php?w=EditSpecifics&PropID='.$PropID.'&TxnID='; $editprocesslabel='Edit';
 		$addlprocess2='propertyassign.php?w=Print&TxnID=';

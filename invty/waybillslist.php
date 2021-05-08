@@ -536,7 +536,7 @@ $(document).ready(function(){
 		$delprocess='waybillslist.php?w=DeleteShipper&ShipperID=';
 
 		$title=''; $formdesc='';
-		$txnid='TxnID';
+		$txnidname='TxnID';
 		$columnnames=$columnnameslist;       
 		if (allowedToOpen(20612,'1rtc')){ $editprocess='waybillslist.php?w=EditSpecificsShipper&ShipperID='; $editprocesslabel='Edit';}
 		echo '<div style="width:45%">';
@@ -609,7 +609,7 @@ $(document).ready(function(){
 		$delprocess='waybillslist.php?w=DeleteShippingRate&SRID=';
 
 		$title=''; $formdesc='';
-		$txnid='TxnID';
+		$txnidname='TxnID';
 		$columnnames=$columnnameslist;       
 		if (allowedToOpen(20612,'1rtc')){ $editprocess='waybillslist.php?w=EditSpecificsShippingRate&SRID='; $editprocesslabel='Edit';}
 		echo '<div style="width:45%">';
@@ -707,7 +707,7 @@ $(document).ready(function(){
 
 			$title=''; $formdesc=''; 
 			
-			$txnid='TxnID';
+			$txnidname='TxnID';
 			$columnnames=$columnnameslist;       
 			if (allowedToOpen(20612,'1rtc')){ $editprocess='waybillslist.php?w=EditSpecificsShipperPrice&SPID='; $editprocesslabel='Edit';
 			$delprocess='waybillslist.php?w=DeleteShipperPrice&SPID=';

@@ -24,7 +24,7 @@ $title='Canvass Per '.$fieldname;
     $processlabelblank='';
     $processblank='';
     $calledfrom='6';
-    $txnid='CanvassID';
+    $txnidname='CanvassID';
     $method='POST';
     $orderby='ForBranch';
 $columnnames=array('CanvassID','CanvassDate', 'ForBranch','Category','ItemCode','Description','SellingPrice','QuotedPrice','PONo','Go','Downpayment','Ordered?','Delivered?','DeliveredByNo','Sold?','InvNo','CanvassRequestedByNo','CanvassRequestTS','CanvassedByNo','SCReplyTS','GoByNo','GoTimeStamp','OrderedByNo','OrderedTimeStamp','DeliveryEnteredByNo','ForClientName','DeliveryEnteredTS','SoldEntryByNo','SoldEntryTS');
@@ -83,7 +83,7 @@ WHERE (c.CanvassID)='.$txnid;
                 // $addlcondition=' and (c.Description) Not Like "REGULAR PO*" and '.$txndate;
             $sql='SELECT c.*,CanvassID as TxnID, b.Branch as `ForBranch`,`invty_1category`.Category FROM quotations_2canvass c INNER JOIN `invty_1category` ON c.Category = `invty_1category`.CatNo join `1branches` b on b.BranchNo=c.BranchNo and (c.Description) Not Like "REGULAR PO*" and '.$txndate;
         
-			$txnid='TxnID';
+			$txnidname='TxnID';
         $delprocess='praddcanvass.php?calledfrom=3&perday='.$perday.'&CanvassID=';
         }
             } else {

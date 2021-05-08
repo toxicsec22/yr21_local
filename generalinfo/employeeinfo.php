@@ -26,7 +26,7 @@ if (in_array($calledfrom,array(0,1))){
 	}
 }
 
-$txnid='IDNo';$txnidname='IDNo';
+$txnidname='IDNo';
 switch ($calledfrom){
     case 0: //all id info
         if (!allowedToOpen(671,'1rtc')){  echo 'No permission'; exit;}
@@ -88,7 +88,7 @@ switch ($calledfrom){
 						$title=$show;
 						
 						$columnnameslist=array('IDNo','Name','Remarks','Email');
-			$txnid='TxnID';
+			$txnidname='TxnID';
 			$columnnames=$columnnameslist;
 			$columnstoedit=array('Email');
 			
@@ -170,7 +170,7 @@ switch ($calledfrom){
         if (!allowedToOpen(6721,'1rtc')){  echo 'No permission'; exit;}
         
         $title='Edit Employee IDNo '.$_REQUEST['IDNo'];
-        $txnid='IDNo';
+        $txnidname='IDNo';
         $editprocess='employeeinfo.php?edit=3&IDNo=';$editprocesslabel='Edit';
         $sql='SELECT *, if(year(`e`.`DateHired`) = '.$currentyr.' - 1,if(month(`e`.`DateHired`) = 12,0,round((365 - dayofyear(`e`.`DateHired`)) / 365 * 5 + 0.5,0)),5) AS `RegularSL`, c.Company FROM `1employees` e left join `1companies` c on e.RCompanyNo=c.CompanyNo where IDNo>1002';
 		//'RDateHired',
@@ -206,7 +206,7 @@ switch ($calledfrom){
 		
     
 	 case 7://edit team leader assigns
-        $txnid='TxnID';
+        $txnidname='TxnID';
         unset($editprocess,$txnidname);
         if (allowedToOpen(674,'1rtc')){
             if (allowedToOpen(6741,'1rtc')){
@@ -331,7 +331,7 @@ switch ($calledfrom){
         $title='STL Fixed Branch Assignment History';
         $columnnames=array('DateofChange','BranchNo','Branch','IDNo','FullName','Remarks','EncodedBy','TimeStamp');
         $columnsub=$columnnames;
-        $txnid='TxnID'; 
+        $txnidname='TxnID'; 
 		 
 		 
 		 echo comboBox($link,'SELECT sfb.IDNo,CONCAT(Nickname," ",Surname) AS FullName FROM attend_1stlfixedbranch sfb LEFT JOIN 1employees id ON sfb.IDNo=id.IDNo WHERE `Resigned`=0 AND DateofChange=CURDATE() AND sfb.EncodedByNo='.$_SESSION['(ak0)'].' GROUP BY IDNo','FullName','IDNo','encodeidtoday');
@@ -361,7 +361,7 @@ switch ($calledfrom){
         $title='STL/SAM/Ops/CreditAnalyst Assignment History';
         $columnnames=array('DateofChange','BranchNo','Branch', 'PositionID','Position','IDNo','FullName','Remarks','EncodedBy','TimeStamp');
         $columnsub=$columnnames;
-        $txnid='TxnID'; 
+        $txnidname='TxnID'; 
 		 
 		 echo comboBox($link,'SELECT cbg.IDNo,CONCAT(Nickname," ",Surname) AS FullName FROM attend_2changebranchgroup cbg LEFT JOIN 1employees id ON cbg.IDNo=id.IDNo WHERE `Resigned`=0 AND DateofChange=CURDATE() AND cbg.EncodedByNo='.$_SESSION['(ak0)'].' GROUP BY IDNo','FullName','IDNo','encodeidtoday');
 		

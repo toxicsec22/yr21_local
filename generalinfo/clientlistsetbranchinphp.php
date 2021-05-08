@@ -12,7 +12,7 @@ include_once $path.'/acrossyrs/commonfunctions/listoptions.php';
 $which=(!isset($_GET['w'])?'List':$_GET['w']);
 
 $title='List of Clients';
-$txnid='ClientNo';
+$txnidname='ClientNo';
 
 if (in_array($which,array('EditSpecifics','List'))){
 	$columnnames=array('ClientName', 'TelNo1', 'TelNo2', 'Mobile','ContactPerson','EmailAddress','TIN');

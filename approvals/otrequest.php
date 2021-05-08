@@ -300,7 +300,7 @@ if (isset($_REQUEST['AttendDate'])){
 
 $attenddate=$_SESSION['AttendDate'];
 
-$txnid='TxnID';
+$txnidname='TxnID';
 
 
 $columnnames=array('DateToday','IDNo','FullName','TimeIn','TimeOut','RemarksDept','Branch','LeaveNo');

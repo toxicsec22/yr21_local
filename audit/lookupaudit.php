@@ -19,7 +19,7 @@ switch ($whichqry){
 case 'InvAuditPerMonth':
     if (!allowedToOpen(648,'1rtc')) { echo 'No permission'; exit;}
 $title='Inventory Audit Per Month';
-$txnid='CountID';
+$txnidname='CountID';
 $fieldname='AuditMonth';
 $showbranches=false;
 
@@ -116,7 +116,7 @@ where Month(c.Date)='.$_REQUEST[$fieldname].' and s.ToolID is null group by Coun
 $columnnames=array('Date','Branch','AuditedBy','NumberofTools','Remarks','Posted');  $width='100%';
 $editprocess='editcash.php?w=Tools&CountID=';
 $editprocesslabel='Lookup';
-$txnid='CountID'; $txnidname='CountID';
+$txnidname='CountID';
 }
 
 include_once('../backendphp/layout/displayastable.php');
@@ -172,7 +172,7 @@ where Month(m.Date)='.$_REQUEST[$fieldname].' AND s.ItemCode is null '.$adjcondi
 $columnnames=array('Date','AdjNo', 'Branch', 'EncodedBy','LineItems','Posted');  
 $process1='addeditadj.php?w=Adjust&';
 $processlabel1='Lookup';
-$txnid='TxnID';
+$txnidname='TxnID';
 }
 
 include_once('../backendphp/layout/clickontabletoeditbody.php');

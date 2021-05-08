@@ -152,7 +152,7 @@ $sql='SELECT a.*, Branch, ShortAcctID AS PrepaidAccount, FORMAT(`Amount`,2) AS `
 FROM `Prepaid` a JOIN `acctg_1chartofaccounts` ca ON ca.AccountID=a.PrepaidAccountID '
         . ' JOIN `1branches` b ON b.BranchNo=a.BranchNo '.$branchcondition
         . ' GROUP BY a.TxnID;'; //echo $sql;
-$txnid='TxnID'; $coltototal='NetValueThisYr';
+$txnidname='TxnID'; $coltototal='NetValueThisYr';
 $editprocess='prepaidandamort.php?w=PrepaidandAmort&TxnID=';
 $editprocesslabel='Lookup';
 $sqlsum='SELECT Branch, ShortAcctID AS PrepaidAccount, FORMAT(SUM(`PreviousYrs`),2) AS `PreviousYrs`, FORMAT(SUM(`TotalAmortizationAsOfThisYr`),2) AS `TotalAmortizationAsOfThisYr`, FORMAT(SUM(`NetValueThisYr`),2) AS `NetValueThisYr`

@@ -48,7 +48,7 @@ if (in_array($which,array('Add','Edit','EditSpecifics'))){ $columnstoadd=array('
    
 switch ($which){
 case 'List':
-$txnid='TxnID';
+$txnidname='TxnID';
 $sortfield=(isset($_POST['sortfield'])?$_POST['sortfield']:' `Biller` ');
 
 $formdesc='</i><br>'        

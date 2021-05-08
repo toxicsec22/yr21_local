@@ -102,7 +102,7 @@ $formdesc.='</br><form method="post" action="callandtextrecords.php?w=Records">
 			<input type="hidden" name="otherphone" value="'.$value.'">
 		</form>';
 		$sql='select cr.TxnID,MobileNo,CONCAT(Nickname,\' \', SurName) as EncodedBy,b.Branch,Purpose,MobileNo,ReceiverNo as ReceiverMobileNo,DateTime,catr.Reason as Reason,cr.TimeStamp from acctg_4callandtextrecords cr left join 1employees e on e.IDNo=cr.EncodedByNo left join attend_30currentpositions cp on cp.IDNo=cr.EncodedByNo left join 1branches b on b.BranchNo=cp.BranchNo left join acctg_1callandtextreasons catr on catr.ReasonID=cr.ReasonID '.$sqlcondition.' and b.BranchNo=\''.$_SESSION['bnum'].'\'';
-		$txnid='TxnID';
+		$txnidname='TxnID';
 		// echo $sql;
 		$editprocess='callandtextrecords.php?w=Edit'.$otherphonevalue.'&TxnID=';
 		$editprocesslabel='Edit';

@@ -203,7 +203,7 @@ echo'</br>';
 				}
 						
 				$columnnames=$columnnameslist;   
-				$title=''; $formdesc=''; $txnid='TxnID';
+				$title=''; $formdesc=''; $txnidname='TxnID';
 				
 				$cronlysql='';
 				if (allowedToOpen(58231,'1rtc')) { 

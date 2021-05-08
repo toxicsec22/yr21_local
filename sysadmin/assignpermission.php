@@ -140,7 +140,7 @@ switch ($which)
    
         $editprocess='assignpermission.php?w=AddPermissionToPage&ProcessID='; $editprocesslabel='Edit';
      
-		$title='Permission Page'; $formdesc=''; $txnid='TxnID';
+		$title='Permission Page'; $formdesc=''; $txnidname='TxnID';
 		$columnnames=$columnnameslist;       
 		
 		$width='100%';
@@ -300,7 +300,7 @@ switch ($which)
    
         $editprocess='assignpermission.php?w=EditProtection&ForDB='; $editprocesslabel='Edit';
      
-		$title='Data Protection'; $formdesc=''; $txnid='TxnID';
+		$title='Data Protection'; $formdesc=''; $txnidname='TxnID';
 		$columnnames=$columnnameslist;       
 		
 		$width='100%';
@@ -706,7 +706,7 @@ echo '<br>';
 				
 		
 		
-		$title=''; $formdesc=''; $txnid='TxnID';
+		$title=''; $formdesc=''; $txnidname='TxnID';
 		$columnnames=$columnnameslist;       
 		
 		$width='70%';
@@ -795,7 +795,7 @@ echo '<br>';
 		$delprocess='assignpermission.php?w=DeleteLevel&MenuID=';
 		$editprocess='assignpermission.php?w=EditSpecificsLevel&MenuID='; $editprocesslabel='Edit';
 
-		$title=''; $formdesc=''; $txnid='TxnID';
+		$title=''; $formdesc=''; $txnidname='TxnID';
 		$columnnames=$columnnameslist;       
 		
 		$width='70%';

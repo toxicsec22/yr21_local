@@ -42,7 +42,7 @@ switch ($which){
 	case when FinanceStatus=0 then "Pending" when FinanceStatus=1 then "Verified" when FinanceStatus=2 then "Rejected" end as FinanceStatus,
 	b.Branch as BranchTransferred,b1.Branch as BranchOrigin from approvals_2requestbudget roa left join attend_30currentpositions cp on cp.IDNo=roa.IDNo left join 1branches b on b.BranchNo=roa.BranchNo left join 1branches b1 on b1.BranchNo=cp.BranchNo left join acctg_1branchpreapprovedbudgetlist bl on bl.TypeID=roa.TypeID';
 	// echo $sql; exit();
-	$txnid='TxnID';
+	$txnidname='TxnID';
 	$columnnames=array('FullName','BranchOrigin','BranchTransferred','AmountPerMonth','BudgetDesc','DurationInMonths','DateOfTransfer','Remarks','OpsStatus','HRStatus','FinanceStatus');
 	
 	if (allowedToOpen(8197,'1rtc')) {

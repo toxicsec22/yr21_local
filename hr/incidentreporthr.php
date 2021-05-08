@@ -58,7 +58,7 @@ switch ($which){
 
         $columnstoedit=array('HRNotes'); $columnstoeditselect=array('GravityofOffense'); $columnsub=$columnnames;
         if (allowedToOpen(65051,'1rtc')) {
-        $editprocess='incidentreporthr.php?w=Notes&TxnID='; $editprocesslabel='Enter'; $txnid='TxnID';
+        $editprocess='incidentreporthr.php?w=Notes&TxnID='; $editprocesslabel='Enter'; $txnidname='TxnID';
         $addlprocess='incidentreporthr.php?w=SetAsResolved&Resolve=1&TxnID='; $addlprocesslabel='Resolved?';
 			if (allowedToOpen(65053,'1rtc')){
 				$delprocess='incidentreporthr.php?w=Delete&TxnID=';

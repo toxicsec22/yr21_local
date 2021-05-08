@@ -58,7 +58,7 @@ $sql='SELECT v.*, b.Branch, i.ItemDesc as Refrigerant FROM vacuumpermonth v
 left join `1branches` b on b.BranchNo=v.BranchNo
 left join `invty_1items` i on i.ItemCode=v.ItemCode
 order by `Date`, `SerialNo`';
-$txnid='CountID';
+$txnidname='CountID';
 }
 
 $stmt=$link->query($sql);

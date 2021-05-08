@@ -19,7 +19,7 @@ $sql='select s.TxnSubId, m.TxnID, m.Date as DateOUT, curdate() as `DateIN?`, b1.
 join acctg_2txfrsub s on m.TxnID=s.TxnID join `1branches` b on b.BranchNo=s.ClientBranchNo
 join `1branches` b1 on b1.BranchNo=m.FromBranchNo
 where (isnull(DateIN) or (DateIN like "")) and ClientBranchNo='.$_SESSION['bnum'].' group by s.TxnSubId order by m.Date, s.Particulars ';
-$txnid='TxnSubId'; $type='date';
+$txnidname='TxnSubId'; $type='date';
 $editprocess='directpr.php?w=SetDateIn&TxnSubId=';
 $editprocesslabel='Accept';
 $columnstoedit=array('DateIN?');

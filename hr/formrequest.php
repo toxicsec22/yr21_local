@@ -84,7 +84,7 @@ $sqlmain='SELECT ERFID AS TxnID,DateNeeded,
 	
 
 
-	$txnid='TxnID';
+	$txnidname='TxnID';
 	$columnnames=array('DateNeeded','RequestedBy','Form','Position','Branch/Dept','Reason','Response');
 	
 	

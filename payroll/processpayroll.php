@@ -394,7 +394,7 @@ FROM `payroll_25payrolltemp` p left join `payroll_21paydayadjustmentstemp` `a` O
 	    WHERE PayrollID='.$payrollid.' AND e.RCompanyNo='.$co['CompanyNo']
 	    .((!allowedToOpen(8173,'1rtc'))?' AND p.IDNo>1002':'')
 	    .' ORDER BY '.$sortfield.(isset($_POST['sortarrange'])?' '.$_POST['sortarrange']:' ASC');
-            $txnid='TxnID'; 
+            $txnidname='TxnID'; 
 	       $subtitle='<font color="darkblue">'.$co['CompanyName'].'</font>';
 	       include('../backendphp/layout/displayastableonlynoheaders.php');
 	       echo '<br><br>';

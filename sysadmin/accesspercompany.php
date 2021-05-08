@@ -29,7 +29,7 @@ switch ($which)
    
         $editprocess='accesspercompany.php?w=UpdatePermissionToPage&ProcessID='; $editprocesslabel='Edit';
      
-		$title='Permission Page'; $formdesc=''; $txnid='TxnID';
+		$title='Permission Page'; $formdesc=''; $txnidname='TxnID';
 		$columnnames=$columnnameslist;       
 		
 		$width='50%';

@@ -219,7 +219,7 @@ switch ($which){
 					<input type="submit" name="submit" value="Submit"> 
 					</font> </form><br/><br/>';
 	}		
-	$title=$row['Branch'].' - '.$row['Permit']. ' ('.$row2['Frequency'].')'; $formdesc=''; $txnid='TxnID';
+	$title=$row['Branch'].' - '.$row['Permit']. ' ('.$row2['Frequency'].')'; $formdesc=''; $txnidname='TxnID';
 	
 	if(!isset($setmonthly)){
 		$columnnames=$columnnameslist;       
@@ -249,7 +249,7 @@ switch ($which){
 		$editprocess='permits.php?w=PostMonthlyPermit&TxnID='.$_GET['TxnID'].'&TxnSubID='; $editprocesslabel='Post';
 		$addlprocess='permits.php?w=EditMonthlyPermit&TxnID='.$_GET['TxnID'].'&TxnSubID='; $addlprocesslabel='Edit';
      
-		$title=''; $formdesc=''; $txnid='TxnMonthlySubID';
+		$title=''; $formdesc=''; $txnidname='TxnMonthlySubID';
 		$columnnames=$columnnameslist;       
 		
 		include('../backendphp/layout/displayastablenosort.php');
@@ -364,7 +364,7 @@ switch ($which){
 	
 		$editprocess='permits.php?w=Print&TxnID='; $editprocesslabel='Print';
      
-		$title=''.$Branch.' Permit Status'; $formdesc=''; $txnid='TxnID';
+		$title=''.$Branch.' Permit Status'; $formdesc=''; $txnidname='TxnID';
 		$columnnames=$columnnameslist;       
 		
 		$width='50%';
@@ -382,7 +382,7 @@ switch ($which){
 		
 		$editprocess='permits.php?w=PermitDetails&TxnID='; $editprocesslabel='Received?';
 	 
-		$title='List of Submitted Permits But Not Received'; $formdesc=''; $txnid='TxnID';
+		$title='List of Submitted Permits But Not Received'; $formdesc=''; $txnidname='TxnID';
 		$columnnames=$columnnameslist;       
 		
 		$width='50%';
@@ -440,7 +440,7 @@ switch ($which){
 		 $title1 = 'Permit Due Dates';
 		 
 		 if (isset($_POST['btnMonth'])){	
-			$title= $title1.' [MonthNo: ' . $_POST['MonthNo'] . ', Permit Type: ' . $_POST['Permit'].']'; $formdesc=''; $txnid='TxnID';
+			$title= $title1.' [MonthNo: ' . $_POST['MonthNo'] . ', Permit Type: ' . $_POST['Permit'].']'; $formdesc=''; $txnidname='TxnID';
 			
 			
 			

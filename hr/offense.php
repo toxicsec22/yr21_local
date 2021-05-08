@@ -108,7 +108,7 @@ switch ($which){
         $sql=$sqlfull.'WHERE ((mt.ResultID IS NULL) OR (mt.ResultID NOT IN (1,2,3))) OR ResultPosted=0 '.$lettermonthfilter.$idfilter.' ORDER BY '.$sortfield.(isset($_POST['sortarrange'])?' '.$_POST['sortarrange']:' ASC'); 
       //  if($_SESSION['(ak0)']==1002) {echo $sql;}
         
-        $editprocess='offense.php?w=LookupNTE&TxnID='; $editprocesslabel='LookupNTE'; $txnid='TxnID';
+        $editprocess='offense.php?w=LookupNTE&TxnID='; $editprocesslabel='LookupNTE'; $txnidname='TxnID';
         if(allowedToOpen(6822,'1rtc')) { $addlprocess='offenseresult.php?w=LookupResult&TxnID='; $addlprocesslabel='Lookup_Result'; } 
         
       include('../backendphp/layout/displayastable.php');  

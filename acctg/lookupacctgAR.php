@@ -108,7 +108,7 @@ case 'UndepositedPDCs':
 
   $orderby='ORDER BY '.$sortfield.' '.(isset($_POST['sortarrange'])?$_POST['sortarrange']:' ASC');
   $coltototal='Total';
-  $txnid='PDCID'; 
+  $txnidname='PDCID'; 
   $columnsub=$columnnames;
 
   $subtitle='With Branch';
@@ -439,7 +439,7 @@ $stmt=$link->prepare($sql0); $stmt->execute();
     $columnnames2=array('Date','INVNO','Age','Branch');
     $showtotals=true; $runtotal=true;
     $showgrandtotal=true; 
-	$txnid='TxnID';
+	$txnidname='TxnID';
 	$addprocess='lookupacctgAR.php?w=LookupPic&TxnID='; $addprocesslabel='Lookup';
 	$delprocess='lookupacctgAR.php?w=DeletePic&TxnID='; $delprocesslabel='Delete';
 	
@@ -745,7 +745,7 @@ $stmt=$link->prepare($sql0); $stmt->execute();
     $columnnames2=array('Date','INVNO','PONo','SaleAmount','RcdAmount','InvBalance','Age','Branch');
     $showtotals=true; $runtotal=true;
     $showgrandtotal=true; 
-	$txnid='TxnID';
+	$txnidname='TxnID';
 	$editprocess='lookupacctgAR.php?w=UploadPic&TxnID='; $editprocesslabel='Upload';
 	$addprocess='lookupacctgAR.php?w=LookupPic&TxnID='; $addprocesslabel='Lookup';
 	

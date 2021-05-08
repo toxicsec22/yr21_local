@@ -10,7 +10,7 @@ $showbranches=true;
     $pagetouse='txnsperday.php?perday='.$perday.(!isset($_REQUEST[$fieldname])?'&Date='.date('Y-m-d'):'&'.$fieldname.'='.$_REQUEST[$fieldname]);
     
     
-$txnid='TxnID';
+$txnidname='TxnID';
 $method='GET';
 
 if (!isset($_REQUEST['print'])) { include_once('../switchboard/contents.php'); include_once('../backendphp/layout/clickontabletoedithead.php'); $title='';} //this is ok
@@ -129,7 +129,7 @@ if ($perday==1){ // per DAY
 } elseif(allowedToOpen(7653,'1rtc')){
 $columnnames=array('PayType','Form','TotalSalesNoOP','VATCollected'); } else { $columnnames=array();}
 if(allowedToOpen(7652,'1rtc')) { array_push($columnnames,'Total with OP');}
-unset($sortfield,$editprocess,$editprocesslabel); $txnid='PayType';
+unset($sortfield,$editprocess,$editprocesslabel); $txnidname='PayType';
 include('../backendphp/layout/displayastableonlynoheaders.php');
   $link=null; $stmt=null;
 ?>

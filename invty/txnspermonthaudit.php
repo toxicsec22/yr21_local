@@ -11,7 +11,7 @@ include_once('../switchboard/contents.php');
     $fieldname=($perday==0?'Month':'Date');
     
     
-$txnid='TxnID';
+$txnidname='TxnID';
 $method='GET';
 $showbranches=true;
 include_once('../backendphp/layout/clickontabletoedithead.php'); //this is ok

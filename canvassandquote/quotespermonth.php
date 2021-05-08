@@ -7,7 +7,7 @@ include_once('../switchboard/contents.php');
 
 
 
-$txnid='QuoteID';
+$txnidname='QuoteID';
 $pagetouse='quotespermonth.php';
 $fieldname='Month';
 $title='Quotation Per '.$fieldname;

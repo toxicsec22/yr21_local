@@ -129,7 +129,7 @@ switch ($which)
 		//Processes
 		$delprocess='uniform.php?w=DeleteUniformInfo&UID=';
 		
-		/* $title=''; $formdesc=''; */ $txnid='TxnID';
+		/* $title=''; $formdesc=''; */ $txnidname='TxnID';
 		$columnnames=$columnnameslist;       
 		$editprocess='uniform.php?w=AddNewUniform&UID='; $editprocesslabel='Lookup';
 		
@@ -270,7 +270,7 @@ switch ($which)
 		//Processes
 		$delprocess='uniform.php?w=DeleteSAP&USAPID=';
 		
-		$title=''; $formdesc=''; $txnid='TxnID';
+		$title=''; $formdesc=''; $txnidname='TxnID';
 		$columnnames=$columnnameslist;       
 		$editprocess='uniform.php?w=EditSpecificsSAP&USAPID='; $editprocesslabel='Edit';
 		
@@ -369,7 +369,7 @@ switch ($which)
 		$addlprocess2='uniform.php?w=DeleteUniformConfirm&TxnID=';
 		$addlprocesslabel2 = 'Delete';
 		
-		$title=''; $formdesc=''; $txnid='TxnID';
+		$title=''; $formdesc=''; $txnidname='TxnID';
 		$columnnames=$columnnameslist;     
 		
 			
@@ -536,7 +536,7 @@ switch ($which)
                     ui.UID JOIN hr_60sizes AS s ON usp.SizeID = s.SizeID';
 	    $columnnameslist=array('UniformType', 'Description', 'Supplier', 'Size', 'SinglePrice', 'AvailableStock');
 	    
-		$title='Uniform Stocks (OnHand)'; $formdesc='List of Available Stocks'; $txnid='TxnID';
+		$title='Uniform Stocks (OnHand)'; $formdesc='List of Available Stocks'; $txnidname='TxnID';
 		$columnnames=$columnnameslist;       
 		
 		include('../backendphp/layout/displayastable.php'); 
@@ -556,7 +556,7 @@ switch ($which)
 		
 		//Processes
 	
-		$title='Uniform Assign Logs'; $formdesc='Action: 0 = Deleted, 1 = Edited'; $txnid='TxnID';
+		$title='Uniform Assign Logs'; $formdesc='Action: 0 = Deleted, 1 = Edited'; $txnidname='TxnID';
 		$columnnames=$columnnameslist;  
 		
 		

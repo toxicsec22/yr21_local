@@ -57,7 +57,7 @@ if (allowedToOpen(array(6464,6465),'1rtc')){
 	$othercon='where bs.BranchNo=\''.$_SESSION['bnum'].'\' and Posted=0';
 }	
 		$sql='select  bs.Posted,bs.TxnID,bs.Date, Category,Concat(Nickname, \' \', SurName) as EncodedBy, bs.TimeStamp, Branch from audit_2branchspotcheck bs left join invty_1category c on c.CatNo=bs.CatNo left join 1employees e on e.IDNo=bs.EncodedByNo left join 1branches b on b.BranchNo=bs.BranchNo '.$othercon.'';
-		$txnid='TxnID';
+		$txnidname='TxnID';
 		
 			if ($showenc==1) {
 				array_push($columnnames,'EncodedBy','TimeStamp');

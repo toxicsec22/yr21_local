@@ -115,7 +115,7 @@ switch ($which)
 		
 		
 		$sql=$sqlmain.' WHERE LoanTypeID=30 ORDER BY IDNo,Posted DESC'; //SSS-Salary
-		$title='SSS-Salary'; $formdesc=''; $txnid='TxnID';
+		$title='SSS-Salary'; $formdesc=''; $txnidname='TxnID';
 		echo '<div>';
 		echo '<div>';
 		include('../backendphp/layout/displayastablenosort.php');

@@ -1,25 +1,25 @@
 <?php
 switch ($which){
          case 'Sale': 
-            $filetoopen='addeditclientside'; $which='Sale'; $txnid='TxnID'; break;
+            $filetoopen='addeditclientside'; $which='Sale'; $txnidname='TxnID'; break;
          case 'Collect':
-             $filetoopen='addeditclientside'; $which='Collect'; $txnid='TxnID'; break;
+             $filetoopen='addeditclientside'; $which='Collect'; $txnidname='TxnID'; break;
         case 'Bounced': 
-             $filetoopen='addeditclientside'; $which='Bounced'; $txnid='TxnID'; break;
+             $filetoopen='addeditclientside'; $which='Bounced'; $txnidname='TxnID'; break;
          case 'Interbranch': 
          case 'InterbranchAdj': 
          case 'InterbranchPaymt': 
-             $filetoopen='addeditclientside'; $which='Interbranch'; $txnid='TxnID'; break;
+             $filetoopen='addeditclientside'; $which='Interbranch'; $txnidname='TxnID'; break;
          case 'Deposit': 
-             $filetoopen='addeditdep';  $txnid='TxnID'; break;
+             $filetoopen='addeditdep';  $txnidname='TxnID'; break;
          case 'Purchase': 
-            $filetoopen='addeditsupplyside'; $txnid='TxnID'; break;
+            $filetoopen='addeditsupplyside'; $txnidname='TxnID'; break;
          case 'CV': 
-            $filetoopen='addeditsupplyside'; $txnid='CVNo'; break;
+            $filetoopen='addeditsupplyside'; $txnidname='CVNo'; break;
          case 'JV': 
-             $filetoopen='addeditsupplyside'; $txnid='JVNo'; break;
-         case 'AssetandDepr': $filetoopen='assetanddepr'; $txnid='DeprID'; break;
-         case 'PrepaidExpense': $filetoopen='prepaidandamort'; $txnid='AmortID'; break;
-         default: $filetoopen='lookupgenacctg'; $txnid='TxnID'; break;
+             $filetoopen='addeditsupplyside'; $txnidname='JVNo'; break;
+         case 'AssetandDepr': $filetoopen='assetanddepr'; $txnidname='DeprID'; break;
+         case 'PrepaidExpense': $filetoopen='prepaidandamort'; $txnidname='AmortID'; break;
+         default: $filetoopen='lookupgenacctg'; $txnidname='TxnID'; break;
         }
 ?>

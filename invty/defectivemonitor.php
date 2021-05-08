@@ -36,7 +36,7 @@ switch ($which){
 	if (allowedToOpen(7152,'1rtc')){
 	    /*$columnnames[]='RequestNo'; $columnnames[]='TransferNo'; */ $columnnames[]='ReqTxfrTS';
 	    $columnstoedit=array('RequestNo','TransferNo');
-	    $txnid='TxnID';
+	    $txnidname='TxnID';
 	    $editprocess='defectivemonitor.php?w=EditReturn&TxnID=';$editprocesslabel='Enter';
 	    include('../backendphp/layout/displayastableeditcells.php');
 	    }
@@ -53,7 +53,7 @@ switch ($which){
         if (allowedToOpen(7152,'1rtc')){
 	    /*$columnnames[]='RequestNo'; $columnnames[]='TransferNo';*/ $columnnames[]='ReqTxfrTS';
 	    $columnstoedit=array('RequestNo','TransferNo');
-	    $txnid='ApprovalID';
+	    $txnidname='ApprovalID';
 	    $editprocess='defectivemonitor.php?w=EditStock&ApprovalID=';$editprocesslabel='Enter';
 	    include('../backendphp/layout/displayastableeditcells.php');
 	    }
@@ -64,7 +64,7 @@ switch ($which){
     case 'EditStock':
 	if (!allowedToOpen(7152,'1rtc')){ header('Location:defectivemonitor.php');}
       require_once $path.'/acrossyrs/logincodes/confirmtoken.php';
-      if ($which=='EditReturn'){ $table='approvals_2salesreturns'; $txnid='TxnID'; } else { $table='approvals_2setasdefective'; $txnid='ApprovalID'; }
+      if ($which=='EditReturn'){ $table='approvals_2salesreturns'; $txnidname='TxnID'; } else { $table='approvals_2setasdefective'; $txnidname='ApprovalID'; }
       $columnstoadd=array('RequestNo','TransferNo'); $sql='';
 	foreach ($columnstoadd as $field) { $sql=$sql.' `' . $field. '`=\''.addslashes($_POST[$field]).'\', '; 	}
       $sql='UPDATE '.$table.' SET '.$sql.' ReqTxfrTS=Now() WHERE '.$txnid.'='.$_GET[$txnid];

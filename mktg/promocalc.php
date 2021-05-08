@@ -79,7 +79,7 @@ switch ($which){
         $title='Promo Lists';
         $sql='select TxnID,PromoName,PromoBranchNos AS BranchNos,PromoFromDate AS DateFrom,PromoToDate AS DateTo FROM mktg_2promocalcmain pm Order By pm.TimeStamp DESC';
         $columnnames=array('PromoName','BranchNos','DateFrom','DateTo');
-        $txnid='TxnID';
+        $txnidname='TxnID';
         $editprocess='promocalc.php?w=Lookup&TxnID=';
         $editprocesslabel='Lookup';
         $formdesc='</i><br><a href="promocalc.php?w=PromoAction">Add New Promo</a><i>';

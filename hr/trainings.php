@@ -28,7 +28,7 @@ switch ($which){
         JOIN `1employees` e ON e.IDNo=t.EncodedByNo ORDER BY '.$sortfield.(isset($_POST['sortarrange'])?' '.$_POST['sortarrange']:' ASC'); 
         
         $delprocess='trainings.php?which=Delete&TrainingID=';
-        $editprocess='trainings.php?which=EditSpecifics&TrainingID='; $editprocesslabel='Edit'; $txnid='TrainingID';
+        $editprocess='trainings.php?which=EditSpecifics&TrainingID='; $editprocesslabel='Edit'; $txnidname='TrainingID';
       include('../backendphp/layout/displayastable.php');       
         break;
     case 'Add':

@@ -10,7 +10,7 @@ foreach ($allowed as $ok) { if (allowedToOpen($ok,'1rtc')) { $allow=$allow+1; } 
 if ($allow==0) { echo 'No permission'; exit;}
 // end of check
 
-$txnid='TxnID';
+$txnidname='TxnID';
 $whichqry=$_GET['w'];
 $pagetouse='branchreports.php?w='.$whichqry;
 $method='GET';
@@ -63,8 +63,7 @@ FROM `comments_30branchreportonclients` rc join `1branches` b on b.BranchNo=rc.B
 join `1clients` c on c.ClientNo=rc.ClientNo
 join `1employees` e on e.IDNo=rc.EncodedByNo
 left join `1employees` e1 on e1.IDNo=rc.CommentByNo  where rc.BranchNo='.$_SESSION['bnum'].$datecondition.$condition.' order by c.ClientName';
-// $txnid='TxnID';
-$txnid='txnid';
+$txnidname='txnid';
 $editprocess='branchreports.php?w=EditOnClient&TxnID=';
 $editprocesslabel='Change!';
 // echo $sql; break;
@@ -143,7 +142,7 @@ $sql='SELECT rc.*, b.Branch, e.Nickname as EncodedBy, concat(e1.Nickname," ",e1.
 FROM `comments_32branchreportoncompetitors` rc join `1branches` b on b.BranchNo=rc.BranchNo
 join `1employees` e on e.IDNo=rc.EncodedByNo
 left join `1employees` e1 on e1.IDNo=rc.CommentByNo  where rc.BranchNo='.$_SESSION['bnum'].$datecondition;
-$txnid='txnid';
+$txnidname='txnid';
 $editprocess='branchreports.php?w=EditOnCompetitors&TxnID=';
 $editprocesslabel='Change!';
 // echo $sql; break;
@@ -216,7 +215,7 @@ $sql='SELECT rc.*, date_format(Date,\'%b %d  %a\') as SaleDate, b.Branch, e.Nick
 FROM `comments_31branchreportondailysales` rc join `1branches` b on b.BranchNo=rc.BranchNo
 join `1employees` e on e.IDNo=rc.EncodedByNo
 left join `1employees` e1 on e1.IDNo=rc.CommentByNo  where rc.BranchNo='.$_SESSION['bnum'].$datecondition;
-$txnid='txnid';
+$txnidname='txnid';
 $editprocess='branchreports.php?w=EditOnDailySales&TxnID=';
 $editprocesslabel='Change!';
 // echo $sql; break;
@@ -300,7 +299,7 @@ FROM `comments_33branchconcerns` rc join `1branches` b on b.BranchNo=rc.BranchNo
 join `1employees` e on e.IDNo=rc.EncodedByNo
 left join `1employees` e1 on e1.IDNo=rc.CommentByNo '.$condition;
 // echo $sql;
-$txnid='TxnID';
+$txnidname='TxnID';
 $editprocess='branchreports.php?w=EditBranchConcerns&TxnID='; $editprocesslabel='Change!';
 if (allowedToOpen(7102,'1rtc')){ $addlprocess='branchreports.php?w=SetAsRead&TxnID='; $addlprocesslabel='Set_as_Read/Unread';}
 // echo $sql; break;

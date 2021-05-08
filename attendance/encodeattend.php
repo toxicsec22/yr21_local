@@ -11,7 +11,7 @@ allowed:
 // end of check
 $showbranches=false; include_once('../switchboard/contents.php');
 
- $txnid='TxnID';
+ $txnidname='TxnID';
 
 $whichqry=$_GET['w'];
 $_SESSION['Date'] = date('Y-m-d'); //$_SESSION['Date'] = date('Y-m-d',strtotime('tomorrow')); allowed today
@@ -64,7 +64,7 @@ $calledfrom=6;
 $fieldname='AttendDate';
 
 
-$txnid='TxnID';
+$txnidname='TxnID';
 
 
 $columnnames=array('DateToday','IDNo','FullName','TimeIn','TimeOut','RemarksHR','OTApproval','OT_Approval','OTTypeNo','OTType','RemarksDept','Branch','Shift','LeaveNo');
@@ -159,7 +159,7 @@ $method='GET';
 include_once('../backendphp/layout/clickontabletoedithead.php');
 
 
-$txnid='TxnID';
+$txnidname='TxnID';
 $columnnames=array('TxnID','DateToday','IDNo','TimeIn','TimeOut','RemarksHR','Overtime','LeaveNo');		
 $sql='SELECT * FROM attend_2attendance where LeaveNo not in (Select LeaveNo from attend_0leavetype);';
 		
@@ -239,7 +239,7 @@ case "AddAttendRecords":
     if (!allowedToOpen(614,'1rtc')){ echo 'No permission'; exit;}
 $title='Add/Delete Attendance Records'; $formdesc='Use this only for cases where attendance was not automatically created in <b>New Employee</b>';	
 
-$txnid='TxnID';
+$txnidname='TxnID';
 $columnnames=array('DateToday','IDNo','TimeIn','TimeOut','RemarksHR','Overtime','Branch','Posted','LeaveNo','LeaveName');
 $method='POST';
 include_once('../backendphp/layout/clickontabletoedithead.php');

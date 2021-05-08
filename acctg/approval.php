@@ -314,11 +314,11 @@ if (allowedToOpen(522,'1rtc') or allowedToOpen(5222,'1rtc')) {
     $stmt1=$link->query($sql1); $res1=$stmt1->fetch();
     $sql=$sql0.' WHERE ISNULL(Approval) '.(allowedToOpen(5222,'1rtc')?'':' AND a.BranchNo IN (Select g.BranchNo from `attend_1branchgroups` g where TeamLeader='.$_SESSION['(ak0)'].' OR SAM='.$_SESSION['(ak0)'].') AND (a.EncodedByNo<>'.$_SESSION['(ak0)'].') AND (SELECT IF (PositionID IN (32,33,37,38,81),0,JLID) FROM `attend_30currentpositions` WHERE IDNo=a.EncodedByNo)<('.$res1['Rank'].')'); 
 $columnnames=array('Branch','InvNo','Amount','RequestedBy','RequestTS','OPClientName','OPClientMobile'); 
-$columnstoedit=array('Amount','OPClientName','OPClientMobile'); $txnid='BranchInvNo'; 
+$columnstoedit=array('Amount','OPClientName','OPClientMobile'); $$txnidname='BranchInvNo'; 
 $editprocess='praddmain.php?w=ApproveOP&action_token='.$_SESSION['action_token'].'&InvNo=';$editprocesslabel='Approve';
 include('../backendphp/layout/displayastableeditcellsnoheaders.php');    
 }
-$txnid='BranchInvNo';$txnidname='BranchInvNo';
+$txnidname='BranchInvNo';
 $columnnames=array('SaleTxnID','SaleDate','Branch','InvNo','ClientName','PayType','Amount','OPClientName','OPClientMobile','RequestedBy','RequestTS','Approval', 'ApprovedBy','ApprovalTS','Recorded');
 $sql=$sql0.' WHERE Month(a.`TimeStamp`)='.$month.$condition.' ORDER BY a.TimeStamp,b.Branch';
 $editprocess='approval.php?w=DelOP&action_token='.$_SESSION['action_token'].'&InvNo=';$editprocesslabel='Del';
@@ -419,7 +419,7 @@ left join `acctg_2collectmain` m on m.TxnID=a.TxnID
 join `banktxns_1maintaining` mt on mt.AccountID=a.Bank
 left join `1clients` c on c.ClientNo=a.ClientNo
 where Month(a.`TimeStamp`)='.$month.$condition.' Order by DirectDepDate DESC, a.TimeStamp DESC,b.Branch';
-$txnid='TxnID';
+$txnidname='TxnID';
 $columnnames=array('DirectDepDate','Branch','ClientName','Bank','RequestRemarks','RequestedBy','RequestTS','CollectNo','Amount','Approval', 'ApproveRemarks','ApprovedBy','ApprovalTS','Recorded');
 
 include('../backendphp/layout/displayastable.php');

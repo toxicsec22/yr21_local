@@ -50,7 +50,7 @@ $addlmenu.='<form method=post action="creditcard.php?w=ProcessAdd">
 $sql='SELECT u.*, b.Branch, ca.ShortAcctID as Account FROM gen_info_5creditcardusualpayees u 
 join `1branches` b on b.BranchNo=u.DefaultBranch
 join acctg_1chartofaccounts ca on ca.AccountID=u.DefaultAcctID;';
-$txnid='CCExpID';
+$txnidname='CCExpID';
 $editprocess='creditcard.php?w=EditPayees&edit=2&CCExpID=';$editprocesslabel='Edit';
 
     $columnnames=array('PayeeDetails','Account','Branch');
@@ -204,7 +204,7 @@ left join `1employees` as e on e.IDNo=cc.EncodedByNo WHERE cc.CreditCardNo='.$cc
    // echo $sql; break;
     $stmt=$link->query($sql);
     $resultsub=$stmt->fetchAll();
-    $txnid='CCTxnSubId';
+    $txnidname='CCTxnSubId';
     $cctxnlist='';
     foreach ($columnnames as $col){ $cctxnlist=$cctxnlist.'<td>'.$col.'</td>';}
     $cctxnlist='<tr>'.$cctxnlist.'</tr>';

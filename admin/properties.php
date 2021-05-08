@@ -74,7 +74,7 @@ switch ($which)
 	$addlprocesslabel='Assign To';
 	
 	
-	$title=''; $formdesc=''; $txnid='PropID';
+	$title=''; $formdesc=''; $txnidname='PropID';
 	$columnnames=$columnnameslist;       
 	$sql.='ORDER BY PropertyOfBranch';
 	include('../backendphp/layout/displayastable.php');       

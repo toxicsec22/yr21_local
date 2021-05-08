@@ -98,7 +98,7 @@ if(allowedToOpen(686,'1rtc')){
          $sql=$sql.' WHERE pf.HRStatus<>1 AND e1.Resigned<>1 '.$evalcondi.' ORDER BY EvalDueDate ASC'; 
 		// echo $sql;
         $addlprocess2='newperfevalform.php?TxnID='; $addlprocesslabel2='Lookup';
-        $txnid='TxnID';
+        $txnidname='TxnID';
         
       include('../backendphp/layout/displayastable.php'); 
     
@@ -326,7 +326,7 @@ $stmt=$link->query($sqlpopultatedtoday); $res=$stmt->fetchAll();
 //           $sql=$sql.$evalcondi.' GROUP BY pf.IDNo'; 
           
 //         //   $addlprocess2='newperfevalformmonthly.php?IDNo='; $addlprocesslabel2='Lookup';
-//         //   $txnid='TxnID';
+//         //   $txnidname='TxnID';
          
 //         include('../backendphp/layout/displayastable.php'); 
       

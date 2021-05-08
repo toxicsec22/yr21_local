@@ -6,7 +6,7 @@ include_once('../switchboard/contents.php');
 
 
 
-$txnid='TxnID';
+$txnidname='TxnID';
 $whichqry=$_GET['w'];
 $pagetouse='txnsinterperday.php?w='.$whichqry;
 include_once('../backendphp/layout/linkstyle.php');

@@ -6,7 +6,7 @@ include_once 'trailgeninfo.php';
 
     $title='List of Suppliers';
     
-    $txnid='SupplierNo';
+    $txnidname='SupplierNo';
     $fieldname='SupplierNo';
 	
 $which=(!isset($_GET['w'])?'List':$_GET['w']);	

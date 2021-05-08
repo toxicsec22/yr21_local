@@ -158,7 +158,7 @@ switch ($which)
                 }                 
 		
 		
-		$formdesc=''; $txnid='TxnID';
+		$formdesc=''; $txnidname='TxnID';
 		$columnnames=$columnnameslist;
 		$width='80%';
 if (allowedToOpen(40041,'1rtc')){ 		

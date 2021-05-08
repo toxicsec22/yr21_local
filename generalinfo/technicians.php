@@ -6,7 +6,7 @@ $showbranches=true; include_once('../switchboard/contents.php');
 $which=!isset($_GET['w'])?'List':$_GET['w'];
 $title='Add New Technician';  
 $list='List';
-$table='gen_info_1technicians'; $txnid='TechID'; $txnidname='TechID'; 
+$table='gen_info_1technicians'; $txnidname='TechID'; 
 $sql='SELECT `t`.*,mask(MobileNo,"####-###-####") AS Mobile,(SELECT GROUP_CONCAT(Branch) FROM 1branches WHERE FIND_IN_SET(BranchNo,t.BranchNos)) AS Branches,IF(EmployedByClientNo<>0,EmployedByClientNo,"") AS EmployedByClientNo,IF(EmployedByClientNo<>0,ClientName,"") AS EmployedByClient, NickName AS EncodedBy FROM gen_info_1technicians `t` JOIN 1employees e ON `t`.EncodedByNo=e.IDNo LEFT JOIN 1clients c ON t.EmployedByClientNo=c.ClientNo ';
 $columnnameslist2=array('TechName', 'MobileNo','BranchNos','EmployedByClientNo','Position','Subscribed');
 $columnnameslist=array('TechName', 'Mobile','Branches','EmployedByClient','Position','Subscribed');

@@ -23,7 +23,7 @@ switch ($which){
         $title='Pending Reports';
         $columnnames=array('ReIDNo', 'ReportRegarding', 'Branch', 'Report', 'ReportedBy', 'TimeStamp', 'MgtNotes');
         $columnstoedit=array('MgtNotes'); $columnsub=$columnnames;
-        $editprocess='confireportjye.php?w=Notes&TxnID='; $editprocesslabel='Enter'; $txnid='TxnID';
+        $editprocess='confireportjye.php?w=Notes&TxnID='; $editprocesslabel='Enter'; $txnidname='TxnID';
         $addlprocess='confireportjye.php?w=SetAsResolved&Resolve=1&TxnID='; $addlprocesslabel='Resolved?';
         $sql=$sql0.'WHERE Resolved=0 '.$orderby;
          include('../backendphp/layout/displayastableeditcells.php');

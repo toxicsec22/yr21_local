@@ -108,7 +108,7 @@ switch ($which)
 				
 		$title=''; $formdesc=''; 
                 
-                $txnid='TxnID';
+                $txnidname='TxnID';
 		$columnnames=$columnnameslist;       
                 if (allowedToOpen(2206,'1rtc')){ $editprocess='checklist.php?w=EditSpecificsRate&RYNID='; $editprocesslabel='Edit';}
 		echo '<div style="width:45%">';
@@ -199,7 +199,7 @@ case 'List':
 				
 		$title=''; $formdesc=''; 
                 
-                $txnid='TxnID';
+                $txnidname='TxnID';
 		$columnnames=$columnnameslist;       
                 $editprocess='checklist.php?w=EditSpecificsList&TxnID='; $editprocesslabel='Edit';
 				$addlprocess='checklist.php?w=Lookup&TxnID=';

@@ -16,7 +16,7 @@ switch ($which){
      // $groupby='CompanyNo'; $orderby=' order by SurName';
     // $columnnames1=array('CompanyName');
     // $columnnames2=array('IDNo','FullName');
-	 // $txnid='IDNo';
+	 // $txnidname='IDNo';
 	 // $addprocess='yrendgovtreports.php?w=lookup&IDNo=';
 	 // $addprocesslabel='lookup';
     

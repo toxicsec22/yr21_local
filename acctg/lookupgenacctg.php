@@ -263,7 +263,7 @@ $show=!isset($_REQUEST['show'])?1:$_REQUEST['show'];
 <?php
 if ((allowedToOpen(303,'1rtc')) or (allowedToOpen(5591,'1rtc'))) { $showperco='';} else { $showperco=' JOIN `banktxns_1maintaining` m ON m.AccountID=dm.DebitAccountID  ';}
 if ($show<>1){	$condition=' AND de.BranchNo like \''.$_SESSION['bnum'].'\' ';  } else {  $condition=''; }
-$txnid='TxnID';
+$txnidname='TxnID';
 $title='Clear Encashments';
 $columnnames=array('DepositNo','EncashDetails','Amount', 'DebitAccount','Date','Branch');  
 $sql='SELECT dm.TxnID,dm.DepositNo, b.Branch, de.EncashDetails, de.Amount, ca.ShortAcctID as DebitAccount, dm.Date, dm.ClearedEncash
@@ -279,7 +279,7 @@ case 'UnclearedDep':
 if (!allowedToOpen(561,'1rtc')) { echo 'No permission'; exit; }
 $title='Uncleared Deposits';
 $showbranches=false;
-$txnid='TxnID';
+$txnidname='TxnID';
 $lefttabletitle='Actual Bank Transactions';
 $righttabletitle='Uncleared in our data (unposted)';
 

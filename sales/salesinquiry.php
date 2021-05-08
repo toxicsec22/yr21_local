@@ -80,7 +80,7 @@ echo'</br>';
 				
 						
 				$columnnames=$columnnameslist;   
-				$title=''; $formdesc=''; $txnid='TxnID';
+				$title=''; $formdesc=''; $txnidname='TxnID';
 				
 						
 				$sql=$sql.' ORDER BY DateInquired DESC';
@@ -186,7 +186,7 @@ echo'</br>';
 		
 				
 	$columnnames=array('Status','Remarks');   
-	$title=''; $formdesc=''; $txnid='TxnID';
+	$title=''; $formdesc=''; $txnidname='TxnID';
 
 
 	include('../backendphp/layout/displayastablenosort.php');
@@ -248,7 +248,7 @@ echo'</br>';
 		
 				
 		$columnnames=$columnnameslist;   
-		$title=''; $formdesc=''; $txnid='TxnID';
+		$title=''; $formdesc=''; $txnidname='TxnID';
 		
 		include('../backendphp/layout/displayastablenosort.php');
     break;

@@ -73,7 +73,7 @@ switch ($which){
         $sql=$sql.'WHERE 1=1 '.$lettermonthfilter.$idfilter.$monthfilter.' ORDER BY '.$sortfield.(isset($_POST['sortarrange'])?' '.$_POST['sortarrange']:' ASC'); 
         
         $delprocess='tardy.php?w=Delete&TxnID=';
-        $editprocess='tardy.php?w=EditSpecifics&TxnID='; $editprocesslabel='Edit'; $txnid='TxnID';
+        $editprocess='tardy.php?w=EditSpecifics&TxnID='; $editprocesslabel='Edit'; $txnidname='TxnID';
         $addlprocess='tardy.php?w=Post&TxnID='; if(allowedToOpen(6881,'1rtc')) { $addlprocesslabel='Post_Unpost'; } else { $addlprocesslabel='Post'; }
         $addlprocess2='tardy.php?w=Letter&print=1&TxnID='; $addlprocesslabel2='PrintPreview'; 
       include('../backendphp/layout/displayastable.php');       

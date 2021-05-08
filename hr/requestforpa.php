@@ -108,7 +108,7 @@ $sql='SELECT RPAID AS TxnID,DateToBeServed,ActionDesc,
     cp.FullName AS Employee,CONCAT(e2.NickName," ",e2.Surname) AS RequestedBy ,RequestedTS,Position,IF(deptid IN (2,10),Branch,dept) AS `Branch/Dept`,Reason,e.NickName AS ApprovedBy,e3.NickName AS ServedBy,e.NickName AS DeniedBy FROM attend_30currentpositions cp JOIN hr_2requestpa rpa ON cp.IDNo=rpa.IDNo LEFT JOIN 1employees e ON rpa.StatusByNo=e.IDNo LEFT JOIN 1employees e2 ON rpa.RequestedByNo=e2.IDNo LEFT JOIN 1employees e3 ON rpa.ServedByNo=e3.IDNo JOIN hr_0personnelaction pa ON rpa.ActionID=pa.ActionID WHERE ReqStatus='.$reqstat.' '.$addlcondi.'  '.$addcondlist.' ORDER BY DateToBeServed ASC';
 
 // echo $sql;
-	$txnid='TxnID';
+	$txnidname='TxnID';
 	$columnnames=array('DateToBeServed','Employee','ActionDesc','Branch/Dept','Position','RequestedBy','Reason');
 	
 	

@@ -22,7 +22,7 @@ GROUP BY ts.TxnID,rp.BulkItemCode HAVING (RepackQtyShouldBe<>RecordedRepacked) O
     $stmt0=$link->prepare($sql0); $stmt0->execute();
     $sql='SELECT *, FORMAT(((RepackQtyShouldBe-RecordedRepacked)/RepackQtyShouldBe)*100,2) AS `PercentDifference`  FROM `unequalrepack`';
     $columnnames=array('Branch', 'RepackEncodedBy', 'DateOUT', 'BulkItemCode', 'RepackItemCode', 'RepackQtyShouldBe', 'RecordedRepacked','PercentDifference');
-    $txnid='TxnID'; $editprocess='../invty/addedittxfr.php?w=Transfers&TxnID='; $editprocesslabel='Lookup';
+    $txnidname='TxnID'; $editprocess='../invty/addedittxfr.php?w=Transfers&TxnID='; $editprocesslabel='Lookup';
     include('../backendphp/layout/displayastable.php'); 
     break;
 

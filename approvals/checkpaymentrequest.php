@@ -134,7 +134,7 @@ switch ($which)
 		<option value="5">Waiting for Receipt</option>
 		<option value="6">Done Requests</option>
 		<option value="7">All Requests</option></select>
-		<input type="submit" name="btnSubmit" value="Filter"></form><i>'; $txnid='TxnID';
+		<input type="submit" name="btnSubmit" value="Filter"></form><i>'; $txnidname='TxnID';
 		
 		if (allowedToOpen(5238,'1rtc')) {
 			$defaultfilter = ' WHERE ReceiptReceived=0';

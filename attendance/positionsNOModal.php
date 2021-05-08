@@ -11,7 +11,7 @@ $formdesc='</i>To add permissions for standard processes for <form method=post a
         . 'New Position ID <input type=number name=NewPositionID size="3" ><input type=submit value="Add Standard Permissions"></form><i><br><br><form method=post action=positions.php?w=CopyPermissions>PositionFROM: <input type=text name=PosFrom list=poslist> PositionTO:<input type=text name=PosTo list=poslist><input type=submit value="Copy Permission"></form><br><br><form method=post action=positions.php?w=DelPosition>Remove Position in AllowedPos: <input type=text name=PosToRemove list=poslist><input type=submit value="Remove Position"></form>
 ';
 $list='List';
-$table='attend_0positions'; $txnid='PositionID'; $txnidname='PositionID'; 
+$table='attend_0positions'; $txnidname='PositionID'; 
 $sql='SELECT p.*, department AS Department, (SELECT Position FROM `attend_0positions` WHERE PositionID=p.supervisorpositionid) AS Supervisor, IF(p.PreferredRateType=1,"Monthly","Daily") AS RateType,p.JobLevelNo
 FROM `attend_0positions` p LEFT JOIN `attend_1joblevel` jl ON jl.JobLevelNo=p.JobLevelNo
 JOIN `1departments` d ON d.deptid=p.deptid ';

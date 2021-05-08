@@ -6,7 +6,7 @@ include_once('../switchboard/contents.php');
 
 
 
-$txnid='TxnID';
+$txnidname='TxnID';
 $whichqry=$_GET['w'];
 $pagetouse='txnsmrrperday.php?w='.$whichqry;
 $show=!isset($show)?0:$show;

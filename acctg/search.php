@@ -32,7 +32,7 @@ if (!isset($_POST['submit'])){    goto noform;}
 
 switch ($_POST['submit']){
 case 'Check Deposits':
-   $txnid='TxnID';
+   $txnidname='TxnID';
    $editprocess='addeditdep.php?w=Deposit&TxnID=';
    $sql='SELECT dm.TxnID, dm.Date, dm.DepositNo, ds.CheckNo, Sum(ds.Amount) AS AmtofCheck, dm.Cleared, `ca`.`ShortAcctID` AS `Bank`, dm.Posted
 FROM acctg_2depositmain dm INNER JOIN acctg_2depositsub ds ON dm.TxnID=ds.TxnID
@@ -43,21 +43,21 @@ $columnnames=array('Date','DepositNo','CheckNo','AmtofCheck','Cleared','Bank');
    break;
 
 case 'Paid to Suppliers':
-   $txnid='TxnID';
+   $txnidname='TxnID';
    $editprocess='addeditsupplyside.php?w=CV&TxnID=';
    $sql='Select vm.CVNo, vm.Date,vm.PayeeNo, vm.Payee, vm.Cleared as PaymentClearedOn, ca.ShortAcctID as BankCheck, vs.ForInvoiceNo,SUM(vs.Amount) as Amount from acctg_2cvmain vm join acctg_2cvsub vs on vm.CVNo=vs.CVNo join acctg_1chartofaccounts ca on ca.AccountID=vm.CreditAccountID where vs.ForInvoiceNo like  \'%'.$_POST['stringsearch'].'%\' GROUP BY vs.ForInvoiceNo';
 $columnnames=array('Date','Payee','ForInvoiceNo','Amount','PaymentClearedOn','BankCheck');
    break;
 
 case 'Payees':
-   $txnid='CVNo';
+   $txnidname='CVNo';
    $editprocess='addeditsupplyside.php?w=CV&CVNo=';
    $sql='Select vm.CVNo, vm.Date,vm.PayeeNo, vm.Payee, vm.ReleaseDate, vm.Cleared as PaymentClearedOn, ca.ShortAcctID as BankCheck, SUM(vs.Amount) AS AmountofCheck from acctg_2cvmain vm join acctg_2cvsub vs on vm.CVNo=vs.CVNo join acctg_1chartofaccounts ca on ca.AccountID=vm.CreditAccountID where vm.Payee like  \'%'.$_POST['stringsearch'].'%\' GROUP BY CVNo';
 $columnnames=array('Date','Payee','AmountofCheck','ReleaseDate','PaymentClearedOn','BankCheck');
    break;
 
 case 'Client Invoices Paid':
-   $txnid='TxnID';
+   $txnidname='TxnID';
    $editprocess='addeditdep.php?w=Deposit&TxnID=';
    include_once '../generalinfo/unionlists/ECList.php';
    $sql='Select m.TxnID, m.Date, m.`DepositNo`, Branch, s.`ForChargeInvNo`, c.BECSName as ClientName, m.Cleared as DepositClearedOn, s.Amount from acctg_2depositmain m join acctg_2depositsub s on m.TxnID=s.TxnID JOIN `ECList` c ON c.BECSNo=s.`ClientNo` AND c.BECS=IF(s.`ClientNo`<9999,"E","C") JOIN `1branches` b ON b.BranchNo=s.BranchNo WHERE s.`ForChargeInvNo` LIKE \'%'.$_POST['stringsearch'].'%\' GROUP BY TxnID;';
@@ -70,7 +70,7 @@ $columnnames=array('Date','CollectNo','Branch','ClientName','ForChargeInvNo','Am
    break;
    
 case 'Amount':
-   $txnid='TxnID';
+   $txnidname='TxnID';
    $sql='SELECT u.*, Branch, ShortAcctID AS Account FROM '.$currentyr.'_static.acctg_unialltxns u JOIN `1branches` b ON b.BranchNo=u.BranchNo '
            . ' JOIN acctg_1chartofaccounts ca on ca.AccountID=u.AccountID '
            . ' WHERE Amount='.$_POST['stringsearch'].' OR Amount='.($_POST['stringsearch']*-1).' OR Amount='.($_POST['stringsearch']+.1).' OR Amount='.(($_POST['stringsearch']+.1)*-1);
@@ -78,7 +78,7 @@ $columnnames=array('Date','ControlNo','Supplier/Customer/Branch','Particulars','
    break;
 
 case 'Particulars':
-   $txnid='TxnID';
+   $txnidname='TxnID';
    $sql='SELECT u.*, Branch, ShortAcctID AS Account FROM '.$currentyr.'_static.acctg_unialltxns u JOIN `1branches` b ON b.BranchNo=u.BranchNo '
            . ' JOIN acctg_1chartofaccounts ca on ca.AccountID=u.AccountID '
            . ' WHERE Particulars LIKE \'%'.$_POST['stringsearch'].'%\' OR `Supplier/Customer/Branch` LIKE \'%'.$_POST['stringsearch'].'%\'';
@@ -86,7 +86,7 @@ $columnnames=array('Date','ControlNo','Supplier/Customer/Branch','Particulars','
    break;
 
 case 'Clients':
-   $txnid='ClientNo';
+   $txnidname='ClientNo';
    $colstosearch=array('ClientNo', 'TelNo1', 'TelNo2', 'Mobile','ContactPerson','EmailAddress','ARClientType','Terms','CreditLimit','Remarks','StreetAddress','Barangay','TownOrCity','Province','Inactive','EncodedByNo');
    $sql='';
    foreach ($colstosearch as $col){
@@ -98,7 +98,7 @@ $columnnames=array('ClientNo', 'ClientName', 'TelNo1', 'TelNo2', 'Mobile','Conta
    
 case 'Collection Number':
 
- $txnid='TxnID';
+ $txnidname='TxnID';
  
    $editprocess='addeditclientside.php?w=Collect&TxnID=';
    

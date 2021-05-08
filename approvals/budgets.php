@@ -106,7 +106,7 @@ switch ($which){
 	join acctg_1chartofaccounts ca on ca.AccountID=bl.AccountID ' . ($show==1?'':' where bud.BranchNo='.$branchno.' AND b.Active<>0').' ORDER BY '.$sortfield.(isset($_POST['sortarrange'])?' '.$_POST['sortarrange']:' ASC');  // echo $sql; break;
         
         if (allowedToOpen(6071,'1rtc')) { $columnstoedit=array('AccountID','BudgetPerMonth','Specifics','Remarks');
-        $txnid='budgetid'; $editprocess='budgets.php?which=Edit&budgetid=';$editprocesslabel='Change!'; $delprocess='budgets.php?which=Delete&budgetid=';}
+        $txnidname='budgetid'; $editprocess='budgets.php?which=Edit&budgetid=';$editprocesslabel='Change!'; $delprocess='budgets.php?which=Delete&budgetid=';}
 	include('../backendphp/layout/displayastableeditcells.php');	
      
      //case 'Compare':

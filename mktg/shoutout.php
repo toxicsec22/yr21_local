@@ -49,7 +49,7 @@ switch($which){
 
             $sql.=$sqlcondi.' Order By ShoutStat,Branch,so.TimeStamp DESC';
 			$columnnames=array('Shoutout','ShoutedBy','Branch','TimeStamp');
-			$txnid='TxnID';
+			$txnidname='TxnID';
 			$editprocess='shoutout.php?w=ManageShoutout&TxnID=';
 			$editprocesslabel='Manage Shoutout';
 			

@@ -36,7 +36,7 @@ switch ($which){
       	 $editprocess='directoryedit.php?w=EditSpecifics&IDNo='; $editprocesslabel='Edit'; 
          
 			
-      $txnid='IDNo';
+      $txnidname='IDNo';
       $columnnames=$columnnameslist;
         $sortfield=(isset($_POST['sortfield'])?$_POST['sortfield']:' Department, FullName'); $columnsub=$columnnames;
         $sql=$sql.' ORDER BY '.$sortfield.(isset($_POST['sortarrange'])?' '.$_POST['sortarrange']:' ASC');    

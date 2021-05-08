@@ -71,7 +71,7 @@ $title='Annual Increase';
 
 
 
-$table='payroll_61plannedincrease'; $txnid='IDNo'; $txnidname='IDNo'; 
+$table='payroll_61plannedincrease'; $txnidname='IDNo'; 
 $sql='SELECT pi.*, FullName, Position AS CurrentPosition, cp.deptid, FORMAT(CurrentRate,0) AS CurrentRate, FORMAT(CalculatedRate,0) AS CalculatedRate, FORMAT(RecommendedRate,0) AS RecommendedRate FROM payroll_61plannedincrease pi JOIN attend_30currentpositions cp ON pi.IDNo=cp.IDNo '.$cond;
 $columnnames=array('CurrentAssignment','IDNo', 'FullName', 'CurrentPosition', 'CurrentRate','CalculatedRate','RecommendedRate', 'Remarks', 'LatesMarchToFeb', 'AbsencesMarchToFeb', 'MeritsMarchToFeb', 'DemeritsMarchToFeb','NTEMarchToFeb', 'PerfScoreLastYr', 'DateofLastIncrease'); 
 

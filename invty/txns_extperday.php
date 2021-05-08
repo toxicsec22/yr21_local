@@ -5,7 +5,7 @@ include_once('../switchboard/contents.php');
  
 
 
-$txnid='TxnID';
+$txnidname='TxnID';
 $whichqry=$_GET['w'];
 $pagetouse='txns_extperday.php?w='.$whichqry;
 if (!allowedToOpen(769,'1rtc')){   echo 'No permission'; exit;}

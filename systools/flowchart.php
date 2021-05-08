@@ -52,7 +52,7 @@
 		
 		$title=''; $formdesc=''; 
                 
-        $txnid='TxnID';
+        $txnidname='TxnID';
 		$columnnames=$columnnameslist;
 		$width="70%";
 		include('../backendphp/layout/displayastable.php');

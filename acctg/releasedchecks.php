@@ -80,7 +80,7 @@ if (in_array($which,array('AddReleaseDate','Unset','SetNonBank','SetBasedOnPayee
 switch ($which){
 case 'List':
 if (!allowedToOpen(5402,'1rtc')) { echo 'No permission'; exit; }
-$txnid='CVNo';
+$txnidname='CVNo';
 $sortfield=(isset($_POST['sortfield'])?$_POST['sortfield']:' `DateofCheck`,`CVNo` ');
 $sql0='CREATE TEMPORARY TABLE released AS '.$sqllastyr.$filter.' UNION ALL '.$sqlcurr.$filter.' UNION ALL '.$sqlfuture.$futurefilter.' ORDER BY '.$sortfield.(isset($_POST['sortarrange'])?' '.$_POST['sortarrange']:' ASC'); // if($_SESSION['(ak0)']==1002) { echo $sql0;}
 $stmt0=$link->prepare($sql0); $stmt0->execute();

@@ -181,7 +181,7 @@ switch ($which)
 		$delprocess='billduedates.php?w=DeleteBillType&BTID=';
 		$editprocess='billduedates.php?w=EditSpecificsBillType&BTID='; $editprocesslabel='Edit';
      
-		$title=''; $formdesc=''; $txnid='TxnID';
+		$title=''; $formdesc=''; $txnidname='TxnID';
 		$columnnames=$columnnameslist;       
 		
 		$width='70%';
@@ -265,7 +265,7 @@ switch ($which)
 		if ((isset($_SESSION['bill_due']))){
 			$title=$filtertitle;
 			$columnnameslist=array('BillerName','BillType','SubscriberName', 'AccountNo', 'TelMobileNo', 'MRF', 'Assignee', 'ExpenseOf', 'DeclaredforCompany','CutOffDate','DueDate','BillAmount');
-			$txnid='TxnID';
+			$txnidname='TxnID';
 			$columnnames=$columnnameslist;
 			$columnstoedit=array('BillAmount');
 			
@@ -336,7 +336,7 @@ switch ($which)
 		$editprocess='billduedates.php?w=EditSpecificsAssignUtilityBill&AssignID='; $editprocesslabel='Edit';
 		$addlprocess='billduedates.php?w=SetActiveInactive&AssignID='; $addlprocesslabel='Active/Inactive';
      
-		$title=''; $formdesc=''; $txnid='AssignID';
+		$title=''; $formdesc=''; $txnidname='AssignID';
 		$columnnames=$columnnameslist;       
 		
 		$width='100%';
@@ -363,7 +363,7 @@ switch ($which)
 		}
 		echo '<form action="billduedates.php?w=AssignmentHistory" method="POST">Account Number: <input type="text" name="AccountNo" list="accountnolist" autocomplete="off"> <input type="submit" name="btnSubmit" value="Lookup"></form>';
 		
-		$title=''; $formdesc=''; $txnid='AssignID';
+		$title=''; $formdesc=''; $txnidname='AssignID';
 		   
 		
 		$width='100%';
@@ -697,7 +697,7 @@ switch ($which)
 		if (allowedToOpen(8004,'1rtc')){
 			$editprocess='billduedates.php?w=Paid&TxnID='; $editprocesslabel='Manually Set as Paid';
 		}
-		$columnstoedit=array('BillAmount','Remarks'); $txnid='TxnID';
+		$columnstoedit=array('BillAmount','Remarks'); $txnidname='TxnID';
 		
 		// include('../backendphp/layout/displayastableeditcells.php');
 		include('../backendphp/layout/displayastableeditcellswithsorting.php');
@@ -709,7 +709,7 @@ switch ($which)
 		
 		
 		$newtab=true;
-		$txnid='TxnID';
+		$txnidname='TxnID';
 		if (allowedToOpen(8005,'1rtc')){
 			$editprocess='addeditsupplyside.php?w=CV&TxnID='; $editprocesslabel='Lookup';
 		}

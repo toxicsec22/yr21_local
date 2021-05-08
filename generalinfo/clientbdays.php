@@ -15,7 +15,7 @@ case 'ClientBdayList':
     $sql='SELECT bday.* FROM `gen_info_clientbdays` bday ORDER BY `ToSort`';      
     $columnnames=array('Company', 'Name', 'Birthday', 'Position','Branches','EncodedBy', 'TimeStamp'); $showbranches=false;
     $columnstoedit=array('Name', 'Position');
-    $txnid='TxnID';      
+    $txnidname='TxnID';      
     if (allowedToOpen(64871,'1rtc')){
     ?><br><br>
 		<form method='POST' action='clientbdays.php?w=Add' >

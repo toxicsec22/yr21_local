@@ -329,7 +329,7 @@ format(m.Maintain,0) as Maintain, format(m.Backup,0) as Backup, format(m.Transfe
 from `bankbalances'.$sessako.'` bb RIGHT JOIN banktxns_1maintaining m ON m.AccountID=bb.AccountID WHERE m.Order<>9999 ';
 
      
-$txnid='AccountID'; //$coltototal='Available'; $showgrandtotal=true;
+$txnidname='AccountID'; //$coltototal='Available'; $showgrandtotal=true;
 $editprocess='prbankbalances.php?AccountID='; $editprocesslabel='Enter';
 include('../backendphp/layout/displayastableeditcellsnoheaders.php'); 
 $sqlsum='Select  "Totals" AS AccountID, "(No Remittance)" AS ShortAcctID,"" AS AccountNumber, "" Remarks, format(sum(BankBalToday),0) as BankBalToday, "" AS `Order`,
@@ -339,7 +339,7 @@ format(sum(`Uncleared'.$asoffri2col.'`)-sum(`Uncleared'.$asofcol.'`),0) as `Uncl
 format(sum(`Uncleared'.$asoffri3col.'`)-sum(`Uncleared'.$asoffri2col.'`),0) as `Uncleared'.$asoffri3col.'`, format(sum(`Available'.$asoffri3col.'`+NewCASHDep),0) as `Available'.$asoffri3col.'`,format(sum(`Uncleared'.$asoffri4col.'`)-sum(`Uncleared'.$asoffri3col.'`),0) as `Uncleared'.$asoffri4col.'`, format(sum(`Available'.$asoffri4col.'`+NewCASHDep),0) as `Available'.$asoffri4col.'`,format(sum(Maintain),0) as Maintain,format(sum(Backup),0) as Backup,"" AS Transfers, format(SUM(Budget),0) as Budget, FORMAT(SUM(NewCASHDep),0) AS NewCASHDep, FORMAT(SUM(NewCHECKDep),0) AS NewCHECKDep from `bankbalances'.$sessako.'` where `Order`<80';
 /*$stmtsum=$link->query($sqlsum);
 $resultsum=$stmtsum->fetch();*/
-$sql=$sqlsum;$txnid='Total';
+$sql=$sqlsum;$txnidname='Total';
 //$columnnames=array('Total','BankBalToday','Backup','Uncleared'.$asofthisfricol,'Available'.$asofthisfricol,'Uncleared'.$asofcol,'Available'.$asofcol,
 	//	   'Uncleared'.$asoffri2col,'Available'.$asoffri2col,'Uncleared'.$asoffri3col,'Available'.$asoffri3col,'TotalBudget');
 //if($sessako){echo $sql; break;}
@@ -368,7 +368,7 @@ $sql='SELECT bb.AccountID,bb.ShortAcctID,FORMAT(`Due'.$asofthisfricol.'`,0) AS `
         . ' FORMAT((IFNULL(`Due'.$asoffri3col.'`,0)-IFNULL(`Due'.$asoffri2col.'`,0)),0) AS `Due'.$asoffri3col.'`,FORMAT((`Available'.$asoffri3col.'`-`Due'.$asoffri3col.'`),0) AS `Available'.$asoffri3col.'`, '
         . ' FORMAT((IFNULL(`Due'.$asoffri4col.'`,0)-IFNULL(`Due'.$asoffri3col.'`,0)),0) AS `Due'.$asoffri4col.'`,FORMAT((`Available'.$asoffri4col.'`-`Due'.$asoffri4col.'`),0) AS `Available'.$asoffri4col.'` '
         . ' FROM `bankbalances'.$sessako.'` bb JOIN `banktxns_1maintaining` m ON m.AccountID=bb.AccountID JOIN `dueap'.$sessako.'` d ON m.RCompanyUse=d.RCompany;';
-$txnid='AccountID';
+$txnidname='AccountID';
 $columnnames=array('AccountID','ShortAcctID','Due'.$asofthisfricol,'Available'.$asofthisfricol,'Due'.$asofcol,'Available'.$asofcol,
 		   'Due'.$asoffri2col,'Available'.$asoffri2col,'Due'.$asoffri3col,'Available'.$asoffri3col,'Due'.$asoffri4col,'Available'.$asoffri4col);
 //if($sessako==1002){echo $sql0; break;}
@@ -381,7 +381,7 @@ $sql='SELECT "Total" AS `Total`,FORMAT(SUM(IFNULL(`Due'.$asofthisfricol.'`,0)),0
         . ' FORMAT(SUM(IFNULL(`Due'.$asoffri3col.'`,0)-IFNULL(`Due'.$asoffri2col.'`,0)),0) AS `Due'.$asoffri3col.'`,FORMAT(SUM(`Available'.$asoffri3col.'`-IFNULL(`Due'.$asoffri3col.'`,0)),0) AS `Available'.$asoffri3col.'`, '
         . ' FORMAT(SUM(IFNULL(`Due'.$asoffri4col.'`,0)-IFNULL(`Due'.$asoffri3col.'`,0)),0) AS `Due'.$asoffri4col.'`,FORMAT(SUM(`Available'.$asoffri4col.'`-IFNULL(`Due'.$asoffri4col.'`,0)),0) AS `Available'.$asoffri4col.'` '
         . ' FROM `bankbalances'.$sessako.'` bb JOIN `banktxns_1maintaining` m ON m.AccountID=bb.AccountID LEFT JOIN `dueap'.$sessako.'` d ON m.RCompanyUse=d.RCompany WHERE bb.Order<80;';
-$txnid='Total';
+$txnidname='Total';
 $columnnames=array('Total','Due'.$asofthisfricol,'Available'.$asofthisfricol,'Due'.$asofcol,'Available'.$asofcol,
 		   'Due'.$asoffri2col,'Available'.$asoffri2col,'Due'.$asoffri3col,'Available'.$asoffri3col,'Due'.$asoffri4col,'Available'.$asoffri4col);
 unset($subtitle,$txnid);
@@ -447,7 +447,7 @@ $title='Latest Imported Data';
 $showbranches=false;
 
 $addlmenu='<a href="lookupbankdata.php?w=LatestImportsBal" target=_blank>Lookup Balances</a><br>';
-$txnid='TxnNo';
+$txnidname='TxnNo';
 $delprocess='lookupbankdata.php?w=LatestImportsDel&TxnNo=';
 $sortfield=(!isset($_POST['sortfield'])?'TxnNo DESC':$_POST['sortfield']).(!isset($_POST['sortarrange'])?' ':' '.$_POST['sortarrange']);
 $sql='SELECT bt.*, c.ShortAcctID FROM banktxns_banktxns bt join `acctg_1chartofaccounts` c on c.AccountID=bt.AccountID

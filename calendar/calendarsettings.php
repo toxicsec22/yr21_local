@@ -81,7 +81,7 @@ switch ($which)
         
 		$editprocess='calendarsettings.php?w=EditSpecificsDeptColorSettings&deptid='; $editprocesslabel='Edit';
      
-		$formdesc=''; $txnid='TxnID';
+		$formdesc=''; $txnidname='TxnID';
 		$columnnames=$columnnameslist;       
 		
 		$width='70%';
@@ -146,7 +146,7 @@ switch ($which)
 		$delprocess='calendarsettings.php?w=DeleteColorSettings&TLIDNo=';
 		$editprocess='calendarsettings.php?w=EditSpecificsColorSettings&TLIDNo='; $editprocesslabel='Edit';
      
-		$title=''; $formdesc=''; $txnid='TxnID';
+		$title=''; $formdesc=''; $txnidname='TxnID';
 		$columnnames=$columnnameslist;       
 		
 		$width='70%';
@@ -237,7 +237,7 @@ switch ($which)
 		$delprocess='calendarsettings.php?w=DeleteSchedule&TxnID=';
 		$editprocess='calendarsettings.php?w=EditSpecificsSchedule&TxnID='; $editprocesslabel='Edit';
      
-		$title=''; $formdesc=''; $txnid='TxnID';
+		$title=''; $formdesc=''; $txnidname='TxnID';
 		$columnnames=$columnnameslist;       
 		
 		$width='100%';
@@ -381,7 +381,7 @@ switch ($which)
 			   $columnnames[]=$auditor['Nickname'];
 			}
 			$sql=$sql.' TxnID FROM calendar_2sched s join `1employees` e on s.EmpIDNo=e.IDNo JOIN 1branches b ON s.BranchNo=b.BranchNo where month(DateSchedule)='.$month.' AND DateSchedule LIKE "%'.$currentyr.'%" group by DateSchedule ORDER BY DateSchedule;'; //echo $sql;break;
-			$txnid='TxnID';
+			$txnidname='TxnID';
 
 			$columnstoedit=array_diff($columnnames,array('DateSchedule'));
 			

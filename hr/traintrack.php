@@ -81,7 +81,7 @@ switch ($which){
                     LEFT JOIN `attend_0positions` p ON p.PositionID=m.LeadPositionID
         WHERE (Month(m.StartDate)='.$month.' OR Month(m.EndDate)='.$month.') AND sub.TxnID IS NULL	
 	';   
-        $editprocess='traintrack.php?which=Training&TxnID='; $editprocesslabel='Lookup'; $txnid='TxnID';
+        $editprocess='traintrack.php?which=Training&TxnID='; $editprocesslabel='Lookup'; $txnidname='TxnID';
 	
       include('../backendphp/layout/displayastable.php');       
         break;

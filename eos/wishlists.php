@@ -12,7 +12,7 @@ $title='Wishlist';  $formdesc='<a href=wishlists.php?w=Upload>Upload Data</a></i
     <input type=submit name=submit value="'.($showall==1?'Hide Completed':'Show All').'">
     </form><i>':'').'';
 $list='List';
-$table='it_list'; $txnid='TxnID'; $txnidname='TxnID';
+$table='it_list'; $txnidname='TxnID';
 if (allowedToOpen(1500,'1rtc')) { 
 $sqlc='select GROUP_CONCAT(d.deptid) as deptid from attend_30currentpositions cp join 1departments d on d.deptheadpositionid=cp.PositionID WHERE IDNo='.$_SESSION['(ak0)'].'';
 // echo $sqlc;

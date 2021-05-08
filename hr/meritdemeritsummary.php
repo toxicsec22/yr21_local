@@ -34,7 +34,7 @@ hr_70points p ON ss.PointID=p.PointID WHERE ReporteeNo='.$idno.'';
 'May', 'June', 'July', 'August', 'September', 'October', 'November',  
 'December','YrTotal');
 
-                $title=''; $formdesc=''; $txnid='TxnID';
+                $title=''; $formdesc=''; $txnidname='TxnID';
                 $columnnames=$columnnameslist;
                 $width='80%';
                 $sql = $sql0.' AND stmtcat=1 AND DecisionStatus=3;';
@@ -42,7 +42,7 @@ hr_70points p ON ss.PointID=p.PointID WHERE ReporteeNo='.$idno.'';
                 $subtitle = '<font color="green">Merits</font>'; $hidecount=true; $hidecontents=1;
                 include('../backendphp/layout/displayastablenosort.php');
 
-                $title=''; $formdesc=''; $txnid='TxnID';
+                $title=''; $formdesc=''; $txnidname='TxnID';
 
                 $columnnames=$columnnameslist;
                 $width='80%';

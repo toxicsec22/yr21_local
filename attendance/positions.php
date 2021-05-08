@@ -27,7 +27,7 @@ include_once $path.'/acrossyrs/commonfunctions/listoptions.php';
 echo comboBox($link,'SELECT Position,PositionID FROM `attend_0positions` ORDER BY Position','Position','PositionID','poslist');
 
 $list='List';
-$table='attend_0positions'; $txnid='PositionID'; $txnidname='PositionID'; 
+$table='attend_0positions'; $txnidname='PositionID'; 
 $sql='SELECT p.*, department AS Department, (SELECT Position FROM `attend_0positions` WHERE PositionID=p.supervisorpositionid) AS Supervisor, IF(p.PreferredRateType=1,"Monthly","Daily") AS RateType,p.JobLevelNo
 FROM `attend_0positions` p LEFT JOIN `attend_1joblevel` jl ON jl.JobLevelNo=p.JobLevelNo
 JOIN `1departments` d ON d.deptid=p.deptid ';

@@ -268,7 +268,7 @@ switch ($which)
 		$delprocess='motorvehicles.php?w=DeleteVehicleType&VTID=';
 		$editprocess='motorvehicles.php?w=EditSpecificsVehicleType&VTID='; $editprocesslabel='Edit';
      
-		$title=''; $formdesc=''; $txnid='TxnID';
+		$title=''; $formdesc=''; $txnidname='TxnID';
 		$columnnames=$columnnameslist;       
 		
 		$width='70%';
@@ -357,7 +357,7 @@ switch ($which)
 		$delprocess='motorvehicles.php?w=DeleteFuelType&FTID=';
 		$editprocess='motorvehicles.php?w=EditSpecificsFuelType&FTID='; $editprocesslabel='Edit';
      
-		$title=''; $formdesc=''; $txnid='TxnID';
+		$title=''; $formdesc=''; $txnidname='TxnID';
 		$columnnames=$columnnameslist;       
 		
 		$width='70%';
@@ -458,7 +458,7 @@ switch ($which)
 		$delprocess='motorvehicles.php?w=DeleteRepairShop&TxnID=';
 		$editprocess='motorvehicles.php?w=EditSpecificsRepairShop&TxnID='; $editprocesslabel='Edit';
      
-		$title=''; $formdesc=''; $txnid='TxnID';
+		$title=''; $formdesc=''; $txnidname='TxnID';
 		$columnnames=$columnnameslist;       
 		
 		$width='100%';
@@ -569,7 +569,7 @@ switch ($which)
 		
 			
 		include('../backendphp/layout/inputmainform.php');
-		 $title=''; $formdesc=''; $txnid='TxnID';
+		 $title=''; $formdesc=''; $txnidname='TxnID';
 		$delprocess='motorvehicles.php?w=DeleteVehicleAssign&TxnID=';
 		$editprocess='motorvehicles.php?w=EditSpecificsVehicleAssign&TxnID='; $editprocesslabel='Edit';
 		
@@ -589,7 +589,7 @@ switch ($which)
 		echo '<h3>Vehicle Assignment History</h3>';
 		$sql=$sqlall.' WHERE Status=0 ORDER BY BranchNo, DateAssigned DESC';
 		$columnnameslist=array('DateAssigned', 'Model', 'PlateNo', 'AssignedBranch', 'RecentlyAssignedTo');
-		$title=''; $formdesc=''; $txnid='TxnID';
+		$title=''; $formdesc=''; $txnidname='TxnID';
 		
 		unset($delprocess, $editprocess,$editprocesslabel);
 		
@@ -726,7 +726,7 @@ switch ($which)
 		}			
 		$addlprocess2='motorvehicles.php?w=CRPic&TxnID='; $addlprocesslabel2='Print CR';
      
-		$title=''; $formdesc=''; $txnid='TxnID';
+		$title=''; $formdesc=''; $txnidname='TxnID';
 		$columnnames=$columnnameslist;       
 		
 		if (((allowedToOpen(8287,'1rtc')) OR (allowedToOpen(82871,'1rtc'))) AND (!(allowedToOpen(8285,'1rtc')))) {
@@ -893,7 +893,7 @@ switch ($which)
 		$addlprocess2='motorvehicles.php?w=ORPic&TxnID='.$txnid.'&TxnSubID='; $addlprocesslabel2='Print OR';
 		$editprocess='motorvehicles.php?w=EditSpecificsVehicleRegistration&TxnID='.$txnid.'&TxnSubID='; $editprocesslabel='Edit';
      
-		$title=''; $formdesc=''; $txnid='TxnID';
+		$title=''; $formdesc=''; $txnidname='TxnID';
 		$columnnames=$columnnameslist;       
 		
 		$width='70%';
@@ -925,7 +925,7 @@ switch ($which)
 		
 		$title='Vehicles Registration Summary';
 		$editprocess='motorvehicles.php?w=VehicleRegistration&action_toke='.$_SESSION['action_token'].'&TxnID='; $editprocesslabel='Lookup'; 
-		 $formdesc=''; $txnid='TxnID';
+		 $formdesc=''; $txnidname='TxnID';
 		$columnnames=array('Model','PlateNo','DueMonth','Registered?');       
 		
 		$width='70%';
@@ -1258,7 +1258,7 @@ switch ($which)
 		<option value="3">Pending Approvals - GenAdmin</option>
 		<option value="4">Done Requests</option>
 		<option value="5">All Requests</option></select>
-		<input type="submit" name="btnSubmit" value="Filter"></form><i>'; $txnid='TxnID';
+		<input type="submit" name="btnSubmit" value="Filter"></form><i>'; $txnidname='TxnID';
 		$defaultfilter = ' WHERE (Approved=0 OR Approved2=0 OR Acknowledged=0 OR Finished=0)';
 		if(!isset($_POST['btnSubmit'])){$_POST['filterby']=''; $filter = $defaultfilter; $_POST['filterby']=0;}
 		else {
@@ -1524,7 +1524,7 @@ switch ($which)
 		
 		$delprocess='motorvehicles.php?w=DeleteFuelConsumption&TxnID=';
 		
-		$title=''; $formdesc=''; $txnid='TxnID';
+		$title=''; $formdesc=''; $txnidname='TxnID';
 		$columnnameslist = array_diff($columnnameslist,array('DistanceTrav','Km/Liter','Liter/Km','Peso/Km'));
 		$columnnames=$columnnameslist;       
 		
@@ -1553,7 +1553,7 @@ switch ($which)
 		if (allowedToOpen(8286,'1rtc')){
 			$delprocess='motorvehicles.php?w=DeleteFuelConsumption&TxnID=';
 		}
-		$title1='Fuel Consumption'; $formdesc=''; $txnid='TxnID';
+		$title1='Fuel Consumption'; $formdesc=''; $txnidname='TxnID';
 		echo '<title>'.$title1.'</title>';
 		echo '<h3>'.$title1.'</h3>';
 		$columnnames=$columnnameslist;       
@@ -1651,7 +1651,7 @@ switch ($which)
 		$columnnameslist = array_diff($columnnameslist, array('ModelPlateNo','Branch','FuelType','Remarks'));
 		
 		echo '<br/>';
-		$title='Fuel Consumption for: '; $formdesc='</i><h3>'.$rowmodel['ModelPlateNo'].'<br>'.$rowmodel['Branch'].', '.$rowmodel['FullName'].'</h3><i>'; $txnid='TxnID';
+		$title='Fuel Consumption for: '; $formdesc='</i><h3>'.$rowmodel['ModelPlateNo'].'<br>'.$rowmodel['Branch'].', '.$rowmodel['FullName'].'</h3><i>'; $txnidname='TxnID';
 		
 		$columnnames=$columnnameslist;       
 		
@@ -1745,7 +1745,7 @@ switch ($which)
 		$liststoshow=array();
 		
 		
-		$formdesc=''; $txnid='TxnID';
+		$formdesc=''; $txnidname='TxnID';
 		
 		$columnnames=$columnnameslist;       
 		

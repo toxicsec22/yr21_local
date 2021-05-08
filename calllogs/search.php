@@ -40,7 +40,7 @@ $columnnames=array('TeamLeader','ClientName','ContactPerson','Position','Contact
 switch ($_POST['submit']){
 
 case 'Client':
-   $txnid='TxnID'; $sqlcondition=' WHERE s.ClientName LIKE  \'%'.$_POST['stringsearch'].'%\' ';
+   $txnidname='TxnID'; $sqlcondition=' WHERE s.ClientName LIKE  \'%'.$_POST['stringsearch'].'%\' ';
    $sql=$sqlcall.$sqlcondition;
    $subtitle='<br><br>Results for: '.$_POST['submit'].' - Calls';
     include('../backendphp/layout/displayastableonlynoheaders.php');
@@ -48,7 +48,7 @@ case 'Client':
    break;
    
 case 'Particulars':
-   $txnid='TxnID';
+   $txnidname='TxnID';
     $sql1='CREATE TEMPORARY TABLE calllist AS '.$sqlcall; $stmt1=$link->prepare($sql1); $stmt1->execute();
     
    $colstosearch=array('TeamLeader','ContactPerson','Position','ContactNumber','Notes','Quote_Type','QuoteNo','InvoiceNo','EncodedByNo');
@@ -72,7 +72,7 @@ case 'Particulars':
    break;
 
 case 'Calendar':
-   $txnid='TxnID'; $sqlcondition=' WHERE ClientName LIKE  \'%'.$_POST['stringsearch'].'%\' ';
+   $txnidname='TxnID'; $sqlcondition=' WHERE ClientName LIKE  \'%'.$_POST['stringsearch'].'%\' ';
    $colstosearch=array('TLIDNo','Nickname','Details');
    $columnnames=array('Event_Date','TLIDNo','Event');
    $sql0='';

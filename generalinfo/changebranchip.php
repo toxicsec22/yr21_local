@@ -11,7 +11,7 @@ $fieldname='BranchNo';
 
 $processlabel1='Edit';
 
-$txnid='BranchNo';
+$txnidname='BranchNo';
 $orderby='Branch';    
 
 $columnnames=array('BranchNo','Branch','IPAdd');

@@ -1,5 +1,5 @@
  <?php
-$txnid='TxnID';
+$txnidname='TxnID';
 $numcols = 0;
 $num=0; $runsum=0;
 $fields=array();

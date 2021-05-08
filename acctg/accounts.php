@@ -76,7 +76,7 @@ switch ($which){
          $columnstoedit=array('AcctTypeDescription', 'AccountID', 'ShortAcctID', 'AccountDescription', 'OrderNo', 'Remarks', 'NormBal');
 	 } else { $columnstoedit=array('CompleteDescription');}
       
-      $title=''; $formdesc='';$txnid='AccountID';
+      $title=''; $formdesc='';$txnidname='AccountID';
       $columnnames=$columnnameslist;
 	  $columnnames[]='Budgeted';
         $sortfield=(isset($_POST['sortfield'])?$_POST['sortfield']:' AcctTypeDescription,OrderNo'); $columnsub=$columnnames;

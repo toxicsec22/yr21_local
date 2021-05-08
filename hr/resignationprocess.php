@@ -239,7 +239,7 @@ switch ($which){
 		
 		$sql='Select TxnID,Date as EffectivityDate,IF(FinalDecision<>0,"",(DATEDIFF(CURDATE(),`Date`))) As AgeOfClearanceInDays,e1.Nickname as Nickname,Concat(e1.FirstName,\' \',e1.SurName) as FullName,(SELECT IF(PseudoBranch=1,dept,Branch) FROM attend_1defaultbranchassign dba JOIN attend_30latestpositionsinclresigned lpir ON dba.IDNo=lpir.IDNo JOIN 1branches b ON DefaultBranchAssignNo=b.BranchNo JOIN attend_0positions p ON lpir.PositionID=p.PositionID JOIN 1departments d ON p.deptid=d.deptid WHERE lpir.IDNo=e1.IDNo) AS `Dept/Branch`,Remarks,Concat (e.NickName,\' \',e.SurName) as EncodedBy,rp.TimeStamp from hr_2resignationprocess rp join 1employees e on e.IDNo=rp.EncodedByNo join 1employees e1 on e1.IDNo=rp.IDNo '.$conditionf.' '.$listcondition.' ORDER BY `Date` DESC';
 		// echo $sql; exit();
-		$txnid='TxnID';
+		$txnidname='TxnID';
 		$columnnames=array('EffectivityDate','Nickname','FullName','Dept/Branch','Remarks','AgeOfClearanceInDays');
 		if ($showenc==1) { array_push($columnnames,'EncodedBy','TimeStamp');}
 		// $width='70%';

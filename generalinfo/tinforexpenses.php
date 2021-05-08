@@ -27,7 +27,7 @@ case 'ListofTIN':
 		</form>	
 
 <?php
-    $txnid='TIN'; 
+    $txnidname='TIN'; 
     if (allowedToOpen(64881,'1rtc')){
 	$columnstoedit=array('CompanyName', 'TIN', 'Address');
 	$columnnames[]='FullCompanyName'; $columnnames[]='FullAddress'; $columnnames[]='LookupTIN';

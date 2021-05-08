@@ -253,7 +253,7 @@ $sql='SELECT  tm.TxnID, Date as DateOUT,`btm`.`Branch` AS `FromBranch`, bts.Bran
 //MONTH(tm.Date)='.$_REQUEST[$fieldname].' AND
 
 $columnnames=array('DateOUT','FromBranch','ClientBranch','Particulars','Amount','DateIN');
-$coltototal='Amount'; $txnid='TxnID';$showgrandtotal=true;
+$coltototal='Amount'; $txnidname='TxnID';$showgrandtotal=true;
 $filetoopen='addeditclientside'; $w='Interbranch';
 $editprocess=$filetoopen.'.php?w='.$w.'&TxnID=';$editprocesslabel='Lookup';   
     include('../backendphp/layout/displayastable.php');

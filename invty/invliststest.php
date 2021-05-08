@@ -11,7 +11,7 @@ $showbranches=false;
     switch ($whichqry){
        case 'Category':
               $title='Category List';
-              $txnid='CatNo';
+              $txnidname='CatNo';
               $sql='Select * from invty_1category order by Category';
               $columnnames=array('Category','CatNo');
               break;

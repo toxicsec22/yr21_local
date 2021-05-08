@@ -86,7 +86,7 @@ if(!isset($_POST['submit'])){
 
 $condition=($show==1)?' WHERE (ClientNo NOT BETWEEN 15001 AND 15005) AND (ClientNo NOT BETWEEN 1000 AND 9999) ':' WHERE (ClientNo NOT BETWEEN 15001 AND 15005) AND (ClientNo NOT BETWEEN 1000 AND 9999) AND m.BranchNo='.$_SESSION['bnum'];
 
-$txnid='TxnID';
+$txnidname='TxnID';
 $title=''.$taon.' Sales Analysis';
 
 $sql='Select date_format(Date,\'%b\') as `Month`, ';

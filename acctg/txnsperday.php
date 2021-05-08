@@ -12,7 +12,7 @@ include_once('../switchboard/contents.php');
  
 
 
-$txnid='TxnID';
+$txnidname='TxnID';
 $whichqry=$_GET['w'];
 $perday=$_REQUEST['perday']; 
 $fieldname=($perday==0?'Month':'Date');
@@ -275,7 +275,7 @@ ORDER BY Date, CVNo;
 SQL;
 
 $process1='addeditsupplyside.php?w='.$whichqry.'&';
-$processlabel1='Lookup'; $txnid='CVNo';
+$processlabel1='Lookup'; $txnidname='CVNo';
 include_once('../backendphp/layout/clickontabletoeditbody.php');
 }
 break;
@@ -290,7 +290,7 @@ $sortfield=(isset($_POST['sortfield'])?$_POST['sortfield']:'CVNo');
 $columnstoedit=array('DateofCheck','CheckNo','CreditAccountID','Remarks');
 $txndate=!isset($_GET['Date'])?'m.Date=\''.$defaultdate.'\'':'m.Date=\''.$_GET['Date'].'\'';
 $sql='select m.CVNo, m.Date, m.DateofCheck,m.CheckNo, CreditAccountID,ca.ShortAcctID as Bank, m.PayeeNo, m.Payee, m.Cleared, m.Posted, format(sum(s.Amount),2) as Total, ROUND(sum(s.Amount),2) as TotalValue, m.Remarks from acctg_2cvmain as m join acctg_1chartofaccounts ca on ca.AccountID=m.CreditAccountID join acctg_2cvsub s on m.CVNo=s.CVNo where '.$txndate .' and CheckNo<100 group by m.CVNo  Order By '.$sortfield;
-$txnid='CVNo';
+$txnidname='CVNo';
 $editprocess='preditsupplyside.php?w='.$whichqry.'&Date='.$defaultdate.'&TxnID=';
 $editprocesslabel='Change!'; $coltototal='TotalValue'; $showgrandtotal=true;
 $addlprocess='addeditsupplyside.php?w=CV&TxnID=';$addlprocesslabel='Lookup';
@@ -303,7 +303,7 @@ if (!allowedToOpen(592,'1rtc')) { echo 'No permission'; exit;}
 $columnnames=array('JVDate','JVNo','Remarks','Total','Posted');  
 $sql='select m.JVNo, m.JVDate, m.Remarks, m.Posted, format(sum(s.Amount),2) as Total from acctg_2jvmain as m join acctg_2jvsub s on m.JVNo=s.JVNo where '.str_replace('Date','JVDate',$txndate) .' group by m.JVNo  
 union select m.JVNo, m.JVDate, m.Remarks, m.Posted, 0 as Total from acctg_2jvmain as m left join acctg_2jvsub s on m.JVNo=s.JVNo where s.JVNo is null and '. str_replace('Date','JVDate',$txndate) .' order by JVDate, JVNo';
-$txnid='JVNo';
+$txnidname='JVNo';
 $process1='addeditsupplyside.php?w=JV&';
 $processlabel1='Lookup';
 include_once('../backendphp/layout/clickontabletoeditbody.php');

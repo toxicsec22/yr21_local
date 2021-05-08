@@ -5,7 +5,7 @@ if (!allowedToOpen(6717,'1rtc')) { echo 'No permission'; exit;}
 
 $showbranches=false; include_once('../switchboard/contents.php');
 
-$txnid='IDNo'; $txnidname='IDNo';
+$txnidname='IDNo';
 $w=isset($_GET['w'])?$_GET['w']:'List';
 $title=!isset($_REQUEST['f'])?'Pending Govt Report':$_REQUEST['f'];
 echo '<br><h3>Government Report</h3><br>';

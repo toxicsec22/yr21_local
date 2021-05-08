@@ -39,7 +39,7 @@ switch ($which){
 	 $delprocess='tools.php?w=Delete&ToolID=';
          $columnstoedit=array('ToolTypeDesc', 'ToolID', 'ToolDesc', 'Unit');
          }
-      $title=''; $formdesc='';$txnid='ToolID';
+      $title=''; $formdesc='';$txnidname='ToolID';
       $columnnames=$columnnameslist;
         $sortfield=(isset($_POST['sortfield'])?$_POST['sortfield']:' ToolDesc'); $columnsub=$columnnames;
         $sql=$sql.' ORDER BY '.$sortfield.(isset($_POST['sortarrange'])?' '.$_POST['sortarrange']:' ASC');         

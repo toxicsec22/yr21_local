@@ -49,7 +49,7 @@ if (in_array($which,array('List','EditRemarks'))){
 switch ($which){
 case 'List':
 if (!allowedToOpen(5693,'1rtc')) { echo 'No permission'; exit; }
-$txnid='TxnID';
+$txnidname='TxnID';
 $sql.=$filter.' ORDER BY '.$sortfield.(isset($_POST['sortarrange'])?' '.$_POST['sortarrange']:' ASC');
 
 $formdesc='<br><br>Note: Explain in Remarks any questionable usage of forms.  Data is updated together with update of static data.</i><br><br><form action="usedseries.php" method=post style="display:in-line; border: solid 1px; padding: 10px;" >Filter by: '.str_repeat('&nbsp;', 10)

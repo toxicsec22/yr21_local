@@ -68,7 +68,7 @@ switch ($which){
         $sql.=' ORDER BY '.$sortfield.(isset($_POST['sortarrange'])?' '.$_POST['sortarrange']:' DESC'); 
         
         if (allowedToOpen(68921,'1rtc')){ $delprocess='personnelaction.php?w=Delete&TxnID=';}
-        $editprocess='personnelaction.php?w=EditSpecifics&TxnID='; $editprocesslabel='Edit'; $txnid='TxnID';
+        $editprocess='personnelaction.php?w=EditSpecifics&TxnID='; $editprocesslabel='Edit'; $txnidname='TxnID';
       include('../backendphp/layout/displayastable.php');       
         break;
     case 'Add':
@@ -124,7 +124,7 @@ switch ($which){
 
           $title='';
           $columnnames=$columnnameslist;
-          $editprocess='personnelaction.php?w=ManageActionEditSpecifics&TxnID='; $editprocesslabel='Edit'; $txnid='TxnID';
+          $editprocess='personnelaction.php?w=ManageActionEditSpecifics&TxnID='; $editprocesslabel='Edit'; $txnidname='TxnID';
           $width='30%';
           include('../backendphp/layout/displayastable.php'); 
         }

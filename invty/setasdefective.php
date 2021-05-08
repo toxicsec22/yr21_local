@@ -41,7 +41,7 @@ switch ($which){
         join `1branches` b on b.BranchNo=sd.BranchNo
         where sd.Approval is null '.$condition;
         $delprocess='setasdefective.php?w=DeleteAdjForApproval&action_token='.$_SESSION['action_token'].'&TxnID=';
-        $txnid='ApprovalId'; 
+        $txnidname='ApprovalId'; 
         include('../backendphp/layout/displayastablewithedit.php');
         echo '<br><br>';
     

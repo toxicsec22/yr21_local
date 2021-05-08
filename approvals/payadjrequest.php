@@ -102,7 +102,7 @@ $sqlmain='SELECT PAID AS TxnID,PayrollID,
     cp.FullName AS RequestedBy,par.`TimeStamp`,Position,IF(deptid IN (2,10),Branch,dept) AS `Branch/Dept`,Details,DeptHeadResponse,HRResponse,e.NickName AS ReadBy,e.NickName AS DeniedByDeptHead,e2.NickName AS AdjustedBy,e2.NickName AS DeniedByHR FROM attend_30currentpositions cp JOIN approvals_5payadjreq par ON cp.IDNo=par.EncodedByNo LEFT JOIN 1employees e ON par.DeptHeadNo=e.IDNo LEFT JOIN 1employees e2 ON par.HRNo=e2.IDNo ';
 
 // echo $sqlmain;
-	$txnid='TxnID'; $title='';
+	$txnidname='TxnID'; $title='';
 	$columnnames=array('PayrollID','Details','RequestedBy','Position','Branch/Dept');
 	if (allowedToOpen(100,'1rtc')){
 		array_push($columnnames,'DeptHeadResponse');

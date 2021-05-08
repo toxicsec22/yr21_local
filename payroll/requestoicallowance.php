@@ -111,7 +111,7 @@ if(isset($_REQUEST['submit'])){
 	$title='';
 	$sql='select *, Date as DateOfEffectivity,Amount as AmountPerMonth,FullName,Duration as `DurationInMonths`,roa.Remarks,case when ExecStatus=0 then "Pending" when ExecStatus=1 then "Approved" when ExecStatus=2 then "Rejected" end as ExecStatus,case when OpsStatus=0 then "Pending" when OpsStatus=1 then "Approved" when OpsStatus=2 then "Rejected" end as OpsStatus,b.Branch,CASE WHEN Valid=\'0\' then "ToValidate" WHEN Valid=\'1\' then "Validated" WHEN Valid=\'2\' then "Invalid" end as Valid from payroll_2requestoicallowance roa left join attend_30currentpositions cp on cp.IDNo=roa.IDNo left join 1branches b on b.BranchNo=roa.BranchNo Where Valid<>2 and curdate()<=Date_ADD(`Date`,Interval Duration month) Order By b.Branch';
 	// echo $sql; exit();
-	$txnid='TxnID';
+	$txnidname='TxnID';
 if (allowedToOpen(8192,'1rtc')) {
 	//delete button
 	$delprocess='requestoicallowance.php?w=delete&TxnID=';

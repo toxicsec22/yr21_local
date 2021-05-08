@@ -126,7 +126,7 @@ switch ($which){
 				Aircon: <input type="checkbox" name="Aircon">
 				<input type="submit" name="btnLookup" value="Lookup">
 			</form>';
-      $title=''; $formdesc='';$txnid='TxnID';
+      $title=''; $formdesc='';$txnidname='TxnID';
       $columnnames=$columnnameslist;
         $sortfield=(isset($_POST['sortfield'])?$_POST['sortfield']:' Category,ItemCode'); $columnsub=$columnnames;
         $sql=$sql.' ORDER BY '.$sortfield.(isset($_POST['sortarrange'])?' '.$_POST['sortarrange']:' ASC');
@@ -182,7 +182,7 @@ switch ($which){
         break;
         
    case 'Purged':
-       $title='Purged Items in '.$currentyr.''; $txnid='ItemCode';
+       $title='Purged Items in '.$currentyr.''; $txnidname='ItemCode';
        $columnnames=array('ItemCode','Category', 'ItemDesc', 'Unit', 'WholesaleUnit', 'Remarks', 'MovementType','With_Barcode','EncodedBy','TimeStamp');//'ItemDesc2', 
         $sortfield=(isset($_POST['sortfield'])?$_POST['sortfield']:' Category,ItemCode'); $columnsub=$columnnames;
         $sql='SELECT i.*, Category, e.Nickname as EncodedBy, i.ItemCode AS TxnID, MovementType, IF(WithBarcode=1,"Yes","No") AS With_Barcode FROM purgedin'.$currentyr.' i

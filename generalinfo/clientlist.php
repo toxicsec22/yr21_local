@@ -58,7 +58,7 @@ $which=(!isset($_GET['w'])?'List':$_GET['w']);
     
     
     
-    $txnid='ClientNo';
+    $txnidname='ClientNo';
     
 switch ($which){
    case 'List': 

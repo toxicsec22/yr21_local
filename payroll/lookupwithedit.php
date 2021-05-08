@@ -43,7 +43,7 @@ skipsession:
             $title='Pay Dates';
             $sql='SELECT * FROM `payroll_1paydates`';
             $orderby='PayrollID';
-	    $txnid='PayrollID';
+	    $txnidname='PayrollID';
             $columnnames=array('PayrollID','PayrollCode','PayrollDate','FromDate','ToDate','WorkDays','LegalHolidays','SpecHolidays','Remarks','Posted','PostedByNo','TimeStamp');
 	    $columnstoedit=array('PayrollDate','WorkDays','LegalHolidays','SpecHolidays','Remarks');
 	    if (allowedToOpen(8171,'1rtc')){	$columnstoedit[]='Posted';  }
@@ -65,7 +65,7 @@ skipsession:
 	    $sortfield=(isset($_POST['sortfield'])?$_POST['sortfield']:'`PayrollID`,`IDNo`');
             $sql='SELECT AdjID,a.IDNo, a.PayrollID, FirstName, Nickname, e.SurName, a.AdjustTypeNo, payroll_0acctid.AdjustType, payroll_0acctid.ShortAcctID, a.AdjustAmt, a.Remarks, a.EncodedByNo, IF(e.Resigned=0,"","Resigned") AS Resigned, Branch,a.BranchNo FROM `1employees` as e RIGHT JOIN (payroll_21scheduledpaydayadjustments as a LEFT JOIN payroll_0acctid ON a.AdjustTypeNo = payroll_0acctid.AdjustTypeNo) ON e.IDNo = a.IDNo JOIN `1branches` b ON b.BranchNo=a.BranchNo JOIN payroll_1paydates pd ON pd.PayrollID=a.PayrollID AND pd.Posted=0 AND pd.PayrollDate>=CURDATE()  ';
             //$orderby='PayrollID,IDNo';
-	    $txnid='AdjID';
+	    $txnidname='AdjID';
             $columnnames=array('PayrollID','IDNo','FirstName','Nickname','SurName','Branch','AdjustTypeNo','AdjustType','ShortAcctID','AdjustAmt','Remarks','EncodedByNo','Resigned'); $columnsub=$columnnames;
 	    $columnstoedit=array('PayrollID','IDNo','BranchNo','AdjustTypeNo','AdjustAmt','Remarks');
 	    $editprocess='lookupwithedit.php?w=FutureAdj&edit=2&AdjID='; $editprocesslabel='Edit';
@@ -93,7 +93,7 @@ skipsession:
 	    
             $sql='SELECT a.*, NickName,FirstName,SurName, IF(deptid IN (10,2,3,4),Branch,Dept) AS Branch,IF(e.Resigned=0,"","Resigned") AS `Resigned?`, IF((`SLDays` + `VLDays` + `LWPDays` + `QDays` + `RegDaysPresent`)=0,0,if(LatestDorM=0,(RegDaysActual+PaidLegalDays+a.SLDays+VLDays+LWPDays),(RegDaysActual+PaidLegalDays+a.SLDays+VLDays+LWPDays+SpecDays))) AS DaysToBePaid FROM `payroll_20fromattendance` a JOIN `1employees` `e` ON `a`.`IDNo` = `e`.`IDNo` LEFT JOIN attend_30currentpositions cp ON e.IDNo=cp.IDNo AND a.IDNo=cp.IDNo JOIN payroll_20latestrates lr ON a.IDNo=lr.IDNo ';
             $orderby='IDNo';
-	    $txnid='TxnID';
+	    $txnidname='TxnID';
             $columnnames=array('IDNo','NickName','FirstName','SurName','Branch','Resigned?','RegDaysPresent','LWOPDays','LegalDays','SpecDays','SLDays','VLDays','RWSDays','RestDays','LWPDays','QDays','RegDaysActual','PaidLegalDays','RegExShiftHrsOT','RestShiftHrsOT','SpecShiftHrsOT','LegalShiftHrsOT','RestExShiftHrsOT','SpecExShiftHrsOT','LegalExShiftHrsOT','DaysToBePaid');
             if ($_GET['edit']==2){
             $txnid=intval($_GET['TxnID']);
@@ -253,7 +253,7 @@ case 'PayrollPerPayID':
 	    WHERE PayrollID='.$_SESSION['payrollidses'].' AND e.RCompanyNo='.$co['CompanyNo']
 	    .((!allowedToOpen(8173,'1rtc'))?' AND p.IDNo>1002':'')
 	    .' ORDER BY '.$sortfield.(isset($_POST['sortarrange'])?' '.$_POST['sortarrange']:' ASC');
-            $txnid='TxnID'; //echo $sql;
+            $txnidname='TxnID'; //echo $sql;
             
 	    $addlmenu=($resultapproved['Approval']==0?'<a href="prpayrolldata.php?w=ApprovePayroll&Company='.$co['CompanyNo'].'&action_token='.$_SESSION['action_token'].'&PayrollID='.$_SESSION['payrollidses'].'">Approve '.$co['Company'].' Payroll ID '.$_SESSION['payrollidses'].'</a><br>':
                 '&nbsp &nbsp <a href="prpayrolldata.php?w=RemoveApproval&Company='.$co['CompanyNo'].'&action_token='.$_SESSION['action_token'].'&PayrollID='.$_SESSION['payrollidses'].'">Remove Approval</a><br>');
@@ -279,7 +279,7 @@ case 'AdjPerPayID':
             $sql='SELECT AdjID,a.IDNo, a.PayrollID, FirstName, Nickname, e.SurName, a.AdjustTypeNo, payroll_0acctid.AdjustType, payroll_0acctid.ShortAcctID, FORMAT(a.AdjustAmt,2) AS AdjustAmt, Remarks,BranchNo, a.EncodedByNo FROM `1employees` as e JOIN (`payroll_21paydayadjustments` as a JOIN payroll_0acctid ON a.AdjustTypeNo = payroll_0acctid.AdjustTypeNo '.$addlcondition.') ON e.IDNo = a.IDNo';
             $orderby='a.PayrollID,a.IDNo';
 	    
-	    $txnid='AdjID'; $sumfield='AdjustAmt';
+	    $txnidname='AdjID'; $sumfield='AdjustAmt';
             $sumsql='SELECT SUM(AdjustAmt) AS AdjustAmt FROM payroll_21paydayadjustments a ';
             $columnnames=array('PayrollID','IDNo','FirstName','Nickname','SurName','AdjustType','ShortAcctID','AdjustAmt','Remarks','BranchNo');
             
@@ -334,7 +334,7 @@ case 'Summary_for_Bank':
                   .' AND (PayrollID IN (Select PayrollID from payroll_26approval))';
       $orderby='PayrollID,IDNo';
       
-      $txnid='IDNo';
+      $txnidname='IDNo';
       $columnnames=array('PayrollID','IDNo','FullName','UBPATM','NetPay');
       $sumfield='NetPay';
       $sumsql='Select Sum(NetPay) as NetPay FROM `payroll_25payrolldatalookup` ';
@@ -369,7 +369,7 @@ case 'Summary_for_Bank':
                                                 FROM payroll_26approval))';
          $orderby='PayrollID, CompanyName ,IDNo';
          
-         $txnid='IDNo';
+         $txnidname='IDNo';
          $title = 'Lookup summary for GCash';
          $columnnames=array('PayrollID', 'CompanyName' ,'IDNo','FullName','GCashMobileNumber','NetPay');
          $sumfield='NetPay';
@@ -387,7 +387,7 @@ case 'Summary_for_Bank':
             $addlcondition=' GROUP BY DisburseVia ';
             $orderby='Disburse_Via';
 	    
-	    $txnid='payrollid'; $hidecount=1;
+	    $txnidname='payrollid'; $hidecount=1;
             $columnnames=array('Disburse_Via','Employee_Count');
             if(allowedToOpen(83008, '1rtc')){ $columnnames[]='Amount';}
 	    include('payrolllayout/displayandeditpayrolldata.php');
@@ -404,7 +404,7 @@ case 'Summary_for_Bank':
             $sql='SELECT * FROM payroll_31empexpenseadjustamts ';
 	    $orderby='PayrollID,Branch';
 	    
-	    $txnid='payrollid';
+	    $txnidname='payrollid';
             $columnnames=array('PayrollID','Branch','DR','CR','Amt');
 	    $sumfield='Amt';
 	    $sumsql='Select Sum(Amt) as NetPay FROM `payroll_31empexpenseadjustamts` ';
@@ -415,7 +415,7 @@ case 'Summary_for_Bank':
             $title='Special Credits';
             $sql='SELECT c.*,concat(e.`FirstName`,\' \',e.SurName) as FullName FROM payroll_30othercredits as c left join `1employees` as e on e.IDNo=c.IDNo';
             $orderby='Batch, FullName';
-	    $txnid='idothercredits';
+	    $txnidname='idothercredits';
 	    $fieldname='DateofCredit';
             $columnnames=array('idothercredits','DateofCredit','IDNo','FullName','Amount','Remarks','EncodedByNo', 'Batch');
 	    $columnstoedit=array('DateofCredit','IDNo','Amount','Remarks', 'Batch');

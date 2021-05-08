@@ -160,7 +160,7 @@ switch ($which){
             if (!allowedToOpen(5822,'1rtc')){
             $editprocess='pettycash.php?w=Edit&PCBranchNo='.$pcbranchno.'&TxnID='; $editprocesslabel='Enter'; $editok=true;
             if($mypc==TRUE) {$delprocess='pettycash.php?w=Del&PCBranchNo='.$pcbranchno.'&TxnID='; }}
-            $txnid='TxnID'; $txnsubid='TxnID'; 
+            $txnidname='TxnID'; $txnsubid='TxnID'; 
             $branchlist='allbranches';
 			$entities='entities';
             include('../backendphp/layout/displayastableeditcellssub.php');

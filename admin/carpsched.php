@@ -71,7 +71,7 @@ foreach ($resultadmin as $carpenter){
    $columnnames[]=$carpenter['Nickname'];
 }
 $sql=$sql.' TxnID FROM calendar_2sched s join `1employees` e on s.EmpIDNo=e.IDNo JOIN 1branches b ON s.BranchNo=b.BranchNo where month(DateSchedule)='.$month.' group by DateSchedule;'; //echo $sql;break;
-$txnid='TxnID';
+$txnidname='TxnID';
 //$editprocess='carpsched.php?w=EditSched&edit=2&TxnID=';
 $columnstoedit=array_diff($columnnames,array('DateSchedule'));
 $editprocesslabel='Commit';

@@ -79,7 +79,7 @@ switch ($which)
 				
 		$title=''; $formdesc=''; 
                 }
-                $txnid='TxnID';
+                $txnidname='TxnID';
 		$columnnames=$columnnameslist;       
                 if (allowedToOpen(6841,'1rtc')){ $editprocess='perfevalsettings.php?w=EditSpecificsPC&PerfComID='; $editprocesslabel='Edit';}
 		echo '<div style="width:45%">';
@@ -159,7 +159,7 @@ switch ($which)
 		//Processes
 		$delprocess='perfevalsettings.php?w=DeletePS&PerfStateID=';
 		
-		$title=''; $formdesc=''; $txnid='TxnID';
+		$title=''; $formdesc=''; $txnidname='TxnID';
 		$columnnames=$columnnameslist;       
 		$editprocess='perfevalsettings.php?w=EditSpecificsPS&PerfStateID='; $editprocesslabel='Edit';
 		
@@ -200,7 +200,7 @@ switch ($which)
 			$addlprocesslabel='Look Up';
 		
 		
-		$title=''; $formdesc=''; $txnid='TxnID';
+		$title=''; $formdesc=''; $txnidname='TxnID';
 		$columnnames=$columnnameslist;       
 		$editprocess='perfevalsettings.php?w=EditSpecificsSA&PSID='; $editprocesslabel='Edit';
 		

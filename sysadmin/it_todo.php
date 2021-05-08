@@ -12,7 +12,7 @@ $title='IT Dept To Do List';  $formdesc='<a href=it_todo.php?w=Upload>Upload Dat
     <input type=submit name=submit value="'.($showall==1?'Hide Completed':'Show All').'">
     </form><i>';
 $list='List';
-$table='it_list'; $txnid='TxnID'; $txnidname='TxnID';
+$table='it_list'; $txnidname='TxnID';
 $sql='SELECT i.*, Nickname AS AssignedTo, dept AS Dept,
 Case when Status=2 then "Completed" when Status=1 then "Working" when Status=4 then "Moved" when Status=0 then "Unassigned" when Status=\'-1\' then "Cancelled" end as Status
 FROM `it_list` i LEFT JOIN `1employees` e ON e.IDNo=i.AssignedToID LEFT JOIN `1departments` d ON d.deptid=i.deptid '.(($showall==1 OR $which=='EditSpecifics')?'':'WHERE Status NOT IN (2,-1,4) ');

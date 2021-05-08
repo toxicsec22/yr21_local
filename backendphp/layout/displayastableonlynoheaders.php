@@ -67,9 +67,9 @@ foreach($datatoshow as $rows){
         }
 	$total=(isset($coltototal)?$total+$rows[$coltototal]:0);  
         $textfordisplay=$textfordisplay.((key($rows)!=$keyoflast)?"":(isset($runtotal)?"<td>".number_format($total,2)."</td>":"")
-					 .(isset($editprocess)?"<td><a href='".$editprocess.addslashes($rows[$txnid])."'>".(isset($editprocesslabel)?$editprocesslabel:"Lookup")."</a></td>":"")
-            .(isset($addlprocess)?"<td><a href='".$addlprocess.addslashes($rows[$txnid]).'&action_token='.$_SESSION['action_token']."'>".$addlprocesslabel."</a></td>":"")
-					 .(isset($addlprocess2)?"<td><a href='".$addlprocess2.addslashes($rows[$txnid]).'&action_token='.$_SESSION['action_token']."'>".$addlprocesslabel2."</a></td>":"")."</tr>");
+					 .(isset($editprocess)?"<td><a href='".$editprocess.addslashes($rows[$txnidname])."'>".(isset($editprocesslabel)?$editprocesslabel:"Lookup")."</a></td>":"")
+            .(isset($addlprocess)?"<td><a href='".$addlprocess.addslashes($rows[$txnidname]).'&action_token='.$_SESSION['action_token']."'>".$addlprocesslabel."</a></td>":"")
+					 .(isset($addlprocess2)?"<td><a href='".$addlprocess2.addslashes($rows[$txnidname]).'&action_token='.$_SESSION['action_token']."'>".$addlprocesslabel2."</a></td>":"")."</tr>");
 } //end foreach
 $textfordisplay=$textfordisplay.(isset($totaltable)?'<tr>'.$totaltable.'</tr>':'')."</tbody></table><br>";
 echo $textfordisplay;

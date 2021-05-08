@@ -4,7 +4,7 @@ $path=$_SERVER['DOCUMENT_ROOT']; include_once $path.'/acrossyrs/logincodes/check
 if (!allowedToOpen(array(6711,6714,6715),'1rtc')) { echo 'No permission'; exit;}
 $showbranches=false; include_once('../switchboard/contents.php');
 
-$txnid='IDNo'; $txnidname='IDNo';
+$txnidname='IDNo';
 $w=isset($_GET['w'])?$_GET['w']:'List';
 $title=!isset($_REQUEST['f'])?'Probationary':$_REQUEST['f'];
 include('../generalinfo/employeefilterlinks.php');

@@ -211,7 +211,7 @@ $formee='<div style="margin-top:0.5%; background-color:1b3d6d; padding:5px; colo
 	
 
 if($posted!='Posted' and ($deptheadpositionid==$resultdepartments['PositionID'] or $deptheadpositionid==$resultdepartments['deptheadpositionid'])){	
-	$txnid='TxnID';	
+	$txnidname='TxnID';	
 	$delprocess='budgetplanningmodule.php?w=Delete&department='.$condition.'&TxnID=';
 	$editprocess='budgetplanningmodule.php?w=Edit&department='.$condition.'&TxnID=';
 	$editprocesslabel='Edit';
@@ -260,7 +260,7 @@ echo'</br>
 /////////////////////////////////////////////////////////////////Employee/////////////////////////	 
 
 if($posted!='Posted' and ($deptheadpositionid==$resultdepartments['PositionID'] or $deptheadpositionid==$resultdepartments['deptheadpositionid'])){	
-	$txnid='TxnID';	
+	$txnidname='TxnID';	
 	$delprocess='budgetplanningmodule.php?w=Delete&department='.$condition.'&checker=1&TxnID=';
 	$editprocess='budgetplanningmodule.php?w=Edit&department='.$condition.'&checker=1&TxnID=';
 	$editprocesslabel='Edit';

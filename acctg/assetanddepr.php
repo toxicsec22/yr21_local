@@ -195,7 +195,7 @@ case 'Lapse':
     $columnnames[]='TotalDepreciationAsOfThisYr';  $columnnames[]='NetValueThisYr'; 
 $sql='SELECT a.`AssetID` as TxnID, ca.ShortAcctID as AssetAccount,`AssetDesc`, FORMAT(`AcqCost`,2) AS `AcqCost`, `DateAcquired`, `SalvageValue`, `EstLifeInMonths`, FORMAT(SUM(IFNULL(CASE WHEN Year(`DeprDate`)<'.$thisyr.' THEN  `Amount` END,0)),2) AS `PreviousYrs`, '.$sql.' FORMAT(SUM(IFNULL(CASE WHEN Year(`DeprDate`)<='.$thisyr.' THEN  `Amount` END,0)),2) AS `TotalDepreciationAsOfThisYr`, FORMAT((`AcqCost`-SUM(IFNULL(CASE WHEN Year(`DeprDate`)<='.$thisyr.' THEN  `Amount` END,0))),2)  AS `NetValueThisYr`
 FROM `acctg_1assets` a JOIN `acctg_1chartofaccounts` ca ON a.AssetAccountID=ca.AccountID LEFT JOIN `acctg_1assetsdepr` d ON a.AssetID=d.AssetID '.$branchcondition.' GROUP BY a.AssetID;'; //echo $sql;
-$txnid='TxnID'; 
+$txnidname='TxnID'; 
 $editprocess='assetanddepr.php?w=AssetandDepr&TxnID='; $editprocesslabel='Lookup';
 
 $sqlsum='SELECT FORMAT(SUM(`AcqCost`),2) AS `AcqCost` FROM `acctg_1assets` a  '.$branchcondition; //echo $sqlsum;

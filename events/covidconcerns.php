@@ -48,7 +48,7 @@ switch ($w){
 				
 				
 //             $title='DOLE CAMP List of Employees';
-//             $txnid='IDNo';
+//             $txnidname='IDNo';
 //             $sql='SELECT e.IDNo, CONCAT(e.Surname,", ",e.FirstName," ",IF(ISNULL(e.MiddleName) OR e.MiddleName LIKE " ","",CONCAT(LEFT(e.MiddleName,1),"."))) AS `Name of Worker`,
 // TRUNCATE(((to_days(curdate()) - to_days(e.`Birthdate`)) / 365.25),0) AS `Age`, IF(Gender=1,"M","F") AS Sex,
 // IFNULL(CONCAT(ei.Street_Present,", ",bot.BarangayOrTown,", ",cop.CityOrProvince),(StreetAddress)) AS `Home Address`, 
@@ -103,7 +103,7 @@ FROM `payroll_26yrtotaland13thmonthcalc` pc';
             
         // case 'SubmitFebPayroll':
         //     $title='Feb payroll for CAMP';
-        //     $txnid='IDNo';
+        //     $txnidname='IDNo';
         //     $sql0='SELECT e.IDNo, CONCAT(e.Surname,", ",e.FirstName," ",IF(ISNULL(e.MiddleName) OR e.MiddleName LIKE " ","",CONCAT(LEFT(e.MiddleName,1),"."))) AS `Name of Worker`, Basic,OT,AbsenceBasic,UndertimeBasic,`SSS-EE`,`PhilHealth-EE`,WTax, (Basic+OT-AbsenceBasic-UndertimeBasic-`SSS-EE`-`PhilHealth-EE`-WTax) AS NetPay  FROM 1employees e JOIN `payroll_25payroll` p ON e.IDNo=p.IDNo JOIN 1_gamit.0idinfo id ON e.IDNo=id.IDNo WHERE e.IDNo IN (SELECT DISTINCT(IDNo) FROM attend_2attendance WHERE LeaveNo=22 AND DateToday<=\'2020-03-23\') AND (e.Resigned=0 OR DateResigned>\'2020-03-31\') ';
         //     $columnnames=array('IDNo','Name of Worker','Basic','OT','AbsenceBasic','UndertimeBasic','SSS-EE','PhilHealth-EE','WTax','NetPay');
             

@@ -137,7 +137,7 @@ switch ($which){
         header("Location:tel.php?w=List&TL=".$tl."&TxnID=".$txnid);
         break;
    case 'All':
-       $title=''; $formdesc='';  $txnid='TxnSubId';
+       $title=''; $formdesc='';  $txnidname='TxnSubId';
        //if ($_SESSION['(ak0)']==1002){ echo $sql;}
        include('dailycalllogsdata.php');
        include('../backendphp/layout/displayastablewithsub.php');

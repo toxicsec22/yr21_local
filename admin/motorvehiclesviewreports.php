@@ -66,7 +66,7 @@ echo '
 			
 			$columnnameslist=array('Branch','PlateNo','Model','Km/Liter','Liter/Km','Peso/Km','ConsumedAmount');
 			
-			$title=''; $formdesc=''; $txnid='TxnID';
+			$title=''; $formdesc=''; $txnidname='TxnID';
 			
 			$columnnames=$columnnameslist;       
 			

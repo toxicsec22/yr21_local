@@ -25,7 +25,7 @@ case 'Edit':
     $sql0='Select PDCID FROM `acctg_2provcollectsubpdcremarks` WHERE PDCID LIKE \''.$_REQUEST['PDCID'].'\'';
     $stmt0=$link->query($sql0); $stmt0->fetch();
 if($stmt0->rowCount()==0) { $sqlinsert='INSERT INTO `acctg_2provcollectsubpdcremarks`(`PDCID`) VALUES (\''.$_REQUEST['PDCID'].'\');'; $stmt0=$link->prepare($sqlinsert); $stmt0->execute();}
-    $txnid='PDCID'; $title='Edit PDC Remarks';
+    $txnidname='PDCID'; $title='Edit PDC Remarks';
     $columnnames=array('PDCBank','PDCNo','DepositOnDate','PDCRemarks','AcctgBy','ARPDCRemarks','ARBy');
     if (allowedToOpen(5505,'1rtc')) { $columnstoedit=array('ARPDCRemarks');} else { $columnstoedit=array('PDCRemarks'); } ;
     if (allowedToOpen(5507,'1rtc')) { $columnstoedit[]='DepositOnDate';}

@@ -125,7 +125,7 @@ case 'ShowRequest':
 		$editprocess='../sysadmin/assignpermission.php?w=AccessPerPosition&Request=1&ForPositionID=';
 	// }
 	$delprocess='allprocesseslist.php?w=DeleteRequest&PositionID=';
-	$txnid='TxnID';
+	$txnidname='TxnID';
     include('../backendphp/layout/displayastable.php');
 
 break;

@@ -65,7 +65,7 @@ case 'StoreUsed':
       $columnnames=array('ItemCode','Category','ItemDesc','Qty','Reason','EncodedBy','TimeStamp');
         if (allowedToOpen(6971,'1rtc')){
         $condition='';
-        $txnid='ApprovalId';
+        $txnidname='ApprovalId';
         $editprocess='prinvapproval.php?w=ApproveSU&action_token='.$_SESSION['action_token'].'&ApprovalId=';
         $editprocesslabel='Approve';
         $columnnames[]='Branch';
@@ -74,7 +74,7 @@ case 'StoreUsed':
      }
       $sql='SELECT su.*, ItemDesc,Category,Branch, Nickname as EncodedBy FROM approvals_2storeused su join invty_1items i on su.ItemCode=i.ItemCode join invty_1category c on c.CatNo=i.CatNo join `1branches` b on b.BranchNo=su.BranchNo join `1employees` e on e.IDNo=su.EncodedByNo where Approved=0'.$condition;
       $delprocess='prinvapproval.php?w=DeleteSU&action_token='.$_SESSION['action_token'].'&TxnID=';
-      $txnid='ApprovalId';
+      $txnidname='ApprovalId';
       include('../backendphp/layout/displayastablewithedit.php');
       
       $title='<br><br>Step 3. Record Store Used in Inventory'; $formdesc='All store used per day will be encoded together in ONE main form.';
@@ -84,7 +84,7 @@ case 'StoreUsed':
         $columnnames[]='Branch';
      } else {
         $condition=' and su.BranchNo='.$_SESSION['bnum'];
-        $txnid='ApprovalId';
+        $txnidname='ApprovalId';
         $editprocess='prinvapproval.php?w=RecordSU&action_token='.$_SESSION['action_token'].'&ApprovalId=';
         $editprocesslabel='Record';
      }

@@ -92,7 +92,7 @@ switch ($which)
 		$editprocess='graphicrequest.php?w=Lookup&TxnID='; $editprocesslabel='Lookup';
 		$addlprocess='graphicrequest.php?w=EditRequest&TxnID='; $addlprocesslabel='Edit';
      
-		$formdesc=''; $txnid='TxnID';
+		$formdesc=''; $txnidname='TxnID';
 		$columnnames=$columnnameslist;
 		
 		$width='100%';

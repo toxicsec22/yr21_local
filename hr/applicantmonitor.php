@@ -45,7 +45,7 @@ switch ($which){
         $delprocess='applicantmonitor.php?which=Delete&TxnID=';
         $addlprocess='applicantmonitor.php?which=Hide&TxnID='; $addlprocesslabel='Hide/Show';
         $columnstoedit=array('Date', 'FirstName', 'MiddleName', 'SurName', 'MobileNo', 'Email', 'DateofInterview', 'Status','ReferredBy','Hired');
-        $editprocess='applicantmonitor.php?which=EditSpecifics&TxnID='; $editprocesslabel='Edit'; $txnid='TxnID';
+        $editprocess='applicantmonitor.php?which=EditSpecifics&TxnID='; $editprocesslabel='Edit'; $txnidname='TxnID';
         echo 'Hired values: 0-Pending, 1-Hired, 2-Rejected';
       include('../backendphp/layout/displayastable.php');       
         break;

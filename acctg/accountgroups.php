@@ -43,7 +43,7 @@ switch ($which){
          $columnstoedit=array('GroupID', 'AccountGroup', 'Level', 'OrderNo');
 	 } else { $columnstoedit=array();}
       
-      $title=''; $formdesc='';$txnid='GroupID'; $txnidname='GroupID';
+      $title=''; $formdesc=''; $txnidname='GroupID';
       $columnnames=$columnnameslist;
         $sortfield=(isset($_POST['sortfield'])?$_POST['sortfield']:' AccountGroup,OrderNo'); $columnsub=$columnnames;
         $sql=$sql.' ORDER BY '.$sortfield.(isset($_POST['sortarrange'])?' '.$_POST['sortarrange']:' ASC');         

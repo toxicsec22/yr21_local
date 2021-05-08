@@ -21,7 +21,7 @@ include_once('../switchboard/contents.php');
 if (!isset($_POST['submit'])){    goto noform;}
 
 $sqlbank='SELECT b.*, ShortAcctID AS Account FROM `banktxns_banktxns` b JOIN `acctg_1chartofaccounts` ca ON ca.AccountID=b.AccountID ';
-$txnid='TxnNo';
+$txnidname='TxnNo';
 $columnnames=array('TxnNo','Account','TxnDate','Particulars','BankBranch','CheckNo','BankTransCode','WithdrawAmt','DepositAmt','Remarks','Cleared','ClearedByNo','ClearedTS');
 
 switch ($_POST['submit']){

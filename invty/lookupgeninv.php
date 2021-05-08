@@ -53,7 +53,7 @@ include_once $path.'/acrossyrs/commonfunctions/listoptions.php';
 		
 		$title='Freon Sold Per Year'; 
          $formdesc='</i><br><form action="lookupgeninv.php?w=FreonSoldPerYear" method="POST">Year: <select name="Yr">'.$yropt.'</select> <input type="submit" value="Select"></form><br><h3>Branch: '.$_SESSION['@brn'].'<br>Year: '.$year.'</h3><i>';
-        $txnid='TxnID';
+        $txnidname='TxnID';
 		$columnnames=$columnnameslist;       
          
 		include('../backendphp/layout/displayastable.php'); 
@@ -147,7 +147,7 @@ SELECT BranchNo,a.ItemCode, SUM(Qty) as Defective,Sum(Qty) as EndInvToday FROM i
     $columnnames1=array('Branch');
     $columnnames2=array('Category','ItemCode','Description','Defective','EndInvToday','Unit');
     $newwindowprocess='lookupperitemdetails.php?w=Item_Activity_Defective&ItemCode=';
-    $newwindowprocesslabel='Lookup Activity'; $txnid='ItemCode'; $txnid2='BranchNo'; $newwindowwidth='800'; $newwindowheight='600';
+    $newwindowprocesslabel='Lookup Activity'; $txnidname='ItemCode'; $txnid2='BranchNo'; $newwindowwidth='800'; $newwindowheight='600';
     include('../backendphp/layout/displayastablewithsub.php');
    break;
 
@@ -981,7 +981,7 @@ $stmt=$link->prepare($sql0);$stmt->execute();
 // branch scores
 $sql='SELECT `Branch`,FORMAT(sum(`CashSales`),0) as CashSales, FORMAT(sum(`ClearedCollections`),0) as ClearedCollections, FORMAT(SUM(`Net`),0) AS Net, FORMAT(YrTarget,0) AS YrTarget, CONCAT(FORMAT((SUM(`Net`)/YrTarget)*100,2),"%") as YrScore, (SUM(`Net`)/YrTarget) AS YrScoreValue FROM acctg_6targetscores ts join 1branches b on b.BranchNo=ts.BranchNo join BranchYrTargets yst on yst.BranchNo=ts.BranchNo WHERE MonthNo>0 group by Branch ORDER BY YrScoreValue DESC';
 
-// $txnid='BranchNo';  
+// $txnidname='BranchNo';  
    include('../backendphp/layout/displayastable.php');
 $title='';
 
@@ -1066,7 +1066,7 @@ case 'YrTargetsEdit':
   
 case 'SetasCharge': 
 $title='Change Payment Type';;
-$txnid='TxnID';
+$txnidname='TxnID';
 if (allowedToOpen(728,'1rtc')) {
    $autoprocess='../acctg/pracctgAR.php?w='.$whichqry.'&TxnID=';
    $autoprocesslabel='Change_PayType';
@@ -1084,7 +1084,7 @@ break;
 
 case 'ChangeTeamLeader': 
 $title='Change Team Leader Per Invoice';
-$txnid='TxnID';
+$txnidname='TxnID';
 if (allowedToOpen(719,'1rtc')) {   $editprocess='praddsale.php?w=ChangeTeamLeader&TxnID=';   $editprocesslabel='Change';} 
 ?><br>
 <form method=post action='lookupgeninv.php?w=ChangeTeamLeader'>
@@ -1114,7 +1114,7 @@ break;
 case 'Turnover': 
 $title='Turnover Rate Per Branch';
 $formdesc='Qty Sold / Endinv Invty';
-$txnid='TxnID';
+$txnidname='TxnID';
 if (!allowedToOpen(732,'1rtc')) {    echo 'No permission'; exit;} 
 $from=!isset($_POST['frommonth'])?date('m'):($_POST['frommonth']);
 $to=!isset($_POST['tomonth'])?date('m'):($_POST['tomonth']);
@@ -1161,7 +1161,7 @@ case 'CompareTurnover':
 $title='Comparative Turnover Rates';
 $formdesc='Qty Sold / Endinv Invty';
 $showbranches=false;
-$txnid='TxnID';
+$txnidname='TxnID';
 if (!allowedToOpen(720,'1rtc')) {    echo 'No permission'; exit;} 
 ?>
 <form method=post action='lookupgeninv.php?w=CompareTurnover'>

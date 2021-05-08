@@ -50,7 +50,7 @@ switch ($which)
 	case 'CoreCompetencies':
 	
 		$title='Core Competencies'; 
-		$txnid='TxnID';
+		$txnidname='TxnID';
 		
 		$columnnames=array('Competency','Interpretation','Weight');
 		$sqlmain='SELECT *,CONCAT(`Weight`,"%") AS `Weight` FROM hr_81ccsub WHERE ';
@@ -176,7 +176,7 @@ switch ($which)
 		case 'FunctionalCompetencies':
 			
 			$title='Functional Competencies'; 
-			$txnid='FID';
+			$txnidname='FID';
         	 $formdesc='';
 			
 			 $method='post';
@@ -262,7 +262,7 @@ break;
 case 'LookupFCStatements':
 
 	$title='Functional Competency Statements'; 
-			$txnid='FCID';
+			$txnidname='FCID';
 			$sqlm='SELECT dept,FormDescription,CONCAT("<a target=\"_blank\" href=\"newperfevalsettings.php?w=FCFormID&FID=",FID,"\"",">Lookup Default Positions</a>") AS DefaultPositions FROM hr_81fcmain fcm JOIN 1departments d ON fcm.DeptID=d.deptid WHERE FID='.intval($_GET['FID']).';';
 	$stmtm=$link->query($sqlm); $rowm=$stmtm->fetch();
 

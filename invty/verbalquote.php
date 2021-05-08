@@ -31,7 +31,7 @@ Remarks<input type=text size=30 name="Remarks" autocomplete="off">
 <input type="submit" name="submit" value="Add">
 </form>';
 $addlmenu=$addlmenu.renderlist('clientswhole').renderlist('items');
-$txnid='TxnID';
+$txnidname='TxnID';
 $date=!isset($_POST['Date'])?date('Y-m-d'):date('Y-m-d');
 
     $condition=' where '.($show==0?'s.Date=\''.$date.'\'':'Month(s.Date)=Month(\''.$date.'\')');

@@ -42,7 +42,7 @@ switch($which){
 			$sql='select u.*,Nickname as EncodedBy,TableFile as `Table/File` from it_2updates u left join 1employees e on e.IDNo=u.EncodedByNo where '.(isset($_POST['Search'])?'TableFile like \'%'.$_POST['table'].'%\' OR Changes like \'%'.$_POST['table'].'%\'':' Date between \''.$from.'\' and \''.$to.'\'  Order By Date Desc,u.TimeStamp DESC').' ';
 			// echo $sql; exit();
 			$columnnames=array('Date','Table/File','Changes','EncodedBy','TimeStamp');
-			$txnid='TxnID';
+			$txnidname='TxnID';
 			$editprocess='itupdates.php?w=Edit&TxnID=';
 			$editprocesslabel='Edit';
 			

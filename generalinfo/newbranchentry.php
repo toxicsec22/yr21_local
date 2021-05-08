@@ -7,7 +7,7 @@ $showbranches=false; include_once('../switchboard/contents.php');
 $which=!isset($_GET['w'])?'BranchList':$_GET['w'];
 $title='Add New Branch';  $formdesc='<a href="newbranchdata.php">Other commands for new branches and _comkey updates.</a>';
 $list='BranchList';
-$table='1branches'; $txnid='BranchNo'; $txnidname='BranchNo';
+$table='1branches'; $txnidname='BranchNo';
 $sql='SELECT b.*, a.Area, Company,RegionMinWageArea
 FROM `1branches` b JOIN `0area` a ON a.AreaNo=b.AreaNo JOIN `1companies` c ON c.CompanyNo=b.CompanyNo left join `1_gamit`.`payroll_0regionsminwageareas` rmwa on rmwa.MinWageAreaID=EffectiveMinWageAreaID ';
 if (allowedToOpen(6063,'1rtc')){
@@ -85,7 +85,7 @@ if (allowedToOpen(60631,'1rtc')) { goto noadd2; }
 $which=($which=='BranchList')?'AreaList':$_GET['w'];
 $title='Add New Area'; unset($formdesc); 
 $list='AreaList';
-$table='0area'; $txnid='AreaNo'; $txnidname='AreaNo'; $width='30%';
+$table='0area'; $txnidname='AreaNo'; $width='30%';
 $sql='SELECT * FROM `0area` ';
 $columnnameslist=array('AreaNo', 'Area');
 $columnstoadd=$columnnameslist;
@@ -119,7 +119,7 @@ include('../backendphp/layout/genlists.php');
 $which=($which=='AreaList')?'CompanyList':$_GET['w'];
 $title='Add New Company'; unset($formdesc); 
 $list='CompanyList';
-$table='1companies'; $txnid='CompanyNo'; $txnidname='CompanyNo'; $width='100%';
+$table='1companies'; $txnidname='CompanyNo'; $width='100%';
 $sql='SELECT * FROM `1companies` ';
 $columnnameslist=array('CompanyNo', 'CompanyName', 'TelNo','Company','IncorporationDate','RegisteredAddress','RDO','RepBranchNo','SSSNo','PHICNo','PagIbigNo','TIN','SECRegNo','Active');
 $columnstoadd=$columnnameslist;
@@ -156,7 +156,7 @@ include('../backendphp/layout/genlists.php');
 $which=($which=='CompanyList')?'Departments':$_GET['w'];
 $title='Add New Department'; unset($formdesc); 
 $list='Departments';
-$table='1departments'; $txnid='deptid'; $txnidname='deptid'; $width='60%';
+$table='1departments'; $txnidname='deptid'; $width='60%';
 $sql='SELECT * FROM `1departments` ';
 $columnnameslist=array('deptid','department','deptheadpositionid','orderby','tel','address');
 $columnstoadd=$columnnameslist;

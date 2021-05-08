@@ -116,7 +116,7 @@ switch ($which)
 		//Processes
 		
 		
-		$title=''; $formdesc=''; $txnid='TxnID';
+		$title=''; $formdesc=''; $txnidname='TxnID';
 		$columnnames=$columnnameslist;       
 		
 		
@@ -134,7 +134,7 @@ switch ($which)
 		//Processes
 		
 		echo '<br/>';
-		$title='All Entries'; $formdesc=''; $txnid='TxnID';
+		$title='All Entries'; $formdesc=''; $txnidname='TxnID';
 		$columnnames=$columnnameslist;       
                 if (allowedToOpen(4002,'1rtc')) { $editprocess='hvac.php?w=EditSpecifics&HVACID='; $editprocesslabel='Edit'; $delprocess='hvac.php?w=Delete&HVACID=';}
                 
@@ -149,7 +149,7 @@ switch ($which)
 	 
    $columnnameslist=array('Company', 'Name', 'Position', 'ContactNo', 'Email', 'Industry', 'STL', 'Date', 'InquiredAbout', 'EncodedBy', 'TimeStamp', 'UserAction', 'ActionBy', 'ActionTimeStamp');
 
-		$title='HVAC Logs'; $formdesc='UserAction: 0 = Deleted, 1 = Edited'; $txnid='TxnID';
+		$title='HVAC Logs'; $formdesc='UserAction: 0 = Deleted, 1 = Edited'; $txnidname='TxnID';
 		$columnnames=$columnnameslist;      
 		
 		include('../backendphp/layout/displayastable.php'); 
@@ -271,7 +271,7 @@ switch ($which)
 		$columnnameslist=array('Day', 'Date');
 		$columnstoadd=array('Day', 'Date');
 		
-		$title=''; $formdesc=''; $txnid='TxnID';
+		$title=''; $formdesc=''; $txnidname='TxnID';
 		$columnnames=$columnnameslist;
 		
 		$editprocess='hvac.php?w=LookupDate&Date='; $editprocesslabel='Look up';
@@ -289,7 +289,7 @@ switch ($which)
 		$columnstoadd=array('STL', 'Date');
 		
 		
-		$title=''; $formdesc=''; $txnid='TxnID';
+		$title=''; $formdesc=''; $txnidname='TxnID';
 		$columnnames=$columnnameslist;       
 		$editprocess='hvac.php?w=LookupAllTime&STL='; $editprocesslabel='Look up';
 		
@@ -331,7 +331,7 @@ switch ($which)
 	 
 	   
 		
-		$title=''; $formdesc=''; $txnid='TxnID';
+		$title=''; $formdesc=''; $txnidname='TxnID';
 		$columnnames=$columnnameslist;       
 		
 		include('../backendphp/layout/displayastable.php'); 
@@ -352,7 +352,7 @@ switch ($which)
 		$columnnameslist=array('STL', 'Total');
 		$columnstoadd=array('STL', 'Date');
 		
-		$title=''; $formdesc=''; $txnid='TxnID';
+		$title=''; $formdesc=''; $txnidname='TxnID';
 		$columnnames=$columnnameslist;
 		
 		$editprocess='hvac.php?w=Lookup&Date='.$_GET['Date'].'&STL='; $editprocesslabel='Look up';
@@ -380,7 +380,7 @@ switch ($which)
 	   
 		$title='List of Visitors'; $formdesc='Add New Visitors Info.';
 		
-		$title=''; $formdesc=''; $txnid='TxnID';
+		$title=''; $formdesc=''; $txnidname='TxnID';
 		$columnnames=$columnnameslist;       
 		
 		include('../backendphp/layout/displayastable.php'); 

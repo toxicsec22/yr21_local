@@ -121,7 +121,7 @@ if ((isset($_POST['Category'])) OR (isset($_SESSION['CatNo']))){
 		 $sql='SELECT lmp.*,ItemDesc, lc.UnitCost FROM `invty_5latestminprice` lmp JOIN invty_1items i ON lmp.ItemCode=i.ItemCode LEFT JOIN invty_52latestcost lc ON i.ItemCode=lc.ItemCode JOIN invty_1category c ON i.CatNo=c.CatNo WHERE i.CatNo='.$catno.';';
                  $columnnames=array('ItemCode','ItemDesc','UnitCost','PriceLevel1','PriceLevel2','PriceLevel3','PriceLevel4','PriceLevel5');
                  
-                 $txnid='ItemCode';
+                 $txnidname='ItemCode';
                  if (allowedToOpen(array(7491),'1rtc')){ 
                      $columnstoedit=array('PriceLevel1','PriceLevel2','PriceLevel3','PriceLevel4','PriceLevel5');
                         $editprocess='lookupperitem.php?w=AddPriceLevel&ItemCode='; $editprocesslabel='Edit';

@@ -33,7 +33,7 @@ switch ($which){
          $columnstoedit=array('CatNo','Category');
 	 } else { $columnstoedit=array();}
       
-      $title=''; $formdesc='';$txnid='TxnID';
+      $title=''; $formdesc='';$txnidname='TxnID';
       $columnnames=$columnnameslist;
         $sortfield=(isset($_POST['sortfield'])?$_POST['sortfield']:' Category'); $columnsub=$columnnames;
         $sql=$sql.' ORDER BY '.$sortfield.(isset($_POST['sortarrange'])?' '.$_POST['sortarrange']:' ASC');    

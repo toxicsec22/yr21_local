@@ -70,7 +70,7 @@ JOIN `invty_0txntype` tt ON tt.txntypeid=fm.InvType'.$condi.'
 GROUP BY DateTransferred,fm.BranchNo,InvoiceType,SeriesFrom
 ORDER BY DateTransferred,Branch,InvoiceType,SeriesFrom;'; 
 // echo $sql;
-$txnid='TxnID'; 
+$txnidname='TxnID'; 
 // $fieldname='TxnID';
 $editprocess='fromsupplier.php?which=ListReceived&TxnID=';
 $editprocesslabel='Lookup';
@@ -130,7 +130,7 @@ JOIN `1employees` e ON e.IDNo=fs.AcceptedByNo
 JOIN `invty_0txntype` tt ON tt.txntypeid=fm.InvType'.$condi.' 
 GROUP BY DateAccepted,fm.BranchNo,InvoiceType,SeriesFrom
 ORDER BY DateAccepted,b.Branch,InvoiceType,SeriesFrom;'; //echo $sql;
-$txnid='TxnID'; $fieldname='TxnID';
+$txnidname='TxnID'; $fieldname='TxnID';
 // $process1='acceptbybranch.php?which=ListAcceptedFromSummary&';
 // $processlabel1='Lookup';
 // $title=''; 
@@ -145,7 +145,7 @@ include_once('../backendphp/layout/displayastable.php');
     $columnnames=array('AcceptedByBranch', 'TransferredToBranch', 'BookletNo', 'InvoiceType', 'SpecialRemarks','SpecTransferredTS', 'SpecTransferredBy');
 	 
 	$sql='SELECT b.Branch AS AcceptedByBranch, b2.Branch AS TransferredToBranch, BookletNo,txndesc AS InvoiceType,SpecTransferredTS,SpecialRemarks, CONCAT(Nickname," ",Surname) AS SpecTransferredBy  FROM monitor_2specialtransfer st JOIN monitor_2fromsuppliersub fs ON st.TxnSubId=fs.TxnSubId JOIN 1branches b ON st.AcceptedByBranchNo=b.BranchNo JOIN 1branches b2 ON st.SpecTransferredToBranchNo=b2.BranchNo JOIN 1_gamit.0idinfo id ON st.SpecTransferredByNo=id.IDNo JOIN monitor_2fromsuppliermain sm ON sm.TxnID=st.TxnID JOIN invty_0txntype tt ON sm.InvType=tt.txntypeid ORDER BY SpecTransferredTS DESC;'; 
-	$txnid='TxnID'; $fieldname='TxnID';
+	$txnidname='TxnID'; $fieldname='TxnID';
 	include_once('../backendphp/layout/displayastable.php');
 	
     break;

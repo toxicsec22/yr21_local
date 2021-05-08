@@ -45,7 +45,7 @@ switch ($which){
 	 $delprocess='salesacrosscompanies.php?w=Delete&TxnID=';
          $columnstoedit=array('ItemsFromBranch','TransferNo','InvoiceFromBranch','SaleNo','Remarks');
 	
-      $title=''; $formdesc='';$txnid='TxnID';
+      $title=''; $formdesc='';$txnidname='TxnID';
       $columnnames=$columnnameslist;
         $sortfield=(isset($_POST['sortfield'])?$_POST['sortfield']:'InvoiceDate'); $columnsub=$columnnames;
         $sql=$sql.' WHERE sm.txntype=2 GROUP BY sm.TxnID UNION       

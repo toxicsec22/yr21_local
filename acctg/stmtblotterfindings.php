@@ -6,7 +6,7 @@ $showbranches=false; include_once('../switchboard/contents.php');
 $which=!isset($_GET['w'])?'List':$_GET['w'];
 $title='Add New Findings';  
 $list='List';
-$table='acctg_0blotterfindingsstmt'; $txnid='FID'; $txnidname='FID';
+$table='acctg_0blotterfindingsstmt'; $txnidname='FID';
 $sql='SELECT `t`.*, NickName AS EncodedBy FROM acctg_0blotterfindingsstmt `t` JOIN 1employees e ON `t`.EncodedByNo=e.IDNo ';
 $columnnameslist=array('Findings');
 $columnstoadd=$columnnameslist;

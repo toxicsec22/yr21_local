@@ -400,7 +400,7 @@ case 'PReditsub':
 						</div>'
                         . '<i>';
                 
-		$txnid='TxnSubId';
+		$txnidname='TxnSubId';
 		if(allowedToOpen(6962,'1rtc')){
 		$tdform=true;
                 $tdforminput='<input type="text" name="DecisionRefNo" placeholder="Reference -- blank if none">'

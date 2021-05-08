@@ -72,7 +72,7 @@ if (in_array($which,array('StatementList','MeritsList'))){
 		$delprocess='scores.php?w=DeleteStatement&SSID=';
 		$editprocess='scores.php?w=EditSpecificsStatement&SSID='; $editprocesslabel='Edit';
      
-		$title=''; $formdesc=''; $txnid='TxnID';
+		$title=''; $formdesc=''; $txnidname='TxnID';
 		$columnnames=$columnnameslist;
 		
 		$width='80%';
@@ -177,7 +177,7 @@ if (in_array($which,array('ScoreDemerits','ScoreMerits','ScoreDemeritsMonth','Sc
 			echo '<title>Merits</title>';
 		}
 		echo $title1;
-		$title=''; $formdesc=''; $txnid='TxnID';
+		$title=''; $formdesc=''; $txnidname='TxnID';
 		$columnnames=$columnnameslist;
 		echo '<br>';
 		
@@ -932,7 +932,7 @@ switch ($which)
           IFNULL(round(SUM(CASE MONTH(DateOfIncident) WHEN 11 THEN WeightinPoints END), 2),0) AS November,
           IFNULL(round(SUM(CASE MONTH(DateOfIncident) WHEN 12 THEN WeightinPoints END), 2),0) AS December FROM hr_72scores s JOIN hr_71scorestmt ss ON s.SSID=ss.SSID JOIN attend_30currentpositions cp ON s.ReporteeNo=cp.IDNo JOIN hr_70points p ON ss.PointID=p.PointID WHERE ('.$_SESSION['(ak0)'].' in ('.$incondi.')) AND stmtcat='.$_POST['StmtCat'].' AND DecisionStatus='.($_POST['StmtCat']==0?1:3).' GROUP BY ReporteeNo ORDER BY Department,JLID DESC;';
 		// echo $sql;
-		$title=''; $formdesc=''; $txnid='TxnID';
+		$title=''; $formdesc=''; $txnidname='TxnID';
 		$columnnameslist=array('Branch', 'Employee', 'Department', 'Position', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December');
 		$columnnames=$columnnameslist;
 		$editprocess='scores.php?w=LookupScore&StmtCat='.$_POST['StmtCat'].'&IDNo='; $editprocesslabel='Lookup';
@@ -960,7 +960,7 @@ switch ($which)
 		
 		$sql0='SELECT s.*, ReporteeNo AS TxnID, FullName AS Employee, department AS Department, Branch, Position, TRUNCATE(SUM(WeightinPoints),2) AS Points FROM hr_72scores s JOIN hr_71scorestmt ss ON s.SSID=ss.SSID JOIN attend_30currentpositions cp ON s.ReporteeNo=cp.IDNo JOIN hr_70points p ON ss.PointID=p.PointID WHERE Month(DateofIncident)='.$_POST['MonthNo'].' AND ReporteeNo='.$_POST['IDNo'].' ';
 		$lookupprocess = 'scores.php?w=LookupScore&MonthNo='.$_POST['MonthNo'].'';
-		$formdesc=''; $txnid='TxnID';
+		$formdesc=''; $txnidname='TxnID';
 		$columnnameslist=array('Branch', 'Employee', 'Department', 'Position', 'Points');
 		$columnnames=$columnnameslist;
 		
@@ -1002,7 +1002,7 @@ switch ($which)
 		$sql0='SELECT s.*, ReporteeNo AS TxnID, FullName AS Employee, cp.department AS Department,d.department AS ReportingDepartment, Branch, Position, TRUNCATE(SUM(WeightinPoints),2) AS Points FROM hr_72scores s JOIN hr_71scorestmt ss ON s.SSID=ss.SSID JOIN attend_30currentpositions cp ON s.ReporteeNo=cp.IDNo JOIN hr_70points p ON ss.PointID=p.PointID JOIN 1departments d ON ss.deptid=d.deptid WHERE Month(DateofIncident)='.$_POST['MonthNo'].' '.($_POST['deptid']=='All'?'':'AND ss.deptid='.$_POST['deptid'].'').'';
 		
 		
-		$formdesc=''; $txnid='TxnID';
+		$formdesc=''; $txnidname='TxnID';
 		// $columnnameslist=array('Branch', 'Employee', 'Department', 'Position', 'ReportingDepartment', 'Merits', 'Demerits', 'NotCounted');
 		$columnnameslist=array('Branch', 'Employee', 'Department', 'Position', 'ReportingDepartment', 'Points');
 		$columnnames=$columnnameslist;
@@ -1062,7 +1062,7 @@ switch ($which)
 	
 		$sql='SELECT s.*, FullName AS Employee, cp.department AS Department,d.department AS ReportingDepartment, Branch, Position, TRUNCATE(SUM(WeightinPoints),2) AS Points FROM hr_72scores s JOIN hr_71scorestmt ss ON s.SSID=ss.SSID JOIN attend_30currentpositions cp ON s.ReporteeNo=cp.IDNo JOIN hr_70points p ON ss.PointID=p.PointID JOIN 1departments d ON ss.deptid=d.deptid WHERE (DecisionStatus=2 OR ReporteeHeadStatus=4) '.(allowedToOpen(65072,'1rtc')?'':'AND ss.deptid='.$rowdept['deptid']).' ORDER BY Branch,Department,JLID DESC';
 		// echo $sql;
-		$formdesc=''; $txnid='TxnID';
+		$formdesc=''; $txnidname='TxnID';
 		
 		$columnnameslist=array('Branch', 'Employee', 'Department', 'Position', 'ReportingDepartment', 'Points');
 		$columnnames=$columnnameslist;
@@ -1076,7 +1076,7 @@ switch ($which)
 	
 	case 'LookupScore':
 	if (!allowedToOpen(65071,'1rtc')) { echo 'No permission'; exit; }
-	$title='Score Summary per Employee'; $formdesc=''; $txnid='TxnID';
+	$title='Score Summary per Employee'; $formdesc=''; $txnidname='TxnID';
 		$columnnames=$columnnameslist;
 		
 		$width='80%';
@@ -1090,7 +1090,7 @@ switch ($which)
 	
 	case 'ScoreSummaryPending':
 	if (!allowedToOpen(65072,'1rtc')) { echo 'No permission'; exit; }
-	$title='All Pending Reports'; $formdesc=''; $txnid='TxnID';
+	$title='All Pending Reports'; $formdesc=''; $txnidname='TxnID';
 	$addlprocess='scores.php?w=Lookup&TxnID='; $addlprocesslabel='Lookup';
 	// $sql01='';
 		$casecondi = ', (CASE

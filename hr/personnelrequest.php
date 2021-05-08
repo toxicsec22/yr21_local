@@ -142,7 +142,7 @@ LEFT JOIN attend_30currentpositions cp ON e.IDNo=cp.IDNo JOIN checkifexists cie 
 		$columnnames=array_diff($columnnames,array('StartingDate'));
          $columnstoedit=$columnstoeditoption; $columnsub=$columnnames;
          $columnsub=$columnnames;
-         $editprocess='personnelrequest.php?which=HRNoted&TxnID='; $editprocesslabel='Enter'; $txnid='TxnID';
+         $editprocess='personnelrequest.php?which=HRNoted&TxnID='; $editprocesslabel='Enter'; $txnidname='TxnID';
 		 
          include('../backendphp/layout/displayastableeditcellswithsorting.php');
         } else {
@@ -157,7 +157,7 @@ LEFT JOIN attend_30currentpositions cp ON e.IDNo=cp.IDNo JOIN checkifexists cie 
         if (allowedToOpen(64901,'1rtc')){
 			$columnnames=array_diff($columnnames,array('StartingDate'));
          $columnstoedit=$columnstoeditoption; $columnsub=$columnnames;
-         $editprocess='personnelrequest.php?which=HRNoted&TxnID='; $editprocesslabel='Enter'; $txnid='TxnID';
+         $editprocess='personnelrequest.php?which=HRNoted&TxnID='; $editprocesslabel='Enter'; $txnidname='TxnID';
 		 
          include('../backendphp/layout/displayastableeditcellswithsorting.php');
         } else {
@@ -172,7 +172,7 @@ LEFT JOIN attend_30currentpositions cp ON e.IDNo=cp.IDNo JOIN checkifexists cie 
 		$hidecount=true;
         if (allowedToOpen(64901,'1rtc')){
          $columnstoedit=$columnstoeditoption; $columnsub=$columnnames;
-         $editprocess='personnelrequest.php?which=HRNoted&TxnID='; $editprocesslabel='Enter'; $txnid='TxnID';
+         $editprocess='personnelrequest.php?which=HRNoted&TxnID='; $editprocesslabel='Enter'; $txnidname='TxnID';
 		 
         include('../backendphp/layout/displayastableeditcellswithsorting.php');
         } else {

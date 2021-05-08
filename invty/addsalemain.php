@@ -136,7 +136,7 @@ if (!allowedToOpen(6935,'1rtc')) {   echo 'No permission'; exit;}
         left join `1employees` e on sr.EncodedByNo=e.IDNo
         join `1branches` b on b.BranchNo=sr.BranchNo
         where sr.Approval is null AND sr.LastYr=1 '.$condition;
-        $txnid='ApprovalId'; $txnidname='ApprovalId';
+        $txnidname='ApprovalId';
         $delprocess='prinvapproval.php?w=DeleteCRS&action_token='.$_SESSION['action_token'].'&ApprovalId=';
         
         include('../backendphp/layout/displayastablewithedit.php');
@@ -190,7 +190,7 @@ if (!allowedToOpen(6935,'1rtc')) {   echo 'No permission'; exit;}
 			echo '<br><br><h3>2. SRS Request Lists</h3><i>Only Requester can delete.</i>';
 			$title='';
 			
-			$txnid='ApprovalId'; $txnidname='ApprovalId';
+			$txnidname='ApprovalId';
 			$delprocess='prinvapproval.php?w=DeleteCancelSRS&ApprovalId=';
 			include('../backendphp/layout/displayastablewithedit.php');
 		

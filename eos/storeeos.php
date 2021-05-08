@@ -1299,7 +1299,7 @@ $sql='select *,if(HigherOrLower=0,"Higher is Better","Lower is Better") as Highe
 	$columnnames2=array('Branch','Attendee','Supervisor');
 	$groupby='Batch';
 	$orderby='';
-	$txnid='TxnID';
+	$txnidname='TxnID';
 	$delprocess='storeeos.php?w=DeleteBatch&TxnID=';
 	$delprocesslabel='Delete';
 	$editprocess='storeeos.php?w=EditBatch&TxnID=';

@@ -28,7 +28,7 @@ switch ($which){
 
 		from invty_2itemswholesalediscount wd left join invty_1items i on i.ItemCode=wd.ItemCode left join invty_1category c on c.CatNo=i.CatNo left join invty_5latestminprice lmp on lmp.ItemCode=wd.ItemCode';
 		$columnnames=array('ItemCode','ItemDesc','MinQty','Disct','DisctdBranchPriceLevel','DisctdPriceLevel1','DisctdPriceLevel2','DisctdPriceLevel3','DisctdPriceLevel4','DisctdPriceLevel5');
-		$txnid='TxnID';
+		$txnidname='TxnID';
 		$editprocess='wholesalediscount.php?w=Edit&TxnID=';
 		$editprocesslabel='Edit';
 		$delprocess='wholesalediscount.php?w=Delete&TxnID=';

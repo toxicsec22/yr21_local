@@ -127,7 +127,7 @@ switch ($which){
 	}
 	$showgrandtotal=true;
 	$coltototal='Budget';
-	$txnid='TxnID';
+	$txnidname='TxnID';
 	$rep=str_replace(' ','_',$_REQUEST['entity']);
 	$repa=str_replace(' ','_',$_REQUEST['account']);
 	$delprocess='annualbudgets.php?w=delete&entity='.$rep.'&account='.$repa.'&TxnID=';

@@ -45,7 +45,7 @@ if (in_array($whichqry,array('summary_for_payroll','my_attendance'))){
             $sql2='SELECT d.*,t.TypeofDayName FROM attend_2attendancedates d join `attend_0typeofday` t on t.TypeOfDayNo=d.TypeofDayNo';
 			$groupby='PayrollID';
 			$orderby='order by DateToday';
-			$txnid='TxnID';
+			$txnidname='TxnID';
 			$columnnames1=array('PayrollIDColumn');
             $columnnames2=array('DateToday', 'TypeofDayName','RemarksOnDates','Posted');
 	    $editprocess='editspecifics.php?w=attend_dates&edit=2&TxnID=';$editprocesslabel='Edit';

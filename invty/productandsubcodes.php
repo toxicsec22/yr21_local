@@ -43,7 +43,7 @@ switch ($choose){
 case 'PC': //Product Codes
 if (!allowedToOpen(64344,'1rtc')) {   echo 'No permission'; exit;}
 $list='ProductList';
-$table='invty_1productcode'; $txnid='ProductCode'; $txnidname='ProductCode'; 
+$table='invty_1productcode'; $txnidname='ProductCode'; 
 $sql='SELECT * FROM  invty_1productcode ';
 $columnnameslist=array('ProductCode', 'ProductGenericDescription', 'ItemCodes'); 
 $columnstoadd=array('ProductGenericDescription', 'ItemCodes');
@@ -82,7 +82,7 @@ break;
 case 'SC':
     if (!allowedToOpen(64344,'1rtc')) {   echo 'No permission'; exit;}
 $list='SubList';
-$table='invty_1substitution'; $txnid='SubCode'; $txnidname='SubCode'; 
+$table='invty_1substitution'; $txnidname='SubCode'; 
 $sql='SELECT * FROM  invty_1substitution ';
 $columnnameslist=array('SubCode', 'ProductSubstitutionDescription', 'ItemCodes'); 
 $columnstoadd=array('ProductSubstitutionDescription', 'ItemCodes');
