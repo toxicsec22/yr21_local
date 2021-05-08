@@ -13,11 +13,11 @@ switch ($which){
          case 'Deposit': 
              $filetoopen='addeditdep';  $txnidname='TxnID'; break;
          case 'Purchase': 
-            $filetoopen='addeditsupplyside'; $txnidname='TxnID'; break;
+            $filetoopen='formpurch'; $txnidname='TxnID'; break;
          case 'CV': 
-            $filetoopen='addeditsupplyside'; $txnidname='CVNo'; break;
+            $filetoopen='formcv'; $txnidname='CVNo'; break;
          case 'JV': 
-             $filetoopen='addeditsupplyside'; $txnidname='JVNo'; break;
+             $filetoopen='formjv'; $txnidname='JVNo'; break;
          case 'AssetandDepr': $filetoopen='assetanddepr'; $txnidname='DeprID'; break;
          case 'PrepaidExpense': $filetoopen='prepaidandamort'; $txnidname='AmortID'; break;
          default: $filetoopen='lookupgenacctg'; $txnidname='TxnID'; break;
