@@ -1,11 +1,6 @@
 <?php
 $currentyr=2021; $lastyr=$currentyr-1; $nextyr=$currentyr+1; $last2yrs=$currentyr-2; $last3yrs=$currentyr-3;
 
-// if (($_SESSION['&pos']==-1 AND strpos($_SERVER['PHP_SELF'], 'acrossyrs/myswitch') === false)) {
-//     header('Location:../');
-//     exit();
-// }
-
 function allowedToOpen($processid, $db){
 	global $currentyr;
 	
@@ -30,4 +25,14 @@ function allowedToOpen($processid, $db){
 	} 
     
 $linkinfunction=null;
+}
+
+function allAllowedID($processid){
+    global $link;
+    $sqlinfunction='SELECT GROUP_CONCAT(cp.IDNo) AS allAlowed
+    FROM permissions_2allprocesses ap JOIN attend_30currentpositions cp ON FIND_IN_SET(cp.PositionID,`AllowedPos`) OR
+    FIND_IN_SET(cp.IDNo,`AllowedPerID`)
+    WHERE ProcessID='.$processid;
+    $stmt=$link->query($sqlinfunction); $res=$stmt->fetch();
+    return $res['allAlowed'];
 }
