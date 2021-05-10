@@ -140,7 +140,7 @@ switch ($which)
    
         $editprocess='assignpermission.php?w=AddPermissionToPage&ProcessID='; $editprocesslabel='Edit';
      
-		$title='Permission Page'; $formdesc=''; $txnidname='TxnID';
+		$title='Permission Page'; $formdesc=''; $txnid='TxnID';
 		$columnnames=$columnnameslist;       
 		
 		$width='100%';
@@ -300,7 +300,7 @@ switch ($which)
    
         $editprocess='assignpermission.php?w=EditProtection&ForDB='; $editprocesslabel='Edit';
      
-		$title='Data Protection'; $formdesc=''; $txnidname='TxnID';
+		$title='Data Protection'; $formdesc=''; $txnid='TxnID';
 		$columnnames=$columnnameslist;       
 		
 		$width='100%';
@@ -706,7 +706,7 @@ echo '<br>';
 				
 		
 		
-		$title=''; $formdesc=''; $txnidname='TxnID';
+		$title=''; $formdesc=''; $txnid='TxnID';
 		$columnnames=$columnnameslist;       
 		
 		$width='70%';
@@ -795,7 +795,7 @@ echo '<br>';
 		$delprocess='assignpermission.php?w=DeleteLevel&MenuID=';
 		$editprocess='assignpermission.php?w=EditSpecificsLevel&MenuID='; $editprocesslabel='Edit';
 
-		$title=''; $formdesc=''; $txnidname='TxnID';
+		$title=''; $formdesc=''; $txnid='TxnID';
 		$columnnames=$columnnameslist;       
 		
 		$width='70%';
@@ -928,7 +928,9 @@ echo '<br>';
 				
 				
 				
-				$sql='SELECT ProcessID, IF(FIND_IN_SET('.$_POST['PositionToView'].',AllowedPos),1,0) AS Ok,AllowedPos, ProcessTitle, ProcessAddress, OnSwitch FROM permissions_2allprocesses WHERE '.$addlc.' ORDER BY ProcessAddress;';
+				$sql='SELECT ProcessID, IF(FIND_IN_SET('.$_POST['PositionToView'].',AllowedPos),1,0) AS Ok,AllowedPos, ProcessTitle, ProcessAddress, OnSwitch FROM permissions_2allprocesses WHERE '.$addlc.' UNION SELECT ProcessID,1,"",ProcessTitle,ProcessAddress,OnSwitch FROM permissions_2allprocesses WHERE FIND_IN_SET(ProcessID,(SELECT ProcessIDs FROM approvals_systempermission WHERE ForPositionID='.$_GET['ForPositionID'].')) ORDER BY ProcessAddress;';
+
+				// $sql='SELECT ProcessID, IF(FIND_IN_SET('.$_POST['PositionToView'].',AllowedPos),1,0) AS Ok,AllowedPos, ProcessTitle, ProcessAddress, OnSwitch FROM permissions_2allprocesses WHERE '.$addlc.' ORDER BY ProcessAddress;';
 				$stmt=$link->query($sql); $row1=$stmt->fetchAll();
 				
 				
