@@ -42,10 +42,10 @@ $columnnames=array('DateofRequest','DateNeeded','Purpose','DurationInDays','Requ
 }
 
 
-$txnid=!isset($_REQUEST['TxnID'])?'TxnID':$_REQUEST['TxnID'];
+$txnidname=!isset($_REQUEST['TxnID'])?'TxnID':$_REQUEST['TxnID'];
 
 
-$sql3='SELECT bl.*,deptid,  (RequestCompleted+Approved+FundsReleased+FundsAccepted+DocsComplete+Liquidated) AS Editable FROM approvals_3budgetandliq bl JOIN attend_30currentpositions cp ON cp.IDNo=bl.EncodedByNo WHERE bl.TxnID='.$txnid;
+$sql3='SELECT bl.*,deptid,  (RequestCompleted+Approved+FundsReleased+FundsAccepted+DocsComplete+Liquidated) AS Editable FROM approvals_3budgetandliq bl JOIN attend_30currentpositions cp ON cp.IDNo=bl.EncodedByNo WHERE bl.TxnID='.$txnidname;
 
 $stmt=$link->query($sql3);$res3=$stmt->fetch();
 $editok=($res3['Editable']==0?1:0);    
@@ -93,7 +93,7 @@ if(in_array($which,array('Lookup','EditSubSpecifics','Print'))){
     $sqlsub='SELECT brs.*,BudgetType,IF(CashorCard=1,"Card","Cash") AS CashorCard, e.Nickname AS EncodedBy 
         FROM approvals_3budgetrequestsub brs JOIN `approvals_1travelbudgettypes` tb ON brs.BudgetTypeID=tb.BudgetTypeID
         JOIN `1employees` e ON e.IDNo=brs.EncodedByNo
-        JOIN `approvals_3budgetandliq` bl ON bl.TxnID=brs.TxnID WHERE bl.TxnID='.$txnid.$condition;
+        JOIN `approvals_3budgetandliq` bl ON bl.TxnID=brs.TxnID WHERE bl.TxnID='.$txnidname.$condition;
 }
 
 if(in_array($which,array('Lookup','AddLiqSub','EditLiqSubSpecifics','EditLiqSub','Print'))){     
@@ -101,26 +101,26 @@ if(in_array($which,array('Lookup','AddLiqSub','EditLiqSubSpecifics','EditLiqSub'
     $columnstoeditliq=array('ExpenseNo','Date','InvNo','Payee','TIN','Particulars','Amount'); 
     $sqlliqsub='SELECT bls.*,BudgetType, (CASE WHEN CashorCard=1 THEN Amount END) AS Card, (CASE WHEN CashorCard<>1 THEN Amount END) AS Cash,ExpenseNo AS `No.` 
         FROM `approvals_3budgetliquidatesub` bls JOIN `approvals_1travelbudgettypes` tb ON bls.BudgetTypeID=tb.BudgetTypeID
-        JOIN `approvals_3budgetandliq` bl ON bl.TxnID=bls.TxnID WHERE bl.TxnID='.$txnid;
+        JOIN `approvals_3budgetandliq` bl ON bl.TxnID=bls.TxnID WHERE bl.TxnID='.$txnidname;
 }
 
 if(in_array($which,array('Lookup','Print'))){
-    $sqltotalbudget='SELECT FORMAT(SUM(Amount),2) AS Total,TRUNCATE(SUM(Amount),2) AS TotalBudget,TRUNCATE(SUM(CASE WHEN CashorCard=0 THEN Amount END),2) AS TotalCashBudget,TRUNCATE(SUM(CASE WHEN CashorCard<>0 THEN Amount END),2) AS TotalCardBudget  FROM `approvals_3budgetrequestsub` brs JOIN `approvals_3budgetandliq` bl ON bl.TxnID=brs.TxnID WHERE brs.TxnID='.$txnid.$condition;
-    $sqlcash='SELECT cc.* FROM `approvals_3budgetandliqcashcount` cc WHERE cc.TxnID='.$txnid;
+    $sqltotalbudget='SELECT FORMAT(SUM(Amount),2) AS Total,TRUNCATE(SUM(Amount),2) AS TotalBudget,TRUNCATE(SUM(CASE WHEN CashorCard=0 THEN Amount END),2) AS TotalCashBudget,TRUNCATE(SUM(CASE WHEN CashorCard<>0 THEN Amount END),2) AS TotalCardBudget  FROM `approvals_3budgetrequestsub` brs JOIN `approvals_3budgetandliq` bl ON bl.TxnID=brs.TxnID WHERE brs.TxnID='.$txnidname.$condition;
+    $sqlcash='SELECT cc.* FROM `approvals_3budgetandliqcashcount` cc WHERE cc.TxnID='.$txnidname;
 		$stmt=$link->query($sqlcash); $resultcash=$stmt->fetch();
-    $sqltotalused='SELECT TRUNCATE(IFNULL(SUM(Amount),0),2) AS TotalUsed FROM `approvals_3budgetliquidatesub` bls JOIN `approvals_3budgetandliq` bl ON bl.TxnID=bls.TxnID WHERE bls.TxnID='.$txnid.$condition;  
+    $sqltotalused='SELECT TRUNCATE(IFNULL(SUM(Amount),0),2) AS TotalUsed FROM `approvals_3budgetliquidatesub` bls JOIN `approvals_3budgetandliq` bl ON bl.TxnID=bls.TxnID WHERE bls.TxnID='.$txnidname.$condition;  
     $stmt=$link->query($sqltotalused); $resultsum=$stmt->fetch();
     
     
-    $sqlspent='CREATE TEMPORARY TABLE BudgetandSpent AS SELECT TxnID, BudgetTypeID, Amount AS Budget, 0 AS Spent FROM approvals_3budgetrequestsub WHERE TxnID='.$txnid
-                    .' UNION ALL SELECT TxnID, BudgetTypeID, 0 AS Budget, Amount AS Spent FROM approvals_3budgetliquidatesub WHERE TxnID='.$txnid;
+    $sqlspent='CREATE TEMPORARY TABLE BudgetandSpent AS SELECT TxnID, BudgetTypeID, Amount AS Budget, 0 AS Spent FROM approvals_3budgetrequestsub WHERE TxnID='.$txnidname
+                    .' UNION ALL SELECT TxnID, BudgetTypeID, 0 AS Budget, Amount AS Spent FROM approvals_3budgetliquidatesub WHERE TxnID='.$txnidname;
     $stmt=$link->prepare($sqlspent); $stmt->execute();
     $sqlspent='SELECT TxnID, BudgetType, SUM(Budget) AS Budget, SUM(Spent) AS Spent, SUM(Budget)-SUM(Spent) AS Balance FROM BudgetandSpent bs LEFT JOIN  `approvals_1travelbudgettypes` tb ON tb.BudgetTypeID=bs.BudgetTypeID GROUP BY TxnID, tb.BudgetTypeID;';
     $columnnamesspent=array('BudgetType','Budget','Spent','Balance'); $hidecount=true;
 
     $sqltotalspent='SELECT FORMAT(SUM(Amount),2) AS Total,TRUNCATE(SUM(CASE WHEN CashorCard=0 THEN Amount END),2) AS TotalCash, '
             . ' FORMAT(SUM(CASE WHEN CashorCard<>0 THEN Amount END),2) AS TotalCard FROM `approvals_3budgetliquidatesub` bls JOIN `approvals_3budgetandliq` bl ON bl.TxnID=bls.TxnID '
-            . ' WHERE bls.TxnID='.$txnid.$condition;
+            . ' WHERE bls.TxnID='.$txnidname.$condition;
 }
 
 switch ($which){
@@ -225,11 +225,11 @@ switch ($which){
                 
         case 'Lookup':
             $title=($res3['Approved']==1)?'Approved Budget':'Budget Request';
-//            $formdesc='<a href="/'.$url_folder.'/approvals/requestforbudget.php?w=AcceptFunds&action_token='.$_SESSION['action_token'].'&TxnID='.$txnid.'"  OnClick="return confirm(\'Funds RECEIVED?\');">Funds accepted</a>';
-            $sql2='SELECT EncodedByNo,RequestCompleted, Approved,FundsReleased,FundsAccepted,ForLiqSubmission, DocsComplete,Liquidated FROM approvals_3budgetandliq bl WHERE TxnID='.$txnid.$condition; 
+//            $formdesc='<a href="/'.$url_folder.'/approvals/requestforbudget.php?w=AcceptFunds&action_token='.$_SESSION['action_token'].'&TxnID='.$txnidname.'"  OnClick="return confirm(\'Funds RECEIVED?\');">Funds accepted</a>';
+            $sql2='SELECT EncodedByNo,RequestCompleted, Approved,FundsReleased,FundsAccepted,ForLiqSubmission, DocsComplete,Liquidated FROM approvals_3budgetandliq bl WHERE TxnID='.$txnidname.$condition; 
             $stmt=$link->query($sql2);$result=$stmt->fetch();
             $edit=(($result['EncodedByNo']==$_SESSION['(ak0)']) and ($editok==1))?2:0;
-            $sqlmain=$sql0.' WHERE TxnID='.$txnid.$condition;
+            $sqlmain=$sql0.' WHERE TxnID='.$txnidname.$condition;
             $nopost=1; $skippost=1; 
             if ($showenc==1) { array_push($columnnames,'TimeStamp','ApprovedBy','ApprovedTS','AcceptedTS','ForLiqSubTS','DocsCompleteBy','DocsCompleteTS','SetLiquidatedBy','SetLiqTS'); } 
             else { $columnnames=$columnnames; }
@@ -237,9 +237,9 @@ switch ($which){
             array_unshift($columnnamesmain,'Requester'); $fieldsinrowmain=3;
             
             if($edit==2){
-            $editprocess='requestforbudget.php?w=EditSpecifics&edit='.$edit.'&TxnID='.$txnid;
-            $delprocess='requestforbudget.php?w=DelMain&TxnID='.$txnid;
-            if($result['RequestCompleted']==0) { $addlprocess='requestforbudget.php?w=RequestComplete&action_token='.$_SESSION['action_token'].'&TxnID='.$txnid; $addlprocesslabel='Set_Request_as_Completed';}
+            $editprocess='requestforbudget.php?w=EditSpecifics&edit='.$edit.'&TxnID='.$txnidname;
+            $delprocess='requestforbudget.php?w=DelMain&TxnID='.$txnidname;
+            if($result['RequestCompleted']==0) { $addlprocess='requestforbudget.php?w=RequestComplete&action_token='.$_SESSION['action_token'].'&TxnID='.$txnidname; $addlprocesslabel='Set_Request_as_Completed';}
                         
             //$addlprocess=str_repeat('&nbsp',8).'<a href="'.$addlprocess.'">'.$addlprocesslabel.'</a>';
             
@@ -250,20 +250,20 @@ switch ($which){
                     array('field'=>'BudgetType', 'type'=>'text','size'=>10, 'required'=>true, 'list'=>'budgettype'),
                     array('field'=>'Amount', 'type'=>'text','size'=>7, 'required'=>true, 'value'=>0),
                     array('field'=>'CashorCard', 'type'=>'text','size'=>5, 'required'=>true, 'list'=>'cashorcard', 'value'=>'Cash'),
-                    array('field'=>'TxnID', 'type'=>'hidden', 'size'=>0,'value'=>$txnid)
+                    array('field'=>'TxnID', 'type'=>'hidden', 'size'=>0,'value'=>$txnidname)
                     );
-            $addsub='requestforbudget.php?w=AddSub&TxnID='.$txnid;
-            $editprocesssub='requestforbudget.php?w=EditSubSpecifics&edit='.$edit.'&TxnID='.$txnid.'&TxnSubId=';
-            $delprocesssub='requestforbudget.php?w=DelSub&TxnID='.$txnid.'&TxnSubId=';
+            $addsub='requestforbudget.php?w=AddSub&TxnID='.$txnidname;
+            $editprocesssub='requestforbudget.php?w=EditSubSpecifics&edit='.$edit.'&TxnID='.$txnidname.'&TxnSubId=';
+            $delprocesssub='requestforbudget.php?w=DelSub&TxnID='.$txnidname.'&TxnSubId=';
             } else {
-                if(($result['EncodedByNo']==$_SESSION['(ak0)']) and ($result['RequestCompleted']<>0) and ($result['Approved']==0) and ($result['FundsReleased']==0) and ($result['FundsAccepted']==0) and ($result['Liquidated']==0)){ $formdesc='<a href="requestforbudget.php?w=RequestComplete&Set=0&action_token='.$_SESSION['action_token'].'&TxnID='.$txnid.'">Set_Request_as_Unfinished</a>'; }                if(($forapprovalby==$_SESSION['(ak0)']) and ($result['RequestCompleted']<>0) and ($result['Approved']==0) and ($result['FundsReleased']==0) and ($result['FundsAccepted']==0) and ($result['Liquidated']==0)){ $formdesc='<a href="requestforbudget.php?w=SetApprove&Set=1&action_token='.$_SESSION['action_token'].'&TxnID='.$txnid.'">Approve</a>'.  str_repeat('&nbsp;',5)
-                        .'<a href="requestforbudget.php?w=SetApprove&Set=2&action_token='.$_SESSION['action_token'].'&TxnID='.$txnid.'">Deny</a>'; }
-                elseif(($forapprovalby==$_SESSION['(ak0)']) and ($result['RequestCompleted']<>0) and ($result['Approved']<>0) and ($result['FundsReleased']==0) and ($result['FundsAccepted']==0) and ($result['Liquidated']==0)) { $formdesc='<a href="requestforbudget.php?w=SetApprove&Set=0&action_token='.$_SESSION['action_token'].'&TxnID='.$txnid.'">Unset Approval</a>';}
+                if(($result['EncodedByNo']==$_SESSION['(ak0)']) and ($result['RequestCompleted']<>0) and ($result['Approved']==0) and ($result['FundsReleased']==0) and ($result['FundsAccepted']==0) and ($result['Liquidated']==0)){ $formdesc='<a href="requestforbudget.php?w=RequestComplete&Set=0&action_token='.$_SESSION['action_token'].'&TxnID='.$txnidname.'">Set_Request_as_Unfinished</a>'; }                if(($forapprovalby==$_SESSION['(ak0)']) and ($result['RequestCompleted']<>0) and ($result['Approved']==0) and ($result['FundsReleased']==0) and ($result['FundsAccepted']==0) and ($result['Liquidated']==0)){ $formdesc='<a href="requestforbudget.php?w=SetApprove&Set=1&action_token='.$_SESSION['action_token'].'&TxnID='.$txnidname.'">Approve</a>'.  str_repeat('&nbsp;',5)
+                        .'<a href="requestforbudget.php?w=SetApprove&Set=2&action_token='.$_SESSION['action_token'].'&TxnID='.$txnidname.'">Deny</a>'; }
+                elseif(($forapprovalby==$_SESSION['(ak0)']) and ($result['RequestCompleted']<>0) and ($result['Approved']<>0) and ($result['FundsReleased']==0) and ($result['FundsAccepted']==0) and ($result['Liquidated']==0)) { $formdesc='<a href="requestforbudget.php?w=SetApprove&Set=0&action_token='.$_SESSION['action_token'].'&TxnID='.$txnidname.'">Unset Approval</a>';}
                 elseif(allowedToOpen(5231,'1rtc') and ($result['FundsReleased']==0)) { 
-                    $formdesc='<a href="../acctg/praddmain.php?w=AutoVchBudget&action_token='.$_SESSION['action_token'].'&TxnID='.$txnid.'">I have confirmed accuracy of values. Make check payment.</a>';}
+                    $formdesc='<a href="../acctg/praddmain.php?w=AutoVchBudget&action_token='.$_SESSION['action_token'].'&TxnID='.$txnidname.'">I have confirmed accuracy of values. Make check payment.</a>';}
                 elseif(allowedToOpen(52311,'1rtc') and ($result['FundsReleased']<>0) and ($result['FundsAccepted']==0)) { 
-                    $formdesc='<a href="../approvals/requestforbudget.php?w=UnsetRel&action_token='.$_SESSION['action_token'].'&TxnID='.$txnid.'"><font color="red">Unset confirmation of accuracy (Voucher must be DELETED separately.)</font></a>';}
-                elseif(($result['EncodedByNo']==$_SESSION['(ak0)']) and ($result['FundsReleased']<>0) and ($result['FundsAccepted']==0)){ $formdesc='<a href="requestforbudget.php?w=AcceptFunds&action_token='.$_SESSION['action_token'].'&TxnID='.$txnid.'">Accept Funds</a>';}
+                    $formdesc='<a href="../approvals/requestforbudget.php?w=UnsetRel&action_token='.$_SESSION['action_token'].'&TxnID='.$txnidname.'"><font color="red">Unset confirmation of accuracy (Voucher must be DELETED separately.)</font></a>';}
+                elseif(($result['EncodedByNo']==$_SESSION['(ak0)']) and ($result['FundsReleased']<>0) and ($result['FundsAccepted']==0)){ $formdesc='<a href="requestforbudget.php?w=AcceptFunds&action_token='.$_SESSION['action_token'].'&TxnID='.$txnidname.'">Accept Funds</a>';}
                 $columnnames=array(); $editprocess=''; $delprocess=''; $columnstoeditmain=array();}
             $sqltotal=$sqltotalbudget; 
             echo '<div id="wrapper" ><div style="float:left; width:50%;">';
@@ -271,7 +271,7 @@ switch ($which){
             echo str_repeat('&nbsp;', 10).'Total Cash: '.number_format($resulttotal['TotalCashBudget'],2).str_repeat('&nbsp;', 10).'Total Card: '.number_format($resulttotal['TotalCardBudget'],2);
             // Cash calc
             $pcf=$resulttotal['TotalCashBudget'];
-            $action='requestforbudget.php?w=EditBill&TxnID='.$txnid; 
+            $action='requestforbudget.php?w=EditBill&TxnID='.$txnidname; 
             include('../backendphp/layout/calcbillsforpettycash.php'); 
             // end of cash calc
             echo '</div>'; // left
@@ -293,29 +293,29 @@ switch ($which){
                     array('field'=>'TIN', 'type'=>'text','size'=>10,'required'=>false),
                     array('field'=>'Particulars', 'caption'=>'Expense details', 'type'=>'text','size'=>20,'required'=>true),
                     array('field'=>'Amount', 'type'=>'text','size'=>7, 'required'=>true, 'value'=>0),
-                    array('field'=>'TxnID', 'type'=>'hidden', 'size'=>0,'value'=>$txnid)
+                    array('field'=>'TxnID', 'type'=>'hidden', 'size'=>0,'value'=>$txnidname)
                     );
             $fieldsinrow=3; $withsub=true; $outside=true;
             
-            $action='requestforbudget.php?w=AddLiqSub&TxnID='.$txnid; $method='POST';
-            $formdesc='</i><a href="requestforbudget.php?w=LiqCompleteByRequester&action_token='.$_SESSION['action_token'].'&TxnID='.$txnid.'">Set Liquidation as Complete</a><i>';;
+            $action='requestforbudget.php?w=AddLiqSub&TxnID='.$txnidname; $method='POST';
+            $formdesc='</i><a href="requestforbudget.php?w=LiqCompleteByRequester&action_token='.$_SESSION['action_token'].'&TxnID='.$txnidname.'">Set Liquidation as Complete</a><i>';;
             include('../backendphp/layout/inputmainform.php');
             $columnstoedit=$columnstoeditliq;
             
-            $editprocess='requestforbudget.php?w=EditLiqSubSpecifics&edit='.$edit.'&TxnID='.$txnid.'&TxnSubId='; $editprocesslabel='Edit';
-            $delprocess='requestforbudget.php?w=DelLiqSub&TxnID='.$txnid.'&TxnSubId='; 
+            $editprocess='requestforbudget.php?w=EditLiqSubSpecifics&edit='.$edit.'&TxnID='.$txnidname.'&TxnSubId='; $editprocesslabel='Edit';
+            $delprocess='requestforbudget.php?w=DelLiqSub&TxnID='.$txnidname.'&TxnSubId='; 
             } else { unset($editprocess,$delprocess); }
             
             if(($result['ForLiqSubmission']<>0) and ($res3['Liquidated']==0)){ 
             if(($requester==$_SESSION['(ak0)'])){ 
-                echo ' <a href="requestforbudget.php?w=Print&print=1&TxnID='.$txnid.'">Print and Sign</a>';
-                if($res3['DocsComplete']==0){ echo str_repeat('&nbsp;', 10).'<i>OR</i>'.str_repeat('&nbsp;', 10).'<a href="requestforbudget.php?w=LiqCompleteByRequester&Set=0&action_token='.$_SESSION['action_token'].'&TxnID='.$txnid.'">Set Liquidation as Unfinished</a>';}                
-                if($res3['DocsComplete']==1){ echo str_repeat('&nbsp;', 10).'<i>OR</i>'.str_repeat('&nbsp;', 10).'<a href="requestforbudget.php?w=DocsReceived&Set=0&action_token='.$_SESSION['action_token'].'&TxnID='.$txnid.'">Documents were returned to me.</a>';}
+                echo ' <a href="requestforbudget.php?w=Print&print=1&TxnID='.$txnidname.'">Print and Sign</a>';
+                if($res3['DocsComplete']==0){ echo str_repeat('&nbsp;', 10).'<i>OR</i>'.str_repeat('&nbsp;', 10).'<a href="requestforbudget.php?w=LiqCompleteByRequester&Set=0&action_token='.$_SESSION['action_token'].'&TxnID='.$txnidname.'">Set Liquidation as Unfinished</a>';}                
+                if($res3['DocsComplete']==1){ echo str_repeat('&nbsp;', 10).'<i>OR</i>'.str_repeat('&nbsp;', 10).'<a href="requestforbudget.php?w=DocsReceived&Set=0&action_token='.$_SESSION['action_token'].'&TxnID='.$txnidname.'">Documents were returned to me.</a>';}
             } elseif((allowedToOpen(5231,'1rtc')) and ($requester<>$_SESSION['(ak0)'])  and ($res3['DocsComplete']==0)) {
-                echo '<a href="requestforbudget.php?w=DocsReceived&action_token='.$_SESSION['action_token'].'&TxnID='.$txnid.'">All receipts, excess cash, and documents have been submitted completely to me.</a>'.  str_repeat('&nbsp;', 10);
+                echo '<a href="requestforbudget.php?w=DocsReceived&action_token='.$_SESSION['action_token'].'&TxnID='.$txnidname.'">All receipts, excess cash, and documents have been submitted completely to me.</a>'.  str_repeat('&nbsp;', 10);
             } elseif((allowedToOpen(5231,'1rtc')) and ($requester<>$_SESSION['(ak0)'])  and ($res3['DocsComplete']==1)) {
-                echo '<a href="../acctg/praddmain.php?w=AutoVchLiq&action_token='.$_SESSION['action_token'].'&TxnID='.$txnid.'">Send To Voucher</a>'.  str_repeat('&nbsp;', 10);
-                if((allowedToOpen(5234,'1rtc')) and ($requester<>$_SESSION['(ak0)'])) { echo '<a href="requestforbudget.php?w=SetLiquidated&action_token='.$_SESSION['action_token'].'&TxnID='.$txnid.'">Set Liquidation as Complete</a>';}
+                echo '<a href="../acctg/praddmain.php?w=AutoVchLiq&action_token='.$_SESSION['action_token'].'&TxnID='.$txnidname.'">Send To Voucher</a>'.  str_repeat('&nbsp;', 10);
+                if((allowedToOpen(5234,'1rtc')) and ($requester<>$_SESSION['(ak0)'])) { echo '<a href="requestforbudget.php?w=SetLiquidated&action_token='.$_SESSION['action_token'].'&TxnID='.$txnidname.'">Set Liquidation as Complete</a>';}
                 
             }
             }
@@ -323,7 +323,7 @@ switch ($which){
             elseif (($result['ForLiqSubmission']<>0) and $res3['Liquidated']<>0) { echo 'Liquidated successfully';}
             
             $sql=$sqlliqsub.' ORDER BY ExpenseNo';
-            $txnidname='TxnSubId'; $columnnames=$columnnamesliq; $title='';$formdesc='';
+            $txnidnamename='TxnSubId'; $columnnames=$columnnamesliq; $title='';$formdesc='';
             
             include('../backendphp/layout/displayastable.php');
             
@@ -347,12 +347,12 @@ switch ($which){
 	
         case 'EditSpecifics':
             $title='Edit Budget Request';
-            $sql=$sql0.' WHERE bl.EncodedByNo='.$_SESSION['(ak0)'].' AND TxnID='.$txnid;
+            $sql=$sql0.' WHERE bl.EncodedByNo='.$_SESSION['(ak0)'].' AND TxnID='.$txnidname;
             if($editok==1){
             $columnstoedit=$columnstoadd; $columnstoedit[]='Branch';
             $columnslist=array('Branch');
             $listsname=array('Branch'=>'branchnames'); $liststoshow=array('branchnames'); $listcondition=''; $processlabelblank='';
-            $action='requestforbudget.php?w=EditMain&TxnID='.$txnid; $method='POST';}
+            $action='requestforbudget.php?w=EditMain&TxnID='.$txnidname; $method='POST';}
             include('../backendphp/layout/rendersubform.php');
             break;
 	case 'EditMain':
@@ -360,16 +360,16 @@ switch ($which){
                 if($editok==1){
 		$sql='';
 		foreach ($columnstoadd as $field) { $sql=$sql.' `' . $field. '`=\''.$_POST[$field].'\', '; }
-		$sql='UPDATE `approvals_3budgetandliq` SET BranchNo='.$branchno.', '.$sql.' TimeStamp=Now(), EncodedByNo=\''.$_SESSION['(ak0)'].'\' WHERE TxnID='.$txnid.' AND EncodedByNo=\''.$_SESSION['(ak0)'].'\' '.$editcondition; 
+		$sql='UPDATE `approvals_3budgetandliq` SET BranchNo='.$branchno.', '.$sql.' TimeStamp=Now(), EncodedByNo=\''.$_SESSION['(ak0)'].'\' WHERE TxnID='.$txnidname.' AND EncodedByNo=\''.$_SESSION['(ak0)'].'\' '.$editcondition; 
 // echo $sql;
                 $stmt=$link->prepare($sql); $stmt->execute();}
-		header('Location:requestforbudget.php?w=Lookup&TxnID='.$txnid);
+		header('Location:requestforbudget.php?w=Lookup&TxnID='.$txnidname);
 		break;
 	
 	case 'DelMain':
                 require_once $path.'/acrossyrs/logincodes/confirmtoken.php';
             if($editok==1){
-            $sql='DELETE FROM `approvals_3budgetandliq` WHERE TxnID='.$txnid.' AND EncodedByNo=\''.$_SESSION['(ak0)'].'\' '.$editcondition; $stmt=$link->prepare($sql); $stmt->execute();}
+            $sql='DELETE FROM `approvals_3budgetandliq` WHERE TxnID='.$txnidname.' AND EncodedByNo=\''.$_SESSION['(ak0)'].'\' '.$editcondition; $stmt=$link->prepare($sql); $stmt->execute();}
 		header('Location:requestforbudget.php');
 		break;
                 
@@ -379,9 +379,9 @@ switch ($which){
 		$sql=''; 
                 $budgettypeno=comboBoxValue($link, 'approvals_1travelbudgettypes', 'BudgetType', $_POST['BudgetType'], 'BudgetTypeID');
 		foreach ($columnsubtoedit as $field) { $sql=$sql.' `' . $field. '`=\''.addslashes($_POST[$field]).'\', '; } 
-		$sql='INSERT INTO `approvals_3budgetrequestsub` SET TxnID='.$txnid.', BudgetTypeID='.$budgettypeno.', CashorCard='.($_POST['CashorCard']=='Cash'?0:1).','.$sql.' TimeStamp=Now(), EncodedByNo=\''.$_SESSION['(ak0)'].'\''; 
+		$sql='INSERT INTO `approvals_3budgetrequestsub` SET TxnID='.$txnidname.', BudgetTypeID='.$budgettypeno.', CashorCard='.($_POST['CashorCard']=='Cash'?0:1).','.$sql.' TimeStamp=Now(), EncodedByNo=\''.$_SESSION['(ak0)'].'\''; 
                 $stmt=$link->prepare($sql); $stmt->execute();  }              
-		header('Location:requestforbudget.php?w=Lookup&TxnID='.$txnid);
+		header('Location:requestforbudget.php?w=Lookup&TxnID='.$txnidname);
 		break;
                 
         case 'EditSubSpecifics':
@@ -393,7 +393,7 @@ switch ($which){
             //$columnstoedit[]='BudgetType';$columnstoedit[]='CashorCard';
             $columnslist=array('BudgetType','CashorCard');
             $listsname=array('BudgetType'=>'budgettype','CashorCard'=>'cashorcard'); $liststoshow=array(); $listcondition=''; $processlabelblank='';
-            $action='requestforbudget.php?w=EditSub&TxnID='.$txnid.'&TxnSubId='.$txnsubid; $method='POST';}
+            $action='requestforbudget.php?w=EditSub&TxnID='.$txnidname.'&TxnSubId='.$txnsubid; $method='POST';}
             include('../backendphp/layout/rendersubform.php');
             break;
         
@@ -404,9 +404,9 @@ switch ($which){
 		$sql=''; 
                 $budgettypeno=comboBoxValue($link, 'approvals_1travelbudgettypes', 'BudgetType', $_POST['BudgetType'], 'BudgetTypeID');
 		foreach ($columnsubtoedit as $field) { $sql=$sql.' `' . $field. '`=\''.addslashes($_POST[$field]).'\', '; } 
-		$sql='UPDATE `approvals_3budgetrequestsub` SET BudgetTypeID='.$budgettypeno.', CashorCard='.($_POST['CashorCard']=='Cash'?0:1).','.$sql.' TimeStamp=Now(), EncodedByNo=\''.$_SESSION['(ak0)'].'\'  WHERE TxnSubId='.$txnsubid.' AND EncodedByNo=(SELECT EncodedByNo FROM approvals_3budgetandliq WHERE TxnID='.$txnid.')'; 
+		$sql='UPDATE `approvals_3budgetrequestsub` SET BudgetTypeID='.$budgettypeno.', CashorCard='.($_POST['CashorCard']=='Cash'?0:1).','.$sql.' TimeStamp=Now(), EncodedByNo=\''.$_SESSION['(ak0)'].'\'  WHERE TxnSubId='.$txnsubid.' AND EncodedByNo=(SELECT EncodedByNo FROM approvals_3budgetandliq WHERE TxnID='.$txnidname.')'; 
             $stmt=$link->prepare($sql); $stmt->execute();      }          
-		header('Location:requestforbudget.php?w=Lookup&TxnID='.$txnid);
+		header('Location:requestforbudget.php?w=Lookup&TxnID='.$txnidname);
 		break;
         
         case 'DelSub':
@@ -414,63 +414,63 @@ switch ($which){
             if($editok==1){
                 $sql='DELETE FROM `approvals_3budgetrequestsub` WHERE TxnSubId='.$_REQUEST['TxnSubId'].' AND EncodedByNo=\''.$_SESSION['(ak0)'].'\''; 
             $stmt=$link->prepare($sql); $stmt->execute();}
-		header('Location:requestforbudget.php?w=Lookup&TxnID='.$txnid);
+		header('Location:requestforbudget.php?w=Lookup&TxnID='.$txnidname);
 		break; 
             
         case 'RequestComplete':
             require_once $path.'/acrossyrs/logincodes/confirmtoken.php';
                 $set=!isset($_GET['Set'])?1:$_GET['Set'];
-                $sql='UPDATE `approvals_3budgetandliq` SET RequestCompleted='.$set.' WHERE TxnID='.$txnid.' AND EncodedByNo=\''.$_SESSION['(ak0)'].'\' AND Approved=0 AND FundsAccepted=0 AND Liquidated=0'; 
+                $sql='UPDATE `approvals_3budgetandliq` SET RequestCompleted='.$set.' WHERE TxnID='.$txnidname.' AND EncodedByNo=\''.$_SESSION['(ak0)'].'\' AND Approved=0 AND FundsAccepted=0 AND Liquidated=0'; 
                 $stmt=$link->prepare($sql); $stmt->execute();
-		header('Location:requestforbudget.php?w=Lookup&TxnID='.$txnid);
+		header('Location:requestforbudget.php?w=Lookup&TxnID='.$txnidname);
             break;
         
         case 'SetApprove':
             require_once $path.'/acrossyrs/logincodes/confirmtoken.php';
             if($forapprovalby==$_SESSION['(ak0)']){
                 $set=$_GET['Set'];
-                $sql='UPDATE `approvals_3budgetandliq` SET Approved='.$set.', ApprovedByNo=\''.$_SESSION['(ak0)'].'\', ApprovedTS=Now() WHERE TxnID='.$txnid.' AND FundsAccepted=0 AND Liquidated=0'; 
+                $sql='UPDATE `approvals_3budgetandliq` SET Approved='.$set.', ApprovedByNo=\''.$_SESSION['(ak0)'].'\', ApprovedTS=Now() WHERE TxnID='.$txnidname.' AND FundsAccepted=0 AND Liquidated=0'; 
             $stmt=$link->prepare($sql); $stmt->execute();}
 		header('Location:requestforbudget.php');
             break;
         
         case 'UnsetRel':
             require_once $path.'/acrossyrs/logincodes/confirmtoken.php';
-                $sql='UPDATE `approvals_3budgetandliq` SET `FundsReleased`=0, ReleasedByNo=\''.$_SESSION['(ak0)'].'\', ReleasedTS=Now() WHERE TxnID='.$txnid; 
+                $sql='UPDATE `approvals_3budgetandliq` SET `FundsReleased`=0, ReleasedByNo=\''.$_SESSION['(ak0)'].'\', ReleasedTS=Now() WHERE TxnID='.$txnidname; 
                 $stmt=$link->prepare($sql); $stmt->execute();
-		header('Location:requestforbudget.php?w=Lookup&TxnID='.$txnid);
+		header('Location:requestforbudget.php?w=Lookup&TxnID='.$txnidname);
             break;
             
         case 'AcceptFunds':
             require_once $path.'/acrossyrs/logincodes/confirmtoken.php';
-                $sql='UPDATE `approvals_3budgetandliq` SET FundsAccepted=1, AcceptedByNo=\''.$_SESSION['(ak0)'].'\', AcceptedTS=Now() WHERE TxnID='.$txnid.' AND EncodedByNo=\''.$_SESSION['(ak0)'].'\''; 
+                $sql='UPDATE `approvals_3budgetandliq` SET FundsAccepted=1, AcceptedByNo=\''.$_SESSION['(ak0)'].'\', AcceptedTS=Now() WHERE TxnID='.$txnidname.' AND EncodedByNo=\''.$_SESSION['(ak0)'].'\''; 
                 $stmt=$link->prepare($sql); $stmt->execute();
-		header('Location:requestforbudget.php?w=Lookup&TxnID='.$txnid);
+		header('Location:requestforbudget.php?w=Lookup&TxnID='.$txnidname);
             break;
         
         case 'Claim':
             require_once $path.'/acrossyrs/logincodes/confirmtoken.php';
-                $sql0='SELECT ApprovedByNo FROM `approvals_3budgetandliq` WHERE TxnID='.$txnid; $stmt0=$link->query($sql0); $res0=$stmt0->fetch();
+                $sql0='SELECT ApprovedByNo FROM `approvals_3budgetandliq` WHERE TxnID='.$txnidname; $stmt0=$link->query($sql0); $res0=$stmt0->fetch();
                 $sql='UPDATE `approvals_3budgetandliq` SET EncodedByNo=\''.$_SESSION['(ak0)'].'\''
                         .(($res0['ApprovedByNo']==$_SESSION['(ak0)'])?',ApprovedByNo=0, Approved=0 ':'')
-                        .', TimeStamp=Now() WHERE TxnID='.$txnid.' AND EncodedByNo=\''.$_REQUEST['EncodedByNo'].'\''; 
+                        .', TimeStamp=Now() WHERE TxnID='.$txnidname.' AND EncodedByNo=\''.$_REQUEST['EncodedByNo'].'\''; 
                 $stmt=$link->prepare($sql); $stmt->execute();
-		header('Location:requestforbudget.php?w=Lookup&TxnID='.$txnid);
+		header('Location:requestforbudget.php?w=Lookup&TxnID='.$txnidname);
             break;
                 
 	  
 	case 'EditBill':
                 if ($requester==$_SESSION['(ak0)'] and $editliqok==1){ 
-                    $sql1='SELECT TxnID FROM `approvals_3budgetandliqcashcount` WHERE TxnID='.$txnid;
+                    $sql1='SELECT TxnID FROM `approvals_3budgetandliqcashcount` WHERE TxnID='.$txnidname;
                     $stmt=$link->query($sql1);$result=$stmt->fetch();
 		$bills=array('1000','500','200','100','50','20','10','5','1','025','010','005');
 		$sql=''; 
 		foreach ($bills as $bill){ $sql=$sql.' `' . $bill. '`='.$_POST[$bill].', '; }
                 if($stmt->rowCount()>0){
-		$sql='UPDATE `approvals_3budgetandliqcashcount` SET '.$sql.'  EncodedByNo=\''.$_SESSION['(ak0)'].'\',TimeStamp=Now() WHERE TxnID='.$txnid; 
-                } else { $sql='INSERT INTO `approvals_3budgetandliqcashcount` SET '.$sql.'  EncodedByNo=\''.$_SESSION['(ak0)'].'\',TimeStamp=Now(),TxnID='.$txnid;}
+		$sql='UPDATE `approvals_3budgetandliqcashcount` SET '.$sql.'  EncodedByNo=\''.$_SESSION['(ak0)'].'\',TimeStamp=Now() WHERE TxnID='.$txnidname; 
+                } else { $sql='INSERT INTO `approvals_3budgetandliqcashcount` SET '.$sql.'  EncodedByNo=\''.$_SESSION['(ak0)'].'\',TimeStamp=Now(),TxnID='.$txnidname;}
                 $stmt=$link->prepare($sql);$stmt->execute();} 
-		header('Location:requestforbudget.php?w=Lookup&TxnID='.$txnid);
+		header('Location:requestforbudget.php?w=Lookup&TxnID='.$txnidname);
 	    break;
 
         
@@ -480,9 +480,9 @@ switch ($which){
 		$sql=''; 
                 $budgettypeno=comboBoxValue($link, 'approvals_1travelbudgettypes', 'BudgetType', $_POST['BudgetType'], 'BudgetTypeID');
 		foreach ($columnstoeditliq as $field) { $sql=$sql.' `' . $field. '`=\''.addslashes($_POST[$field]).'\', '; } 
-		$sql='INSERT INTO `approvals_3budgetliquidatesub` SET TxnID='.$txnid.', BudgetTypeID='.$budgettypeno.', CashorCard='.($_POST['CashorCard']=='Cash'?0:1).','.$sql.' TimeStamp=Now(), EncodedByNo=\''.$_SESSION['(ak0)'].'\''; 
+		$sql='INSERT INTO `approvals_3budgetliquidatesub` SET TxnID='.$txnidname.', BudgetTypeID='.$budgettypeno.', CashorCard='.($_POST['CashorCard']=='Cash'?0:1).','.$sql.' TimeStamp=Now(), EncodedByNo=\''.$_SESSION['(ak0)'].'\''; 
                 $stmt=$link->prepare($sql); $stmt->execute();  }              
-		header('Location:requestforbudget.php?w=Lookup&TxnID='.$txnid);
+		header('Location:requestforbudget.php?w=Lookup&TxnID='.$txnidname);
 		break;
                 
         case 'EditLiqSubSpecifics':
@@ -493,7 +493,7 @@ switch ($which){
             $columnstoedit=$columnstoeditliq; $columnstoedit[]='BudgetType'; $columnstoedit[]='CashorCard'; $columnnames=$columnnamesliq;
             $columnslist=array('BudgetType','CashorCard');
             $listsname=array('BudgetType'=>'budgettype','CashorCard'=>'cashorcard'); $liststoshow=array(); $listcondition=''; $processlabelblank='';
-            $action='requestforbudget.php?w=EditLiqSub&TxnID='.$txnid.'&TxnSubId='.$txnsubid; $method='POST';}
+            $action='requestforbudget.php?w=EditLiqSub&TxnID='.$txnidname.'&TxnSubId='.$txnsubid; $method='POST';}
             include('../backendphp/layout/rendersubform.php');
             break;
         
@@ -504,9 +504,9 @@ switch ($which){
 		$sql=''; 
                 $budgettypeno=comboBoxValue($link, 'approvals_1travelbudgettypes', 'BudgetType', $_POST['BudgetType'], 'BudgetTypeID');
 		foreach ($columnstoeditliq as $field) { $sql=$sql.' `' . $field. '`=\''.addslashes($_POST[$field]).'\', '; } 
-		$sql='UPDATE `approvals_3budgetliquidatesub` SET BudgetTypeID='.$budgettypeno.', CashorCard='.($_POST['CashorCard']=='Cash'?0:1).','.$sql.' TimeStamp=Now(), EncodedByNo=\''.$_SESSION['(ak0)'].'\'  WHERE TxnSubId='.$txnsubid.' AND EncodedByNo=(SELECT EncodedByNo FROM approvals_3budgetandliq WHERE TxnID='.$txnid.')'; //echo $sql;
+		$sql='UPDATE `approvals_3budgetliquidatesub` SET BudgetTypeID='.$budgettypeno.', CashorCard='.($_POST['CashorCard']=='Cash'?0:1).','.$sql.' TimeStamp=Now(), EncodedByNo=\''.$_SESSION['(ak0)'].'\'  WHERE TxnSubId='.$txnsubid.' AND EncodedByNo=(SELECT EncodedByNo FROM approvals_3budgetandliq WHERE TxnID='.$txnidname.')'; //echo $sql;
             $stmt=$link->prepare($sql); $stmt->execute();      }          
-		header('Location:requestforbudget.php?w=Lookup&TxnID='.$txnid);
+		header('Location:requestforbudget.php?w=Lookup&TxnID='.$txnidname);
 		break;
         
         case 'DelLiqSub':
@@ -514,29 +514,29 @@ switch ($which){
             if($editliqok==1){
                 $sql='DELETE FROM `approvals_3budgetliquidatesub` WHERE TxnSubId='.$_REQUEST['TxnSubId'].' AND EncodedByNo=\''.$_SESSION['(ak0)'].'\''; 
             $stmt=$link->prepare($sql); $stmt->execute();}
-		header('Location:requestforbudget.php?w=Lookup&TxnID='.$txnid);
+		header('Location:requestforbudget.php?w=Lookup&TxnID='.$txnidname);
 		break;     
         
         case 'LiqCompleteByRequester':
             require_once $path.'/acrossyrs/logincodes/confirmtoken.php';
                 $set=!isset($_GET['Set'])?1:$_GET['Set'];
-                $sql='UPDATE `approvals_3budgetandliq` SET ForLiqSubmission='.$set.', ForLiqSubByNo=\''.$_SESSION['(ak0)'].'\',ForLiqSubTS=Now() WHERE TxnID='.$txnid.' AND EncodedByNo=\''.$_SESSION['(ak0)'].'\' AND DocsComplete=0 AND Liquidated=0 '; 
+                $sql='UPDATE `approvals_3budgetandliq` SET ForLiqSubmission='.$set.', ForLiqSubByNo=\''.$_SESSION['(ak0)'].'\',ForLiqSubTS=Now() WHERE TxnID='.$txnidname.' AND EncodedByNo=\''.$_SESSION['(ak0)'].'\' AND DocsComplete=0 AND Liquidated=0 '; 
                 $stmt=$link->prepare($sql); $stmt->execute();
-		header('Location:requestforbudget.php?w=Lookup&TxnID='.$txnid);
+		header('Location:requestforbudget.php?w=Lookup&TxnID='.$txnidname);
             break;
         
         case 'DocsReceived':
             if (allowedToOpen(5231,'1rtc')){
             require_once $path.'/acrossyrs/logincodes/confirmtoken.php';
                 $set=!isset($_GET['Set'])?1:$_GET['Set'];
-                $sql='UPDATE `approvals_3budgetandliq` SET DocsComplete='.$set.', DocsCompleteByNo=\''.$_SESSION['(ak0)'].'\',DocsCompleteTS=Now() WHERE TxnID='.$txnid.' AND Liquidated=0'; 
+                $sql='UPDATE `approvals_3budgetandliq` SET DocsComplete='.$set.', DocsCompleteByNo=\''.$_SESSION['(ak0)'].'\',DocsCompleteTS=Now() WHERE TxnID='.$txnidname.' AND Liquidated=0'; 
             $stmt=$link->prepare($sql); $stmt->execute();}
-		header('Location:requestforbudget.php?w=Lookup&TxnID='.$txnid);
+		header('Location:requestforbudget.php?w=Lookup&TxnID='.$txnidname);
             break;
         
         case 'Print':
             $title='Liquidation'; $formdesc='<a href="javascript:window.print()">Print</a>';            
-            $sql=$sql0.' WHERE bl.TxnID='.$txnid.$condition; $hidecontents=1;
+            $sql=$sql0.' WHERE bl.TxnID='.$txnidname.$condition; $hidecontents=1;
             $columnnames=array('Requester','AcceptedTS','Purpose','DurationInDays','RequestAmt','Branch','FundsReleased',
     );
             
@@ -605,10 +605,10 @@ switch ($which){
             if (allowedToOpen(5234,'1rtc')){
             require_once $path.'/acrossyrs/logincodes/confirmtoken.php';
                 $set=!isset($_GET['Set'])?1:$_GET['Set'];
-                $sql='UPDATE `approvals_3budgetandliq` SET Liquidated='.$set.', SetLiqByNo=\''.$_SESSION['(ak0)'].'\',SetLiqTS=Now() WHERE TxnID='.$txnid.' AND EncodedByNo<>\''.$_SESSION['(ak0)'].'\''; 
+                $sql='UPDATE `approvals_3budgetandliq` SET Liquidated='.$set.', SetLiqByNo=\''.$_SESSION['(ak0)'].'\',SetLiqTS=Now() WHERE TxnID='.$txnidname.' AND EncodedByNo<>\''.$_SESSION['(ak0)'].'\''; 
             $stmt=$link->prepare($sql); $stmt->execute();}
             header("Location:".$_SERVER['HTTP_REFERER']);
-		//header('Location:requestforbudget.php?w=Lookup&TxnID='.$txnid);
+		//header('Location:requestforbudget.php?w=Lookup&TxnID='.$txnidname);
             break;
         
 }
