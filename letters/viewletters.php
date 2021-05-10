@@ -161,7 +161,7 @@ echo '
 }
 // if(allowedToOpen(5901,'1rtc') or allowedToOpen(590,'1rtc')){
 	
-if(allowedToOpen(array(5901,590),'1rtc')){
+if(allowedToOpen(array(5901,590,589),'1rtc')){
 echo '<td>
 <div style="width:150px;  border: 2px solid grey; padding:40px; margin: 25px; ">
 	<p style="color:white; font-size: 13px;">Other</p><br> ';
@@ -171,8 +171,11 @@ echo '
  <input type="submit" name="lookup" value="View Criteria Write-off" formaction="writeoffcriteria.php?w=view"> 
  <br> <br> <input type="submit" name="add_edit" value="Add/Edit Criteria Write-off" formaction="writeoffcriteria.php?w=addedit">';} 
  
+ if(allowedToOpen(array(590,589),'1rtc')){
+echo '<br> <br><input type="submit" name="lookup" value="Sample Letter For Hold Check" formaction="SampleLetterForHoldCheck'.$_SESSION['*cnum'].'.pdf"> ';
+ } 
  if(allowedToOpen(590,'1rtc')){
-echo '<br> <br><input type="submit" name="lookup" value="Sample Letter For Hold Check" formaction="SampleLetterForHoldCheck.pdf"> 
+echo '
  <br> <br> <input type="submit" name="lookup" value="Final Notice for Hold Check" formaction="printsoa.php?w=RemindHoldCheck"> 
  <br> <br> <input type="submit" name="lookup" value="Promissory Note" formaction="overduenotice.php?w=PromissoryNote">';
  }

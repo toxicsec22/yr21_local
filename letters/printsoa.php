@@ -237,7 +237,7 @@ $dataasof=$stmtasof->fetch(); */
 echo '<div id="prev"><form action="printsoa.php?w=SendToEmailPreview" method="POST"><input type="hidden" name="ClientName" value="'.$clientno.'"> <input type="submit" name="btnEmail" value="Email to client"></form></div>';
 foreach ($resultco as $company){
 $letter='<center><img src="../generalinfo/logo/'.$company['Company'].'.png"><br>';
-$letter=$letter. '<br><font style="font-size: 80%;">Credit & Collections Office: &nbsp; collections@1rotarytrading.com <br/>(02) 734 07679 •  '.$resultuser['MobileNo'].'</font><br><br>Statement of Account<br><br></center>';
+$letter=$letter. '<br><font style="font-size: 80%;">Credit & Collections Office: &nbsp; collections@1rotary.com.ph <br/>(02) 734 07679 •  '.$resultuser['MobileNo'].'</font><br><br>Statement of Account<br><br></center>';
 //$letter=$letter. '<br>Accounting Office: (02) 808-1569  (02) 808-1574    (0917) 571-2535<br><br>Statement of Account<br><br></center>';
 
 //for PDC
@@ -426,7 +426,7 @@ $company=$result['CompanyName'];
 
 $letter='<center><img src="../generalinfo/logo/'.$result['Company'].'.png"></br>';
 
-$letter=$letter. '<font style="font-size: 80%;">Credit & Collections Office: &nbsp; collections@1rotarytrading.com <br/>(02) 734 07679 •  '.$resultuser['MobileNo'].'</font><br><br><br>Credit Information<br><br></center>';	
+$letter=$letter. '<font style="font-size: 80%;">Credit & Collections Office: &nbsp; collections@1rotary.com.ph <br/>(02) 734 07679 •  '.$resultuser['MobileNo'].'</font><br><br><br>Credit Information<br><br></center>';	
 	
 $letter=$letter.'<a href="javascript:window.print()">To:  '.$result['ClientName'].'</a>
 <div style="float:right">Date: '.date('F d, Y').'</div>
@@ -495,7 +495,7 @@ $company=$result['CompanyName'];
 
 $letter='<center><img src="../generalinfo/logo/'.$result['Company'].'.png"></br>';
 
-$letter=$letter. '<font style="font-size: 80%;">Credit & Collections Office: &nbsp; collections@1rotarytrading.com <br/>(02) 734 07679 •  '.$resultuser['MobileNo'].'</font><br><br><br>Credit Information<br><br></center>';	
+$letter=$letter. '<font style="font-size: 80%;">Credit & Collections Office: &nbsp; collections@1rotary.com.ph <br/>(02) 734 07679 •  '.$resultuser['MobileNo'].'</font><br><br><br>Credit Information<br><br></center>';	
 	
 $letter=$letter.'<a href="javascript:window.print()">To:  '.$result['ClientName'].'</a>
 <div style="float:right">Date: '.date('F d, Y').'</div>
@@ -555,7 +555,7 @@ $company=$result['CompanyName'];
 
 $letter='<center><img src="../generalinfo/logo/'.$result['Company'].'.png"></br>';
 
-$letter=$letter. '<font style="font-size: 80%;">Credit & Collections Office: &nbsp; collections@1rotarytrading.com <br/>(02) 734 07679 •  '.$resultuser['MobileNo'].'</font><br><br><br>Credit Information<br><br></center>';	
+$letter=$letter. '<font style="font-size: 80%;">Credit & Collections Office: &nbsp; collections@1rotary.com.ph <br/>(02) 734 07679 •  '.$resultuser['MobileNo'].'</font><br><br><br>Credit Information<br><br></center>';	
 	
 $letter=$letter.'<a href="javascript:window.print()">To:  '.$result['ClientName'].'</a>
 <div style="float:right">Date: '.date('F d, Y').'</div>
@@ -688,7 +688,7 @@ $resultco=$stmt->fetchAll();
 foreach ($resultco as $company){
 $letter='<center><img src="../generalinfo/logo/'.$company['Company'].'.png"></br>';
  
-$letter=$letter. '<font style="font-size: 80%;">Credit & Collections Office: &nbsp; collections@1rotarytrading.com <br/>(02) 734 07679 •  '.$resultuser['MobileNo'].'</font><br><br><br>Final Notice<br><br></center>';
+$letter=$letter. '<font style="font-size: 80%;">Credit & Collections Office: &nbsp; collections@1rotary.com.ph <br/>(02) 734 07679 •  '.$resultuser['MobileNo'].'</font><br><br><br>Final Notice<br><br></center>';
 $sqlmain='SELECT * FROM `1clients` c where ClientNo='.$clientno;
 
     $stmt=$link->query($sqlmain);
@@ -717,7 +717,7 @@ $ack='<p style="display:inline; float:left;border-style:solid; border-width: 1px
     width:300px;">Acknowledged By:  _______________________<br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
     <font size="1">Signature above printed name</font></p>';
 
-$sqluser='Select concat(FirstName, \' \',Left(MiddleName,1), \'. \',SurName) as FullName, Position from `1employees` e join `attend_30currentpositions` p on e.IDNo=p.IDNo where p.PositionID=11';
+$sqluser='Select concat(FirstName, \' \',Left(MiddleName,1), \'. \',SurName) as FullName, Position from `1employees` e join `attend_30currentpositions` p on e.IDNo=p.IDNo where p.IDNo='.$_SESSION['(ak0)'].'';
 $stmt=$link->query($sqluser);
 $result=$stmt->fetch();
 $creditofficer=$result['FullName'];
@@ -733,7 +733,7 @@ break;
 case 'HoldCheckSampleLetter':
     if (!allowedToOpen(589,'1rtc')) { echo 'No permission'; exit; }
 $letter='<center>Company Logo<br><br></center>';
-$letter=$letter.'<a href="javascript:window.print()">To:  1Rotary Trading Corporation</a><br><font style="font-size: 80%;">Credit & Collections Office: &nbsp; collections@1rotarytrading.com <br/>(02) 734 07679 •  '.$resultuser['MobileNo'].'</font><br>
+$letter=$letter.'<a href="javascript:window.print()">To:  1Rotary Trading Corporation</a><br><font style="font-size: 80%;">Credit & Collections Office: &nbsp; collections@1rotary.com.ph <br/>(02) 734 07679 •  '.$resultuser['MobileNo'].'</font><br>
 <div style="float:right">Date: '.date('F d, Y').'</div>
 <br><br><i>Attn: Credit & Collections Department</i><br><hr><br>';
 
