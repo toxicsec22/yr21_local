@@ -16,7 +16,7 @@ switch($which){
 		$to=$_POST['To'];	
 	}	
 		echo '<title>IT Updates</title>';
-		echo '<br><h3><a href="../info/faq/itchecklists.php">IT Checklists</a></h3>';
+		echo '<br><h3><a href="../info/faq/itchecklists.php">IT Checklists</a> &nbsp; &nbsp; &nbsp; <a href="itupdates.php?w=UserComments">User Comments, Questions and Suggestions</a></h3>';
 		echo'</br><h3>IT Updates</h3></br>
 		<div style="border:1px solid black; width:400px; padding:5px"> <h4>Filtering:</h4></br>
 		<form method="post" action="itupdates.php?w=List">
@@ -74,6 +74,14 @@ switch($which){
 			$stmt=$link->prepare($sql); $stmt->execute();
 			header("Location:itupdates.php?w=List");
 	break;
-	
+
+
+	case 'UserComments':
+$title='User Comments and Suggestions';
+$sql='select TxnID,Comments,slc.TimeStamp,FullName AS EncodedBy,Position,IF(deptid IN (2,10),Branch,dept) AS Branch FROM events_2syslayoutcomments slc left join attend_30currentpositions cp on cp.IDNo=slc.EncodedByNo  Order By slc.TimeStamp DESC';
+$columnnames=array('Comments','EncodedBy','Position','Branch','TimeStamp');
+$txnidname='TxnID';
+include('../backendphp/layout/displayastablenosort.php');
+	break;
 }
 ?>
