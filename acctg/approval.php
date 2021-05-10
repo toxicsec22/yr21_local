@@ -309,16 +309,18 @@ $month=date('m');
    $month=$_REQUEST[$fieldname];
 }
 
+$txnidname='BranchInvNo';
+
 if (allowedToOpen(522,'1rtc') or allowedToOpen(5222,'1rtc')) {
     $sql1='SELECT JLID AS `Rank` FROM attend_0positions p JOIN `attend_1joblevel` jl ON jl.JobLevelNo=p.JobLevelNo WHERE `PositionID`='.$_SESSION['&pos'];
     $stmt1=$link->query($sql1); $res1=$stmt1->fetch();
     $sql=$sql0.' WHERE ISNULL(Approval) '.(allowedToOpen(5222,'1rtc')?'':' AND a.BranchNo IN (Select g.BranchNo from `attend_1branchgroups` g where TeamLeader='.$_SESSION['(ak0)'].' OR SAM='.$_SESSION['(ak0)'].') AND (a.EncodedByNo<>'.$_SESSION['(ak0)'].') AND (SELECT IF (PositionID IN (32,33,37,38,81),0,JLID) FROM `attend_30currentpositions` WHERE IDNo=a.EncodedByNo)<('.$res1['Rank'].')'); 
 $columnnames=array('Branch','InvNo','Amount','RequestedBy','RequestTS','OPClientName','OPClientMobile'); 
-$columnstoedit=array('Amount','OPClientName','OPClientMobile'); $txnidname='BranchInvNo'; 
+$columnstoedit=array('Amount','OPClientName','OPClientMobile'); 
 $editprocess='praddmain.php?w=ApproveOP&action_token='.$_SESSION['action_token'].'&InvNo=';$editprocesslabel='Approve';
 include('../backendphp/layout/displayastableeditcellsnoheaders.php');    
 }
-$txnidname='BranchInvNo';
+
 $columnnames=array('SaleTxnID','SaleDate','Branch','InvNo','ClientName','PayType','Amount','OPClientName','OPClientMobile','RequestedBy','RequestTS','Approval', 'ApprovedBy','ApprovalTS','Recorded');
 $sql=$sql0.' WHERE Month(a.`TimeStamp`)='.$month.$condition.' ORDER BY a.TimeStamp,b.Branch';
 $editprocess='approval.php?w=DelOP&action_token='.$_SESSION['action_token'].'&InvNo=';$editprocesslabel='Del';

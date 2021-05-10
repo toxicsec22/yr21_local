@@ -42,7 +42,8 @@ $columnnames=array('DateofRequest','DateNeeded','Purpose','DurationInDays','Requ
 }
 
 
-$txnid=!isset($_REQUEST['TxnID'])?'TxnID':$_REQUEST['TxnID'];
+$txnidname='TxnID';
+$txnid=!isset($_REQUEST['TxnID'])?0:$_REQUEST['TxnID'];
 
 
 $sql3='SELECT bl.*,deptid,  (RequestCompleted+Approved+FundsReleased+FundsAccepted+DocsComplete+Liquidated) AS Editable FROM approvals_3budgetandliq bl JOIN attend_30currentpositions cp ON cp.IDNo=bl.EncodedByNo WHERE bl.TxnID='.$txnid;
@@ -225,7 +226,6 @@ switch ($which){
                 
         case 'Lookup':
             $title=($res3['Approved']==1)?'Approved Budget':'Budget Request';
-//            $formdesc='<a href="/'.$url_folder.'/approvals/requestforbudget.php?w=AcceptFunds&action_token='.$_SESSION['action_token'].'&TxnID='.$txnid.'"  OnClick="return confirm(\'Funds RECEIVED?\');">Funds accepted</a>';
             $sql2='SELECT EncodedByNo,RequestCompleted, Approved,FundsReleased,FundsAccepted,ForLiqSubmission, DocsComplete,Liquidated FROM approvals_3budgetandliq bl WHERE TxnID='.$txnid.$condition; 
             $stmt=$link->query($sql2);$result=$stmt->fetch();
             $edit=(($result['EncodedByNo']==$_SESSION['(ak0)']) and ($editok==1))?2:0;
@@ -323,7 +323,7 @@ switch ($which){
             elseif (($result['ForLiqSubmission']<>0) and $res3['Liquidated']<>0) { echo 'Liquidated successfully';}
             
             $sql=$sqlliqsub.' ORDER BY ExpenseNo';
-            $txnidname='TxnSubId'; $columnnames=$columnnamesliq; $title='';$formdesc='';
+            $txnidnamename='TxnSubId'; $columnnames=$columnnamesliq; $title='';$formdesc='';
             
             include('../backendphp/layout/displayastable.php');
             
