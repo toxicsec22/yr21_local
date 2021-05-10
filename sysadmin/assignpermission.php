@@ -140,7 +140,7 @@ switch ($which)
    
         $editprocess='assignpermission.php?w=AddPermissionToPage&ProcessID='; $editprocesslabel='Edit';
      
-		$title='Permission Page'; $formdesc=''; $txnid='TxnID';
+		$title='Permission Page'; $formdesc=''; $txnidname='TxnID';
 		$columnnames=$columnnameslist;       
 		
 		$width='100%';
@@ -300,7 +300,7 @@ switch ($which)
    
         $editprocess='assignpermission.php?w=EditProtection&ForDB='; $editprocesslabel='Edit';
      
-		$title='Data Protection'; $formdesc=''; $txnid='TxnID';
+		$title='Data Protection'; $formdesc=''; $txnidname='TxnID';
 		$columnnames=$columnnameslist;       
 		
 		$width='100%';
@@ -706,7 +706,7 @@ echo '<br>';
 				
 		
 		
-		$title=''; $formdesc=''; $txnid='TxnID';
+		$title=''; $formdesc=''; $txnidname='TxnID';
 		$columnnames=$columnnameslist;       
 		
 		$width='70%';
@@ -736,14 +736,14 @@ echo '<br>';
 	case 'EditSpecificsSwitch':
         if (!allowedToOpen(3000,'1rtc')) { header('Location:assignpermission.php?denied=true'); }
 		$title='Edit Specifics';
-		$txnid=intval($_GET['switchid']);
+		$txnidname=intval($_GET['switchid']);
 
-		$sql=$sql.' WHERE switchid='.$txnid;
+		$sql=$sql.' WHERE switchid='.$txnidname;
 		$columnstoedit=$columnstoadd;
 		
 		$columnnames=$columnnameslist;
 		
-		$editprocess='assignpermission.php?w=EditSwitch&switchid='.$txnid;
+		$editprocess='assignpermission.php?w=EditSwitch&switchid='.$txnidname;
 		
 		include('../backendphp/layout/editspecificsforlists.php');
 	break;
@@ -752,11 +752,11 @@ echo '<br>';
 		require_once $path.'/acrossyrs/logincodes/confirmtoken.php';
 		
 		if (allowedToOpen(3000,'1rtc')){
-		$txnid = intval($_GET['switchid']);
+		$txnidname = intval($_GET['switchid']);
 		$sql='';
 		foreach ($columnstoadd as $field) {$sql=$sql.' `' . $field. '`=\''.addslashes($_REQUEST[$field]).'\', '; }
 		
-		$sql='UPDATE `permissions_00switch` SET '.$sql.' switchid='.$txnid.' WHERE switchid='.$txnid;
+		$sql='UPDATE `permissions_00switch` SET '.$sql.' switchid='.$txnidname.' WHERE switchid='.$txnidname;
 		
 		$stmt=$link->prepare($sql);
 		$stmt->execute();
@@ -795,7 +795,7 @@ echo '<br>';
 		$delprocess='assignpermission.php?w=DeleteLevel&MenuID=';
 		$editprocess='assignpermission.php?w=EditSpecificsLevel&MenuID='; $editprocesslabel='Edit';
 
-		$title=''; $formdesc=''; $txnid='TxnID';
+		$title=''; $formdesc=''; $txnidname='TxnID';
 		$columnnames=$columnnameslist;       
 		
 		$width='70%';
@@ -822,10 +822,10 @@ echo '<br>';
 	case 'EditSpecificsLevel':
     if (!allowedToOpen(3000,'1rtc')) { header('Location:assignpermission.php?denied=true'); }
 		$title='Edit Specifics';
-		$txnid=intval($_GET['MenuID']);
+		$txnidname=intval($_GET['MenuID']);
 
 		$sql='SELECT l.*, s.switchname, l.MenuID AS TxnID FROM permissions_00switch AS s JOIN permissions_01level1 AS l ON s.switchid = l.switchid  '
-                        . ' WHERE MenuID='.$txnid;
+                        . ' WHERE MenuID='.$txnidname;
 						
 		
 		$columnnameslist=array('MenuID', 'Menu', 'switchname', 'Remarks', 'OrderBy');
@@ -839,7 +839,7 @@ echo '<br>';
 		
 		$columnnames=$columnnameslist;
 		
-		$editprocess='assignpermission.php?w=EditLevel&MenuID='.$txnid;
+		$editprocess='assignpermission.php?w=EditLevel&MenuID='.$txnidname;
 		
 		include('../backendphp/layout/editspecificsforlists.php');
 	break; //End of Case EditSpecifics
@@ -848,12 +848,12 @@ echo '<br>';
 	require_once $path.'/acrossyrs/logincodes/confirmtoken.php';
 	
 	if (allowedToOpen(3000,'1rtc')){
-		$txnid = intval($_GET['MenuID']);
+		$txnidname = intval($_GET['MenuID']);
 		$sql='';
 		
 		foreach ($columnstoadd as $field) {$sql=$sql.' `' . $field. '`=\''.addslashes($_REQUEST[$field]).'\', '; }
 		
-		$sql='UPDATE `permissions_01level1` SET '.$sql.' switchid='.$switchid.' WHERE MenuID='.$txnid;
+		$sql='UPDATE `permissions_01level1` SET '.$sql.' switchid='.$switchid.' WHERE MenuID='.$txnidname;
 		
 		$stmt=$link->prepare($sql);
 		$stmt->execute();
