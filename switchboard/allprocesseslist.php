@@ -32,9 +32,9 @@ $conds=substr($conds, 0, -4);
 $condallowed='('.$conds.' OR (FIND_IN_SET('.$_SESSION['(ak0)'].',`AllowedPerID`)))';
 
 $sqlalloptions='CREATE TEMPORARY TABLE `SwitchboardItems` AS
-SELECT s.switchid AS SwitchID, switchname AS Switch, 0 AS MenuID, 0 AS Menu, ProcessID, ProcessTitle, ProcessDesc, OnSwitch, ap.OrderBy, 0 AS WithSub FROM `permissions_2allprocesses` ap JOIN `permissions_00switch` s on s.switchid=ap.OnSwitch WHERE OnSwitch<>0 AND '.$condallowed.' AND (ProcessID<1500 OR ProcessID>1600)
-    UNION SELECT s.switchid AS SwitchID, switchname AS Switch, MenuID, Menu, CONCAT(MenuID,"NOT") AS ProcessID, Menu, "#" AS ProcessDesc, l1.switchid, l1.OrderBy, 1 AS WithSub FROM `permissions_2allprocesses` ap RIGHT JOIN `permissions_01level1` l1 ON l1.MenuID=ap.OnSwitch JOIN `permissions_00switch` s on s.switchid=l1.switchid WHERE OnSwitch<>0 AND '.$condallowed.' AND (ProcessID<1500 OR ProcessID>1600)
-UNION SELECT s.switchid AS SwitchID, switchname AS Switch, MenuID, Menu, ProcessID, ProcessTitle, ProcessDesc, OnSwitch, ap.OrderBy, 1 AS WithSub FROM `permissions_2allprocesses` ap JOIN `permissions_01level1` l1 ON l1.MenuID=ap.OnSwitch JOIN `permissions_00switch` s on s.switchid=l1.switchid WHERE OnSwitch<>0 AND '.$condallowed.' AND (ProcessID<1500 OR ProcessID>1600) ORDER BY OrderBy;';
+SELECT s.switchid AS SwitchID, switchname AS Switch, 0 AS MenuID, 0 AS Menu, ProcessID, ProcessTitle, ProcessDesc, OnSwitch, ap.OrderBy, 0 AS WithSub,SUBSTRING_INDEX(SUBSTRING_INDEX(ProcessAddress, ".php", 1), "/", -1) AS ProAdd FROM `permissions_2allprocesses` ap JOIN `permissions_00switch` s on s.switchid=ap.OnSwitch WHERE OnSwitch<>0 AND '.$condallowed.' AND (ProcessID<1500 OR ProcessID>1600)
+    UNION SELECT s.switchid AS SwitchID, switchname AS Switch, MenuID, Menu, CONCAT(MenuID,"NOT") AS ProcessID, Menu, "#" AS ProcessDesc, l1.switchid, l1.OrderBy, 1 AS WithSub,SUBSTRING_INDEX(SUBSTRING_INDEX(ProcessAddress, ".php", 1), "/", -1) AS ProAdd FROM `permissions_2allprocesses` ap RIGHT JOIN `permissions_01level1` l1 ON l1.MenuID=ap.OnSwitch JOIN `permissions_00switch` s on s.switchid=l1.switchid WHERE OnSwitch<>0 AND '.$condallowed.' AND (ProcessID<1500 OR ProcessID>1600)
+UNION SELECT s.switchid AS SwitchID, switchname AS Switch, MenuID, Menu, ProcessID, ProcessTitle, ProcessDesc, OnSwitch, ap.OrderBy, 1 AS WithSub,SUBSTRING_INDEX(SUBSTRING_INDEX(ProcessAddress, ".php", 1), "/", -1) AS ProAdd FROM `permissions_2allprocesses` ap JOIN `permissions_01level1` l1 ON l1.MenuID=ap.OnSwitch JOIN `permissions_00switch` s on s.switchid=l1.switchid WHERE OnSwitch<>0 AND '.$condallowed.' AND (ProcessID<1500 OR ProcessID>1600) ORDER BY OrderBy;';
 $stmt=$link->prepare($sqlalloptions); $stmt->execute();
 
 $sqlmenugroup='SELECT si.SwitchID, Switch FROM `SwitchboardItems` si JOIN `permissions_00switch` s ON s.switchid=si.SwitchID GROUP BY si.SwitchID ORDER BY switchorder;';
@@ -67,12 +67,19 @@ if(allowedToOpen(3000,'1rtc')){
 echo '<form action="#" method="POST">'.$positionlist;
 foreach ($resultgroup as $group){
     $switch=$switch.'<li>'.$group['Switch'].'<ul class="level2">';
-    $sqlmenu='SELECT MenuID, Menu, ProcessID, ProcessTitle, ProcessDesc, OrderBy, WithSub FROM `SwitchboardItems` si WHERE OnSwitch='.$group['SwitchID'].' ORDER BY OrderBy;';
+    $sqlmenu='SELECT MenuID, Menu, ProcessID, ProcessTitle, ProcessDesc, OrderBy, WithSub,ProAdd FROM `SwitchboardItems` si WHERE OnSwitch='.$group['SwitchID'].' ORDER BY OrderBy;';
     $stmt=$link->query($sqlmenu);    $result=$stmt->fetchAll();
     
     foreach ($result as $command){
             
             $switch=$switch."<li>".((!allowedToOpen(3000,'1rtc'))?(substr($command['ProcessID'], -3)<>'NOT'?"<input type='checkbox' name='requestaccess[]' value='".$command['ProcessID']."'/> ":""):"").$command['ProcessTitle']."";
+
+			$sqlonswitch0='SELECT ProcessID,ProcessDesc FROM permissions_2allprocesses WHERE ProcessAddress LIKE "%'.$command['ProAdd'].'%" AND OnSwitch=0 GROUP BY ProcessAddress';
+			$stmtonswitch0=$link->query($sqlonswitch0);    $resultsonswitch0=$stmtonswitch0->fetchAll();
+
+			foreach($resultsonswitch0 AS $resultonswitch0){
+				$switch=$switch."<li>".((!allowedToOpen(3000,'1rtc'))?"<input type='checkbox' name='requestaccess[]' value='".$resultonswitch0['ProcessID']."'/> ":"")."<font color='green'>".$resultonswitch0['ProcessDesc']."</font>";
+			}
             if ($command['WithSub']==1){
                    $sqlmenusub='SELECT ProcessID, ProcessTitle, ProcessDesc, OrderBy FROM `SwitchboardItems` si WHERE OnSwitch='.$command['MenuID'].' ORDER BY OrderBy;';
                     $stmt=$link->query($sqlmenusub); $resultsub=$stmt->fetchAll();

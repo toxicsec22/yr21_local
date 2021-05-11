@@ -85,7 +85,7 @@ if(empty($_POST['ClientName'])){
 	   $img=$company['Company'];
 	   $msgregards=$company['CompanyName'];
 	   
-	   $compadd='<font size="2pt">Suite 1018 High Street South Corporate Plaza Tower 1<br>26th Street Bonifacio Global City, Taguig City<br>Tel no. 7751-2213<br><br>www.1rotary.com.ph</font>';
+	   $compadd='<font size="2pt">Suite 1715 High Street South Corporate Plaza Tower 1<br>26th Street Bonifacio Global City, Taguig City<br>Tel no. 7340-7679<br><br>www.1rotary.com.ph</font>';
 	   $imglink='<img   src="../generalinfo/logo/'.$img.'.png">';
 	    ?>
     </form>
@@ -167,7 +167,7 @@ echo '<div class="post-container">
 	   $img=$company['Company'];
 	   $msgregards=$company['CompanyName'];
 	   
-	   $compadd='<font size="2pt">Suite 1018 High Street South Corporate Plaza Tower 1<br>26th Street Bonifacio Global City, Taguig City<br>Tel no. 7751-2213<br><br>www.1rotary.com.ph</font>';
+	   $compadd='<font size="2pt">Suite 1715 High Street South Corporate Plaza Tower 1<br>26th Street Bonifacio Global City, Taguig City<br>Tel no. 7340-7679<br><br>www.1rotary.com.ph</font>';
 	   $imglink='<img   src="../generalinfo/logo/'.$img.'.png">';
 
  ?>

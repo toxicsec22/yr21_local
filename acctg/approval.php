@@ -320,7 +320,6 @@ $columnstoedit=array('Amount','OPClientName','OPClientMobile');
 $editprocess='praddmain.php?w=ApproveOP&action_token='.$_SESSION['action_token'].'&InvNo=';$editprocesslabel='Approve';
 include('../backendphp/layout/displayastableeditcellsnoheaders.php');    
 }
-
 $columnnames=array('SaleTxnID','SaleDate','Branch','InvNo','ClientName','PayType','Amount','OPClientName','OPClientMobile','RequestedBy','RequestTS','Approval', 'ApprovedBy','ApprovalTS','Recorded');
 $sql=$sql0.' WHERE Month(a.`TimeStamp`)='.$month.$condition.' ORDER BY a.TimeStamp,b.Branch';
 $editprocess='approval.php?w=DelOP&action_token='.$_SESSION['action_token'].'&InvNo=';$editprocesslabel='Del';
