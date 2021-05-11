@@ -1,98 +1,53 @@
 <?php
-// check if allowed
-$allowed=array(8288); $allow=0;
-foreach ($allowed as $ok) { if (allowedToOpen($ok,'1rtc')) { $allow=($allow+1); goto allowedmotor; } else { $allow=$allow; }}
-if ($allow==0) { goto nomotor;}
-allowedmotor:
-// end of check
-//sqltobecalled
-$sqlforall = 'SELECT rr.TxnID, DATE_FORMAT(DateRequest, "%m-%d-%Y") AS DateRequest,Particulars, Amount, b.Branch FROM `admin_2repairrequest` rr LEFT JOIN `1_gamit`.`0idinfo` id ON id.IDNo=rr.RequestedByNo JOIN `1branches` b ON b.BranchNo=rr.BranchNo';
+if(isset($_SESSION['(ak0)'])){
+    if (!allowedToOpen(8288,'1rtc')) { goto skip;} 
+    $editprocess='../admin/motorvehicles.php?w=Lookup&TxnID=';
+    $editprocesslabel='Lookup';
+    $columnnames=array('DateRequest','Particulars','Amount','Branch');
 
-$lookupaddress='../admin/motorvehicles.php?w=Lookup&TxnID=';
-// echo $_SESSION['&pos'];
-$thead='<tr><td>Date
-of Request</td><td>Particulars</td><td>Amount</td><td>Expense of</td></tr>';
-// echo 'test';
-//Ops Head
-if (allowedToOpen(8289,'1rtc')){ //OpsHead /SupplyChain
-    
-    $sqlsp=$sqlforall.' WHERE RequestCompleted=1 AND Approved=0 AND Approved2=0 AND ((SELECT deptheadpositionid FROM attend_30currentpositions WHERE IDNo=rr.RequestedByNo)=(SELECT PositionID FROM attend_30currentpositions WHERE IDNo='.$_SESSION['(ak0)'].'))';
+    $sql1 = 'SELECT rr.TxnID, DATE_FORMAT(DateRequest, "%m-%d-%Y") AS DateRequest,Particulars, FORMAT(Amount,2) AS Amount, b.Branch, 
+(SELECT IFNULL(IDNo,0) FROM attend_30currentpositions WHERE PositionID=(SELECT deptheadpositionid FROM attend_30currentpositions cp WHERE cp.IDNo=rr.RequestedByNo)) AS NotifIDNo FROM `admin_2repairrequest` rr JOIN `1branches` b ON b.BranchNo=rr.BranchNo ';
+    $txnidname='TxnID';
+} else {
 
-	$stmtsp=$link->query($sqlsp); $datatoshowsp=$stmtsp->fetchAll(); $sp=0;
-
-    if ($stmtsp->rowCount()>0){
-        $msgcb='<div><br>Repair Request (For Approval)<table bgcolor="FFFFF">'
-                . $thead;
-    foreach($datatoshowsp as $rows){
-        $sp++;
-
-$msgcb.='<tr><td>'.$rows['DateRequest']
-
-.'</td><td>'.htmlcharwithbr($fromBRtoN,$rows['Particulars']).'</td>'
-                .
-'<td>'.number_format($rows['Amount'],2).'</td>'
-                . '<td>'.$rows['Branch'].'</td>'
-            .'<td><a
-href="'.$lookupaddress.$rows['TxnID'].'"
-target=blank>Lookup Request</a></td>'.'</tr>';
-   }
-   echo $msgcb.'<br></table></div>';
-   }
+    $sql1='SELECT COUNT(rr.TxnID) AS CountTxn, rr.RequestedByNo, (SELECT IFNULL(IDNo,0) FROM attend_30currentpositions WHERE PositionID=(SELECT deptheadpositionid FROM attend_30currentpositions cp WHERE cp.IDNo=rr.RequestedByNo)) AS NotifIDNo FROM `admin_2repairrequest` rr ';
 }
 
-if (allowedToOpen(8290,'1rtc')){ //GenAdminHead
+// OpsHead /SupplyChain Head
+    $sqlfilter=' WHERE RequestCompleted=1 AND Approved=0 AND Approved2=0 ';
+    if(isset($_SESSION['(ak0)'])){
+        if (allowedToOpen(8289,'1rtc')) { 
+        $subtitle='Repair Request For Approval';
+        $sql=$sql1. $sqlfilter.' HAVING NotifIDNo='.$_SESSION['(ak0)'];
+        include '../backendphp/layout/displayastableonlynoheaders.php';}
+    } else { 
+        $sql='INSERT INTO approvals_notif (IDNo,CountNotif) SELECT (SELECT IFNULL(IDNo,0) FROM attend_30currentpositions WHERE PositionID=(SELECT deptheadpositionid FROM attend_30currentpositions cp WHERE cp.IDNo=rr.RequestedByNo)) AS IDNo, COUNT(rr.TxnID) AS CountTxn FROM `admin_2repairrequest` rr '.$sqlfilter.' GROUP BY IDNo HAVING IDNo IN ('.allAllowedID(8289).') AND CountTxn>0'; 
+        $stmt=$link->prepare($sql); $stmt->execute();
+    }
+
+//GenAdminHead
     
-    $sqlsp=$sqlforall.' WHERE RequestCompleted=1 AND Approved=1 AND Approved2=0';
-
-	$stmtsp=$link->query($sqlsp); $datatoshowsp=$stmtsp->fetchAll(); $sp=0;
-
-    if ($stmtsp->rowCount()>0){
-        $msgcb='<div><br>Repair Request (For Approval - GenAdminHead)<table bgcolor="FFFFF">'
-                . $thead;
-    foreach($datatoshowsp as $rows){
-        $sp++;
-
-$msgcb.='<tr><td>'.$rows['DateRequest']
-
-.'</td><td>'.htmlcharwithbr($fromBRtoN,$rows['Particulars']).'</td>'
-                .
-'<td>'.number_format($rows['Amount'],2).'</td>'
-                . '<td>'.$rows['Branch'].'</td>'
-            .'<td><a
-href="'.$lookupaddress.$rows['TxnID'].'"
-target=blank>Lookup Request</a></td>'.'</tr>';
-   }
-   echo $msgcb.'<br></table></div>';
-   }
+    $sqlfilter=' WHERE RequestCompleted=1 AND Approved=1 AND Approved2=0'; 
+    if(isset($_SESSION['(ak0)'])){ 
+        if (allowedToOpen(8290,'1rtc')) { 
+            $sql=$sql1.$sqlfilter;
+    $subtitle='Repair Request (For Approval - GenAdminHead)';
+    include '../backendphp/layout/displayastableonlynoheaders.php';}
+} else {
+    $sql='INSERT INTO approvals_notif (IDNo,CountNotif) SELECT '.allAllowedID(8289).' AS IDNo, COUNT(rr.TxnID) AS CountTxn FROM `admin_2repairrequest` rr '.$sqlfilter.'  HAVING CountTxn>0';
 }
 
-if (allowedToOpen(8287,'1rtc')){ //Acknowledge by Requester /BranchHead
-    
-    $sqlsp=$sqlforall.' WHERE RequestCompleted=1 AND Approved=1 AND Approved2=1 AND Acknowledged=0 AND RequestedByNo='.$_SESSION['(ak0)'];
+//Acknowledge by Requester /BranchHead
 
-	$stmtsp=$link->query($sqlsp); $datatoshowsp=$stmtsp->fetchAll(); $sp=0;
+    $sqlfilter=' WHERE RequestCompleted=1 AND Approved=1 AND Approved2=1 AND Acknowledged=0 ';
 
-    if ($stmtsp->rowCount()>0){
-        $msgcb='<div><br>Repair Request (For Approval - GenAdminHead)<table bgcolor="FFFFF">'
-                . $thead;
-    foreach($datatoshowsp as $rows){
-        $sp++;
-
-$msgcb.='<tr><td>'.$rows['DateRequest']
-
-.'</td><td>'.htmlcharwithbr($fromBRtoN,$rows['Particulars']).'</td>'
-                .
-'<td>'.number_format($rows['Amount'],2).'</td>'
-                . '<td>'.$rows['Branch'].'</td>'
-            .'<td><a
-href="'.$lookupaddress.$rows['TxnID'].'"
-target=blank>Lookup Request</a></td>'.'</tr>';
-   }
-   echo $msgcb.'<br></table></div>';
-   }
+    if(isset($_SESSION['(ak0)'])){
+    if (allowedToOpen(8287,'1rtc')){ 
+    $sql= $sql1.$sqlfilter.' AND rr.RequestedByNo='.$_SESSION['(ak0)'];
+    $subtitle='Repair Request For Acknowledgement';
+    include '../backendphp/layout/displayastableonlynoheaders.php';}
+} else {
+    $sql='INSERT INTO approvals_notif (IDNo,CountNotif) SELECT RequestedByNo AS IDNo, COUNT(rr.TxnID) AS CountTxn FROM `admin_2repairrequest` rr '.$sqlfilter.' AND rr.RequestedByNo IN ('.allAllowedID(8287).') GROUP BY RequestedByNo HAVING CountTxn>0';
 }
-
-
-
-nomotor:
+skip:
 ?>
