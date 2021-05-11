@@ -37,7 +37,7 @@ if (allowedToOpen(7133,'1rtc')){
 	echo '</div><div style="clear: both; display: block; position: relative;"></div>';
 } 
 include_once('switchboard/messagesonswitch.php');
-include_once('approvals/forapprovalswitchboard.php');
+//include_once('approvals/forapprovalswitchboard.php');
 include_once('switchboard/contents.php');
 $link=null;
 ?>

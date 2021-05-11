@@ -33,7 +33,7 @@ include_once('generalinfo/bdaytoday.php');
 <?php
 
 include_once('switchboard/messagesonswitch.php');
-include_once('approvals/forapprovalswitchboard.php');
+//include_once('approvals/forapprovalswitchboard.php');
 include_once('switchboard/contents.php');
 
 ?>

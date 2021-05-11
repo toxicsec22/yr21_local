@@ -114,7 +114,7 @@ if (isset($_SESSION['&pos'])){
 
 		}else{
                     include_once $path.'/'.$url_folder.'/generalinfo/closedbranchesandattendanceerrors.php';
-                    include_once $path.'/'.$url_folder.'/approvals/forapprovalallpages.php';
+                  //  include_once $path.'/'.$url_folder.'/approvals/forapprovalallpages.php';
 		}
 		
 	}
