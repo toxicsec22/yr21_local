@@ -323,7 +323,7 @@ switch ($which){
             elseif (($result['ForLiqSubmission']<>0) and $res3['Liquidated']<>0) { echo 'Liquidated successfully';}
             
             $sql=$sqlliqsub.' ORDER BY ExpenseNo';
-            $txnidnamename='TxnSubId'; $columnnames=$columnnamesliq; $title='';$formdesc='';
+            $txnidname='TxnSubId'; $columnnames=$columnnamesliq; $title='';$formdesc='';
             
             include('../backendphp/layout/displayastable.php');
             
