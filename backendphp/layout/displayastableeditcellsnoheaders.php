@@ -56,7 +56,11 @@ foreach($datatoshow as $rows){
 	    }
         }
 	$total=(isset($coltototal)?$total+$rows[$coltototal]:0);  
-        $textfordisplay=$textfordisplay.((key($rows)!=$keyoflast)?"":'<td><input type="hidden" name="action_token" value="'.$_SESSION['action_token'].'"><input type="submit" value="'.$editprocesslabel.'"></td>'.(isset($runtotal)?"<td>".number_format($total,2)."</td></form>":"</form>").(isset($addlprocess)?"<td><a href='".$addlprocess.addslashes($rows[$txnidname])."'>".$addlprocesslabel."</a></td>":"")."</tr>");
+        $textfordisplay=$textfordisplay.((key($rows)!=$keyoflast)?"":'<td><input type="hidden" name="action_token" value="'.$_SESSION['action_token'].'"><input type="submit" value="'.$editprocesslabel.'"></td>'
+        .(isset($runtotal)?"<td>".number_format($total,2)."</td></form>":"</form>")
+        .(!isset($inputprocess)?"":"<td><form method=post action='" . $inputprocess.$txnidname."=".$rows[$txnidname].'&action_token='.$_SESSION['action_token']."'>". $inputprocesslabel .
+				      "<input type='".(!isset($inputtype)?"text":$inputtype)."' name='".$inputname."' size=10 ".(!isset($inputplaceholder)?"":" placeholder='".$inputplaceholder."' ").(!isset($inputdefault)?"":"value='".$inputdefault."'")."><input type=submit value='Enter' name='submit'></form></td>")
+        .(isset($addlprocess)?"<td><a href='".$addlprocess.addslashes($rows[$txnidname])."'>".$addlprocesslabel."</a></td>":"")."</tr>");
 	//$grandtotal=$grandtotal+$total;
 } //end foreach
 
