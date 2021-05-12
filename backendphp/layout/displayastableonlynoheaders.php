@@ -69,7 +69,10 @@ foreach($datatoshow as $rows){
         $textfordisplay=$textfordisplay.((key($rows)!=$keyoflast)?"":(isset($runtotal)?"<td>".number_format($total,2)."</td>":"")
 					 .(isset($editprocess)?"<td><a href='".$editprocess.addslashes($rows[$txnidname])."'>".(isset($editprocesslabel)?$editprocesslabel:"Lookup")."</a></td>":"")
             .(isset($addlprocess)?"<td><a href='".$addlprocess.addslashes($rows[$txnidname]).'&action_token='.$_SESSION['action_token']."'>".$addlprocesslabel."</a></td>":"")
-					 .(isset($addlprocess2)?"<td><a href='".$addlprocess2.addslashes($rows[$txnidname]).'&action_token='.$_SESSION['action_token']."'>".$addlprocesslabel2."</a></td>":"")."</tr>");
+					 .(isset($addlprocess2)?"<td><a href='".$addlprocess2.addslashes($rows[$txnidname]).'&action_token='.$_SESSION['action_token']."'>".$addlprocesslabel2."</a></td>":"")
+                     .(!isset($inputprocess)?"":"<td><form method=post action='" . $inputprocess.$txnidname."=".$rows[$txnidname].'&action_token='.$_SESSION['action_token']."'>". $inputprocesslabel .
+				      "<input type='".(!isset($inputtype)?"text":$inputtype)."' name='".$inputname."' size=10 ".(!isset($inputplaceholder)?"":" placeholder='".$inputplaceholder."' ").(!isset($inputdefault)?"":"value='".$inputdefault."'")."><input type=submit value='Enter' name='submit'></form></td>")
+                     ."</tr>");
 } //end foreach
 $textfordisplay=$textfordisplay.(isset($totaltable)?'<tr>'.$totaltable.'</tr>':'')."</tbody></table><br>";
 echo $textfordisplay;
