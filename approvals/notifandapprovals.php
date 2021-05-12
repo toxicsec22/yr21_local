@@ -1,92 +1,50 @@
-<?php
-$path=$_SERVER['DOCUMENT_ROOT'];
-
-
-if(isset($_SESSION['(ak0)'])){
-    include_once $path.'/acrossyrs/logincodes/checkifloggedon.php';
-    ?>
-    <title>Notifications & Approvals</title>
+<title>Notifications & Approvals</title>
     <br><br>
     <H3>Notifications & Approvals</H3>
     <?php
-    $showbranches=false; include_once('../switchboard/contents.php');
-    include_once('../switchboard/scrollcss.php');
-} else {
+    session_start();
+$path=$_SERVER['DOCUMENT_ROOT'];
+if (!isset($_SESSION['(ak0)'])){
     //include_once $path.'/yr21/backendphp/functions/allallowedid.php';
     //TEMPORARILY PLACED THIS WHILE TESTING:
     include_once $path.'/acrossyrs/logincodes/checkifloggedon.php';
+} else {
+    include_once $path.'/acrossyrs/logincodes/checkifloggedon.php';
+    
+    $showbranches=false; 
+    include_once('../switchboard/contents.php');
+    include_once('../switchboard/scrollcss.php');
+
+    
 }
-
-
-//List Of Request Repairs
-include_once('../admin/motorvehiclesapproval.php');
 
 $cntres=0; $sp=0;
 $switchboard='';
 
 
+//List Of Request Repairs
+include_once('../admin/motorvehiclesapproval.php');
+//Leave approvals
+include_once('../attendance/leaveapprovals.php');
+
+
+
 // Sale Addons
  
 if (allowedToOpen(array(7004,7006),'1rtc')){ 
-
+$subtitle='Add-on for approval';
     if (allowedToOpen(7004,'1rtc')){ //SAM
         $condition='WHERE FApproved=0';
     }else{ //SC
         $condition='WHERE FApproved=1 AND Approved=0';
     }
-        $sqlsp='SELECT Branch,SaleNo,ao.ItemCode,CONCAT(Category,\' \',ItemDesc) as ItemDesc,ao.TxnID,txndesc as txntype,Qty,case when Approved=0 then "For Approval" when Approved=1 then "Approved" when Approved=2 then "Rejected" end as Status from invty_2salesubaddons ao join invty_2sale s on s.TxnID=ao.TxnID join invty_1items i on i.ItemCode=ao.ItemCode join invty_1category c on c.CatNo=i.CatNo join 1branches b on b.BranchNo=s.BranchNo join invty_0txntype t on t.txntypeid=s.txntype '.$condition.'';
-      // echo $sqlsp; exit();
-         $stmtsp=$link->query($sqlsp); $datatoshowsp=$stmtsp->fetchAll();    
-        $countsp=0;
-       if ($stmtsp->rowCount()>0){
-        $msgsp='<br>Add-on for approval:<table><tr><td>Branch</td><td>ItemCode</td><td>ItemDesc</td></tr>';
-        foreach($datatoshowsp as $rows){
-            $countsp++;
-            $msgsp=$msgsp.'<tr><td>'.$rows['Branch'].'</td><td>'.$rows['ItemCode'].'</td><td>'.$rows['ItemDesc'].'</td><td><a style="color:blue;text-decoration:none;" href="/'.$url_folder.'/invty/addons.php?w=Addons&TxnID='.$rows['TxnID'].'&Lookup=1&Branch='.$rows['Branch'].'&SaleNo='.$rows['SaleNo'].'&txntype='.$rows['txntype'].'" target=_blank>Look up</a></td></tr>';
-            
+        $sql='SELECT Branch,SaleNo,ao.ItemCode,CONCAT(Category,\' \',ItemDesc) as ItemDesc,ao.TxnID,txndesc as txntype,Qty,case when Approved=0 then "For Approval" when Approved=1 then "Approved" when Approved=2 then "Rejected" end as Status from invty_2salesubaddons ao join invty_2sale s on s.TxnID=ao.TxnID join invty_1items i on i.ItemCode=ao.ItemCode join invty_1category c on c.CatNo=i.CatNo join 1branches b on b.BranchNo=s.BranchNo join invty_0txntype t on t.txntypeid=s.txntype '.$condition.'';
+        $columnnames=array('Branch','ItemCode','ItemDesc');
+        $editprocess='../invty/addons.php?w=Addons&TxnID=';
+        $editprocesslabel='Lookup';
+        $txnidname='TxnID';
+        include '../backendphp/layout/displayastableonlynoheaders.php';
        }
-       echo $msgsp.'</tr></table><br>';
-       }
-       
-     } 
-
-// LEAVE REQUESTS -- HR 
-if (allowedToOpen(215,'1rtc')) {
-    include_once $path.'/acrossyrs/commonfunctions/listoptions.php';
-    echo comboBox($link,'SELECT * FROM `attend_0leavetype` WHERE LeaveNo NOT IN (11,12,13,15) ORDER BY LeaveName;','LeaveNo','LeaveName','leavetype');
-    
-    $stmthr=$link->query('SELECT lr.*, FullName, if(p.deptid IN (1,2,3,10),Branch,dept) AS `Branch/Dept`, LeaveName as LeaveType, CONCAT("SLBal: ", IFNULL(SLBal,0)," VLBal: ",IFNULL(VLBal,0)," BirthdayBal: ",IFNULL(BirthdayBal,0)) AS LeaveBalBeforeThisLeave, IF(SupervisorApproved=1,"Approved","Denied") AS SupervisorResponse, IF(Approved=1,"Approved","Denied") AS DeptHeadResponse FROM attend_3leaverequest lr JOIN `attend_30currentpositions` p ON lr.IDNo=p.IDNo JOIN `attend_0leavetype` lt ON lt.LeaveNo=lr.LeaveNo LEFT JOIN `attend_61leavebal` lb ON lb.IDNo=lr.IDNo WHERE MarkasReadByDeptHead=1 AND HRVerifiedByNo IS NULL');// Acknowledged=1 AND
-    
-$datatoshowhr=$stmthr->fetchAll();
-    if ($stmthr->rowCount()>0){
-        $colorcount=0;
-        $rcolor[0]="FFFFCC";
-        $rcolor[1]="FFFFFF";
-        
-        $colstoshow=array('FullName', 'Branch/Dept', 'FromDate', 'ToDate', 'LeaveType', 'Reason', 'LeaveBalBeforeThisLeave', 'SupervisorComment', 'SupervisorResponse', 'ApproveComment', 'DeptHeadResponse'); $coltitle='';
-        foreach ($colstoshow as $field) {$coltitle=$coltitle.'<td style="border: 1px solid black;">' . $field.'</td>'; }
-        $msghr='<br><div id="table-wrapper" style="width:89%">Verification of HR<div id="table-scroll" style="height:150px"><table style="border-collapse: collapse; border: 1px solid black;"><tr>'.$coltitle.'</tr><tr bgcolor='. $rcolor[$colorcount%2].'>';
-		// $countrec=0;
-    foreach($datatoshowhr as $rows){
-        $cols=''; $colorcount++; 
-        foreach ($colstoshow as $field) {$cols=$cols.'<td style="border: 1px solid black;">' . htmlcharwithbr($fromBRtoN,$rows[$field]).'</td>'; }
-        $msghr.='<form method="post" action="/'.$url_folder.'/attendance/leaverequest.php?w=HRVerified&TxnID='.$rows['TxnID'].'">'.$cols.'<td style="padding: 2px; border-bottom: 1px solid black;">';
-        if ($rows['Acknowledged']<>0) { $msghr.='<input type="hidden" name="action_token" value="'. html_escape($_SESSION['action_token']).'" />
-        Revise Leave Type, if needed <input type="text" name="LeaveType" list="leavetype" size=8></td>
-        <td style="padding: 2px;">Comments, if any: <input type="text" size=15 name="HRComment" placeholder="blank if no comment"></td>
-        <td style="padding: 2px;">&nbsp &nbsp &nbsp<input type="submit" name="submit" value="Verified & Recorded">';
-        } else {$msghr.='Requester must acknowledge';}
-        $msghr.='</td></form></tr><tr bgcolor='. $rcolor[$colorcount%2].'>';
-        // $countrec++;
-   }
-   $switchboard = $switchboard . $msghr.'<b style="color:red;">'.$colorcount.' unfinished leave'.($colorcount>1?'s':'').'.</b><br></tr></table></div></div>';
-    }
-    $cntres = $cntres + $stmthr->rowCount();
-    $stmthr=null;
-}
-
-
-
 
 
 // APPROVE RATES -- will now open a new page
@@ -98,7 +56,7 @@ if (allowedToOpen(7911,7912,'1rtc')) {
         $cntres+=$res['cntreq'];
     $msgcb='<br><div id="table-wrapper" style="width:80%;">Salary Rates for Approval :<div><table bgcolor="FFFFF">'
          .'';
-                $msgcb.='<tr><td><a href = "payroll/ratesforapproval.php"> '.$res['cntreq'].' record(s).</a>'.'</td>'
+                $msgcb.='<tr><td><a href = "../payroll/ratesforapproval.php"> '.$res['cntreq'].' record(s).</a>'.'</td>'
 
                         .'</tr>';
           $switchboard = $switchboard . $msgcb.'<br></table></div></div>';
@@ -153,14 +111,14 @@ WHERE FundsAccepted=1 AND ForLiqSubmission=0 AND DATEDIFF(CURDATE(),DATE_ADD(Dat
                 . '<td>'.htmlcharwithbr($fromBRtoN,$rows['Purpose']).'</td><td>'.$rows['Amount'].'</td>'
                 . '<td>'.$rows['Branch'].'</td>'
                 .'<td>'.$rows['Status'].'</td>'
-            .'<td><a href="/'.$url_folder.'/approvals/requestforfinancialasst.php?w=Lookup&TxnID='.$rows['TxnID'].'" target=blank>Lookup Request</a></td>'.'</tr>';}
+            .'<td><a href="../approvals/requestforfinancialasst.php?w=Lookup&TxnID='.$rows['TxnID'].'" target=blank>Lookup Request</a></td>'.'</tr>';}
     }else{
         $msgcb.='<tr><td>'.$rows['DateofRequest'].'</td><td>'.$rows['DateNeeded']
                 .'</td><td>'.$rows['Duration'].'</td><td>'.$rows['Requester'].'</td>'
                 . '<td>'.htmlcharwithbr($fromBRtoN,$rows['Purpose']).'</td><td>'.$rows['Amount'].'</td>'
                 . '<td>'.$rows['Branch'].'</td>'
                 .'<td>'.$rows['Status'].'</td>'
-            .'<td><a href="/'.$url_folder.'/approvals/requestforbudget.php?w=Lookup&TxnID='.$rows['TxnID'].'" target=blank>Lookup Request</a></td>'.'</tr>';
+            .'<td><a href="../approvals/requestforbudget.php?w=Lookup&TxnID='.$rows['TxnID'].'" target=blank>Lookup Request</a></td>'.'</tr>';
     }
  
    }
@@ -180,7 +138,7 @@ LEFT JOIN `1employees` e4 ON e4.IDNo=bl.DocsCompleteByNo
 WHERE DocsComplete=1 AND Liquidated=0 AND DATEDIFF(CURDATE(),DocsCompleteTS)>2 GROUP BY bl.TxnID';
 $stmtsp=$link->query($sqlsp); $datatoshowsp=$stmtsp->fetchAll(); $sp=0;
 if ($stmtsp->rowCount()>0){
-        $msgcb='<br><div style="background-color: white; " >Pending liquidations beyond 2 days:&nbsp; &nbsp;<a href="/'.$url_folder.'/approvals/requestforbudget.php?w=SetAsLiquidated" target=blank>Open List</a><table bgcolor="FFFFF">'
+        $msgcb='<br><div style="background-color: white; " >Pending liquidations beyond 2 days:&nbsp; &nbsp;<a href="../approvals/requestforbudget.php?w=SetAsLiquidated" target=blank>Open List</a><table bgcolor="FFFFF">'
                 . '<tr><td>Date Needed</td><td>Requester</td><td>Purpose</td><td>Amount</td><td>Charge to Branch</td><td>Docs Received On</td><td>Docs Received By</td></tr>';
     foreach($datatoshowsp as $rows){
         $sp++;
@@ -210,7 +168,7 @@ WHERE DocsComplete=0 AND ForLiqSubmission=1 AND bl.EncodedByNo='.$_SESSION['(ak0
         $msgcb='<br><div style="background-color: white; " >Released funds for budget requests:&nbsp; &nbsp;';
     foreach($datatoshowsp as $rows){
         $sp++;
-        $msgcb.='<a href="/'.$url_folder.'/approvals/requestforbudget.php?w=Lookup&TxnID='.$rows['TxnID'].'" target=blank>Lookup Request</a>&nbsp; &nbsp;';
+        $msgcb.='<a href="../approvals/requestforbudget.php?w=Lookup&TxnID='.$rows['TxnID'].'" target=blank>Lookup Request</a>&nbsp; &nbsp;';
    }
    $switchboard = $switchboard . $msgcb.'</div>';
    }
@@ -247,7 +205,7 @@ if (allowedToOpen(6507,'1rtc')){
                 . '<td>'.$rows['WeightinPoints'].'</td>'
                 .'<td>'.$rows['DateofIncident'].'</td>'
                 .'<td>'.$rows['Status'].'</td>'
-            .'<td><a href="hr/scores.php?w=Lookup&TxnID='.$rows['TxnID'].'" target=blank>Lookup</a></td>'.'</tr>';
+            .'<td><a href="../hr/scores.php?w=Lookup&TxnID='.$rows['TxnID'].'" target=blank>Lookup</a></td>'.'</tr>';
    }
   $switchboard = $switchboard . $msgcb.'<br></table></div></div>';
    }
@@ -274,7 +232,7 @@ if (allowedToOpen(6507,'1rtc')){
                 . '<td>'.$rows['WeightinPoints'].'</td>'
                 .'<td>'.$rows['DateofIncident'].'</td>'
                 .'<td>'.$rows['Status'].'</td>'
-            .'<td><a href="hr/scores.php?w=Lookup&TxnID='.$rows['TxnID'].'" target=blank>Lookup</a></td>'.'</tr>';
+            .'<td><a href="../hr/scores.php?w=Lookup&TxnID='.$rows['TxnID'].'" target=blank>Lookup</a></td>'.'</tr>';
    }
    $switchboard = $switchboard . $msgcb.'<br></table></div></div>';
    }
@@ -308,7 +266,7 @@ if (allowedToOpen(8191,'1rtc')){
 					<td>'.$resroa['OpsStatus'].'</td>
 					<td>'.$resroa['ExecStatus'].'</td>
 					<td>'.$resroa['Valid'].'</td>
-					<td><a href="payroll/requestoicallowance.php">Lookup</a></td>
+					<td><a href="../payroll/requestoicallowance.php">Lookup</a></td>
 			</tr>';
    }
    $switchboard = $switchboard . $msgcb.'<br></table></div></div>';
@@ -351,7 +309,7 @@ if (allowedToOpen(8201,'1rtc')){
 					<td>'.$resra['OpsStatus'].'</td>
 					<td>'.$resra['HRStatus'].'</td>
 					<td>'.$resra['FinanceStatus'].'</td>
-					<td><a href="approvals/relocation.php">Lookup</a></td>
+					<td><a href="../approvals/relocation.php">Lookup</a></td>
 			</tr>';
    }
    $switchboard = $switchboard . $msgcb.'<br></table></div></div>';
@@ -401,7 +359,7 @@ JOIN `1branches` b ON b.BranchNo=bl.BranchNo WHERE  (RequestCompleted=1 AND Appr
                                 . '<td>'.$rows['Card'].'</td>'
                                 . '<td>'.$rows['Branch'].'</td>'
                         .'<td><a  
-href="approvals/requestforbudget.php?w=Lookup&TxnID='.$rows['TxnID'].'"  
+href="../approvals/requestforbudget.php?w=Lookup&TxnID='.$rows['TxnID'].'"  
 target=blank>Lookup</a></td>'.'</tr>';
     }
     $switchboard = $switchboard . $msgcb.'<br></table></div>';
@@ -420,7 +378,7 @@ if (allowedToOpen(53601,'1rtc')) {
         $msgcb='<br><div id="table-wrapper" style="width:80%;">Request for Certificate of Employment / Printed Payslips:<div><table bgcolor="FFFFF">'
             .'';
                     $sp++;
-                    $msgcb.='<tr><td><a href = "hr/formrequest.php">Look up '.$res['cntreq'].' request(s).</a>'.'</td>'
+                    $msgcb.='<tr><td><a href = "../hr/formrequest.php">Look up '.$res['cntreq'].' request(s).</a>'.'</td>'
 
                             .'</tr>';
             $switchboard = $switchboard . $msgcb.'<br></table></div></div>';
@@ -448,7 +406,7 @@ if (allowedToOpen(array(63001,100),'1rtc')) {
         $msgcb='<br><div id="table-wrapper" style="width:80%;">Report Incorrect Payroll:<div><table bgcolor="FFFFF">'
             .'';
                     $sp++;
-                    $msgcb.='<tr><td><a href = "approvals/payadjrequest.php">Look up '.$res['cntreq'].' request(s).</a>'.'</td>'
+                    $msgcb.='<tr><td><a href = "../approvals/payadjrequest.php">Look up '.$res['cntreq'].' request(s).</a>'.'</td>'
 
                             .'</tr>';
             $switchboard = $switchboard . $msgcb.'<br></table></div></div>';
@@ -477,7 +435,7 @@ if (allowedToOpen(6302,'1rtc')) {
         $msgcb='<br><div id="table-wrapper" style="width:80%;">Request For Personnel Action:<div><table bgcolor="FFFFF">'
             .'';
                     $sp++;
-                    $msgcb.='<tr><td><a href = "hr/requestforpa.php">Look up '.$res['cntreq'].' request(s).</a>'.'</td>'
+                    $msgcb.='<tr><td><a href = "../hr/requestforpa.php">Look up '.$res['cntreq'].' request(s).</a>'.'</td>'
 
                             .'</tr>';
             $switchboard = $switchboard . $msgcb.'<br></table></div></div>';
@@ -539,7 +497,7 @@ if ((allowedToOpen(220,'1rtc'))){
         foreach($datatoshowsp as $rows){
                 $sp++;
                 $msgcb.='<tr><td>'.$rows['ForPosition'].'</td><td>'.$rows['RequestedBy']
-                                .'</td><td><a href="sysadmin/assignpermission.php?w=AccessPerPosition&Request=1&ForPositionID='.$rows['TxnID'].'">Lookup</a></td>'
+                                .'</td><td><a href="../sysadmin/assignpermission.php?w=AccessPerPosition&Request=1&ForPositionID='.$rows['TxnID'].'">Lookup</a></td>'
                         .'</tr>';
     }
     $switchboard = $switchboard . $msgcb.'<br></table></div></div>';
@@ -588,7 +546,7 @@ if (allowedToOpen(5353,'1rtc') or allowedToOpen(5354,'1rtc') or allowedToOpen(53
                                 .'</td>'
                                 . '<td>'.$res['DateRequested'].'</td>'
                                 . '<td>'.$res['FinalApproval'].'</td>'
-                                . '<td>' .'<a href = "approvals/requestforfinancialasst.php?w=Lookup&TxnID='.$res['TxnID'].'">Look up </a>'.'</td>'
+                                . '<td>' .'<a href = "../approvals/requestforfinancialasst.php?w=Lookup&TxnID='.$res['TxnID'].'">Look up </a>'.'</td>'
 
                         .'</tr>';
     }
@@ -606,7 +564,7 @@ $stmt=$link->query($sql); $res=$stmt->fetch();
    $msgcb='<br><div id="table-wrapper" style="width:80%;">Shoutout For Approval:<div><table bgcolor="FFFFF">'
         .'';
                $sp++;
-               $msgcb.='<tr><td><a href = "mktg/shoutout.php?w=List">Look up '.$res['cntreq'].' shoutout(s).</a>'.'</td>'
+               $msgcb.='<tr><td><a href = "../mktg/shoutout.php?w=List">Look up '.$res['cntreq'].' shoutout(s).</a>'.'</td>'
                        .'</tr>';
          $switchboard = $switchboard . $msgcb.'<br></table></div></div>';
    }
@@ -630,17 +588,17 @@ $cntres=$cntres + $sp;
  if (allowedToOpen(array(6081,6082,6110),'1rtc')) {
 
     if(allowedToOpen(6082,'1rtc')){ //direct sa AWOL Report
-        $dlink='attendance/lookupperteam.php?w=AWOLCount';
+        $dlink='../attendance/lookupperteam.php?w=AWOLCount';
         $dcondi='';
     }  else if(allowedToOpen(6110,'1rtc')){ //direct sa remarks
         $stmt0=$link->query('SELECT deptid FROM `attend_30currentpositions` WHERE IDNo='.$_SESSION['(ak0)']);
         $res0=$stmt0->fetch();
         
         $dcondi='AND deptid IN ('.(($res0['deptid']==70)?'70,10':$res0['deptid']).')';
-        $dlink='attendance/encodeattend.php?w=RemarksOfDept';
+        $dlink='../attendance/encodeattend.php?w=RemarksOfDept';
     } 
     else { //direct sa remarks
-        $dlink='attendance/encodeattend.php?w=RemarksOfDept';
+        $dlink='../attendance/encodeattend.php?w=RemarksOfDept';
         $dcondi='AND (LatestSupervisorIDNo='.$_SESSION['(ak0)'].' OR deptheadpositionid='.$_SESSION['&pos'].')';
     }
 
@@ -699,11 +657,11 @@ if (allowedToOpen(6503,'1rtc')){
    if ($stmtsp->rowCount()>0){
     $cols=array('Re_IDNo', 'Regarding', 'Branch', 'Report', 'ReportedBy'); 
     $coltitle=''; foreach ($cols as $col) { $coltitle=$coltitle.'<td>'.$col.'</td>';}
-    $msgsp='<div><br>Unread confidential reports: <a href="/'.$url_folder.'/generalinfo/confireportjye.php">Open List</a> <table bgcolor="FFFFF"><tr>'.$coltitle.'<td>Mark as Read</td></tr><tr>';
+    $msgsp='<div><br>Unread confidential reports: <a href="../generalinfo/confireportjye.php">Open List</a> <table bgcolor="FFFFF"><tr>'.$coltitle.'<td>Mark as Read</td></tr><tr>';
     foreach($datatoshowsp as $rows){
         $countsp++;
         $colsql=''; foreach ($cols as $col) { $colsql=$colsql.'<td>'.htmlcharwithbr($fromBRtoN,$rows[$col]).'</td>';}
-        $msgsp=$msgsp.$colsql.'<td><a href="/'.$url_folder.'/generalinfo/confireportjye.php?w=SetAsRead&ReportType='.$rows['ReportType'].'&ReadbyMgt=1&TxnID='.$rows['TxnID'].'&action_token='.$_SESSION['action_token'].'">Read</a></td></tr><tr>';
+        $msgsp=$msgsp.$colsql.'<td><a href="../generalinfo/confireportjye.php?w=SetAsRead&ReportType='.$rows['ReportType'].'&ReadbyMgt=1&TxnID='.$rows['TxnID'].'&action_token='.$_SESSION['action_token'].'">Read</a></td></tr><tr>';
     }
        $switchboard = $switchboard . $msgsp.'</tr></table></div>';               
    }   
@@ -729,7 +687,7 @@ if (allowedToOpen(6505,'1rtc')){
     $datatoshowsp=$stmtsp->fetchAll(PDO::FETCH_ASSOC);    
     $countsp=0;
     if ($stmtsp->rowCount()>0){
-        $msgsp='<div><br>Unresolved incident reports (<b>'.$stmtsp->rowCount().'</b>): <a href="/'.$url_folder.'/hr/incidentreporthr.php">Open List</a></div>';
+        $msgsp='<div><br>Unresolved incident reports (<b>'.$stmtsp->rowCount().'</b>): <a href="../hr/incidentreporthr.php">Open List</a></div>';
 
         $switchboard = $switchboard . $msgsp;
 
@@ -750,7 +708,7 @@ if (allowedToOpen(6505,'1rtc')){
     foreach($datatoshowsp as $rows){
         $countsp++;
         $colsql=''; foreach ($cols as $col) { $colsql=$colsql.'<td style="font-size: small;">'.htmlcharwithbr($fromBRtoN,$rows[$col]).'</td>';}
-        // if (allowedToOpen(217,'1rtc')) { $setread='<td><a href="/'.$url_folder.'/hr/incidentreporthr.php?w=SetAsRead&ReportType='.$rows['ReportType'].'&ReadbyMgt=1&TxnID='.$rows['TxnID'].'&action_token='.$_SESSION['action_token'].'">Read</a></td>';} else {$setread='<td>Unread by HR</td>';}
+        
         $msgsp=$msgsp.$colsql.'</tr><tr>'; //$setread
     }
         // echo $msgsp.'</tr></table></div>';
@@ -772,11 +730,11 @@ join `1employees` e on e.IDNo=rc.EncodedByNo WHERE ReadByOps=0';
    if ($stmtsp->rowCount()>0){
     $cols=array('Branch', 'BranchConcern','ReportedBy', 'TimeStamp'); 
     $coltitle=''; foreach ($cols as $col) { $coltitle=$coltitle.'<td>'.$col.'</td>';}
-    $msgsp='<div><br>Unread branch concerns: <a href="/'.$url_folder.'/invty/branchreports.php?w=BranchConcerns">Open List</a> <table bgcolor="FFFFF"><tr>'.$coltitle.'<td>Mark as Read</td></tr><tr>';
+    $msgsp='<div><br>Unread branch concerns: <a href="../invty/branchreports.php?w=BranchConcerns">Open List</a> <table bgcolor="FFFFF"><tr>'.$coltitle.'<td>Mark as Read</td></tr><tr>';
     foreach($datatoshowsp as $rows){
         $countsp++;
         $colsql=''; foreach ($cols as $col) { $colsql=$colsql.'<td>'.htmlcharwithbr($fromBRtoN,$rows[$col]).'</td>';}
-        if (allowedToOpen(7102,'1rtc')) { $setread='<td><a href="/'.$url_folder.'/invty/branchreports.php?w=SetAsRead&TxnID='.$rows['TxnID'].'&action_token='.$_SESSION['action_token'].'">Set As Read</a></td>';} else {$setread='<td>Unread by Ops</td>';}
+        if (allowedToOpen(7102,'1rtc')) { $setread='<td><a href="../invty/branchreports.php?w=SetAsRead&TxnID='.$rows['TxnID'].'&action_token='.$_SESSION['action_token'].'">Set As Read</a></td>';} else {$setread='<td>Unread by Ops</td>';}
         $msgsp=$msgsp.$colsql.$setread.'</tr><tr>';
     }
         $switchboard = $switchboard . $msgsp.'</tr></table></div>';               
@@ -793,7 +751,7 @@ join `1employees` e on e.IDNo=rc.EncodedByNo WHERE ReadByOps=0';
     $msgcb='<br><div id="table-wrapper" style="width:80%;">Pre-Approved OT Request :<div><table bgcolor="FFFFF">'
          .'';
                 $sp++;
-                $msgcb.='<tr><td><a href = "approvals/otrequest.php">Look up '.$res['cntreq'].' request(s).</a>'.'</td>'
+                $msgcb.='<tr><td><a href = "../approvals/otrequest.php">Look up '.$res['cntreq'].' request(s).</a>'.'</td>'
 
                         .'</tr>';
           $switchboard = $switchboard . $msgcb.'<br></table></div></div>';
@@ -809,7 +767,7 @@ join `1employees` e on e.IDNo=rc.EncodedByNo WHERE ReadByOps=0';
     $msgcb='<br><div id="table-wrapper" style="width:80%;">Pre-Approved WFH Request :<div><table bgcolor="FFFFF">'
          .'';
                 $sp++;
-                $msgcb.='<tr><td><a href = "approvals/wfhrequest.php">Look up '.$res['cntreq'].' request(s).</a>'.'</td>'
+                $msgcb.='<tr><td><a href = "../approvals/wfhrequest.php">Look up '.$res['cntreq'].' request(s).</a>'.'</td>'
 
                         .'</tr>';
           $switchboard = $switchboard . $msgcb.'<br></table></div></div>';
@@ -845,7 +803,7 @@ echo comboBox($link,'SELECT EntityID, Entity FROM acctg_1budgetentities ','Entit
    if ($stmtsp->rowCount()>0){
     $msgsp='<br><div><br>Expenses for approval:<table border="1px solid black" style="border-collapse:collapse;"><tr>';
     foreach($datatoshowsp as $rows){
-        $msgsp=$msgsp.'<form method="post" action="/'.$url_folder.'/acctg/praddmain.php?w=ApproveRequestforExpense" enctype="multipart/form-data">'
+        $msgsp=$msgsp.'<form method="post" action="../acctg/praddmain.php?w=ApproveRequestforExpense" enctype="multipart/form-data">'
                 . '<td style="width:85px;">'.$rows['Date'].'</td><td>'.$rows['TimeStamp'].'</td><td>'.$rows['Branch'].'</td>
         <td>&nbsp &nbsp '.($rows['eeswitch']==4?'WaybillNo':($rows['eeswitch']==7?'Txfr Receipt':'Particulars')).' &nbsp<input type=text size=45 name=Particulars value="'.htmlcharwithbr($fromBRtoN,$rows['Particulars']).'" autocomplete="off" onclick="IsEmpty(Particulars);"></td>
 		'.(!empty($rows['BudgetDesc'])?'<td style="white-space: pre;">&nbsp &nbsp Excess from Pre-approved for <b>'.$rows['BudgetDesc'].'</b></td>':'').'
@@ -876,7 +834,7 @@ echo comboBox($link,'SELECT EntityID, Entity FROM acctg_1budgetentities ','Entit
    if ($stmtsp->rowCount()>0){
     $msgsp='<div><br>Freight-Client for approval:<table><tr>';
     foreach($datatoshowsp as $rows){
-        $msgsp=$msgsp.'<form method="post" action="/'.$url_folder.'/acctg/praddmain.php?w=ApproveFreightClientExpense" enctype="multipart/form-data"><td>'.$rows['Branch'].'</td>
+        $msgsp=$msgsp.'<form method="post" action="../acctg/praddmain.php?w=ApproveFreightClientExpense" enctype="multipart/form-data"><td>'.$rows['Branch'].'</td>
         <td>&nbsp &nbsp &nbsp'.$rows['Date'].'</td><td>&nbsp &nbsp &nbsp'.htmlcharwithbr($fromBRtoN,$rows['Particulars']).'</td>
         <td>&nbsp &nbsp Amount &nbsp<input type=text size=5 name=Amount value='.$rows['Amount'].' autocomplete="off" required=1 onclick="IsEmpty(Amount);"></td>
         <td>From Budget Of: <input type="text" name="FromBudgetOf" list="entities" value="'.$rows['Branch'].'"></td><td><input type="hidden" name="action_token" value="'. html_escape($_SESSION['action_token']).'" /><input type=hidden name=ApprovalID value='.$rows['ApprovalId'].'>
@@ -901,8 +859,8 @@ if (allowedToOpen(6929,'1rtc')){
     $msgsp='<br><div id="table-wrapper" >SPECIAL PRICE for approval:<div id="table-scroll"><table>';
     foreach($datatoshowsp as $rows){
         $countsp++;
-        // $msgsp=$msgsp.'<tr><td><a style="color:blue;text-decoration:none;" href="/'.$url_folder.'/invty/addeditsale.php?TxnID='.$rows['TxnID'].'&txntype='.$rows['txntype'].'" target=_blank>'.$rows['Branch'].' Inv '.$rows['SaleNo'].'</a></td></tr>';
-        $msgsp=$msgsp.'<tr><td>'.$rows['Branch'].'</td><td>'.$rows['SaleNo'].'</td><td><a style="color:blue;text-decoration:none;" href="/'.$url_folder.'/invty/addeditsale.php?TxnID='.$rows['TxnID'].'&txntype='.$rows['txntype'].'&specprice=1" target=_blank>Look up</a></td></tr>';
+        
+        $msgsp=$msgsp.'<tr><td>'.$rows['Branch'].'</td><td>'.$rows['SaleNo'].'</td><td><a style="color:blue;text-decoration:none;" href="../invty/addeditsale.php?TxnID='.$rows['TxnID'].'&txntype='.$rows['txntype'].'&specprice=1" target=_blank>Look up</a></td></tr>';
         
    }
    echo $msgsp.'</tr></table><br></div></div>';
@@ -925,7 +883,7 @@ $sqlsp=$sqlsp.' UNION SELECT b.Branch,sm.Date from `approvals_2salesreturns` sr 
     $msgsp='<br><div><br>RETURNS for approval:<table><tr>';
     foreach($datatoshowsp as $rows){
         $countsp++;
-        $msgsp=$msgsp.'<td><a href="/'.$url_folder.'/invty/addsalemain.php?w=Return&saletype=5"</a>'.$rows['Branch'].' from Sale on '.$rows['Date'].'</td>'.($countsp%15==0?'</tr><tr>':'');
+        $msgsp=$msgsp.'<td><a href="../invty/addsalemain.php?w=Return&saletype=5"</a>'.$rows['Branch'].' from Sale on '.$rows['Date'].'</td>'.($countsp%15==0?'</tr><tr>':'');
         
    }
    echo $msgsp.'</tr></table><br><br></div>';
@@ -943,7 +901,7 @@ if (allowedToOpen(208,'1rtc')){
     $msgsp='<br><div><br>Cancelled SRS:<table><tr>';
     foreach($datatoshowsp as $rows){
         $countsp++;
-        $msgsp=$msgsp.'<td><a href="/'.$url_folder.'/invty/addsalemain.php?w=Cancel&saletype=cancel5"</a>'.$rows['Branch'].'</td>'.($countsp%15==0?'</tr><tr>':'');
+        $msgsp=$msgsp.'<td><a href="../invty/addsalemain.php?w=Cancel&saletype=cancel5"</a>'.$rows['Branch'].'</td>'.($countsp%15==0?'</tr><tr>':'');
         
    }
    echo $msgsp.'</tr></table><br><br></div>';
@@ -963,7 +921,7 @@ if (allowedToOpen(209,'1rtc')){
     $msgsp='<br><div><br>STORE USED for approval:<table bgcolor="FFFFF"><tr>';
     foreach($datatoshowsp as $rows){
         $countsp++;
-        $msgsp=$msgsp.'<td><a href="/'.$url_folder.'/invty/addmrrmain.php?w=StoreUsed&saletype=9"</a>'.$rows['Branch'].' -  '.htmlcharwithbr($fromBRtoN,$rows['Category']).' '.htmlcharwithbr($fromBRtoN,$rows['ItemDesc']).'</td>'.($countsp%15==0?'</tr><tr>':'');
+        $msgsp=$msgsp.'<td><a href="../invty/addmrrmain.php?w=StoreUsed&saletype=9"</a>'.$rows['Branch'].' -  '.htmlcharwithbr($fromBRtoN,$rows['Category']).' '.htmlcharwithbr($fromBRtoN,$rows['ItemDesc']).'</td>'.($countsp%15==0?'</tr><tr>':'');
         
    }
    echo $msgsp.'</tr></table><br><br></div>';
@@ -984,7 +942,7 @@ if (allowedToOpen(210,'1rtc')){
     $msgsp='<br><div><br>DEFECTIVE for approval:<table bgcolor="FFFFF"><tr>';
     foreach($datatoshowsp as $rows){
         $countsp++;
-        $msgsp=$msgsp.'<td><a href="/'.$url_folder.'/invty/setasdefective.php?w=RequestSetDefective"</a>'.$rows['Branch'].': '.$rows['Qty'].' '.$rows['Unit'].' '.htmlcharwithbr($fromBRtoN,$rows['Category']).' '.htmlcharwithbr($fromBRtoN,$rows['ItemDesc']).'</td>'.($countsp%15==0?'</tr><tr>':'');
+        $msgsp=$msgsp.'<td><a href="../invty/setasdefective.php?w=RequestSetDefective"</a>'.$rows['Branch'].': '.$rows['Qty'].' '.$rows['Unit'].' '.htmlcharwithbr($fromBRtoN,$rows['Category']).' '.htmlcharwithbr($fromBRtoN,$rows['ItemDesc']).'</td>'.($countsp%15==0?'</tr><tr>':'');
         
    }
    echo $msgsp.'</tr></table><br><br></div>';
@@ -993,123 +951,7 @@ if (allowedToOpen(210,'1rtc')){
  } 
  $link=!isset($link)?connect_db(''.$currentyr.'_1rtc',0):$link;
   
- 
- if (allowedToOpen(213,'1rtc')) {
-	if (allowedToOpen(2131,'1rtc')) { //Rce/jye
-		$cond=' AND LatestSupervisorIDNo IN (1001,1002) ';
-	}
-	else if (allowedToOpen(2133,'1rtc'))  { //Stores Branch Heads
-		$stmt0=$link->query('SELECT IFNULL(GROUP_CONCAT(BranchNo),0) AS BranchNo FROM attend_1branchgroups WHERE OpsSpecialist='.$_SESSION['(ak0)'].'');
-		$res0=$stmt0->fetch();
-		// $cond2=' AND p.BranchNo IN ('.$res0['BranchNo'].')';
-		// $cond=$cond2.' AND p.PositionID IN (32,37,81)';
-		$cond=' AND (p.BranchNo IN ('.$res0['BranchNo'].'))';
-		// $cond=$cond2.' AND p.PositionID IN (32,37,81)) OR lr.IDNo IN (SELECT IDNo FROM attend_30currentpositions WHERE LatestSupervisorIDNo='.$_SESSION['(ak0)'].' AND SupervisorApproved=0)';
-	} else if (allowedToOpen(6110,'1rtc')){ //assistants
-           $stmt0=$link->query('SELECT deptid FROM attend_0positions WHERE PositionID='.$_SESSION['&pos']);
-           $res0=$stmt0->fetch();
-           $cond=' AND p.deptid IN ('.$res0['deptid'].')'; }
-	else { //LatestSupervisorIDNo
-		$cond=' AND p.LatestSupervisorIDNo='.$_SESSION['(ak0)'];
-	}
-	//First Approval
-	$stmtsuper1=$link->query('SELECT lr.*, FullName,LatestSupervisorIDNo, Branch, LeaveName as LeaveType, CONCAT("SLBal: ", IFNULL(SLBal,0)," VLBal: ",IFNULL(VLBal,0)," BirthdayBal: ",IFNULL(BirthdayBal,0)) AS LeaveBalBeforeThisLeave, lr.TimeStamp as RequestTS 
-        FROM attend_3leaverequest lr JOIN `attend_30currentpositions` p ON lr.IDNo=p.IDNo LEFT JOIN `attend_61leavebal` lb ON lb.IDNo=lr.IDNo
-        JOIN `attend_0leavetype` lt ON lt.LeaveNo=lr.LeaveNo WHERE SupervisorApproved=0 '.$cond);
-    $datatoshowsuper=$stmtsuper1->fetchAll();
-    if ($stmtsuper1->rowCount()>0){
-        $colstoshow=array('FullName', 'Branch', 'FromDate', 'ToDate', 'LeaveType', 'Reason', 'LeaveBalBeforeThisLeave','RequestTS'); $coltitle='';
-        foreach ($colstoshow as $field) {$coltitle=$coltitle.'<td>' . $field.'</td>'; }
-        $msgsuper='<br><div><br>Leave Requests<table bgcolor="FFFFF"><tr>'.$coltitle.'</tr><tr>';
-    
-		foreach($datatoshowsuper as $rows){
-			$cols='';
-			foreach ($colstoshow as $field) {$cols=$cols.'<td>' . htmlcharwithbr($fromBRtoN,$rows[$field]).'</td>'; }
-				$msgsuper.='<form method="post" action="/'.$url_folder.'/attendance/leaverequest.php?w=SupervisorApprove&TxnID='.$rows['TxnID'].'">'.$cols
-				.((($rows['LatestSupervisorIDNo']==$_SESSION['(ak0)']) OR (allowedToOpen(2131,'1rtc')))?'<td><input type="hidden" name="action_token" value="'. html_escape($_SESSION['action_token']).'" />
-				Comments, if any: <input type="text" size=15 name="SupervisorComment" placeholder="blank if no comment"></td>
-				<td>&nbsp &nbsp &nbsp<input type="submit" name="submit" value="Approve">&nbsp &nbsp &nbsp<input type="submit" name="submit" value="Deny"></td>':'').'</form>';
-			$msgsuper.='</tr><tr>';
-			}
-			
-		echo $msgsuper.'<br></tr></table><br><br></div>';
-	}
-	
-	$sqlall='SELECT lr.*,lr.TimeStamp AS RequestTS, FullName, Branch, LeaveName as LeaveType, CONCAT("SLBal: ", IFNULL(SLBal,0)," VLBal: ",IFNULL(VLBal,0)," BirthdayBal: ",IFNULL(BirthdayBal,0)) AS LeaveBalBeforeThisLeave, IF(SupervisorApproved=1,"Approved","Denied") AS SupervisorResponse';
-	
-	//Final approval 
-	// leave requests status before dept head response
-	if ((allowedToOpen(2135,'1rtc')) OR (allowedToOpen(2134,'1rtc'))){
-			if (allowedToOpen(2135,'1rtc')){ //Ops Manager
-				$cond=' AND p.deptid=10';
-			}
-			else if (allowedToOpen(2134,'1rtc')) { //Acctg Associate
-				$cond=' AND p.PositionID IN (13,131,132)';
-			}
-			$stmtsuper1=$link->query(''.$sqlall.' FROM attend_3leaverequest lr JOIN `attend_30currentpositions` p ON lr.IDNo=p.IDNo LEFT JOIN `attend_61leavebal` lb ON lb.IDNo=lr.IDNo JOIN `attend_0leavetype` lt ON lt.LeaveNo=lr.LeaveNo WHERE SupervisorApproved<>0 AND Approved=0 AND MarkasReadByDeptHead=0 AND (Acknowledged=0 OR (HRVerifiedByNo IS NULL)) '.$cond);
-			
-			$datatoshowsuper=$stmtsuper1->fetchAll();
-			if ($stmtsuper1->rowCount()>0){
-				$colstoshow=array('FullName', 'Branch', 'FromDate', 'ToDate','RequestTS', 'LeaveType', 'Reason','LeaveBalBeforeThisLeave','SupervisorComment','SupervisorResponse','SupervisorTS'); $coltitle='';
-				foreach ($colstoshow as $field) {$coltitle=$coltitle.'<td>' . $field.'</td>'; }
-				$msgsuper2='<br><div><br>Leave Requests<table bgcolor="FFFFF"><tr>'.$coltitle.'</tr><tr>';
-			foreach($datatoshowsuper as $rows){
-				$cols='';
-				foreach ($colstoshow as $field) {$cols=$cols.'<td>' . htmlcharwithbr($fromBRtoN,$rows[$field]).'</td>'; }
-				$msgsuper2=$msgsuper2.'<form method="post" action="/'.$url_folder.'/attendance/leaverequest.php?w=Approve&TxnID='.$rows['TxnID'].'">'.$cols
-		.'<td><input type="hidden" name="action_token" value="'. html_escape($_SESSION['action_token']).'" />
-		Comments, if any: <input type="text" size=15 name="ApproveComment" placeholder="blank if no comment"></td>
-		<td>&nbsp &nbsp &nbsp<input type="submit" name="submit" value="Approve">&nbsp &nbsp &nbsp<input type="submit" name="submit" value="Deny"></td></form></tr><tr>';
-				}
-			echo $msgsuper2.'<br></tr></table><br><br></div>';
-			
-		}
-	}
-	else { 
-	$stmtsuper1=$link->query(''.$sqlall.', IF(p.PositionID IN (13,131,132),"Waiting for final approval","'.(!allowedToOpen(2133,'1rtc')?"Waiting for Dept Head response":"Waiting for Manager response").'") AS Next_Action_Must_Be FROM attend_3leaverequest lr JOIN `attend_30currentpositions` p ON lr.IDNo=p.IDNo LEFT JOIN `attend_61leavebal` lb ON lb.IDNo=lr.IDNo JOIN `attend_0leavetype` lt ON lt.LeaveNo=lr.LeaveNo WHERE SupervisorApproved<>0 AND Approved=0 AND MarkasReadByDeptHead=0 AND (Acknowledged=0 OR (HRVerifiedByNo IS NULL)) '.$cond);
-		$datatoshowsuper=$stmtsuper1->fetchAll();
-		if ($stmtsuper1->rowCount()>0){
-			$colstoshow=array('FullName', 'Branch', 'FromDate', 'ToDate','RequestTS', 'LeaveType', 'Reason','LeaveBalBeforeThisLeave','SupervisorComment','SupervisorResponse','SupervisorTS','Next_Action_Must_Be'); $coltitle='';
-			foreach ($colstoshow as $field) {$coltitle=$coltitle.'<td>' . $field.'</td>'; }
-			$msgsuper2='<br><div><br>Status of Leave Requests (for dept head response)<table bgcolor="FFFFF"><tr>'.$coltitle.'</tr><tr>';
-		foreach($datatoshowsuper as $rows){
-			$cols='';
-			foreach ($colstoshow as $field) {$cols=$cols.'<td>' . htmlcharwithbr($fromBRtoN,$rows[$field]).'</td>'; }
-			$msgsuper2=$msgsuper2.$cols.'</tr><tr>';
-			}
-		echo $msgsuper2.'<br></tr></table><br><br></div>';
-	   }
-	}
-}   
 
-  
-// LEAVE REQUESTS -- DEPT HEAD
-if (allowedToOpen(214,'1rtc')) {
-	$stmtsuper2=$link->query('SELECT lr.*, FullName, Branch, LeaveName as LeaveType, CONCAT("SLBal: ", IFNULL(SLBal,0)," VLBal: ",IFNULL(VLBal,0)," BirthdayBal: ",IFNULL(BirthdayBal,0)) AS LeaveBalBeforeThisLeave, IF(SupervisorApproved=1,"Approved",IF(SupervisorApproved=2,"Denied","")) AS SupervisorResponse,IF(Approved=1,"Approved",IF(Approved=2,"Denied","")) AS FinalResponse, e1.Nickname AS FinalApprover, e.Nickname AS Supervisor, lr.TimeStamp as RequestTS FROM attend_3leaverequest lr JOIN `attend_30currentpositions` p ON lr.IDNo=p.IDNo
-		JOIN `attend_0leavetype` lt ON lt.LeaveNo=lr.LeaveNo JOIN `1employees` e on e.IDNo=lr.SupervisorByNo
-		LEFT JOIN `attend_61leavebal` lb ON lb.IDNo=lr.IDNo LEFT JOIN `1employees` e1 on e1.IDNo=lr.ApprovedByNo
-		WHERE SupervisorApproved<>0 AND IF(p.PositionID IN (13,131,132,32,37,50,81,33,38),Approved<>0,Approved<>1) AND MarkasReadByDeptHead=0 AND '.((allowedToOpen(2131,'1rtc'))?'deptheadpositionid IN (99,100)':'deptheadpositionid='.$_SESSION['&pos'].'').'');
-		
-		
-	$datatoshowsuper=$stmtsuper2->fetchAll();
-	if ($stmtsuper2->rowCount()>0){
-		$colstoshow2=array('FullName', 'Branch', 'FromDate', 'ToDate', 'LeaveType', 'Reason','RequestTS', 'LeaveBalBeforeThisLeave', 'SupervisorComment', 'SupervisorResponse', 'Supervisor','SupervisorTS','FinalResponse','FinalApprover','ApproveTS'); $coltitle2='';
-		foreach ($colstoshow2 as $field) {$coltitle2=$coltitle2.'<td>' . $field.'</td>'; }
-		$msgsuper2='<br><div><br>Leave Requests<table bgcolor="FFFFF"><tr>'.$coltitle2.'</tr><tr>';
-	foreach($datatoshowsuper as $rows){
-		$cols2='';
-		foreach ($colstoshow2 as $field) {$cols2=$cols2.'<td>' . htmlcharwithbr($fromBRtoN,$rows[$field]).'</td>'; }
-		// $msgsuper2=$msgsuper2.'<form method="post" action="/'.$url_folder.'/attendance/leaverequest.php?w=Approve&TxnID='.$rows['TxnID'].'">'.$cols2
-		$msgsuper2=$msgsuper2.'<form method="post" action="/'.$url_folder.'/attendance/leaverequest.php?w='.($rows['Approved']<>0?'MarkasReadByDeptHead':'Approve').'&TxnID='.$rows['TxnID'].'">'.$cols2
-		.'<td><input type="hidden" name="action_token" value="'. html_escape($_SESSION['action_token']).'" />'.($rows['Approved']==0?'Comments, if any: <input type="text" size=15 name="ApproveComment" placeholder="blank if no comment">':'').'
-		</td>
-		<td>&nbsp &nbsp &nbsp<input type="submit" name="submit" value="'.($rows['Approved']<>0?'MarkasReadByDeptHead':'Approve').'">&nbsp &nbsp &nbsp<input type="submit" name="submit" value="'.($rows['Approved']<>0?'Set As Incomplete':'Deny').'"></td></form></tr><tr>';
-   }
-   echo $msgsuper2.'<br></tr></table><br><br></div>';
-   }
-   $stmtsuper2=null;
-}
-	
 
 // Direct Deposits for approval
 if (allowedToOpen(5211,'1rtc')){
@@ -1123,7 +965,7 @@ where a.`Approved?`=0 Order by DirectDepDate, a.TimeStamp, b.Branch';
     $stmtsp=$link->query($sqlsp); $datatoshowsp=$stmtsp->fetchAll(PDO::FETCH_ASSOC);  
     
     if ($stmtsp->rowCount()>0){
-        $submitprocess='/'.$url_folder.'/acctg/praddmain.php?w=DDApproval';
+        $submitprocess='../acctg/praddmain.php?w=DDApproval';
         $columnnamessp=array('Branch','ClientName','Bank','DirectDepDate','Amount','RequestedBy','RequestRemarks'); 
         $fieldlist=''; $rows=''; $textfordisplay='';
         echo '<style>table, td, th {padding: 3px; border-collapse: collapse; border: 1px brown solid;"} </style>';
@@ -1160,7 +1002,7 @@ if (allowedToOpen(4031,'1rtc')){
     $msgsp='<br><div style="float:left"><br>PO\'s for approval:<table bgcolor="FFFFF"><tr>';
     foreach($datatoshowsp as $rows){
         $countsp++;
-        $msgsp=$msgsp.'<td><a href="'.$path.'yr'.substr($currentyr,2).'/invty/praddext.php?w=ApprovePO&TxnID='.$rows['TxnID'].'"</a>'.$rows['Branch'].' PO No.: '.$rows['PONo'].' '.$rows['Supplier'].' <B>'.$rows['POAmount'].'</B></td>'.($countsp%5==0?'</tr><tr>':'');        
+        $msgsp=$msgsp.'<td><a href="../invty/praddext.php?w=ApprovePO&TxnID='.$rows['TxnID'].'"</a>'.$rows['Branch'].' PO No.: '.$rows['PONo'].' '.$rows['Supplier'].' <B>'.$rows['POAmount'].'</B></td>'.($countsp%5==0?'</tr><tr>':'');        
    }
    echo $msgsp.'</tr></table></div><br><br>';
    }
