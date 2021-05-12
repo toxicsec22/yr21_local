@@ -71,7 +71,7 @@ foreach($datatoshow as $rows){
 					 .(isset($delprocess)?'<td><form method="post" action='.$delprocess.$rows[$txnidname].' style="display:inline"  OnClick="return confirm(\'Really delete this?\');"><input type="hidden" name="action_token" value="'.$_SESSION['action_token'].'"><input type="submit" value="Delete"></form></td>':'')
 					   .(isset($editprocess3)?'<td><a href="'.$editprocess3.$rows[$txnidname].(isset($addlfield)?'&'.$addlfield.'='.$rows[$addlfield]:'').'">'.$editprocesslabel3.'</a></td>':'')
                                          .(!isset($inputprocess)?"":"<td><form method=post action='" . $inputprocess.$txnidname."=".$rows[$txnidname].'&action_token='.$_SESSION['action_token']."'>". $inputprocesslabel .
-				      "<input type='".(!isset($inputtype)?"text":$inputtype)."' name='".$inputname."' size=10 ".(!isset($inputdefault)?"":"value='".$inputdefault."'")."><input type=submit value='Enter' name='submit'></form></td>")
+				      "<input type='".(!isset($inputtype)?"text":$inputtype)."' name='".$inputname."' size=10 ".(!isset($inputplaceholder)?"":" placeholder='".$inputplaceholder."' ").(!isset($inputdefault)?"":"value='".$inputdefault."'")."><input type=submit value='Enter' name='submit'></form></td>")
 					 .(isset($runtotal)?"<td>".number_format($total,2)."</td></tr>":"</tr>"));
 	//$grandtotal=$grandtotal+$total;
 } //end foreach
