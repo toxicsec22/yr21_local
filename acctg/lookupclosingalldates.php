@@ -255,17 +255,17 @@ if($_SESSION['(ak0)']==1002) { echo 'As of '.date('Y-m-d h:i:s l').'<br><br>';}
 
 
 if (allowedToOpen(5571,'1rtc')) { goto skipincorrectdatesacctg;}
-$sql='SELECT 1 AS DB,  "acctg_2jvmain" AS `Table`, "Date" AS DateField, adjs.Date, concat("JVNo ",adjm.JVNo) AS ControlNo, "JV" as w, "addeditsupplyside" AS filetoopen, adjm.JVNo AS TxnID FROM acctg_2jvmain adjm JOIN acctg_2jvsub adjs ON adjm.JVNo=adjs.JVNo WHERE YEAR(`Date`)<>'.$currentyr.' 
-UNION ALL SELECT 1 AS DB,  "acctg_1assets" AS `Table`, "DateAcquired" AS DateField, a.DateAcquired, concat("AssetID ",a.AssetID) AS ControlNo, "AssetandDepr" as w, "assetanddepr" AS filetoopen, a.AssetID FROM acctg_1assets a WHERE YEAR(DateAcquired)>'.$currentyr.'
-UNION ALL SELECT 1 AS DB,  "acctg_2purchasemain" AS `Table`, "Date" AS DateField, Date, concat("Supp.Inv# ",SupplierInv), "Purchases", "addeditsupplyside" AS filetoopen, p.TxnID FROM `acctg_2purchasemain` p LEFT JOIN `acctg_2purchasesub` ps ON p.TxnID=ps.TxnID WHERE YEAR(Date)<>'.$currentyr.'
-UNION ALL SELECT 1 AS DB, "acctg_2cvmain" AS `Table`, "Date" AS DateField, vchm.Date, concat("Vch# ",vchm.CVNo), "CVs", "addeditsupplyside" AS filetoopen, vchm.CVNo  FROM acctg_2cvmain vchm WHERE YEAR(Date)<>'.$currentyr.'
-UNION ALL SELECT 1 AS DB,  "acctg_2salemain" AS `Table`, "Date" AS DateField, sm.Date, "Sale" AS Expr1, "Sales", "addeditclientside" AS filetoopen, sm.TxnID FROM acctg_2salemain sm WHERE YEAR(sm.Date)<>'.$currentyr.'
-UNION ALL SELECT 1 AS DB,  "acctg_2collectmain" AS `Table`, "Date" AS DateField, orm.Date, concat("Collect#",orm.CollectNo) AS Expr1, "Sales", "addeditclientside" AS filetoopen, orm.TxnID FROM acctg_2collectmain orm WHERE YEAR(orm.Date)<>'.$currentyr.'
-UNION ALL SELECT 1 AS DB,  "acctg_2depositmain" AS `Table`, "Date" AS DateField, depm.Date, concat("Dep# ",depm.DepositNo) AS Expr1, "Deposits", "addeditdep" AS filetoopen, depm.TxnID FROM acctg_2depositmain depm WHERE YEAR(depm.Date)<>'.$currentyr.'
-UNION ALL SELECT 1 AS DB,  "acctg_2collectsubbounced" AS `Table`, "DateBounced" AS DateField, DateBounced, concat("Bounced#",bm.CheckNo) AS Expr1, "BouncedfromCR", "addeditclientside" AS filetoopen, bm.TxnID FROM acctg_2collectmain bm JOIN acctg_2collectsubbounced bs ON bm.TxnID=bs.TxnID WHERE YEAR(DateBounced)<>'.$currentyr.'
-UNION ALL SELECT 1 AS DB,  "acctg_3undepositedpdcfromlastperiodbounced" AS `Table`, "DateBounced" AS DateField, DateBounced, concat("Bounced#",bm.PDCNo) AS Expr1, "BouncedfromCR", "addeditclientside" AS filetoopen, bm.UndepPDCId FROM acctg_3undepositedpdcfromlastperiod bm JOIN acctg_3undepositedpdcfromlastperiodbounced bs ON bm.UndepPDCId=bs.UndepPDCId WHERE YEAR(DateBounced)<>'.$currentyr.'
-UNION ALL SELECT 1 AS DB,  "acctg_2txfrmain" AS `Table`, "Date" AS DateField, tm.Date, "TxfrOUT" AS Expr1, "Interbranch", "addeditclientside" AS filetoopen, tm.TxnID FROM acctg_2txfrmain tm WHERE YEAR(tm.Date)>'.$currentyr.'
-UNION ALL SELECT 1 AS DB,  "acctg_2txfrsub" AS `Table`, "DateIN" AS DateField, ts.DateIN, "TxfrIN" AS Expr1, "Interbranch", "addeditclientside" AS filetoopen, ts.TxnID FROM acctg_2txfrsub ts WHERE YEAR(ts.DateIN)<'.$currentyr.' ';
+$sql='SELECT 1 AS DB,  "acctg_2jvmain" AS `Table`, "JVDate" AS DateField, adjs.Date, concat("JVNo ",adjm.JVNo) AS ControlNo, "JV" as w, "formjv" AS filetoopen,"JVNo" AS TxnIDName, adjm.JVNo AS TxnID FROM acctg_2jvmain adjm JOIN acctg_2jvsub adjs ON adjm.JVNo=adjs.JVNo WHERE YEAR(`Date`)<>'.$currentyr.' 
+UNION ALL SELECT 1 AS DB,  "acctg_1assets" AS `Table`, "DateAcquired" AS DateField, a.DateAcquired, concat("AssetID ",a.AssetID) AS ControlNo, "AssetandDepr" as w, "assetanddepr" AS filetoopen,"AssetID" AS TxnIDName, a.AssetID FROM acctg_1assets a WHERE YEAR(DateAcquired)>'.$currentyr.'
+UNION ALL SELECT 1 AS DB,  "acctg_2purchasemain" AS `Table`, "Date" AS DateField, Date, concat("Supp.Inv# ",SupplierInv), "Purchases", "formpurch" AS filetoopen,"TxnID" AS TxnIDName, p.TxnID FROM `acctg_2purchasemain` p LEFT JOIN `acctg_2purchasesub` ps ON p.TxnID=ps.TxnID WHERE YEAR(Date)<>'.$currentyr.'
+UNION ALL SELECT 1 AS DB, "acctg_2cvmain" AS `Table`, "Date" AS DateField, vchm.Date, concat("Vch# ",vchm.CVNo), "CVs", "formcv" AS filetoopen,"CVNo" AS TxnIDName, vchm.CVNo  FROM acctg_2cvmain vchm WHERE YEAR(Date)<>'.$currentyr.'
+UNION ALL SELECT 1 AS DB,  "acctg_2salemain" AS `Table`, "Date" AS DateField, sm.Date, "Sale" AS Expr1, "Sales", "addeditclientside" AS filetoopen,"TxnID" AS TxnIDName, sm.TxnID FROM acctg_2salemain sm WHERE YEAR(sm.Date)<>'.$currentyr.'
+UNION ALL SELECT 1 AS DB,  "acctg_2collectmain" AS `Table`, "Date" AS DateField, orm.Date, concat("Collect#",orm.CollectNo) AS Expr1, "Sales", "addeditclientside" AS filetoopen,"TxnID" AS TxnIDName, orm.TxnID FROM acctg_2collectmain orm WHERE YEAR(orm.Date)<>'.$currentyr.'
+UNION ALL SELECT 1 AS DB,  "acctg_2depositmain" AS `Table`, "Date" AS DateField, depm.Date, concat("Dep# ",depm.DepositNo) AS Expr1, "Deposits", "addeditdep" AS filetoopen,"TxnID" AS TxnIDName, depm.TxnID FROM acctg_2depositmain depm WHERE YEAR(depm.Date)<>'.$currentyr.'
+UNION ALL SELECT 1 AS DB,  "acctg_2collectsubbounced" AS `Table`, "DateBounced" AS DateField, DateBounced, concat("Bounced#",bm.CheckNo) AS Expr1, "BouncedfromCR", "addeditclientside" AS filetoopen,"TxnID" AS TxnIDName, bm.TxnID FROM acctg_2collectmain bm JOIN acctg_2collectsubbounced bs ON bm.TxnID=bs.TxnID WHERE YEAR(DateBounced)<>'.$currentyr.'
+UNION ALL SELECT 1 AS DB,  "acctg_3undepositedpdcfromlastperiodbounced" AS `Table`, "DateBounced" AS DateField, DateBounced, concat("Bounced#",bm.PDCNo) AS Expr1, "BouncedfromCR", "addeditclientside" AS filetoopen,"UndepPDCId" AS TxnIDName, bm.UndepPDCId FROM acctg_3undepositedpdcfromlastperiod bm JOIN acctg_3undepositedpdcfromlastperiodbounced bs ON bm.UndepPDCId=bs.UndepPDCId WHERE YEAR(DateBounced)<>'.$currentyr.'
+UNION ALL SELECT 1 AS DB,  "acctg_2txfrmain" AS `Table`, "Date" AS DateField, tm.Date, "TxfrOUT" AS Expr1, "Interbranch", "addeditclientside" AS filetoopen,"TxnID" AS TxnIDName, tm.TxnID FROM acctg_2txfrmain tm WHERE YEAR(tm.Date)>'.$currentyr.'
+UNION ALL SELECT 1 AS DB,  "acctg_2txfrsub" AS `Table`, "DateIN" AS DateField, ts.DateIN, "TxfrIN" AS Expr1, "Interbranch", "addeditclientside" AS filetoopen,"TxnID" AS TxnIDName, ts.TxnID FROM acctg_2txfrsub ts WHERE YEAR(ts.DateIN)<'.$currentyr.' ';
 $stmt=$link->query($sql); $result=$stmt->fetchAll();
 if ($stmt->rowCount()==0){ goto skipincorrectdatesacctg;}
 $subtitle='Incorrect Dates';
@@ -278,7 +278,7 @@ foreach ($result as $row){
         }
         if (allowedToOpen(5572,'1rtc')) {
             $toopen=$row['filetoopen'].'.php?w='.$row['w'].'&TxnID='.$row['TxnID'];
-            $sub=$sub.'<td><a href="setastoday.php?tbl='.$row['Table'].'&DB='.$row['DB'].'&Date='.$row['DateField'].'&TxnID='.$row['TxnID'].'&ToOpen='.$toopen.'" target=_blank>Set_as_Today</a>';}
+            $sub=$sub.'<td><a href="setastoday.php?tbl='.$row['Table'].'&TxnIDName='.$row['TxnIDName'].'&DB='.$row['DB'].'&Date='.$row['DateField'].'&TxnID='.$row['TxnID'].'&ToOpen='.$toopen.'" target=_blank>Set_as_Today</a>';}
         $sub=$sub.'<td><a href="'.$toopen.'"  target=_blank>Lookup</a></tr>';
    $colorcount++;
 }
