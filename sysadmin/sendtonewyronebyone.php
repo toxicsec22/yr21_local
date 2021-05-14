@@ -336,10 +336,13 @@ SELECT ch.ClientNo, ch.TimeStamp, Reason, Remarks, EncodedByNo, Hold FROM `' . $
         
         break;
     
-        case 'acctg_2prepaid':
+case 'acctg_2prepaid':
         
         overwrite($link,'`acctg_2prepaidamort`');
-        
+        /* this can be used if data exists
+        DELETE FROM `' . $nextyr . '_1rtc`.`acctg_2prepaidamort` WHERE PrepaidID IN (SELECT PrepaidID FROM `' . $nextyr . '_1rtc`.`acctg_2prepaid` WHERE Year(DatePaid)<' . $nextyr);
+        DELETE FROM `' . $nextyr . '_1rtc`.`acctg_2prepaid` WHERE Year(DatePaid)<' . $nextyr;     
+        */
         $sql0='DELETE FROM `' . $nextyr . '_1rtc`.`acctg_2prepaid`;';
         $stmt=$link->prepare($sql0); $stmt->execute();
         
