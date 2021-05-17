@@ -5,7 +5,15 @@ $link=!isset($link)?connect_db(''.$currentyr.'_1rtc',0):$link;
 
 
 include_once "../generalinfo/lists.inc"; include_once $path.'/acrossyrs/commonfunctions/listoptions.php';
- $showbranches=false; $which=$_GET['which'];  $method='POST';
+ $which=$_GET['which'];
+ 
+ if(in_array($which,array('AcceptSummary','TagExpired','TagRetired','TagDiscarded'))){
+	$sqlinvtype='SELECT `txntypeid`,`txndesc` FROM `invty_0txntype` WHERE `txntypeid` IN (1,2, 4,5,10,11,29,30,41) ORDER BY txndesc;';
+	$showbranches=true;
+} else {
+	$showbranches=false; 
+}
+  $method='POST';
 if ($_GET['which']!='ProcessFlow')
 {
 	include_once('monitorinvlinks.php');
@@ -14,6 +22,18 @@ if ($_GET['which']!='ProcessFlow')
 	include_once('../switchboard/contents.php');
 }
 
+
+if(in_array($which,array('ExpiredLists','RetiredLists','DiscardedLists'))){
+	$columnnames=array('DateAccepted','Branch', 'InvoiceType', 'SeriesFrom', 'SeriesTo','BookletNo');  
+
+	$sqlmain='SELECT `DateAccepted`,`BookletNo`,`Branch`, `Remarks`, `txndesc` as `InvoiceType`, 
+	SeriesFrom, CEIL(SeriesFrom/50)*50 AS SeriesTo,
+	concat(`Nickname`," ",`SurName`) as `IssuedBy`, fm.`TimeStamp`, fm.TxnID FROM `monitor_2fromsuppliermain` fm
+	JOIN `monitor_2fromsuppliersub` fs ON fm.TxnID=fs.TxnID
+	JOIN `1branches` b ON b.BranchNo=IssuedTo
+	JOIN `1employees` e ON e.IDNo=fs.IssuedByNo
+	JOIN `invty_0txntype` tt ON tt.txntypeid=fm.InvType';
+}
 
 switch($which){
 
@@ -106,23 +126,23 @@ include_once('../backendphp/layout/displayastable.php');
 	
 	case 'AcceptSummary':
 	
-	if ((!allowedToOpen(782,'1rtc')) AND (!allowedToOpen(78835,'1rtc'))) { echo 'No permission'; exit;}
+	if ((!allowedToOpen(array(782,78835,78836),'1rtc'))) { echo 'No permission'; exit;}
 	
-if (isset($_GET['BranchNo'])){
-	$condi = ' WHERE fm.BranchNo='.intval($_GET['BranchNo']).' AND TransferredToCentralWarehouse=1 AND DateIssued IS NOT NULL AND DateAccepted IS NOT NULL';
-} else if (allowedToOpen(78835,'1rtc')){
-	$condi = ' WHERE fs.IssuedTo IN (SELECT BranchNo FROM 1branches WHERE Pseudobranch=1)';
-} else if (allowedToOpen(783,'1rtc')){
-	$condi = ' ';
-} else {
-	$condi = ' WHERE fs.IssuedTo='.$_SESSION['bnum'];
-}
+	if (isset($_GET['BranchNo'])){
+		$condi = ' WHERE fm.BranchNo='.intval($_GET['BranchNo']).' AND TransferredToCentralWarehouse=1 AND DateIssued IS NOT NULL AND DateAccepted IS NOT NULL';
+	} else if (allowedToOpen(78835,'1rtc')){
+		$condi = ' WHERE fs.IssuedTo IN (SELECT BranchNo FROM 1branches WHERE Pseudobranch=1)';
+	} else if (allowedToOpen(783,'1rtc')){
+		$condi = ' ';
+	} else {
+		$condi = ' WHERE fs.IssuedTo='.$_SESSION['bnum'];
+	}
 
     $title='Accept Summary'; $formdesc='';
     $columnnames=array('DateAccepted','OwnedBy','BranchorComp', 'Remarks', 'InvoiceType', 'SeriesFrom', 'SeriesTo');  
 $sql='SELECT `DateAccepted`,b2.`Branch` AS OwnedBy,b.`Branch` AS BranchorComp, `Remarks`, `txndesc` as `InvoiceType`, 
 SeriesFrom, CEIL(SeriesFrom/50)*50 AS SeriesTo,
-concat(`Nickname`," ",`SurName`) as `AcceptedBy`, fm.`TimeStamp`, fm.TxnID, fs.TxnSubId FROM `monitor_2fromsuppliermain` fm
+concat(`Nickname`," ",`SurName`) as `AcceptedBy`, fm.`TimeStamp`, fs.TxnSubId AS TxnID FROM `monitor_2fromsuppliermain` fm
 JOIN `monitor_2fromsuppliersub` fs ON fm.TxnID=fs.TxnID
 JOIN `1branches` b ON b.BranchNo=fs.IssuedTo
 JOIN `1branches` b2 ON b2.BranchNo=fm.BranchNo
@@ -130,9 +150,18 @@ JOIN `1employees` e ON e.IDNo=fs.AcceptedByNo
 JOIN `invty_0txntype` tt ON tt.txntypeid=fm.InvType'.$condi.' 
 GROUP BY DateAccepted,fm.BranchNo,InvoiceType,SeriesFrom
 ORDER BY DateAccepted,b.Branch,InvoiceType,SeriesFrom;'; //echo $sql;
-$txnidname='TxnID'; $fieldname='TxnID';
-// $process1='acceptbybranch.php?which=ListAcceptedFromSummary&';
-// $processlabel1='Lookup';
+$txnidname='TxnSubId'; $fieldname='TxnSubId';
+
+// if (allowedToOpen(78838,'1rtc')) { 
+// 	$editprocess='monitorinvsummary.php?which=Expired&TxnSubId=';
+// 	$editprocesslabel='Expired';
+
+// 	$addlprocess='monitorinvsummary.php?which=Reset&TxnSubId=';
+// 	$addlprocesslabel='Reset';
+
+// 	$editprocess2='monitorinvsummary.php?which=Retired&TxnSubId=';
+// 	$editprocesslabel2='Retired';
+// }
 // $title=''; 
 // include_once('../backendphp/layout/clickontabletoeditbody.php');
 include_once('../backendphp/layout/displayastable.php');
@@ -149,8 +178,40 @@ include_once('../backendphp/layout/displayastable.php');
 	include_once('../backendphp/layout/displayastable.php');
 	
     break;
+
+	case 'Expired':
+		if (!allowedToOpen(78838,'1rtc')) { echo 'No permission'; exit;}
+		$txnsubid=$_REQUEST['TxnSubId'];
+		$sql='UPDATE `monitor_2fromsuppliersub` SET Expired=1 where TxnSubId='.$txnsubid; 
+		$stmt=$link->prepare($sql); $stmt->execute();
+		header("Location:monitorinvsummary.php?which=ExpiredLists");
+
+	break;
+
+	case 'Discarded':
+		if (!allowedToOpen(78838,'1rtc')) { echo 'No permission'; exit;}
+		$txnsubid=$_REQUEST['TxnSubId'];
+		$sql='UPDATE `monitor_2fromsuppliersub` SET Expired=3 where TxnSubId='.$txnsubid; 
+		$stmt=$link->prepare($sql); $stmt->execute();
+		header("Location:monitorinvsummary.php?which=DiscardedLists");
+
+	break;
+
+	case 'Retired':
+		if (!allowedToOpen(78838,'1rtc')) { echo 'No permission'; exit;}
+		$txnsubid=$_REQUEST['TxnSubId'];
+		$sql='UPDATE `monitor_2fromsuppliersub` SET Expired=2 where TxnSubId='.$txnsubid; 
+		$stmt=$link->prepare($sql); $stmt->execute();
+		header("Location:monitorinvsummary.php?which=RetiredLists");
+	break;
 	
-	
+	case 'Reset':
+		if (!allowedToOpen(78838,'1rtc')) { echo 'No permission'; exit;}
+		$txnsubid=$_REQUEST['TxnSubId'];
+		$sql='UPDATE `monitor_2fromsuppliersub` SET Expired=0 where TxnSubId='.$txnsubid; 
+		$stmt=$link->prepare($sql); $stmt->execute();
+		header("Location:monitorinvsummary.php?which=AcceptSummary");
+	break;
 	
 	case 'PrintTransferSummary':
 	
@@ -234,12 +295,13 @@ echo '<br/><br/>Transferred By: '.comboBoxValue($link,'attend_30currentpositions
         <?php echo $starttag;?> id='link' href="monitorinvsummary.php?which=IssuanceSummary">Issuance Summary<?php echo $endtag;?><br/><br/><?php echo $imglink;?><h4>Branch</h4>
 		<br/>
 		
-	<?php } if (allowedToOpen(781,'1rtc') OR allowedToOpen(78835,'1rtc')){ $starttag = $starta; $endtag = '</a>'; } else { $starttag = $startspan; $endtag = '</span>'; } {?>
+	<?php } if ((allowedToOpen(array(782,78835,78836),'1rtc'))){ $starttag = $starta; $endtag = '</a>'; } else { $starttag = $startspan; $endtag = '</span>'; } {?>
 	<?php echo $starttag;?> id='link' href="fromsupplier.php?which=ReceivedSummaryBranch">Accept Printed Invoices<?php echo $endtag;?>
 	
-	<?php } if ((allowedToOpen(782,'1rtc')) OR (allowedToOpen(78835,'1rtc'))){ $starttag = $starta; $endtag = '</a>'; } else { $starttag = $startspan; $endtag = '</span>'; } {?>
-        <?php echo $starttag;?> id='link' href="monitorinvsummary.php?which=AcceptSummary">Accept Summary<?php echo $endtag;?><br/><br/><br/><br/>
-		
+	<?php } if ((allowedToOpen(array(782,78835,78836),'1rtc'))){ $starttag = $starta; $endtag = '</a>'; } else { $starttag = $startspan; $endtag = '</span>'; } {?>
+        <?php echo $starttag;?> id='link' href="monitorinvsummary.php?which=AcceptSummary">Accept Summary<?php echo $endtag;?>
+	<br/><br/><br/><br/>
+	
 	<?php } if (allowedToOpen(78832,'1rtc')){ $starttag = $starta; $endtag = '</a>'; } else { $starttag = $startspan; $endtag = '</span>'; } {?>
         <?php echo $starttag;?> id='link' href="fromsupplier.php?which=SpecialTransfer">Special Transfer Case<?php echo $endtag;?> 
 		
@@ -252,7 +314,9 @@ echo '<br/><br/>Transferred By: '.comboBoxValue($link,'attend_30currentpositions
 	<?php } if (allowedToOpen(785,'1rtc')){ $starttag = $starta; $endtag = '</a>'; } else { $starttag = $startspan; $endtag = '</span>'; } {?>
      <?php echo $starttag;?> id='link' href="invoicesonhand.php?which=LastSeries">Latest Series At Branch<?php echo $endtag;?>
 	 
-	<?php } nolinks:?>
+	<?php } if (allowedToOpen(78838,'1rtc')) {
+		echo '<br><br><a id="link" href="monitorinvsummary.php?which=ExpiredLists" style="color:green;">Expired Booklets</a> <a id="link" href="monitorinvsummary.php?which=RetiredLists" style="color:green;">Retired Booklets</a>  <a id="link" href="monitorinvsummary.php?which=DiscardedLists" style="color:green;">Discarded Booklets</a>';
+	 } nolinks:?>
 	
 	
     </div>
@@ -267,6 +331,9 @@ echo '<br/><br/>Transferred By: '.comboBoxValue($link,'attend_30currentpositions
 		
 	</ol>
 	<br>Special Case (can transfer from branch to branch).
+	<br>
+	<br>Expired booklets must be discarded.
+	<br>Retired booklets can be discarded/used by others.
 	</div>
 	</div>
 	</center>
@@ -275,6 +342,103 @@ echo '<br/><br/>Transferred By: '.comboBoxValue($link,'attend_30currentpositions
 	
     break;
 	
+
+	case 'TagExpired':
+	$title='Tag Booklet as Expired';
+	$alink='Expired';
+	goto ok;
+	case 'TagRetired':
+		$title='Tag Booklet as Retired';
+		$alink='Retired';
+		goto ok;
+	case 'TagDiscarded':
+	$title='Tag Booklet as Retired';
+	$alink='Discarded';
+	goto ok;
+
+	ok:
+
+
+	echo '<title>'.$title.'</title>';
+	echo '<h3>'.$title.'</h3>';
+
+
+	$stmt = $link->query($sqlinvtype);
+	
+	$chooseinvtype=' Invoice Type: <select name="InvType"><option value="">- Pls Select -</option>';
+	while($row= $stmt->fetch()) {
+		$chooseinvtype.='<option value="'.$row['txntypeid'].'" '.((isset($_POST['InvType']) AND $row['txntypeid']==$_POST['InvType'])?'selected':'').'>'.$row['txndesc'].'</option>';
+	}
+	$chooseinvtype.='</select>';
+
+	echo '<form method="POST" action="#" autocomplete="off">
+	Date: <input type="date" name="Date" value="'.(isset($_POST['Date'])?$_POST['Date']:'').'"> 
+	'.$chooseinvtype.'
+	Booklet No: <input type="text" name="BookletNo" size="10" value="'.(isset($_POST['BookletNo'])?$_POST['BookletNo']:'').'">
+	<input type="submit" name="btnLookup" value="Lookup">
+	</form>';
+
+	if(isset($_POST['btnLookup'])){
+		$sql='SELECT TxnSubId,`DateAccepted`,b2.`Branch` AS OwnedBy,b.`Branch` AS BranchorComp, `Remarks`, `txndesc` as `InvoiceType`, SeriesFrom, CEIL(SeriesFrom/50)*50 AS SeriesTo, concat(`Nickname`," ",`SurName`) as `AcceptedBy`, fm.`TimeStamp`, fs.TxnSubId AS TxnID FROM `monitor_2fromsuppliermain` fm JOIN `monitor_2fromsuppliersub` fs ON fm.TxnID=fs.TxnID JOIN `1branches` b ON b.BranchNo=fs.IssuedTo LEFT JOIN `1branches` b2 ON b2.BranchNo=fm.BranchNo LEFT JOIN `1employees` e ON e.IDNo=fs.AcceptedByNo JOIN `invty_0txntype` tt ON tt.txntypeid=fm.InvType WHERE fm.BranchNo='.$_SESSION['bnum'].' AND fs.InvType='.$_POST['InvType'].' AND BookletNo='.$_POST['BookletNo'].' AND Date="'.$_POST['Date'].'"';
+		// echo $sql;
+		$stmt = $link->query($sql);
+		$row= $stmt->fetch();
+		echo '<br>';
+		
+		echo 'Series: '.$row['SeriesFrom'].' - '.$row['SeriesTo'];
+		echo '<br>Remarks: '.$row['Remarks'];
+		echo '<br>Date Accepted: '.$row['DateAccepted'];
+		echo '<br>Owned By: '.$row['OwnedBy'];
+		echo '<br>BranchorComp: '.$row['BranchorComp'];
+		echo '<br>InvoiceType: '.$row['InvoiceType'];
+
+		echo '<form action="monitorinvsummary.php?which='.$alink.'&TxnSubId='.$row['TxnSubId'].'" method="POST"><input type="submit" value="Tag as '.$alink.'" name="btnTag" OnClick="return confirm(\'Are you SURE you want to tag as '.$alink.'?\');"></form>';
+
+		echo '<br><br><form action="monitorinvsummary.php?which=Reset&TxnSubId='.$row['TxnSubId'].'" method="POST"><input type="submit" value="Reset" name="btnReset" OnClick="return confirm(\'Are you SURE you want to Reset?\');"></form>';
+	}
+
+	break;
+
+	
+
+
+		case 'ExpiredLists':
+			if (!allowedToOpen(78838,'1rtc')) { echo 'No permission'; exit; }
+			$title='Expired Booklets'; $formdesc='</i><a href="monitorinvsummary.php?which=TagExpired">Tag Booklet as Expired</a><i>';
+		  
+		$sql=$sqlmain.' WHERE `Expired`=1 
+		GROUP BY DateIssued,fm.BranchNo,InvoiceType,SeriesFrom
+		ORDER BY DateIssued,Branch,InvoiceType,SeriesFrom;'; 
+			$width='50%';
+			$txnidname='TxnID'; $fieldname='TxnID';
+			include_once('../backendphp/layout/displayastable.php');
+		break;
+		
+		
+		case 'RetiredLists':
+			if (!allowedToOpen(78838,'1rtc')) { echo 'No permission'; exit; }
+			$title='Retired Booklets';  $formdesc='</i><a href="monitorinvsummary.php?which=TagRetired">Tag Booklet as Retired</a><i>';
+			// $columnnames=array('DateIssued','Branch', 'InvoiceType', 'SeriesFrom', 'SeriesTo');  
+			$sql=$sqlmain.' WHERE `Expired`=2 
+			GROUP BY DateIssued,fm.BranchNo,InvoiceType,SeriesFrom
+			ORDER BY DateIssued,Branch,InvoiceType,SeriesFrom;'; 
+			$width='50%';
+			$txnidname='TxnID'; $fieldname='TxnID';
+			include_once('../backendphp/layout/displayastable.php');
+			
+			break;
+
+		case 'DiscardedLists':
+			if (!allowedToOpen(78838,'1rtc')) { echo 'No permission'; exit; }
+			$title='Discarded Booklets';  $formdesc='</i><a href="monitorinvsummary.php?which=TagDiscarded">Tag Booklet as Discarded</a><i>';
+			// $columnnames=array('DateIssued','Branch', 'InvoiceType', 'SeriesFrom', 'SeriesTo');  
+			$sql=$sqlmain.' WHERE `Expired`=3 
+			GROUP BY DateIssued,fm.BranchNo,InvoiceType,SeriesFrom
+			ORDER BY DateIssued,Branch,InvoiceType,SeriesFrom;'; 
+			$width='50%';
+			$txnidname='TxnID'; $fieldname='TxnID';
+			include_once('../backendphp/layout/displayastable.php');
+		break;
 	
 }
   $stmt=null;

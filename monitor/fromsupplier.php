@@ -161,7 +161,7 @@ if (!allowedToOpen(783,'1rtc')) { echo 'No permission'; exit;}
 		JOIN `invty_0txntype` tt ON tt.txntypeid=fm.InvType '.$sqlcondition.' '.($_POST['Transferred']==0?'HAVING ShowCount>0':'').';';
 		
 		
-		$txnidname='TxnID'; $fieldname='TxnID';
+		$txnid='TxnID'; $fieldname='TxnID';
 		$process1='fromsupplier.php?which=ListReceived&';
 		$processlabel1='Lookup';
 		$process2='monitorinvsteps.php?which=TransferToCentralWarehouse&';
@@ -233,7 +233,7 @@ if (!allowedToOpen(78831,'1rtc') AND !allowedToOpen(78832,'1rtc')) { echo 'No pe
 		JOIN `1employees` e ON e.IDNo=fm.EncodedByNo
 		JOIN `1suppliers` s ON s.SupplierNo=fm.SupplierNo
 		JOIN `invty_0txntype` tt ON tt.txntypeid=fm.InvType '.$sqlcondition.' HAVING ShowCount>0;';
-		$txnidname='TxnID'; $fieldname='TxnID';
+		$txnid='TxnID'; $fieldname='TxnID';
 		$process1='monitorinvsteps.php?which=IssueToBranch&';
 		$processlabel1='Issue To Branch';
 		
@@ -246,13 +246,21 @@ if (!allowedToOpen(78831,'1rtc') AND !allowedToOpen(78832,'1rtc')) { echo 'No pe
 	
   case 'ReceivedSummaryBranch':
   
-  if ((!allowedToOpen(781,'1rtc')) AND (!allowedToOpen(78835,'1rtc'))) { echo 'No permission'; exit;}
+  if ((!allowedToOpen(array(781,78835,78836),'1rtc'))) { echo 'No permission'; exit;}
     $title='Accept Printed Invoices';$formdesc='';
 	echo '<title>'.$title.'</title>';
 		$columnnames=array('InvoiceType','SeriesFrom','SeriesTo');
 		
-		$sql='SELECT fm.`TxnID`,SeriesFrom,TxnSubId,IssuedTo,`Remarks`,`txndesc` as `InvoiceType`,CEIL(`SeriesFrom`/50)*50 AS SeriesTo FROM monitor_2fromsuppliermain fm JOIN `1branches` b ON b.BranchNo=fm.BranchNo JOIN `1employees` e ON e.IDNo=fm.EncodedByNo JOIN `1suppliers` s ON s.SupplierNo=fm.SupplierNo JOIN `invty_0txntype` tt ON tt.txntypeid=fm.InvType JOIN monitor_2fromsuppliersub fs ON fm.TxnID=fs.TxnID WHERE IssuedTo='.$_SESSION['bnum'].' AND (AcceptedByNo=0 OR AcceptedByNo IS NULL) ORDER BY Date DESC';
-		$txnidname='TxnSubId'; $fieldname='TxnSubId';
+
+		$sqlcondi='';
+		if((allowedToOpen(array(78836,78836,78839),'1rtc'))){
+			$sqlcondi=' AND fm.InvType IN (2,30,11)'; //Charge,SI,CR
+		} else if((allowedToOpen(78835,'1rtc'))){
+			$sqlcondi=' AND fm.InvType IN (30)'; //CR
+		}
+
+		$sql='SELECT fm.`TxnID`,SeriesFrom,TxnSubId,IssuedTo,`Remarks`,`txndesc` as `InvoiceType`,CEIL(`SeriesFrom`/50)*50 AS SeriesTo FROM monitor_2fromsuppliermain fm JOIN `1branches` b ON b.BranchNo=fm.BranchNo JOIN `1employees` e ON e.IDNo=fm.EncodedByNo JOIN `1suppliers` s ON s.SupplierNo=fm.SupplierNo JOIN `invty_0txntype` tt ON tt.txntypeid=fm.InvType JOIN monitor_2fromsuppliersub fs ON fm.TxnID=fs.TxnID WHERE IssuedTo='.$_SESSION['bnum'].' AND (AcceptedByNo=0 OR AcceptedByNo IS NULL) '.$sqlcondi.' ORDER BY Date DESC';
+		$txnid='TxnSubId'; $fieldname='TxnSubId';
 	
 		$process1='monitorinvsteps.php?which=Accept&';
 		$processlabel1='Accept';
@@ -270,13 +278,17 @@ if (!allowedToOpen(78831,'1rtc') AND !allowedToOpen(78832,'1rtc')) { echo 'No pe
     include_once('../backendphp/layout/clickontabletoedithead.php');
 	
 	echo '<form method="POST" action="fromsupplier.php?which=SpecialTransfer">';
-	echo 'Month: <input type="number" min="1" max="12" name="Month" value="'.date("m").'"/>';
-	echo ' <input type="submit" name="btnSubmitMonth" value="Lookup">';
+	// echo 'Month: <input type="number" min="1" max="12" name="Month" value="'.date("m").'"/>';
+	echo 'Date FROM: <input type="date" name="DateFrom" value="'.date("Y-m-d").'"/> ';
+	echo 'Date TO: <input type="date" name="DateTo" value="'.date("Y-m-d").'"/>';
+	echo ' <input type="submit" name="btnSubmitDate" value="Lookup">';
 	echo '</form>';
 	
-	if (isset($_POST['btnSubmitMonth'])){
+	if (isset($_POST['btnSubmitDate'])){
 
-		$monthno = $_POST['Month'];
+		$datefrom = $_POST['DateFrom'];
+		$dateto = $_POST['DateTo'];
+
 		$columnnames=array('Date','SupplierName','Branch', 'Remarks', 'InvoiceType', 'SeriesFrom', 'SeriesTo','BookletNoFrom','BookletNoTo');  
 		$sql='SELECT fm.`TxnID`,`Date`,`SupplierName`,`Branch`, `InvType`,`Remarks`, `txndesc` as `InvoiceType`,	
 		(SELECT Min(SeriesFrom) FROM `monitor_2fromsuppliersub` fs WHERE fm.TxnID=fs.TxnID) AS SeriesFrom,
@@ -287,8 +299,11 @@ if (!allowedToOpen(78831,'1rtc') AND !allowedToOpen(78832,'1rtc')) { echo 'No pe
 		JOIN `1branches` b ON b.BranchNo=fm.BranchNo
 		JOIN `1employees` e ON e.IDNo=fm.EncodedByNo
 		JOIN `1suppliers` s ON s.SupplierNo=fm.SupplierNo
-		JOIN `invty_0txntype` tt ON tt.txntypeid=fm.InvType WHERE fm.BranchNo='.$_SESSION['bnum'].' AND (Date>="'.$currentyr.'-'.$monthno.'-01'.'" AND Date<=LAST_DAY("'.$currentyr.'-'.$monthno.'-01'.'"));';
-		$txnidname='TxnID'; $fieldname='TxnID';
+		JOIN `invty_0txntype` tt ON tt.txntypeid=fm.InvType WHERE fm.BranchNo='.$_SESSION['bnum'].' AND Date BETWEEN "'.$_POST['DateFrom'].'" AND "'.$_POST['DateTo'].'";';
+
+		// JOIN `invty_0txntype` tt ON tt.txntypeid=fm.InvType WHERE fm.BranchNo='.$_SESSION['bnum'].' AND (Date>="'.$currentyr.'-'.$monthno.'-01'.'" AND Date<=LAST_DAY("'.$currentyr.'-'.$monthno.'-01'.'"));';
+	
+		$txnid='TxnID'; $fieldname='TxnID';
 		$process1='monitorinvsteps.php?which=SpecialTransferToBranch&';
 		$processlabel1='Special Transfer';
 		$title='';
