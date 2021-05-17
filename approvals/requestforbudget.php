@@ -45,7 +45,7 @@ $columnnames=array('DateofRequest','DateNeeded','Purpose','DurationInDays','Requ
 $txnidname='TxnID';
 $txnid=!isset($_REQUEST['TxnID'])?0:$_REQUEST['TxnID'];
 
-if(!isset($_REQUEST['TxnID'])){  $editok=0; $editliqok=0; $requester=0;} else {
+// if(!isset($_REQUEST['TxnID'])){  $editok=0; $editliqok=0; $requester=0;} else {
 $sql3='SELECT bl.*,deptid,  (RequestCompleted+Approved+FundsReleased+FundsAccepted+DocsComplete+Liquidated) AS Editable FROM approvals_3budgetandliq bl JOIN attend_30currentpositions cp ON cp.IDNo=bl.EncodedByNo WHERE bl.TxnID='.$txnid;
 
 $stmt=$link->query($sql3);$res3=$stmt->fetch();
@@ -59,9 +59,8 @@ if(in_array($which,array('Unliquidated','Lookup','SetApprove','EditSubSpecifics'
     $sql2='SELECT IDNo as DeptHead FROM attend_30currentpositions WHERE PositionID=(SELECT deptheadpositionid FROM 1departments WHERE deptid=\''.$deptid.'\')';
     $stmt=$link->query($sql2);$result=$stmt->fetch();
     $forapprovalby=(($requester==$result['DeptHead']) OR ($result['DeptHead']=='1001'))?'1002':$result['DeptHead'];            
-}
 
-}
+// }
 
 
 
@@ -76,6 +75,9 @@ elseif (allowedToOpen(100,'1rtc') or allowedToOpen(5232,'1rtc')) {
     $condition=' AND bl.EncodedByNo IN ('.$deptemployees.')';
 }
 else { $condition=' AND bl.EncodedByNo='.$_SESSION['(ak0)'];}
+
+}
+
 
 if(in_array($which,array('Add','Lookup','EditSpecifics','EditMain'))){    $columnstoadd=array('Purpose','Duration','DateNeeded'); }
 
@@ -325,7 +327,7 @@ switch ($which){
             elseif (($result['ForLiqSubmission']<>0) and $res3['Liquidated']<>0) { echo 'Liquidated successfully';}
             
             $sql=$sqlliqsub.' ORDER BY ExpenseNo';
-            $txnidnamename='TxnSubId'; $columnnames=$columnnamesliq; $title='';$formdesc='';
+            $txnidname='TxnSubId'; $columnnames=$columnnamesliq; $title='';$formdesc='';
             
             include('../backendphp/layout/displayastable.php');
             
