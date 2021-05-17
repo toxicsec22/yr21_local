@@ -53,6 +53,7 @@ if (in_array($w,array('Add','EditMain'))){
         $paytype=comboBoxValue($link,'`acctg_0paymentmodes`','PaymentMode',addslashes($_POST['PaymentMode']),'PaymentModeID');
 	$sql='';
         foreach ($columnstoadd as $field) {$sql.=' `' . $field. '`=\''.addslashes($_POST[$field]).'\', '; }
+        if($paytype==2){ $sql.=' ReleaseDate=CURDATE(),ReleaseDateByNo='.$_SESSION['(ak0)'].',ReleaseDateTS=NOW(),';}
         $sql.=' CreditAccountID='.$acctid.', PaymentModeID='.$paytype.', PayeeNo='.(empty($payeeno)?'NULL':$payeeno).', EncodedByNo='.$_SESSION['(ak0)'].', TimeStamp=Now(),  PostedByNo='.$_SESSION['(ak0)'].'';
         
 }
