@@ -418,6 +418,8 @@ $stmt=$link->query($sql);
             $filetoopen='formjv'; $cvjvtxn='JVNo';
          break;
          case 'Purchase':
+            $filetoopen='formpurch';
+            break;
          case 'Forex':
             $filetoopen='addeditsupplyside';
             break;
