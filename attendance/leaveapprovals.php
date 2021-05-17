@@ -37,7 +37,7 @@ if(isset($_SESSION['(ak0)'])){
 			
 		echo $msgsuper.'<br></tr></table><br><br></div>';
 	}
- }
+ 
 	
 	$sqlall='SELECT lr.*,lr.TimeStamp AS RequestTS, FullName, Branch, LeaveName as LeaveType, CONCAT("SLBal: ", IFNULL(SLBal,0)," VLBal: ",IFNULL(VLBal,0)," BirthdayBal: ",IFNULL(BirthdayBal,0)) AS LeaveBalBeforeThisLeave, IF(SupervisorApproved=1,"Approved","Denied") AS SupervisorResponse';
 	
@@ -84,7 +84,7 @@ if(isset($_SESSION['(ak0)'])){
 		echo $msgsuper2.'<br></tr></table><br><br></div>';
 	   }
 	}
-  
+}
 
   
 // LEAVE REQUESTS -- DEPT HEAD

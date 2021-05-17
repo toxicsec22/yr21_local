@@ -471,9 +471,9 @@ case 'Interbranch':
         break;
 	
 	
-case 'PurchaseMain':
-    if($_SESSION['bnum']==999){ $allowed=999;} else { $allowed=5962;}
-        if (!allowedToOpen($allowed,'1rtc')) { echo 'No permission'; exit;}
+// case 'PurchaseMain':
+//     if($_SESSION['bnum']==999){ $allowed=999;} else { $allowed=5962;}
+//         if (!allowedToOpen($allowed,'1rtc')) { echo 'No permission'; exit;}
 	//to check if editable
 	//include('../backendphp/functions/checkeditablemainacctg.php');
         // include_once $path.'/acrossyrs/commonfunctions/listoptions.php';
@@ -501,11 +501,11 @@ case 'PurchaseMain':
 	// $stmt=$link->query($sql);
 	// $result=$stmt->fetch();
 	// header("Location:addeditsupplyside.php?w=Purchase&TxnID=".$result['TxnID']);
-        break;
+        // break;
 
 
-case 'CVMain':
-	if (!allowedToOpen(5401,'1rtc')) { echo 'No permission'; exit;} 
+// case 'CVMain':
+// 	if (!allowedToOpen(5401,'1rtc')) { echo 'No permission'; exit;} 
         //to check if editable
 	// include('../backendphp/functions/checkeditablemainacctg.php');
 	// // to get supp no
@@ -532,42 +532,42 @@ case 'CVMain':
 	
 
 	// header("Location:addeditsupplyside.php?w=CV&CVNo=".$_POST['CVNo']);
-        break;
-case 'FutureCV':
-        if (!allowedToOpen(5401,'1rtc')) { echo 'No permission'; exit;} 
-	// ensure future year
-	if(date('Y',  strtotime($_POST['Date']))<=$currentyr){header('Location:/'.$url_folder.'/forms/errormsg.php?err=Closed'); }
-	if(isset($_POST['Posted']) and $_POST['Posted']<>0){header('Location:/'.$url_folder.'/forms/errormsg.php?err=Posted');}
-	// to get supp no
-	$suppno=getNumber('Supplier',addslashes($_POST['Payee']));
-	$suppno=($suppno>1?$suppno:'null');
-	$crid=getNumber('Account',$_POST['CreditAccount']);
-	$pmid=comboBoxValue($link,'acctg_0paymentmodes','PaymentMode',addslashes($_POST['PaymentMode']),'PaymentModeID');
-	$sqlinsert='INSERT INTO `acctg_4futurecvmain` SET PaymentModeID='.$pmid.',PayeeNo='.$suppno.', Payee=\''.$_POST['Payee'].'\', `Posted`=0, CreditAccountID='.$crid.', ';
-	$sql='';
-        $columnstoadd=array('Date','DueDate','CVNo','CheckNo','DateofCheck','Remarks');
+//         break;
+// case 'FutureCV':
+//         if (!allowedToOpen(5401,'1rtc')) { echo 'No permission'; exit;} 
+// 	// ensure future year
+// 	if(date('Y',  strtotime($_POST['Date']))<=$currentyr){header('Location:/'.$url_folder.'/forms/errormsg.php?err=Closed'); }
+// 	if(isset($_POST['Posted']) and $_POST['Posted']<>0){header('Location:/'.$url_folder.'/forms/errormsg.php?err=Posted');}
+// 	// to get supp no
+// 	$suppno=getNumber('Supplier',addslashes($_POST['Payee']));
+// 	$suppno=($suppno>1?$suppno:'null');
+// 	$crid=getNumber('Account',$_POST['CreditAccount']);
+// 	$pmid=comboBoxValue($link,'acctg_0paymentmodes','PaymentMode',addslashes($_POST['PaymentMode']),'PaymentModeID');
+// 	$sqlinsert='INSERT INTO `acctg_4futurecvmain` SET PaymentModeID='.$pmid.',PayeeNo='.$suppno.', Payee=\''.$_POST['Payee'].'\', `Posted`=0, CreditAccountID='.$crid.', ';
+// 	$sql='';
+//         $columnstoadd=array('Date','DueDate','CVNo','CheckNo','DateofCheck','Remarks');
 	
-	foreach ($columnstoadd as $field) {
-		$sql=$sql.' `' . $field. '`=\''.$_POST[$field].'\', '; 
-	}
-	//adjustments
-	if($pmid==2){
-		$sql.='ReleaseDate=CURDATE(),ReleaseDateByNo='.$_SESSION['(ak0)'].',ReleaseDateTS=NOW(),';
-	}
-	$sql=$sqlinsert.$sql.' EncodedByNo=\''.$_SESSION['(ak0)'].'\', PostedByNo=\''.$_SESSION['(ak0)'].'\',TimeStamp=Now();'; 
-	// echo $sql; break;
-        $stmt=$link->prepare($sql);
-	$stmt->execute();
+// 	foreach ($columnstoadd as $field) {
+// 		$sql=$sql.' `' . $field. '`=\''.$_POST[$field].'\', '; 
+// 	}
+// 	//adjustments
+// 	if($pmid==2){
+// 		$sql.='ReleaseDate=CURDATE(),ReleaseDateByNo='.$_SESSION['(ak0)'].',ReleaseDateTS=NOW(),';
+// 	}
+// 	$sql=$sqlinsert.$sql.' EncodedByNo=\''.$_SESSION['(ak0)'].'\', PostedByNo=\''.$_SESSION['(ak0)'].'\',TimeStamp=Now();'; 
+// 	// echo $sql; break;
+//         $stmt=$link->prepare($sql);
+// 	$stmt->execute();
 	
-	$sql='Select CVNo from `acctg_4futurecvmain` where CVNo=\''.$_POST['CVNo'].'\'';
-	$stmt=$link->query($sql);
-	$result=$stmt->fetch();
-	header("Location:addeditsupplyside.php?w=FutureCV&CVNo=".$result['CVNo']);
-        break;
+// 	$sql='Select CVNo from `acctg_4futurecvmain` where CVNo=\''.$_POST['CVNo'].'\'';
+// 	$stmt=$link->query($sql);
+// 	$result=$stmt->fetch();
+// 	header("Location:addeditsupplyside.php?w=FutureCV&CVNo=".$result['CVNo']);
+//         break;
 
-case 'JV':
+// case 'JV':
 
-    if (!allowedToOpen(5921,'1rtc')) { echo 'No permission'; exit;}
+//     if (!allowedToOpen(5921,'1rtc')) { echo 'No permission'; exit;}
 	
     //     $table='acctg_2jvmain'; 
 	// 			//to check if editable
@@ -587,7 +587,7 @@ case 'JV':
 	
 
 	// header("Location:addeditsupplyside.php?w=$whichqry&JVNo=".$_POST['JVNo']);
-        break;
+//        break;
 
 case 'Encashments':
         if (!allowedToOpen(5993,'1rtc')) { echo 'No permission'; exit; }

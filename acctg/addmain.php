@@ -278,10 +278,10 @@ if (!allowedToOpen(5951,'1rtc')) { echo 'No permission'; exit; }
      break;    
      
      
-case 'Purchase':
-      if($_SESSION['bnum']==999){ $allowed=999;} else { $allowed=5962;}
-        if (!allowedToOpen($allowed,'1rtc')) { echo 'No permission'; exit;}   
-        header('Location: formpurch.php?w=AddMain');      
+// case 'Purchase':
+//       if($_SESSION['bnum']==999){ $allowed=999;} else { $allowed=5962;}
+//         if (!allowedToOpen($allowed,'1rtc')) { echo 'No permission'; exit;}   
+//         header('Location: formpurch.php?w=AddMain');      
     // $title='Add Purchase';
     // $columnnames=array(
     //                 array('field'=>'Date', 'type'=>'date','size'=>20,'required'=>true,'value'=>date('Y-m-d')),
@@ -302,50 +302,50 @@ case 'Purchase':
     // $otherlist=array('accounts');
     // $liststoshow=array('suppliers','companies','branchnames');
     //  include('../backendphp/layout/inputmainform.php');
-     break;
+ //    break;
 
-case 'CV':
-      if (!allowedToOpen(5401,'1rtc')) { echo 'No permission'; exit;} 
-      header('Location: formcv.php?w=AddMain'); exit;
-case 'FutureCV':
-      if (!allowedToOpen(5401,'1rtc')) { echo 'No permission'; exit;} 
-if ($whichqry=='FutureCV'){
-   $title='Add PDC'; $w='FutureCV'; $vchdate=strtotime("next year"); $table='acctg_4futurecvmain';
-} else {//Check Vouchers
-   $title='Add Check Voucher'; $w='CVMain'; $vchdate=strtotime((date('Y')==$currentyr?"today":''.$currentyr.'-01-01')); $table='acctg_2cvmain';
-}
+// case 'CV':
+//       if (!allowedToOpen(5401,'1rtc')) { echo 'No permission'; exit;} 
+//       header('Location: formcv.php?w=AddMain'); exit;
+// case 'FutureCV':
+//       if (!allowedToOpen(5401,'1rtc')) { echo 'No permission'; exit;} 
+// if ($whichqry=='FutureCV'){
+//    $title='Add PDC'; $w='FutureCV'; $vchdate=strtotime("next year"); $table='acctg_4futurecvmain';
+// } else {//Check Vouchers
+//    $title='Add Check Voucher'; $w='CVMain'; $vchdate=strtotime((date('Y')==$currentyr?"today":''.$currentyr.'-01-01')); $table='acctg_2cvmain';
+// }
 
-include_once $path.'/acrossyrs/commonfunctions/listoptions.php';
-echo comboBox($link,'SELECT PaymentModeID,PaymentMode FROM `acctg_0paymentmodes` ORDER BY PaymentModeID;','PaymentModeID','PaymentMode','pmlist');
+// include_once $path.'/acrossyrs/commonfunctions/listoptions.php';
+// echo comboBox($link,'SELECT PaymentModeID,PaymentMode FROM `acctg_0paymentmodes` ORDER BY PaymentModeID;','PaymentModeID','PaymentMode','pmlist');
 
-    include_once $path.'/acrossyrs/commonfunctions/lastnum.php'; 
-    $vchno=lastNum('CVNo',$table,((date('Y',$vchdate))-2000)*100000, 'WHERE LEFT(CVNo,2)=Right('.(date('Y',$vchdate)).',2)')+1;
+//     include_once $path.'/acrossyrs/commonfunctions/lastnum.php'; 
+//     $vchno=lastNum('CVNo',$table,((date('Y',$vchdate))-2000)*100000, 'WHERE LEFT(CVNo,2)=Right('.(date('Y',$vchdate)).',2)')+1;
   
-    $columnnames=array(
-                    array('field'=>'Date', 'type'=>'date','size'=>20,'required'=>true,'value'=>date('Y-m-d',$vchdate)),
-                    array('field'=>'DueDate', 'type'=>'date','size'=>20,'required'=>true,'value'=>date('Y-m-d',$vchdate)),
-                    array('field'=>'CVNo','type'=>'hidden','size'=>00,'value'=>$vchno),
-                    array('field'=>'PaymentMode','type'=>'text','size'=>12,'list'=>'pmlist','required'=>true),
-                    array('field'=>'CheckNo','type'=>'text','size'=>10,'required'=>true),
-                    array('field'=>'DateofCheck', 'type'=>'date','size'=>20,'required'=>true,'value'=>date('Y-m-d',$vchdate)),
-                    array('field'=>'Payee','type'=>'text','size'=>10,'required'=>true,'list'=>'suppliers'),
-                    array('field'=>'CreditAccount','caption'=>'Bank','type'=>'text','size'=>10,'required'=>true,'list'=>'accounts'),
-                    array('field'=>'Remarks', 'type'=>'text','size'=>50, 'required'=>false));
+//     $columnnames=array(
+//                     array('field'=>'Date', 'type'=>'date','size'=>20,'required'=>true,'value'=>date('Y-m-d',$vchdate)),
+//                     array('field'=>'DueDate', 'type'=>'date','size'=>20,'required'=>true,'value'=>date('Y-m-d',$vchdate)),
+//                     array('field'=>'CVNo','type'=>'hidden','size'=>00,'value'=>$vchno),
+//                     array('field'=>'PaymentMode','type'=>'text','size'=>12,'list'=>'pmlist','required'=>true),
+//                     array('field'=>'CheckNo','type'=>'text','size'=>10,'required'=>true),
+//                     array('field'=>'DateofCheck', 'type'=>'date','size'=>20,'required'=>true,'value'=>date('Y-m-d',$vchdate)),
+//                     array('field'=>'Payee','type'=>'text','size'=>10,'required'=>true,'list'=>'suppliers'),
+//                     array('field'=>'CreditAccount','caption'=>'Bank','type'=>'text','size'=>10,'required'=>true,'list'=>'accounts'),
+//                     array('field'=>'Remarks', 'type'=>'text','size'=>50, 'required'=>false));
     
-    $action='praddmain.php?w='.$w;
+//     $action='praddmain.php?w='.$w;
 	
-    $listcondition='';
-    $whichotherlist='acctg';
-    $otherlist=array('accounts');
-    $liststoshow=array('suppliers');
-	$fieldsinrow='5';
-     include('../backendphp/layout/inputmainform.php');
-     break;
+//     $listcondition='';
+//     $whichotherlist='acctg';
+//     $otherlist=array('accounts');
+//     $liststoshow=array('suppliers');
+// 	$fieldsinrow='5';
+//      include('../backendphp/layout/inputmainform.php');
+//      break;
 
-case 'JV':
-   if (!allowedToOpen(5921,'1rtc')) { echo 'No permission'; exit;} 
+// case 'JV':
+//    if (!allowedToOpen(5921,'1rtc')) { echo 'No permission'; exit;} 
 
-   header('Location: formjv.php?w=AddMain'); exit;
+//    header('Location: formjv.php?w=AddMain'); exit;
    
 //    $title='Add Journal Voucher'; $adjdate=strtotime((date('Y')==$currentyr?"today":''.$currentyr.'-01-01'));
 //    include_once $path.'/acrossyrs/commonfunctions/lastnum.php'; 
@@ -360,7 +360,7 @@ case 'JV':
 //     $action='praddmain.php?w='.$whichqry;
 //     $liststoshow=array(); 
 //      include('../backendphp/layout/inputmainform.php');
-     break;
+ //    break;
 
      }
   $link=null; $stmt=null;
