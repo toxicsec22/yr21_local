@@ -379,7 +379,7 @@ echo '<br/><br/>Transferred By: '.comboBoxValue($link,'attend_30currentpositions
 	</form>';
 
 	if(isset($_POST['btnLookup'])){
-		$sql='SELECT TxnSubId,`DateAccepted`,b2.`Branch` AS OwnedBy,b.`Branch` AS BranchorComp, `Remarks`, `txndesc` as `InvoiceType`, SeriesFrom, CEIL(SeriesFrom/50)*50 AS SeriesTo, concat(`Nickname`," ",`SurName`) as `AcceptedBy`, fm.`TimeStamp`, fs.TxnSubId AS TxnID FROM `monitor_2fromsuppliermain` fm JOIN `monitor_2fromsuppliersub` fs ON fm.TxnID=fs.TxnID JOIN `1branches` b ON b.BranchNo=fs.IssuedTo LEFT JOIN `1branches` b2 ON b2.BranchNo=fm.BranchNo LEFT JOIN `1employees` e ON e.IDNo=fs.AcceptedByNo JOIN `invty_0txntype` tt ON tt.txntypeid=fm.InvType WHERE fm.BranchNo='.$_SESSION['bnum'].' AND fs.InvType='.$_POST['InvType'].' AND BookletNo='.$_POST['BookletNo'].' AND Date="'.$_POST['Date'].'"';
+		$sql='SELECT TxnSubId,`DateAccepted`,b2.`Branch` AS OwnedBy,b.`Branch` AS BranchorComp, `Remarks`, `txndesc` as `InvoiceType`, SeriesFrom, CEIL(SeriesFrom/50)*50 AS SeriesTo, concat(`Nickname`," ",`SurName`) as `AcceptedBy`, fm.`TimeStamp`, fs.TxnSubId AS TxnID FROM `monitor_2fromsuppliermain` fm JOIN `monitor_2fromsuppliersub` fs ON fm.TxnID=fs.TxnID LEFT JOIN `1branches` b ON b.BranchNo=fs.IssuedTo LEFT JOIN `1branches` b2 ON b2.BranchNo=fm.BranchNo LEFT JOIN `1employees` e ON e.IDNo=fs.AcceptedByNo JOIN `invty_0txntype` tt ON tt.txntypeid=fm.InvType WHERE fm.BranchNo='.$_SESSION['bnum'].' AND fs.InvType='.$_POST['InvType'].' AND BookletNo='.$_POST['BookletNo'].' AND Date="'.$_POST['Date'].'"';
 		// echo $sql;
 		$stmt = $link->query($sql);
 		$row= $stmt->fetch();
