@@ -161,7 +161,7 @@ if (!allowedToOpen(783,'1rtc')) { echo 'No permission'; exit;}
 		JOIN `invty_0txntype` tt ON tt.txntypeid=fm.InvType '.$sqlcondition.' '.($_POST['Transferred']==0?'HAVING ShowCount>0':'').';';
 		
 		
-		$txnid='TxnID'; $fieldname='TxnID';
+		$txnidname='TxnID'; $fieldname='TxnID';
 		$process1='fromsupplier.php?which=ListReceived&';
 		$processlabel1='Lookup';
 		$process2='monitorinvsteps.php?which=TransferToCentralWarehouse&';
@@ -233,7 +233,7 @@ if (!allowedToOpen(78831,'1rtc') AND !allowedToOpen(78832,'1rtc')) { echo 'No pe
 		JOIN `1employees` e ON e.IDNo=fm.EncodedByNo
 		JOIN `1suppliers` s ON s.SupplierNo=fm.SupplierNo
 		JOIN `invty_0txntype` tt ON tt.txntypeid=fm.InvType '.$sqlcondition.' HAVING ShowCount>0;';
-		$txnid='TxnID'; $fieldname='TxnID';
+		$txnidname='TxnID'; $fieldname='TxnID';
 		$process1='monitorinvsteps.php?which=IssueToBranch&';
 		$processlabel1='Issue To Branch';
 		
@@ -260,7 +260,7 @@ if (!allowedToOpen(78831,'1rtc') AND !allowedToOpen(78832,'1rtc')) { echo 'No pe
 		}
 
 		$sql='SELECT fm.`TxnID`,SeriesFrom,TxnSubId,IssuedTo,`Remarks`,`txndesc` as `InvoiceType`,CEIL(`SeriesFrom`/50)*50 AS SeriesTo FROM monitor_2fromsuppliermain fm JOIN `1branches` b ON b.BranchNo=fm.BranchNo JOIN `1employees` e ON e.IDNo=fm.EncodedByNo JOIN `1suppliers` s ON s.SupplierNo=fm.SupplierNo JOIN `invty_0txntype` tt ON tt.txntypeid=fm.InvType JOIN monitor_2fromsuppliersub fs ON fm.TxnID=fs.TxnID WHERE IssuedTo='.$_SESSION['bnum'].' AND (AcceptedByNo=0 OR AcceptedByNo IS NULL) '.$sqlcondi.' ORDER BY Date DESC';
-		$txnid='TxnSubId'; $fieldname='TxnSubId';
+		$txnidname='TxnSubId'; $fieldname='TxnSubId';
 	
 		$process1='monitorinvsteps.php?which=Accept&';
 		$processlabel1='Accept';
@@ -303,7 +303,7 @@ if (!allowedToOpen(78831,'1rtc') AND !allowedToOpen(78832,'1rtc')) { echo 'No pe
 
 		// JOIN `invty_0txntype` tt ON tt.txntypeid=fm.InvType WHERE fm.BranchNo='.$_SESSION['bnum'].' AND (Date>="'.$currentyr.'-'.$monthno.'-01'.'" AND Date<=LAST_DAY("'.$currentyr.'-'.$monthno.'-01'.'"));';
 	
-		$txnid='TxnID'; $fieldname='TxnID';
+		$txnidname='TxnID'; $fieldname='TxnID';
 		$process1='monitorinvsteps.php?which=SpecialTransferToBranch&';
 		$processlabel1='Special Transfer';
 		$title='';
