@@ -75,7 +75,8 @@ if(isset($changecolorfield)){
         $colorcount++;
         
         foreach($fields as $col){
-          $textfordisplay=$textfordisplay."<td>". nl2br(htmlspecialchars(str_replace($fromBRtoN,"\n",addslashes($rows[$col])))) . "</td>";
+        //   $textfordisplay=$textfordisplay."<td>". nl2br(htmlspecialchars(str_replace($fromBRtoN,"\n",addslashes($rows[$col])))) . "</td>";
+          $textfordisplay=$textfordisplay."<td>". nl2br(str_replace($fromBRtoN,"\n",$rows[$col])) . "</td>";
         }
 	$total=(isset($coltototal)?$total+$rows[$coltototal]:0);  
         $textfordisplay=$textfordisplay.((key($rows)!=$keyoflast)?"":(isset($formprocess)?'<td><form action="'.$formprocess.'">'.$formprocessfields.'<input type=hidden name='.$txnid.' value='.$rows[$txnidname].'><input type=submit name=submit value="'.$submitlabel.'"></form></td>':'')
