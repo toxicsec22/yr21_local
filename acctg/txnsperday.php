@@ -174,112 +174,7 @@ $editprocesslabel='Lookup';
 echo '<h4>Bounced From CR Last Year</h4>';
 include('../backendphp/layout/displayastableonlynoheaders.php');
     break;    
-    
-case 'Purchase':
-if (!allowedToOpen(596,'1rtc')) { echo 'No permission'; exit;} else {
-$showpronly=!isset($_POST['showpronly'])?0:$_POST['showpronly'];
-$print='<form  method="post" action="txnsperday.php?perday=0&Month='.$_REQUEST[$fieldname].'&w=Purchase">
-   <input type=hidden name="showpronly" value="'.($showpronly==0?1:0).'">
-    <input type="submit" name="submit" value="'.($showpronly==0?'Show Purchase Returns':'Show All Purchases').'">
-</form>&nbsp &nbsp';
 
-if ($showpronly==0){
-$columnnames=array('Date','SupplierName','InvNo','InvDate','Amount','MRRNo','ForPONo','Company','RegisteredSupplier','Remarks','Posted');  //,'Debit','Credit';ca1.ShortAcctID as Debit, ca2.ShortAcctID as Credit,; join acctg_1chartofaccounts ca1 on ca1.AccountID=ps.DebitAccountID join acctg_1chartofaccounts ca2 on ca2.AccountID=m.CreditAccountID
-$sql='select m.TxnID, m.Date AS `Date`, s.SupplierName, m.SupplierInv as InvNo, m.DateofInv as InvDate, sum(ps.Amount) as Amount, sum(ps.Amount) as AmountValue, m.MRRNo, mrr.ForPONo, m.Remarks, m.Posted, co.Company, s1.SupplierName AS RegisteredSupplier from `acctg_2purchasemain` m join `acctg_2purchasesub` ps on `m`.TxnID=`ps`.TxnID
-left join `1companies` co on co.CompanyNo=m.RCompany
-left join `invty_2mrr` mrr ON mrr.MRRNo=m.MRRNo AND m.BranchNo=mrr.BranchNo
-join `1suppliers` s on s.SupplierNo=m.SupplierNo
-LEFT join `1suppliers` s1 on s1.SupplierNo=m.RegisteredSupplierNo
-where '.$txndate .' and m.BranchNo='.$_SESSION['bnum'].' group by m.TxnID 
-union all
-select m.TxnID, m.Date, s.SupplierName, m.SupplierInv as InvNo, m.DateofInv as InvDate, sum(ps.Amount) as Amount, sum(ps.Amount) as AmountValue, m.MRRNo, mrr.ForPONo, m.Remarks, m.Posted, co.Company, s1.SupplierName AS RegisteredSupplier from `acctg_2purchasemain` m left join `acctg_2purchasesub` ps on `m`.TxnID=`ps`.TxnID
-left join `1companies` co on co.CompanyNo=m.RCompany
-left join `invty_2mrr` mrr ON mrr.MRRNo=m.MRRNo AND m.BranchNo=mrr.BranchNo
-join `1suppliers` s on s.SupplierNo=m.SupplierNo
-LEFT join `1suppliers` s1 on s1.SupplierNo=m.RegisteredSupplierNo
-where '.$txndate .' and m.BranchNo='.$_SESSION['bnum'].' and (ps.TxnID is null) group by m.TxnID order by `Date`, SupplierName, InvDate';
-} else {
-$columnnames=array('Date','SupplierName','InvNo','InvDate','Amount','CollectNo','RegisteredSupplier','Remarks','Posted');  //,'Debit','Credit';, ca1.ShortAcctID as Debit, ca2.ShortAcctID as Credit; join acctg_1chartofaccounts ca1 on ca1.AccountID=ps.DebitAccountID join acctg_1chartofaccounts ca2 on ca2.AccountID=m.CreditAccountID
-$sql='select m.TxnID, m.Date AS `Date`, s.SupplierName, m.SupplierInv as InvNo, m.DateofInv as InvDate, ps.Amount as Amount, ps.Amount as AmountValue, MRRNo as CollectNo,m.Remarks, m.Posted from `acctg_2purchasemain` m join `acctg_2purchasesub` ps on `m`.TxnID=`ps`.TxnID 
-join `1suppliers` s on s.SupplierNo=m.SupplierNo
-where '.$txndate .' and BranchNo='.$_SESSION['bnum'].' and ps.Amount<0 group by m.TxnID 
-union all
-select m.TxnID, m.Date, s.SupplierName, m.SupplierInv as InvNo, m.DateofInv as InvDate, ps.Amount as Amount, ps.Amount as AmountValue, MRRNo as CollectNo,m.Remarks, m.Posted from `acctg_2purchasemain` m left join `acctg_2purchasesub` ps on `m`.TxnID=`ps`.TxnID 
-join `1suppliers` s on s.SupplierNo=m.SupplierNo
-where '.$txndate .' and BranchNo='.$_SESSION['bnum'].' and (ps.TxnID is null) group by m.TxnID order by `Date`, SupplierName, InvDate
-';
-}
-if (allowedToOpen(5961,'1rtc')){ $coltototal='AmountValue';$showgrandtotal=true;}  
-$process1='addeditsupplyside.php?w='.$whichqry.'&'; $processlabel1='Lookup';
-include_once('../backendphp/layout/clickontabletoeditbody.php');
-
-}
-
-    break; 
-
-    
-case 'CV':
-if (!allowedToOpen(598,'1rtc')) { echo 'No permission'; exit;}
-
-$print=<<<HTML
-<p>Note: Choosing 0 for the month will show uncleared checks from previous year.</p>
-<br><br>
-  <form action="printvoucher.php?w={$whichqry}" method="POST">
-      Print FROM <input type="text" name="FromVch">  TO <input type="text" name="ToVch"> 
-      <input type="Submit" name="Print" value="Print">
-  </form>
-  <form action="printvoucher.php?w=Check" method="POST">
-      Print Check Number 
-      <input type="text" name="CheckNo">  
-      <input type="Submit" name="PrintCheck" value="Print Check (mm-dd-yyyy)">
-      <input type="Submit" name="PrintCheck" value="Print Check (mm/dd/yy)">      
-  </form>
-HTML;
-
-
-
-$columnnames=array('Date','CVNo','DateofCheck','PaymentMode','CheckNo','Bank','PayeeNo','Payee','Total','Remarks','Cleared','Posted');
-
-if (isset($_REQUEST['Month']) and $_REQUEST['Month']==0){
-  $sql=<<<SQL
-SELECT 
-  '{((intval($currentyr))-1)}-12-31' AS `Date`, `CVNo`, `DateofCheck`,
-  `CheckNo`, FromAccount AS `Bank`, `PayeeNo`, `Payee`,
-  AmountofCheck AS `Total`, "From Last Yr" AS `Remarks`, `Cleared`,1 AS `Posted` 
-FROM 
-  `acctg_3unclearedchecksfromlastperiod`;
-SQL;
-
-// echo $sql;
-  include_once('../backendphp/layout/displayastable.php');
-} 
-else {
-  
-$sql=<<<SQL
-SELECT 
-  m.CVNo, PaymentMode,  m.Date, m.DateofCheck, m.CheckNo, ca.ShortAcctID as Bank, 
-  m.PayeeNo, m.Payee, m.Cleared, m.Posted, FORMAT(SUM(s.Amount), 2) as Total, m.Remarks 
-FROM 
-  acctg_2cvmain as m 
-  JOIN acctg_1chartofaccounts ca ON ca.AccountID=m.CreditAccountID 
-  JOIN acctg_0paymentmodes pm ON m.PaymentModeID=pm.PaymentModeID
-  JOIN acctg_2cvsub s on m.CVNo=s.CVNo where $txndate group by m.CVNo  
-UNION SELECT 
-  m.CVNo, PaymentMode, m.Date, m.DateofCheck,m.CheckNo, ca.ShortAcctID as Bank, 
-  m.PayeeNo, m.Payee, m.Cleared, m.Posted, 0 as Total, m.Remarks from acctg_2cvmain as m 
-  JOIN acctg_1chartofaccounts ca ON ca.AccountID = m.CreditAccountID 
-  JOIN acctg_0paymentmodes pm ON m.PaymentModeID=pm.PaymentModeID
-  LEFT JOIN acctg_2cvsub s on m.CVNo=s.CVNo 
-  where s.CVNo is null and $txndate 
-ORDER BY Date, CVNo;
-SQL;
-
-$process1='addeditsupplyside.php?w='.$whichqry.'&';
-$processlabel1='Lookup'; $txnidname='CVNo';
-include_once('../backendphp/layout/clickontabletoeditbody.php');
-}
-break;
-   
 case 'CVBudget':
 if (!allowedToOpen(601,'1rtc')) { echo 'No permission'; exit;}
 $title='';
@@ -293,21 +188,11 @@ $sql='select m.CVNo, m.Date, m.DateofCheck,m.CheckNo, CreditAccountID,ca.ShortAc
 $txnidname='CVNo';
 $editprocess='preditsupplyside.php?w='.$whichqry.'&Date='.$defaultdate.'&TxnID=';
 $editprocesslabel='Change!'; $coltototal='TotalValue'; $showgrandtotal=true;
-$addlprocess='addeditsupplyside.php?w=CV&TxnID=';$addlprocesslabel='Lookup';
+$addlprocess='formcv.php?w=CV&TxnID=';$addlprocesslabel='Lookup';
 
 include_once('../backendphp/layout/displayastableeditcells.php');
     break;   
 
-case 'JV':
-if (!allowedToOpen(592,'1rtc')) { echo 'No permission'; exit;}
-$columnnames=array('JVDate','JVNo','Remarks','Total','Posted');  
-$sql='select m.JVNo, m.JVDate, m.Remarks, m.Posted, format(sum(s.Amount),2) as Total from acctg_2jvmain as m join acctg_2jvsub s on m.JVNo=s.JVNo where '.str_replace('Date','JVDate',$txndate) .' group by m.JVNo  
-union select m.JVNo, m.JVDate, m.Remarks, m.Posted, 0 as Total from acctg_2jvmain as m left join acctg_2jvsub s on m.JVNo=s.JVNo where s.JVNo is null and '. str_replace('Date','JVDate',$txndate) .' order by JVDate, JVNo';
-$txnidname='JVNo';
-$process1='addeditsupplyside.php?w=JV&';
-$processlabel1='Lookup';
-include_once('../backendphp/layout/clickontabletoeditbody.php');
-    break;
     
 case 'Interbranch':
 case 'Txfr':

@@ -283,27 +283,6 @@ case 'YrPurchPerSupplier':
       include('../backendphp/layout/displayastable.php');
       break;   
 
-
-case 'FutureCV';
-    if (!allowedToOpen(540,'1rtc')) { echo 'No permission'; exit; }
-$title='Future CVs'; $formdesc='CVs dated beyond Yr '.$currentyr.'<br><br><a href="addmain.php?w=FutureCV"   target=_blank>Add New PDC</a><br><br>';
-$formdesc=$formdesc.'<form action="printvoucher.php?w='.$whichqry.'" method="POST">
-        Print FROM <input type="text" name="FromVch">  TO <input type="text" name="ToVch"> <input type="Submit" name="Print" value="Print">
-    </form>
-    <form action="printvoucher.php?w=FutureCheck" method="POST">
-        Print Check Number <input type="text" name="CheckNo">  <input type="Submit" name="PrintCheck" value="Print Check (mm-dd-yyyy)">   <input type="Submit" name="PrintCheck" value="Print Check (mm/dd/yy)">
-    </form>';
-$columnnames=array('Date','CVNo','DateofCheck','PaymentMode','CheckNo','Bank','Payee','Total','Remarks','ReleaseDate');
-$sortfield=(isset($_POST['sortfield']))?$_POST['sortfield']:'Date, CVNo';
-$sql='select PaymentMode,m.CVNo, m.Date, m.DateofCheck,m.CheckNo, ca.ShortAcctID as Bank, m.Payee, format(sum(s.Amount),2) as Total, m.Remarks,m.ReleaseDate from acctg_4futurecvmain as m JOIN acctg_0paymentmodes pm ON m.PaymentModeID=pm.PaymentModeID join acctg_1chartofaccounts ca on ca.AccountID=m.CreditAccountID join acctg_4futurecvsub s on m.CVNo=s.CVNo  group by m.CVNo  
-union select PaymentMode,m.CVNo, m.Date, m.DateofCheck,m.CheckNo, ca.ShortAcctID as Bank, m.Payee, 0 as Total, m.Remarks,"" AS ReleaseDate from acctg_4futurecvmain as m JOIN acctg_0paymentmodes pm ON m.PaymentModeID=pm.PaymentModeID join acctg_1chartofaccounts ca on ca.AccountID=m.CreditAccountID left join acctg_4futurecvsub s on m.CVNo=s.CVNo where s.CVNo is null ORDER BY '.$sortfield.(isset($_POST['sortarrange'])?' '.$_POST['sortarrange']:' ASC'); 
-$txnidname='CVNo';
-if (allowedToOpen(5401,'1rtc')) { $editprocess='addeditsupplyside.php?w='.$whichqry.'&CVNo=';
-$editprocesslabel='Lookup';}
-$columnsub=$columnnames;
-include_once('../backendphp/layout/displayastable.php');
-    break; 
-
 case 'SLPerSupplier':
 if (!allowedToOpen(544,'1rtc')) { echo 'No permission'; exit; }
 

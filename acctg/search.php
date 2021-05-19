@@ -44,14 +44,14 @@ $columnnames=array('Date','DepositNo','CheckNo','AmtofCheck','Cleared','Bank');
 
 case 'Paid to Suppliers':
    $txnidname='TxnID';
-   $editprocess='addeditsupplyside.php?w=CV&TxnID=';
+   $editprocess='formcv.php?w=CV&TxnID=';
    $sql='Select vm.CVNo, vm.Date,vm.PayeeNo, vm.Payee, vm.Cleared as PaymentClearedOn, ca.ShortAcctID as BankCheck, vs.ForInvoiceNo,SUM(vs.Amount) as Amount from acctg_2cvmain vm join acctg_2cvsub vs on vm.CVNo=vs.CVNo join acctg_1chartofaccounts ca on ca.AccountID=vm.CreditAccountID where vs.ForInvoiceNo like  \'%'.$_POST['stringsearch'].'%\' GROUP BY vs.ForInvoiceNo';
 $columnnames=array('Date','Payee','ForInvoiceNo','Amount','PaymentClearedOn','BankCheck');
    break;
 
 case 'Payees':
    $txnidname='CVNo';
-   $editprocess='addeditsupplyside.php?w=CV&CVNo=';
+   $editprocess='formcv.php?w=CV&CVNo=';
    $sql='Select vm.CVNo, vm.Date,vm.PayeeNo, vm.Payee, vm.ReleaseDate, vm.Cleared as PaymentClearedOn, ca.ShortAcctID as BankCheck, SUM(vs.Amount) AS AmountofCheck from acctg_2cvmain vm join acctg_2cvsub vs on vm.CVNo=vs.CVNo join acctg_1chartofaccounts ca on ca.AccountID=vm.CreditAccountID where vm.Payee like  \'%'.$_POST['stringsearch'].'%\' GROUP BY CVNo';
 $columnnames=array('Date','Payee','AmountofCheck','ReleaseDate','PaymentClearedOn','BankCheck');
    break;

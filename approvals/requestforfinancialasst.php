@@ -342,7 +342,7 @@ require_once $path.'/acrossyrs/logincodes/confirmtoken.php';
     $sql='UPDATE `approvals_4financial` SET vchStatus=1  WHERE TxnID='.$_REQUEST['TxnID'].''; 
     $stmt=$link->prepare($sql);  $stmt->execute(); 
 				
-header('Location:../acctg/addeditsupplyside.php?w=CV&CVNo='.$vchno);
+header('Location:../acctg/formcv.php?w=CV&CVNo='.$vchno);
 break;
 }
 
