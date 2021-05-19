@@ -131,11 +131,11 @@ case 'Lookup':
         $sql0='SELECT TxnID FROM `acctg_2vouchermain` WHERE TxnID='.$txnid; 
         $stmt0=$link->query($sql0); $res0=$stmt0->fetch(); $txnid=$res0['TxnID'];
         $txn='TxnID';
-        header('Location:/'.$yr.'/acctg/addeditsupplyside.php?w='.$txn.'&TxnID='.$txnid); exit();
+        header('Location:/'.$yr.'/acctg/formcv.php?w='.$txn.'&TxnID='.$txnid); exit();
     } elseif (substr($_GET['CVNo'],0,1)==2) { $yr='yr'.substr($currentyr,2); $txn='FutureCV';}
             else { $yr='yr'.substr($currentyr,2); $txn='CV'; 
     
-            header('Location:/'.$yr.'/acctg/addeditsupplyside.php?w='.$txn.'&CVNo='.$txnid);
+            header('Location:/'.$yr.'/acctg/form'.strtolower($txn).'.php?w='.$txn.'&CVNo='.$txnid);
             }
     break;
   

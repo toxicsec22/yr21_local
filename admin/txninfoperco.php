@@ -35,7 +35,7 @@ $sortfield=(isset($_POST['sortfield'])?$_POST['sortfield']:' Date, SupplierName,
 
 //if($_SESSION['(ak0)']==1002){ echo $sql;}
 $coltototal='AmountValue';$showgrandtotal=true; 
-$editprocess='../acctg/addeditsupplyside.php?w=Purchase&TxnID='; $editprocesslabel='Lookup';
+$editprocess='../acctg/formpurch.php?w=Purchase&TxnID='; $editprocesslabel='Lookup';
 include_once('../backendphp/layout/displayastablenosort.php');
 
     break; 
