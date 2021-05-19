@@ -156,7 +156,7 @@ case "Step 0. Accept Store Used":
 			
 		}
 		
-    header("Location:addeditsupplyside.php?w=JV&JVNo=".$jvno."&done=".$done); }
+    header("Location:formjv.php?w=JV&JVNo=".$jvno."&done=".$done); }
     break;
 
 case 'Step 0. Set FreightINCL as confirmed if there are no errors shown.':
@@ -193,7 +193,7 @@ SELECT \''.$lastdayofmonth.'\', tc.AccountID, 500, TRUNCATE((`13thBasicAsOf`-`To
         }
     }
 	existing13th:			
-    header("Location:addeditsupplyside.php?w=JV&JVNo=".$jvno."&done=".$done);}
+    header("Location:formjv.php?w=JV&JVNo=".$jvno."&done=".$done);}
     break;
     
 case 'Step 3.  Return Profit of Transfers and Adjust InTransit':
@@ -271,7 +271,7 @@ WHERE tm.BranchNo<>tm.ToBranchNo  AND YEAR(tm.DateOUT)='.$currentyr.' AND (tm.Da
    skipinsert:
         }
         
-        header("Location:addeditsupplyside.php?w=JV&JVNo=".$jvno."&done=".$done);
+        header("Location:formjv.php?w=JV&JVNo=".$jvno."&done=".$done);
     }
     break;
     
@@ -388,7 +388,7 @@ case 'Step 7.  Consolidate CIB for Branches per Company AFTER static update':
     }
 
 
-	header("Location:addeditsupplyside.php?w=JV&JVNo=".$jvno."&done=".$done);
+	header("Location:formjv.php?w=JV&JVNo=".$jvno."&done=".$done);
         
 	break;
         
@@ -423,7 +423,7 @@ FROM `acctg_2jvsub` s JOIN `banktxns_1maintaining` m ON  m.AccountID=s.CreditAcc
        
     } else {  $done=2;} 
 	existingcibpseudo:
-	header("Location:addeditsupplyside.php?w=JV&JVNo=".$jvno."&done=".$done);
+	header("Location:formjv.php?w=JV&JVNo=".$jvno."&done=".$done);
     
 	break;
 
@@ -463,63 +463,11 @@ FROM `acctg_2jvsub` s JOIN `banktxns_1maintaining` m ON  m.AccountID=s.DebitAcco
 }
       // end of pseudobranches
        
-	header("Location:addeditsupplyside.php?w=JV&JVNo=".$jvno."&done=".$done);
+	header("Location:formjv.php?w=JV&JVNo=".$jvno."&done=".$done);
     
     break;
 
 
-/*
-case 'Step 8.  Zero Recon of Non-Pseudo AFTER static update':
-    if (($lastdayofmonth)<($_SESSION['nb4A'])){ header("Location:/yr".substr($currentyr,2,2)."/acctg/closedataautoadj.php?done=0");  } else {
-	$condition=' WHERE u.AccountID=105 and Month(`Date`)<='.$reportmonth;
-    include('sqlphp/createcibbalances.php');}
-    
-   // check if existing
- $sql='Select TxnID from `acctg_2jvmain` where JVNo=concat("ConsolCIB","'.str_pad($reportmonth,2,"0",STR_PAD_LEFT).'-Recon")';
-	$stmt=$link->query($sql);	$resultadj=$stmt->fetch();
-	if ($stmt->rowCount()>0){ $txnid=$resultadj['TxnID'];	$done=2; // goto existingcib;
-	} else {  
-            $done=1; 
-     
- $sql='INSERT INTO `acctg_2jvmain` SET  Posted=0, Date=Last_Day(\''.$currentyr.'-'.$reportmonth.'-1\'), JVNo=concat("ConsolCIB","'.str_pad($reportmonth,2,"0",STR_PAD_LEFT).'-Recon"), Remarks="to consolidate recon for non-pseudo", EncodedByNo=\''.$_SESSION['(ak0)'].'\', PostedByNo=\''.$_SESSION['(ak0)'].'\',TimeStamp=Now();'; 
-        $stmt=$link->prepare($sql); 	$stmt->execute();
-$sql='Select TxnID from `acctg_2jvmain` where JVNo=concat("ConsolCIB","'.str_pad($reportmonth,2,"0",STR_PAD_LEFT).'-Recon")';
-	$stmt=$link->query($sql); 	$resultadj=$stmt->fetch(); $txnid=$resultadj['TxnID'];
-         // zero out non-pseudobranches
-$sqlinsert='INSERT INTO `acctg_2jvsub` (TxnID, BranchNo, DebitAccountID, CreditAccountID, Amount, EncodedByNo, `TimeStamp`)
-SELECT '.$txnid.' AS TxnID, BranchNo, (SELECT AccountID FROM `banktxns_1maintaining` m WHERE RCompanyUse=cib.CompanyNo) AS DebitAccountID, 105 AS CreditAccountID, TotalCIB AS Amount, \''.$_SESSION['(ak0)'].'\' AS EncodedByNo, NOW() AS `TimeStamp` FROM cibtxns cib WHERE (cib.BranchNo<>0 OR cib.BranchNo<95) GROUP BY BranchNo;'; 
-if ($_SESSION['(ak0)']==1002) { echo $sqlinsert;}
-        $stmt=$link->prepare($sqlinsert); $stmt->execute();
-        // step 2 - credit to pseudobranch who owns it
-$sqlinsert='INSERT INTO `acctg_2jvsub` (TxnID, BranchNo, DebitAccountID, CreditAccountID, Amount, EncodedByNo, `TimeStamp`)
-SELECT '.$txnid.' AS TxnID, b.BranchNo, DebitAccountID, 105 AS CreditAccountID, SUM(Amount)*-1 AS Amount, \''.$_SESSION['(ak0)'].'\' AS EncodedByNo, NOW() AS `TimeStamp` 
-FROM `acctg_2jvsub` s JOIN `banktxns_1maintaining` m ON  m.AccountID=s.DebitAccountID JOIN  `1branches` b ON m.RCompanyUse=b.CompanyNo AND PseudoBranch=1 AND b.BranchNo<>95 WHERE TxnID='.$txnid.' GROUP BY DebitAccountID;'; if ($_SESSION['(ak0)']==1002) { echo $sqlinsert;}
-	$stmt=$link->prepare($sqlinsert); $stmt->execute();  
-        }
-      // end of pseudobranches
-       
-
-	existingcibrecon:
-	header("Location:addeditsupplyside.php?w=Adjust&TxnID=".$txnid."&done=".$done);
-    break;
-
-case 'Check CIB Balances AFTER UPDATE OF STATIC DATA';
-    if(allowedToOpen(6455,'1rtc')){
-	$showbranches=false;
-	$title='CIB Balances';
-	$dbtouse=$link;
-	$sql='SELECT `ShortAcctID`, `Branch`, Format(Sum(`Amount`),2) as EndBalance, Truncate(Sum(`Amount`),2) as NetValue, Last_Day(\''.$currentyr.'-'.$reportmonth.'-1\') as AsOf FROM `'.$currentyr.'_static`.`acctg_unialltxns` u
-JOIN `acctg_1chartofaccounts` ca on ca.AccountID=u.AccountID
-JOIN `1branches` b on b.BranchNo=u.BranchNo
-WHERE AccountDescription Like \'CIB%\' and Month(`Date`)<='.$reportmonth.'
-GROUP BY u.`AccountID`, u.`BranchNo` HAVING NetValue<>0;';
-	$stmt=$link->query($sql);
-	$result=$stmt->fetchAll();
-	$columnnames=array('ShortAcctID','EndBalance','Branch','AsOf');
-	include ('../backendphp/layout/displayastable.php');
-    }
-break;
-*/
 case 'Update Closed-By Date for Invty':
 	if(allowedToOpen(6455,'1rtc')){
       $sql='UPDATE `00dataclosedby` SET `DataClosedBy`=\''.$lastdayofmonth.'\' WHERE `ForDB`=0';

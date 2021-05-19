@@ -95,7 +95,7 @@ case 'COGSAdj':
 	}
 	
 	existingcogs:
-	header("Location:addeditsupplyside.php?w=JV&JVNo=".$jvno."&done=".$done);
+	header("Location:formjv.php?w=JV&JVNo=".$jvno."&done=".$done);
     break;
 
 }

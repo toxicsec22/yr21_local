@@ -711,7 +711,7 @@ switch ($which)
 		$newtab=true;
 		$txnidname='TxnID';
 		if (allowedToOpen(8005,'1rtc')){
-			$editprocess='addeditsupplyside.php?w=CV&TxnID='; $editprocesslabel='Lookup';
+			$editprocess='formcv.php?w=CV&TxnID='; $editprocesslabel='Lookup';
 		}
 		// include('../backendphp/layout/displayastablenosort.php');
 		include('../backendphp/layout/displayastable.php');
