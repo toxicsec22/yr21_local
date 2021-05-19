@@ -35,10 +35,13 @@ case 'SetStaticDataToday':
     if(isset($_GET['done']) and $_GET['done']==1){ echo 'Static Data created.';}
     header("Location:".$_SERVER['HTTP_REFERER'].(strpos($_SERVER['HTTP_REFERER'],'?')?'&':'?')."done=1");
     break;
+
 case 'AcctgVsInvtySalesTxfr':
     if (!allowedToOpen(528,'1rtc')) { echo 'No permission'; exit; }
 $title='Sales - Acctg Vs Invty';
-?><div style="float:left">
+?>
+
+<!-- <div style="float:left"> -->
 <?php
 //echo 'Sales - Acctg vs. Invty<br><br>'; ADD BACK FREIGHT INCL into Acctg Value
 $sql0='Create temporary table dailysales (
@@ -102,8 +105,9 @@ HAVING `DiffCashSales`<-0.05 Or `DiffCashSales`>0.05 or `DiffChargeSales`<-0.05 
     
     // $showtotals=false; $showgrandtotal=true; $runtotal=true;
     include('../backendphp/layout/displayastable.php');
-?></div>
-<div style="float:right">
+?>
+<!-- </div>
+<div style="float:right"> -->
 <?php
 $title='Interbranch Transfers Sales - Acctg Vs Invty';
 
@@ -142,7 +146,8 @@ $columnnames=array('Branch','Date','AcctgTxfr','AcctgWriteOff','InvtyTxfr','Invt
 $sql='SELECT `BranchNo`,`Branch`,`Date`,truncate(`AcctgTxfr`,2) as `AcctgTxfr`,truncate(`AcctgWriteOff`,2) as `AcctgWriteOff`,truncate(`InvtyTxfr`,2) as `InvtyTxfr`,ifnull(`AcctgTxfr`,0)+ifnull(`AcctgWriteOff`,0)-ifnull(`InvtyTxfr`,0) as `Diff`, InvtyBranch,InvtyDate FROM dailytransfers having Diff<-0.05 Or Diff>0.05 order by '.$sortfield;
     
     include('../backendphp/layout/displayastable.php');
-?></div>
+?>
+<!-- </div> -->
 <?php
 //}
 break;
