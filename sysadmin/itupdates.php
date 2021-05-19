@@ -78,10 +78,52 @@ switch($which){
 
 	case 'UserComments':
 $title='User Comments and Suggestions';
-$sql='select TxnID,Comments,slc.TimeStamp,FullName AS EncodedBy,Position,IF(deptid IN (2,10),Branch,dept) AS Branch FROM events_2syslayoutcomments slc left join attend_30currentpositions cp on cp.IDNo=slc.EncodedByNo  Order By slc.TimeStamp DESC';
-$columnnames=array('Comments','EncodedBy','Position','Branch','TimeStamp');
-$txnidname='TxnID';
-include('../backendphp/layout/displayastablenosort.php');
+
+$sqlmain='select TxnID,Comments,DetailsOrReply,slc.TimeStamp,FullName AS EncodedBy,Position,IF(deptid IN (2,10),Branch,dept) AS Branch FROM events_2syslayoutcomments slc left join attend_30currentpositions cp on cp.IDNo=slc.EncodedByNo  ';
+$orderby='Order By slc.TimeStamp DESC';
+$sql=$sqlmain.' WHERE Done=0 '.$orderby;
+$columnnames=array('Comments','EncodedBy','Position','Branch','TimeStamp','DetailsOrReply');
+$columnstoedit=array('DetailsOrReply');
+$txnidname='TxnID'; $txnid='TxnID';
+
+$editprocess='itupdates.php?w=Reply&TxnID='; $editprocesslabel='Enter';
+$addlprocess='itupdates.php?w=Done&TxnID='; $addlprocesslabel='Mark as Read';
+
+include('../backendphp/layout/displayastableeditcells.php');
+
+
+
+unset($editprocess, $editprocesslabel);
+$columnstoedit=array(); $editprocess=''; $editprocesslabel='';
+$formdesc='<br><br></i><b>Read<b><i>'; $title='';
+$sql=$sqlmain.' WHERE Done=1 '.$orderby;
+$addlprocess='itupdates.php?w=Undo&TxnID='; $addlprocesslabel='Undo';
+
+include('../backendphp/layout/displayastableeditcellspercolumn.php');
+
 	break;
+
+	case 'Reply':
+
+		$sql='update events_2syslayoutcomments set DetailsOrReply=\''.addslashes($_POST['DetailsOrReply']).'\' where TxnID=\''.$_GET['TxnID'].'\' ';
+
+		$stmt=$link->prepare($sql); $stmt->execute();
+		header("Location:itupdates.php?w=UserComments");
+		break;
+
+		case 'Done':
+
+		case 'Undo':
+			$sql='update events_2syslayoutcomments set Done=IF(Done=1,0,1) where TxnID=\''.$_GET['TxnID'].'\' ';
+
+			$stmt=$link->prepare($sql); $stmt->execute();
+			header("Location:itupdates.php?w=UserComments");
+
+		break;
+
+		
+
+
+		
 }
 ?>
