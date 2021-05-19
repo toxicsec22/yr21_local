@@ -13,6 +13,9 @@ echo comboBox($link,'SELECT BEID, Explanation FROM `acctg_0blotterbranchexplanat
 if (allowedToOpen(58229,'1rtc')) {
 	echo '<br><a id="link" href="stmtblotterfindings.php" target="_blank">Blotter Findings Statements</a>';
 }
+if (allowedToOpen(58225,'1rtc')) {
+	echo ' <a id="link" href="blotterfindings.php?w=Cancelled" target="_blank">Cancelled Invoices per Month</a>';
+}
 if (allowedToOpen(58235,'1rtc')) {
 echo ' <a id="link" href="blotterfindings.php">Blotter Findings</a>';	
 echo ' <a id="link" href="blotterfindings.php?w=BranchExplanationsList">Branch Explanations List</a>';
@@ -315,6 +318,9 @@ echo '<title>'.$title.'</title>';
 					
 				} else {
 					$sqlcon.=' AND FixedByAcctg=0 ';
+					$sqlcon3.=' AND FixedByAcctg=0 ';
+					$sqlcon4.=' AND FixedByAcctg=0 ';
+					$sqlcon5.=' AND FixedByAcctg=0 ';
 				}
 				
 				$sql.=$sqlcon;
@@ -543,7 +549,29 @@ echo '<title>'.$title.'</title>';
 		}
     break;
 	
-	
+	case 'Cancelled':
+		include_once $path.'/acrossyrs/commonfunctions/monthName.php';
+		$title='Cancelled Invoices per Month';
+		$sql='CREATE TEMPORARY TABLE cancelled AS SELECT m.BranchNo, Branch, MONTH(Date) AS CancelledMonth, COUNT(TxnID) AS Cancelled, FORMAT(COUNT(TxnID)/(SELECT COUNT(TxnID) FROM invty_2sale sm WHERE sm.BranchNo=m.BranchNo AND MONTH(sm.Date)=MONTH(m.Date))*100,2) AS Percent  FROM invty_2sale m JOIN 1branches b ON b.BranchNo=m.BranchNo WHERE ClientNo=10001 GROUP BY MONTH(Date), m.BranchNo ORDER BY Branch';
+		$stmt=$link->prepare($sql);
+		$stmt->execute();
+		$columnnames=array('Branch');
+		$sql=''; $months=array(1,2,3,4,5,6,7,8,9,10,11,12); $formatcond='';
+		foreach ($months as $month){
+			$monthname=monthName($month); 
+			$columnnames[]=$monthname.'_Cancelled';
+			$columnnames[]=$monthname.'_Percent';
+			$sql.=' SUM(CASE WHEN CancelledMonth='.$month.' THEN IFNULL(Cancelled,0) END) AS `'.$monthname.'_Cancelled`, SUM(CASE WHEN CancelledMonth='.$month.' THEN Percent END) AS `'.$monthname.'_PercentNoFormat`,';
+			$formatcond.= ', IF(`'.$monthname.'_PercentNoFormat`>=4,CONCAT("<font style=\"background-color: coral;\">",`'.$monthname.'_PercentNoFormat`,"</font>"),`'.$monthname.'_PercentNoFormat`) AS `'.$monthname.'_Percent`';
+		}
+
+		$sql='CREATE TEMPORARY TABLE sumcancelled AS SELECT '.$sql.' Branch FROM cancelled GROUP BY BranchNo ORDER BY Branch';
+		$stmt=$link->prepare($sql);
+		$stmt->execute();
+		$sql='SELECT *'.$formatcond.' FROM sumcancelled;';
+		
+		include '../backendphp/layout/displayastablenosort.php';
+
 	}
 	
 		
