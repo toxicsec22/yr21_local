@@ -72,7 +72,7 @@ if (in_array($which,array('AddReleaseDate','Unset','SetNonBank','SetBasedOnPayee
     }
     
     $sql='UPDATE `'.$table.'` SET ReleaseDate='.($which=='Unset'?'NULL':'\''.$rdate.'\'').', ReleaseDateByNo='.$_SESSION['(ak0)'].', ReleaseDateTS=Now()'.(in_array($which,array('AddReleaseDate','SetBasedOnPayee'))?',CheckReceivedBy="'.$_POST['CheckReceivedBy'].'"':'').' WHERE '.$sql.($which=='Unset'?' AND ((ReleaseDate >\''.$_SESSION['nb4A'].'\') OR ReleaseDate LIKE \'0000-00-00\')':' AND (ReleaseDate IS NULL)');
- //   if($_SESSION['(ak0)']==1002) { echo $sql; break;}
+//    if($_SESSION['(ak0)']==1002) { echo $sql; exit();}
     $stmt=$link->prepare($sql); $stmt->execute(); $connector=strpos($_SERVER['HTTP_REFERER'],'?')?'&':'?';
     header("Location:".$_SERVER['HTTP_REFERER'].(strpos($_SERVER['HTTP_REFERER'],'ReleaseDate')?'':$connector."ReleaseDate=".$rdate));
 }
@@ -80,7 +80,8 @@ if (in_array($which,array('AddReleaseDate','Unset','SetNonBank','SetBasedOnPayee
 switch ($which){
 case 'List':
 if (!allowedToOpen(5402,'1rtc')) { echo 'No permission'; exit; }
-$txnidname='CVNo';
+// $txnidname='CVNo';
+$txnidname='TxnID';
 $sortfield=(isset($_POST['sortfield'])?$_POST['sortfield']:' `DateofCheck`,`CVNo` ');
 $sql0='CREATE TEMPORARY TABLE released AS '.$sqllastyr.$filter.' UNION ALL '.$sqlcurr.$filter.' UNION ALL '.$sqlfuture.$futurefilter.' ORDER BY '.$sortfield.(isset($_POST['sortarrange'])?' '.$_POST['sortarrange']:' ASC'); // if($_SESSION['(ak0)']==1002) { echo $sql0;}
 $stmt0=$link->prepare($sql0); $stmt0->execute();
