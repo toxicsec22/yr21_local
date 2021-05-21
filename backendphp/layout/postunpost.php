@@ -133,15 +133,14 @@ $txnidname='TxnID';
 
         case 'invty_2transfer':
         case 'invty_2sale':
-            if (!allowedToOpen(array(401,40101,40102),'1rtc')){ goto nopermission; }
+            if (!allowedToOpen(array(401,40101,314),'1rtc')){ goto nopermission; }
 
+            $sqla='SELECT '.$date.',`BranchNo` FROM '.$_POST['Table'].' WHERE TxnID='.intval($_POST['TxnID']);
+            $stmta=$link->query($sqla); $resulta=$stmta->fetch();
 
             if(allowedToOpen(40101,'1rtc')){ //handled branches of operations manager
                 
-                $sqla='SELECT `Date`,`BranchNo` FROM '.$_POST['Table'].' WHERE TxnID='.intval($_POST['TxnID']);
-                $stmta=$link->query($sqla); $resulta=$stmta->fetch();
-
-                if($resulta['Date']==date('Y-m-d') OR (date('Y-m-d')==date('Y-m-d', strtotime("+1 day", strtotime($resulta['Date']))) AND date('H:i')<='12:00')){
+                if($resulta[$date]==date('Y-m-d') OR (date('Y-m-d')==date('Y-m-d', strtotime("+1 day", strtotime($resulta[$date]))) AND date('H:i')<='12:00')){
                     $sqlcheckopsmanager='SELECT BranchNo FROM attend_1branchgroups WHERE BranchNo='.$resulta['BranchNo'].' AND OpsManager='.$_SESSION['(ak0)'].'';
                     $stmtcheckopsmanager=$link->query($sqlcheckopsmanager);
                     if($stmtcheckopsmanager->rowCount()>0){
@@ -152,11 +151,13 @@ $txnidname='TxnID';
                 } else {
                     goto nopermission; 
                 }
-            } elseif(allowedToOpen(40102,'1rtc')){ //invty planners
-                if(1==1){ // no handled branches as of the moment
-                    
+            } elseif(allowedToOpen(314,'1rtc')){ //invty planners
+                $sqlcheckplanner='SELECT BranchNo FROM attend_1branchgroups WHERE BranchNo='.$resulta['BranchNo'].' AND InventoryPlanner='.$_SESSION['(ak0)'].'';
+                $stmtcheckplanner=$link->query($sqlcheckplanner);
+                if($stmtcheckplanner->rowCount()>0){
+                    //allowed
                 } else {
-                    goto nopermission; 
+                    goto nopermission;  
                 }
             }
             break;
