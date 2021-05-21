@@ -40,7 +40,7 @@ switch ($which){
 		
 		
 		$title='Wrong Time Out'; ;
-		$sql=$sqlmain.' WHERE (a.OTTypeNo<>13 AND TimeOut<"10:00") OR (a.OTTypeNo=13 AND TimeOut>"08:00") ORDER BY DateToday DESC, Branch, FullName ASC';
+		$sql=$sqlmain.' WHERE (a.OTTypeNo NOT IN (13,24) AND TimeOut<"10:00") OR (a.OTTypeNo IN (13,24) AND TimeOut>"08:00") ORDER BY DateToday DESC, Branch, FullName ASC';
         $columnnames=array('DateToday', 'IDNo', 'FullName','TimeIn','TimeOut','RemarksDept','RemarksHR', 'Branch'); $width='70%';
         include('../backendphp/layout/displayastable.php'); 
 		
