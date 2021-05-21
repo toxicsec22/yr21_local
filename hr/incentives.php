@@ -124,7 +124,8 @@ echo '</div></div>';
 			WHEN `his`.PositionID IN (37,81) THEN IF(Score>=115,300,250)
 			ELSE 
 				IF(Score>=115,200,150)
-		END) AS RatePerUnit FROM hr_2incentivesub his JOIN 1branches b ON his.BranchNo=b.BranchNo JOIN acctg_6targetscores ts ON `his`.BranchNo=`ts`.BranchNo AND `his`.MonthNo=ts.MonthNo JOIN 1employees e ON `his`.IDNo=e.IDNo JOIN attend_0positions p ON his.PositionID=p.PositionID JOIN attend_1joblevel jl ON jl.JobLevelNo=p.JobLevelNo WHERE his.MonthNo='.$txndate.' ORDER BY Branch,JLID DESC,FullName';
+		END) AS RatePerUnit,IF(NoOfDays>=NoOfSaleDays,"100",TRUNCATE((((SELECT TRUNCATE(IFNULL(SUM(Qty*UnitPrice),0),2) FROM invty_2sale sm JOIN invty_2salesub ss ON sm.TxnID=ss.TxnID WHERE BranchNo=his.BranchNo AND MONTH(`Date`)=his.MonthNo AND `Date` IN (SELECT DateToday FROM attend_2attendance WHERE IDNo=his.IDNo AND BranchNo=his.BranchNo AND LeaveNo IN (11,15)))/(SELECT TRUNCATE(IFNULL(SUM(Qty*UnitPrice),0),2) FROM invty_2sale sm JOIN invty_2salesub ss ON sm.TxnID=ss.TxnID WHERE BranchNo=his.BranchNo AND MONTH(`Date`)=his.MonthNo))*100),2))
+         AS PercentSale FROM hr_2incentivesub his JOIN 1branches b ON his.BranchNo=b.BranchNo JOIN acctg_6targetscores ts ON `his`.BranchNo=`ts`.BranchNo AND `his`.MonthNo=ts.MonthNo JOIN 1employees e ON `his`.IDNo=e.IDNo JOIN attend_0positions p ON his.PositionID=p.PositionID JOIN attend_1joblevel jl ON jl.JobLevelNo=p.JobLevelNo WHERE his.MonthNo='.$txndate.' ORDER BY Branch,JLID DESC,FullName';
         
 	
 	$stmt=$link->query($sql); $result=$stmt->fetchAll();
@@ -151,14 +152,16 @@ SELECT e.IDNo,cop.AssignedBranchNo,cop.NewPositionID,DateofChange FROM attend_2c
                 JOIN (SELECT cop.`DateofChange` AS MaxOfDateofChange,cop.AssignedBranchNo, cp.`IDNo` AS `IDNo`,`NewPositionID` FROM `attend_2changeofpositions` cop JOIN attend_30latestpositionsinclresigned cp ON cop.IDNo=cp.IDNo AND cop.AssignedBranchNo=cp.AssignedBranchNo AND cop.NewPositionID=cp.PositionID WHERE cop.`DateofChange` <= LAST_DAY("'.$currentyr.'-'.$txndate.'-01") GROUP BY cop.`IDNo`,`NewPositionID`) `lp` ON (`cp`.`IDNo` = `lp`.`IDNo`))
             WHERE
                 `cp`.`DateofChange` = `lp`.`MaxOfDateofChange`) AND deptid=10 AND AssignedBranchNo IN (SELECT BranchNo FROM acctg_6targetscores WHERE Score>=100 AND MonthNo='.$txndate.') ;';
-
+// echo $sqltemp.'<br><br>';
 		$stmttemp=$link->prepare($sqltemp); $stmttemp->execute();
 		
 $sqltemp='CREATE TEMPORARY TABLE unionall AS
 SELECT t.IDNo,AssignedBranchNo,NewPositionID,"'.$currentyr.'-'.$txndate.'-01" AS DateofEffectivity FROM assignmenthistory t JOIN 
 (SELECT MAX(`DateofEffectivity`) AS `MaxOfDateofChange`,`IDNo` FROM `assignmenthistory`
     WHERE  `DateofEffectivity` < "'.$currentyr.'-'.$txndate.'-01" GROUP BY `IDNo`) m ON t.IDNo=m.IDNo AND m.MaxOfDateofChange=t.DateofEffectivity
-    UNION SELECT IDNo,AssignedBranchNo,NewPositionID,IFNULL(DateofEffectivity,NULL) AS DateofEffectivity FROM assignmenthistory WHERE YEAR(DateOfEffectivity)='.$currentyr.' AND MONTH(DateOfEffectivity)='.$txndate.'';
+    UNION SELECT IDNo,AssignedBranchNo,NewPositionID,IFNULL(DateofEffectivity,NULL) AS DateofEffectivity FROM assignmenthistory WHERE YEAR(DateOfEffectivity)='.$currentyr.' AND MONTH(DateOfEffectivity)='.$txndate.';';
+	// echo $sqltemp.'<br><br>';
+
 		$stmttemp=$link->prepare($sqltemp); $stmttemp->execute();
 		
 		
@@ -172,20 +175,35 @@ SELECT t.IDNo,AssignedBranchNo,NewPositionID,"'.$currentyr.'-'.$txndate.'-01" AS
 		
 		$sqltemp='CREATE TEMPORARY TABLE attend_2attendanceEdited AS
 SELECT IDNo,TimeIn,DateToday,LeaveNo,BranchNo,if(isnull((SELECT NewPositionID FROM unionall WHERE IDNo=a.IDNo AND DateofEffectivity=a.DateToday)),@n,(@n:=(SELECT NewPositionID FROM unionall WHERE IDNo=a.IDNo AND DateofEffectivity=a.DateToday))) PositionID FROM '.$tabletouse.' a join(select @n:="") n WHERE MONTH(`DateToday`)='.$txndate.' AND YEAR(`DateToday`)='.$currentyr.' AND BranchNo IN (SELECT BranchNo FROM acctg_6targetscores WHERE Score>=100 AND MonthNo='.$txndate.') ORDER BY IDNo;';
-		
+		// echo $sqltemp.'<br><br>';
 $stmttemp=$link->prepare($sqltemp); $stmttemp->execute();
 	
 		
-		/*  $sql0='INSERT INTO hr_2incentivesub (MonthNo,BranchNo,IDNo,PositionID,NoOfDays,Amount,Remarks,EncodedByNo,TimeStamp) SELECT '.$txndate.' AS MonthNo, b.BranchNo,e.IDNo,PositionID, Count(DateToday) AS NoOfDays,ROUND(( (( ( (CASE WHEN (PositionID=32 OR (PositionID IN (37,81) AND (SELECT COUNT(IDNo) FROM attend_30currentpositions WHERE BranchNo=b.BranchNo AND PositionID=32)=0)) THEN IF(Score>=115,400,350) WHEN PositionID IN (37,81) THEN IF(Score>=115,300,250) 
-ELSE IF(Score>=115,200,150) END) * Units)/NoOfSaleDays)*IF(COUNT(DateToday)>=NoOfSaleDays,NoOfSaleDays,COUNT(DateToday)))),0) AS Amount,IF(e.Resigned=1,"Resigned","") AS Remarks,'.$_SESSION['(ak0)'].' AS EncodedByNo,NOW() AS TimeStamp FROM 1employees e  JOIN `'.$tabletouse.'` a ON e.IDNo = a.IDNo
-JOIN `1branches` as b ON b.BranchNo = a.BranchNo 
-JOIN acctg_6targetscores ts ON b.BranchNo=ts.BranchNo JOIN attend_30latestpositionsinclresigned lpr ON e.IDNo=lpr.IDNo 
-JOIN acctg_2salemain asm ON asm.Date=a.DateToday AND asm.BranchNo=a.BranchNo
-WHERE MONTH(DateToday)='.$txndate.' AND PseudoBranch=0 AND Score>=100 AND ts.MonthNo='.$txndate.' AND ((TO_DAYS(CURRENT_TIMESTAMP()) - TO_DAYS(`e`.`DateHired`)) / 365.25)>.25 AND (TimeIn IS NOT NULL OR LeaveNo IN (12,13,15)) 
-GROUP BY e.IDNo,a.BranchNo ORDER BY IDNo,Branch;';  */
 
-$sql0='INSERT INTO hr_2incentivesub (MonthNo,BranchNo,IDNo,PositionID,NoOfDays,Amount,Remarks,EncodedByNo,TimeStamp) SELECT '.$txndate.' AS MonthNo, b.BranchNo,e.IDNo,PositionID, Count(DateToday) AS NoOfDays,ROUND(( (( ( (CASE WHEN (PositionID=32 OR (PositionID IN (37,81) AND (SELECT COUNT(IDNo) FROM attend_2attendanceEdited WHERE BranchNo=b.BranchNo AND PositionID=32)=0)) THEN IF(Score>=115,400,350) WHEN PositionID IN (37,81) THEN IF(Score>=115,300,250) 
-ELSE IF(Score>=115,200,150) END) * Units)/NoOfSaleDays)*IF(COUNT(DateToday)>=NoOfSaleDays,NoOfSaleDays,COUNT(DateToday)))),0) AS Amount,
+$sql0='INSERT INTO hr_2incentivesub (MonthNo,BranchNo,IDNo,PositionID,NoOfDays,Amount,Remarks,EncodedByNo,TimeStamp)
+
+ SELECT '.$txndate.' AS MonthNo, b.BranchNo,e.IDNo,PositionID, Count(DateToday) AS NoOfDays,
+ 
+ 
+ ROUND(( (( ( (CASE 
+ 
+ WHEN (PositionID=32 OR (PositionID IN (37,81) AND (SELECT COUNT(IDNo) FROM attend_2attendanceEdited WHERE BranchNo=b.BranchNo AND PositionID=32)=0)) THEN IF(Score>=115,400,350) 
+ 
+ WHEN PositionID IN (37,81) THEN IF(Score>=115,300,250)
+
+ELSE IF(Score>=115,200,150) END)
+
+
+* Units))*
+
+IF(COUNT(DateToday)>=NoOfSaleDays,1,
+
+
+
+((SELECT TRUNCATE(IFNULL(SUM(Qty*UnitPrice),0),2) FROM invty_2sale sm JOIN invty_2salesub ss ON sm.TxnID=ss.TxnID WHERE BranchNo=a.BranchNo AND MONTH(`Date`)='.$txndate.' AND `Date` IN (SELECT DateToday FROM '.$tabletouse.' WHERE IDNo=e.IDNo AND BranchNo=a.BranchNo AND LeaveNo IN (11,15)))/(SELECT TRUNCATE(IFNULL(SUM(Qty*UnitPrice),0),2) FROM invty_2sale sm JOIN invty_2salesub ss ON sm.TxnID=ss.TxnID WHERE BranchNo=a.BranchNo AND MONTH(`Date`)='.$txndate.'))
+
+
+))),0) AS Amount,
 
 IF(e.Resigned=1,"Resigned","") AS Remarks,'.$_SESSION['(ak0)'].' AS EncodedByNo,NOW() AS TimeStamp FROM 1employees e  JOIN `attend_2attendanceEdited` a ON e.IDNo = a.IDNo
 JOIN `1branches` as b ON b.BranchNo = a.BranchNo 
@@ -218,7 +236,8 @@ GROUP BY e.IDNo,a.BranchNo,PositionID ORDER BY IDNo,Branch;
 	<tr><td>Junior Branch Head (if there is a Branch Head)  </td><td>  250  </td><td>  300</td></tr>
 	<tr><td>Branch Personnel  </td><td>  150  </td><td>  200</td></tr>
 	</table><br>';
-	echo 'Notes *<br>1. ALL absences of branch personnel will be deducted from incentive, except for BH, JBH, OIC who are allowed 2 absences for NCR, or 3 absences for Provincial.<br>2. Only people who have reached 15 days in a branch is eligible for incentives from that branch.<br><br>';
+	// echo 'Notes *<br>1. ALL absences of branch personnel will be deducted from incentive, except for BH, JBH, OIC who are allowed 2 absences for NCR, or 3 absences for Provincial.<br>2. Only people who have reached 15 days in a branch is eligible for incentives from that branch.<br><br>';
+	echo 'Notes *<br>1. Prorated deductions will be done for all absences.  Restdays are not considered as absences.<br>2. If temporarily assigned to other branches, prorated values will be given based on days assigned. This can be a combination of different branches that have reached targets.<br>3. Prorated values are based on daily sales values, <u>not</u> attendance days.<br><br>';
 	$sqlb='SELECT Posted,Approved,Sent FROM hr_1incentivemain WHERE MonthNo='.$txndate.'';
 	$stmtb=$link->query($sqlb); $resultb=$stmtb->fetch();
 	
@@ -331,7 +350,7 @@ GROUP BY e.IDNo,a.BranchNo,PositionID ORDER BY IDNo,Branch;
 	
 	echo '<br><h3>Incentives for the Month of '.date("F", mktime(0, 0, 0, $txndate, 10)).'</h3><br>';
 	echo '<table class="hoverstyle" style="width:90%;font-size:11pt;border:1px solid black;border-collapse:collapse;background-color:#B7E2DB;">';
-	echo '<tr style="font-weight:bold;font-size:12pt;"><td>Branch</td><td>TargetReached</td><td>IDNo</td><td>Name</td><td>Position</td><td>NoOfDays</td><td>Units</td><td>Rate/Unit</td><td align="right" style="padding-right:5px;">Incentives</td><td>Remarks</td><td></td></tr>';
+	echo '<tr style="font-weight:bold;font-size:12pt;"><td>Branch</td><td>TargetReached</td><td>IDNo</td><td>Name</td><td>Position</td><td>NoOfDays</td><td>Units</td><td>Rate/Unit</td><td>PercentSale</td><td align="right" style="padding-right:5px;">Incentives</td><td>Remarks</td><td></td></tr>';
 	echo '<tbody style="overflow:auto;">';
 	
 	$color[1]='#FFEBCD';
@@ -358,9 +377,9 @@ GROUP BY e.IDNo,a.BranchNo,PositionID ORDER BY IDNo,Branch;
 			$cntc=1;
 		}
 		if($editallow==1){
-			echo '<form action="incentives.php?w=Update&MonthNo='.$txndate.'&TxnSubId='.$res['TxnSubId'].'" method="POST"><tr style="padding:30px;" bgcolor="'.$color[$cntc].'">'.($oldbranch<>$res['Branch']?'<td>'.$res['Branch'].'</td><td>'.$res['Score'].'</td>':str_repeat('<td></td>',2)).'<td>'.$res['IDNo'].'</td><td>'.((($res['NoOfDays']<$res['TotalDays']) OR $res['Resigned']==1)?'<blink><b>':'').''.$res['FullName'].''.((($res['NoOfDays']<$res['TotalDays']) OR $res['Resigned']==1)?'</b></blink>':'').'</td><td>'.$res['Position'].'</td><td>'.($res['NoOfDays']<$res['TotalDays']?$res['NoOfDays']."/".$res['TotalDays']:'').'</td><td>'.$res['Units'].'</td><td>'.$res['RatePerUnit'].'</td><td align="right" style="padding-right:5px;"><input style="text-align:right;" type="text" size="5" name="Amount" value="'.$res['Amount'].'"></td><td><input type="text" name="Remarks" value="'.$res['Remarks'].'" size="15"></td><td><input style="background-color:#20B2AA;color:white;padding:4px;" type="submit" value="Edit"></td><tr></form>';
+			echo '<form action="incentives.php?w=Update&MonthNo='.$txndate.'&TxnSubId='.$res['TxnSubId'].'" method="POST"><tr style="padding:30px;" bgcolor="'.$color[$cntc].'">'.($oldbranch<>$res['Branch']?'<td>'.$res['Branch'].'</td><td>'.$res['Score'].'</td>':str_repeat('<td></td>',2)).'<td>'.$res['IDNo'].'</td><td>'.((($res['NoOfDays']<$res['TotalDays']) OR $res['Resigned']==1)?'<blink><b>':'').''.$res['FullName'].''.((($res['NoOfDays']<$res['TotalDays']) OR $res['Resigned']==1)?'</b></blink>':'').'</td><td>'.$res['Position'].'</td><td>'.($res['NoOfDays']<$res['TotalDays']?$res['NoOfDays']."/".$res['TotalDays']:'').'</td><td>'.$res['Units'].'</td><td>'.$res['RatePerUnit'].'</td><td>'.$res['PercentSale'].'</td><td align="right" style="padding-right:5px;"><input style="text-align:right;" type="text" size="5" name="Amount" value="'.$res['Amount'].'"></td><td><input type="text" name="Remarks" value="'.$res['Remarks'].'" size="15"></td><td><input style="background-color:#20B2AA;color:white;padding:4px;" type="submit" value="Edit"></td><tr></form>';
 		} else {
-			echo '<tr style="padding:30px;" bgcolor="'.$color[$cntc].'">'.($oldbranch<>$res['Branch']?'<td>'.$res['Branch'].'</td><td>'.$res['Score'].'</td>':str_repeat('<td></td>',2)).'<td>'.$res['IDNo'].'</td><td>'.((($res['NoOfDays']<$res['TotalDays']) OR $res['Resigned']==1)?'<blink><b>':'').''.$res['FullName'].''.((($res['NoOfDays']<$res['TotalDays']) OR $res['Resigned']==1)?'</b></blink>':'').'</td><td>'.$res['Position'].'</td><td>'.($res['NoOfDays']<$res['TotalDays']?$res['NoOfDays']."/".$res['TotalDays']:'').'</td><td>'.$res['Units'].'</td><td>'.$res['RatePerUnit'].'</td><td align="right" style="padding-right:5px;">'.$res['Amount'].'</td><td>'.$res['Remarks'].'</td><td style="padding:4px;"></td><tr>';
+			echo '<tr style="padding:30px;" bgcolor="'.$color[$cntc].'">'.($oldbranch<>$res['Branch']?'<td>'.$res['Branch'].'</td><td>'.$res['Score'].'</td>':str_repeat('<td></td>',2)).'<td>'.$res['IDNo'].'</td><td>'.((($res['NoOfDays']<$res['TotalDays']) OR $res['Resigned']==1)?'<blink><b>':'').''.$res['FullName'].''.((($res['NoOfDays']<$res['TotalDays']) OR $res['Resigned']==1)?'</b></blink>':'').'</td><td>'.$res['Position'].'</td><td>'.($res['NoOfDays']<$res['TotalDays']?$res['NoOfDays']."/".$res['TotalDays']:'').'</td><td>'.$res['Units'].'</td><td>'.$res['RatePerUnit'].'</td><td>'.$res['PercentSale'].'</td><td align="right" style="padding-right:5px;">'.$res['Amount'].'</td><td>'.$res['Remarks'].'</td><td style="padding:4px;"></td><tr>';
 		}
 		
 		$oldbranch=$res['Branch'];
@@ -370,7 +389,7 @@ GROUP BY e.IDNo,a.BranchNo,PositionID ORDER BY IDNo,Branch;
 		$totnum++;
 		
 	}
-	echo '<tr><td colspan=2><b>'.$noofbranch.' branches, '.$totnum.' records</b></td><td colspan="7" align="right" style="padding-right:5px;"><b>Total: P '.number_format($totamount,0).'</b></td><td></td><td></td></tr>';
+	echo '<tr><td colspan=2><b>'.$noofbranch.' branches, '.$totnum.' records</b></td><td colspan="8" align="right" style="padding-right:5px;"><b>Total: P '.number_format($totamount,0).'</b></td><td></td><td></td></tr>';
 	echo '</tbody>';
 	echo '</table>';
 	
@@ -518,6 +537,7 @@ case 'SendToVoucher':
     $stmt=$link->prepare($sql); $stmt->execute();
     header('Location:../acctg/formcv.php?w=CV&CVNo='.$txnid);
     break;
+	
 	
   
 }
