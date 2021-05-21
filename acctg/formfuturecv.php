@@ -71,7 +71,7 @@ if (in_array($w,array('AddSub','EditSub'))){
         if (isset($_POST['TIN']) AND !empty($_POST['TIN'])){$tin=' TIN=\''.str_replace("-","",$_POST['TIN']).'\', ';} else { $tin='';}
         $sql='';
         foreach ($columnstoaddsub as $field) {$sql=$sql.' `' . $field. '`=\''.addslashes($_POST[$field]).'\', '; }
-        
+        $sql.=' BranchNo='.$branchno.', FromBudgetOf='.$budgetof.', '.$tin.' Amount='.(!is_numeric($_POST['Amount'])?str_replace(',', '',$_POST['Amount']):$_POST['Amount']).', DebitAccountID='.$acctid.',  EncodedByNo='.$_SESSION['(ak0)'].', TimeStamp=Now()';
 
 }
 
@@ -281,6 +281,7 @@ switch ($w){
    case 'AddSub':
        if (allowedToOpen($addallow,$co)){
            $sql='INSERT INTO `'.$subtable.'` SET CVNo='.$_GET[$txnidname].', '.$sql; 
+         //  if($_SESSION['(ak0)']==1002){ echo $sql;}
 	   $stmt=$link->prepare($sql); $stmt->execute();	   
 	   }
         header('Location:formfuturecv.php?w='.$form.'&'.$txnidname.'='.$_GET[$txnidname]);
@@ -303,7 +304,7 @@ switch ($w){
         recordtrail($txnsubid,$subtable,$link,0);
 
         $sql='UPDATE `'.$subtable.'` SET '.$sql.' WHERE TxnSubId='.$txnsubid; 
-        if($_SESSION['(ak0)']==1002){ echo $sql;}
+       // if($_SESSION['(ak0)']==1002){ echo $sql;}
        $stmt=$link->prepare($sql); $stmt->execute();}
         header('Location:formfuturecv.php?w='.$form.'&'.$txnidname.'='.$_GET[$txnidname]);
         break;
