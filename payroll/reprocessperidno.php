@@ -35,7 +35,7 @@ $idno=$_POST['IDNo'];
 $sqlattend='SELECT a.*, FirstName,SurName FROM payroll_20fromattendance a JOIN 1employees e ON e.IDNo=a.IDNo WHERE a.PayrollID='.$payrollid.' AND e.IDNo='.$idno;
 $stmtattend=$link->query($sqlattend); $resattend=$stmtattend->fetch();
 
-$attendcolumns=array('RegDaysPresent', 'LWOPDays', 'LegalDays', 'SpecDays', 'SLDays','VLDays', 'RestDays', 'LWPDays','QDays', 'RegDaysActual','RegDaysActual','RegExShiftHrsOT','RestShiftHrsOT','SpecShiftHrsOT','LegalShiftHrsOT','RestExShiftHrsOT','SpecExShiftHrsOT','LegalExShiftHrsOT');
+$attendcolumns=array('RegDaysPresent', 'LWOPDays', 'LegalDays', 'SpecDays', 'SLDays','VLDays', 'RestDays', 'LWPDays','QDays', 'RegDaysActual','RegExShiftHrsOT','RestShiftHrsOT','SpecShiftHrsOT','LegalShiftHrsOT','RestExShiftHrsOT','SpecExShiftHrsOT','LegalExShiftHrsOT');
 $attend=''; 
 foreach ($attendcolumns as $attendcol){
     $attend.=$attendcol.'&nbsp; <input type=text size=4 name='.$attendcol.' value="'.$resattend[$attendcol].'" ><br>';
@@ -81,8 +81,8 @@ include 'processpayroll.php';
 $sql='SELECT * FROM payroll_25payrolldatalookuptemp WHERE IDNo='.$idno;
 $stmt=$link->query($sql); $res=$stmt->fetch();
 
-$paycolumns=array('Basic','DeM','TaxSh','OT','AbsenceBasic','UndertimeBasic','AbsenceTaxSh','UndertimeTaxSh','SSS-EE','PhilHealth-EE','PagIbig-EE','WTax','SSS-ER',
-    'PhilHealth-ER');
+// $paycolumns=array('Basic','DeM','TaxSh','OT','AbsenceBasic','UndertimeBasic','AbsenceTaxSh','UndertimeTaxSh','SSS-EE','PhilHealth-EE','PagIbig-EE','WTax','SSS-ER','PhilHealth-ER');
+$paycolumns=array('RegDayBasic','RegDayDeM','RegDayTaxSh','VLBasic','VLDeM','VLTaxSh','SLBasic','SLDeM','SLTaxSh','LWPBasic','LWPDeM','LWPTaxSh','RHBasicforDaily','RHDeMforDaily','RHTaxShforDaily','AbsenceBasicforMonthly','AbsenceDeMforMonthly','AbsenceTaxShforMonthly','UndertimeBasic','UndertimeDeM','UndertimeTaxSh','RegDayOT','RestDayOT','SpecOT','RHOT','SSS-EE','PhilHealth-EE','PagIbig-EE','SSS-ER','PhilHealth-ER','PagIbig-ER','WTax');
 
 $update='';
 foreach ($paycolumns as $paycol){
