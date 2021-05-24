@@ -65,7 +65,7 @@ SELECT
                 THEN
                     ShiftHours(`a`.`TimeIn`, `a`.`TimeOut`, `e`.`JobClassNo`, `a`.`Shift`)/ 8
             END),
-            0) + COUNT(IF(`a`.`OTTypeNo` = 13, 1, NULL)) AS `RegDaysActual`,
+            0) + COUNT(IF(`a`.`OTTypeNo` IN (13,24), 1, NULL)) AS `RegDaysActual`,
             
     SUM(IF(`a`.`LeaveNo` = 12 AND `a`.`OTApproval` <> 0, -- Legal/Regular Holiday
             ShiftHours(`a`.`TimeIn`, IF(`ot`.`EndOfOT` IS NULL, `a`.`TimeOut`,
