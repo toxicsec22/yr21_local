@@ -133,7 +133,7 @@ $txnidname='TxnID';
 
         case 'invty_2transfer':
         case 'invty_2sale':
-            if (!allowedToOpen(array(401,40101,314),'1rtc')){ goto nopermission; }
+            if (!allowedToOpen(array(401,40101,40102,314),'1rtc')){ goto nopermission; }
 
             $sqla='SELECT '.$date.',`BranchNo` FROM '.$_POST['Table'].' WHERE TxnID='.intval($_POST['TxnID']);
             $stmta=$link->query($sqla); $resulta=$stmta->fetch();
