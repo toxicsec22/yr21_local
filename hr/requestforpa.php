@@ -14,7 +14,7 @@ if (allowedToOpen(6304,'1rtc')) {  //OPS Man
 	$addcondlist=' AND cp.deptid IN (70,10) AND cp.IDNo<>'.$_SESSION['(ak0)'].'';
 } else if (allowedToOpen(6305,'1rtc')){ //SalesM
 	$addcondlist=' AND cp.IDNo IN (SELECT TeamLeader FROM attend_1branchgroups WHERE SAM='.$_SESSION['(ak0)'].') AND cp.IDNo<>'.$_SESSION['(ak0)'].'';
-} else if (allowedToOpen(6303,'1rtc')){ //SalesM
+} else if (allowedToOpen(array(6303,101),'1rtc')){ //SalesM
 	$addcondlist='';
 } else { //others or heads
 	$addcondlist=' AND (cp.deptheadpositionid='.$_SESSION['&pos'].' OR cp.deptid=(SELECT deptid FROM attend_30currentpositions WHERE IDNo='.$_SESSION['(ak0)'].')) AND cp.IDNo<>'.$_SESSION['(ak0)'].'';
@@ -37,7 +37,7 @@ switch ($which){
 	<div style="background-color:#cccccc; width:63%; border: 1px solid black; padding:10px;" >
 	 <b>Approval Process:</b><br>
 &nbsp; &nbsp; &nbsp; &nbsp; 1. Requester encodes all details, then submits.<br>
-&nbsp; &nbsp; &nbsp; &nbsp; 2. Dept Head shall approve/deny request. (No approval if the requester is dept head [Auto-Approved])<br>&nbsp; &nbsp; &nbsp; &nbsp; 3. HR will serve request.<br><br>&nbsp; &nbsp; &nbsp; &nbsp; * All denied requests must have explanations.<br></div>';
+&nbsp; &nbsp; &nbsp; &nbsp; 2. Dept Head shall approve/deny request. (No approval if the requester is dept head [Auto-Approved])<br> &nbsp; &nbsp; &nbsp; &nbsp; 3. RCE/JYE shall approve/deny request.<br>&nbsp; &nbsp; &nbsp; &nbsp; 4. HR will serve request.<br><br></div>';
 
 	echo '</br><h3>'.$title.'</h3></br>';
 	if(isset($_GET['reset'])){
@@ -53,18 +53,24 @@ switch ($which){
 				</form>';
 	
     //Active
-    if(isset($_POST['btnLookup'])){
-        if($_POST['Status']==1){
-            $status='Approved';
-            $reqstat=1 .' AND Served=0';
-        } else if($_POST['Status']==2){
-            $status='Denied';
+    if(isset($_POST['btnLookup']) OR isset($_REQUEST['Status'])){
+        if($_REQUEST['Status']==1){
+            $status='Approved By Dept Head';
+            $reqstat=1 .' AND Served=0 AND ApprovedByEO=0';
+        } else if($_REQUEST['Status']==2){
+            $status='Denied By Dept Head';
             $reqstat=2;
-        } else if($_POST['Status']==3){
+        } else if($_REQUEST['Status']==3){
             $status='Served';
 			$reqstat=1 .' AND Served=1';
 			$addlprocess='requestforpa.php?w=Reset&TxnID='; $addlprocesslabel='Reset';
-        } else {
+        } else if($_REQUEST['Status']==4){
+            $status='Approved By ExecOfc';
+			$reqstat=1 .' AND ApprovedByEO=1 AND Served=0';
+        }  else if($_REQUEST['Status']==5){
+            $status='Denied By ExecOfc';
+			$reqstat=1 .' AND ApprovedByEO=2 AND Served=0';
+		} else {
             $status='Pending';
             $reqstat=0;
         }
@@ -73,16 +79,14 @@ switch ($which){
         $reqstat=0;
     }
 	$formdesc='</i><br><form action="requestforpa.php" method="POST">
-	<input type="radio" name="Status" value="0"/> Pending &nbsp; &nbsp; &nbsp;  
-	<input type="radio" name="Status" value="1"/> Approved &nbsp; &nbsp; &nbsp; 
-	<input type="radio" name="Status" value="2"/> Denied &nbsp; &nbsp; &nbsp; 
+	<b>Filter by:</b> &nbsp; &nbsp;<input type="radio" name="Status" value="0"/> Pending &nbsp; &nbsp; &nbsp;  
+	<input type="radio" name="Status" value="1"/> Approved By Dept Head &nbsp; &nbsp; &nbsp; 
+	<input type="radio" name="Status" value="2"/> Denied By Dept Head &nbsp; &nbsp; &nbsp; 
+	<input type="radio" name="Status" value="4"/> Approved By ExecOfc &nbsp; &nbsp; &nbsp; 
+	<input type="radio" name="Status" value="5"/> Denied By ExecOfc &nbsp; &nbsp; &nbsp; 
 	<input type="radio" name="Status" value="3"/> Served &nbsp; &nbsp; &nbsp; <input type="submit" name="btnLookup" value="Lookup"></form><br><b>'.$status.'</b><i>';
 	
    
-	
-	
-
-
 
 if (allowedToOpen(array(100,6303),'1rtc')) {
         if($reqstat==0 AND (allowedToOpen(100,'1rtc'))){
@@ -91,10 +95,20 @@ if (allowedToOpen(array(100,6303),'1rtc')) {
 
 		$addlprocess2='requestforpa.php?w=deny&TxnID='; $addlprocesslabel2='Deny';
 	}
-	if(isset($_POST['Status']) AND $_POST['Status']==1 AND (allowedToOpen(6303,'1rtc'))){
+	if(isset($_REQUEST['Status']) AND $_REQUEST['Status']==1 AND (allowedToOpen(array(6303,101),'1rtc'))){
 		//serve button
-		$editprocess2='requestforpa.php?w=deletebyhr&TxnID='; $editprocesslabel2='Delete';
-		$editprocess2onclick='OnClick="return confirm(\'Really Delete This?\');"';
+		if(allowedToOpen(6303,'1rtc')){
+			$editprocess2='requestforpa.php?w=deletebyhr&TxnID='; $editprocesslabel2='Delete';
+			$editprocess2onclick='OnClick="return confirm(\'Really Delete This?\');"';
+		}
+		if(allowedToOpen(101,'1rtc')){
+			$editprocess='requestforpa.php?w=approvedeo&TxnID='; $editprocesslabel='Approve'; $editprocessonclick='OnClick="return confirm(\'Are you sure you want to Approve?\');"';
+
+			$addlprocess2='requestforpa.php?w=denyeo&TxnID='; $addlprocesslabel2='Deny';
+		}
+	}
+	if(isset($_REQUEST['Status']) AND $_REQUEST['Status']==4 AND (allowedToOpen(6303,'1rtc'))){
+		//serve button
 
 		$addlprocess2='requestforpa.php?w=serve&TxnID='; $addlprocesslabel2='Served?';
 	}
@@ -105,7 +119,7 @@ if (allowedToOpen(array(100,6303),'1rtc')) {
 
 
 $sql='SELECT RPAID AS TxnID,DateToBeServed,ActionDesc,
-    cp.FullName AS Employee,CONCAT(e2.NickName," ",e2.Surname) AS RequestedBy ,RequestedTS,Position,IF(deptid IN (2,10),Branch,dept) AS `Branch/Dept`,Reason,e.NickName AS ApprovedBy,e3.NickName AS ServedBy,e.NickName AS DeniedBy FROM attend_30currentpositions cp JOIN hr_2requestpa rpa ON cp.IDNo=rpa.IDNo LEFT JOIN 1employees e ON rpa.StatusByNo=e.IDNo LEFT JOIN 1employees e2 ON rpa.RequestedByNo=e2.IDNo LEFT JOIN 1employees e3 ON rpa.ServedByNo=e3.IDNo JOIN hr_0personnelaction pa ON rpa.ActionID=pa.ActionID WHERE ReqStatus='.$reqstat.' '.$addlcondi.'  '.$addcondlist.' ORDER BY DateToBeServed ASC';
+    cp.FullName AS Employee,CONCAT(e2.Nickname," ",e2.Surname) AS RequestedBy,CONCAT(e4.Nickname," ",e4.SurName) AS ApprovedByExecOfc,RequestedTS,Position,IF(deptid IN (2,10),Branch,dept) AS `Branch/Dept`,Reason,CONCAT(e.Nickname," ",e.SurName) AS ApprovedByDHead,CONCAT(e3.Nickname," ",e3.SurName) AS ServedBy,CONCAT(e.Nickname," ",e.SurName) AS DeniedByDhead,CONCAT(e5.Nickname," ",e5.SurName) AS DeniedByExecOfc FROM attend_30currentpositions cp JOIN hr_2requestpa rpa ON cp.IDNo=rpa.IDNo LEFT JOIN 1employees e ON rpa.StatusByNo=e.IDNo LEFT JOIN 1employees e2 ON rpa.RequestedByNo=e2.IDNo LEFT JOIN 1employees e3 ON rpa.ServedByNo=e3.IDNo JOIN hr_0personnelaction pa ON rpa.ActionID=pa.ActionID LEFT JOIN 1employees e4 ON rpa.ApprovedByEONo=e4.IDNo LEFT JOIN 1employees e5 ON rpa.ApprovedByEONo=e5.IDNo WHERE ReqStatus='.$reqstat.' '.$addlcondi.'  '.$addcondlist.' ORDER BY DateToBeServed ASC';
 
 // echo $sql;
 	$txnidname='TxnID';
@@ -116,14 +130,20 @@ $sql='SELECT RPAID AS TxnID,DateToBeServed,ActionDesc,
 	if($reqstat==0){
 	$delprocess='requestforpa.php?w=delete&TxnID=';
 	}
-	if($status=='Approved'){
-		array_push($columnnames,'ApprovedBy');
+	if($status=='Approved By Dept Head'){
+		array_push($columnnames,'ApprovedByDHead');
+	}
+	if($status=='Approved By ExecOfc'){
+		array_push($columnnames,'ApprovedByDHead','ApprovedByExecOfc');
 	}
 	if($reqstat==2){
-		array_push($columnnames,'DeniedBy');
+		array_push($columnnames,'DeniedByDHead');
+	}
+	if($status=='Denied By ExecOfc'){
+		array_push($columnnames,'ApprovedByDHead','DeniedByExecOfc');
 	}
 	if($status=='Served'){
-		array_push($columnnames,'ApprovedBy','ServedBy');
+		array_push($columnnames,'ApprovedByDHead','ApprovedByExecOfc','ServedBy');
 	}
 	include('../backendphp/layout/displayastablenosort.php');
 	
@@ -142,6 +162,18 @@ $sql='SELECT RPAID AS TxnID,DateToBeServed,ActionDesc,
 		}
 	header("Location:requestforpa.php?w=lists");
 	break;
+
+	case 'approvedeo':
+	case 'denyeo':
+		if (allowedToOpen(101,'1rtc')) {
+		$txnid=intval($_GET['TxnID']);
+		$sql='update hr_2requestpa set ApprovedByEO=IF("'.$which.'"="approvedeo",1,2),ApprovedByEOTS=NOW(),ApprovedByEONo='.$_SESSION['(ak0)'].' where RPAID=\''.$txnid.'\' and ReqStatus=1';
+		// echo $sql; exit();
+		$stmt=$link->prepare($sql); $stmt->execute();
+	}
+		header("Location:requestforpa.php?w=lists");
+	break;
+
 	
 	case 'serve':
 			if (allowedToOpen(6303,'1rtc')) {
@@ -179,8 +211,8 @@ $sql='SELECT RPAID AS TxnID,DateToBeServed,ActionDesc,
 	$txnid=intval($_GET['TxnID']);
 
 	
-	$sql='update hr_2requestpa set Served=0,ServedTS=NOW(),ServedByNo=NULL where RPAID=\''.$txnid.'\' and ReqStatus=1 AND Served=1 AND DateToBeServed>=(CURDATE() - INTERVAL 3 DAY)';
-
+	$sql='update hr_2requestpa set Served=0,ServedTS=NOW(),ServedByNo=NULL where RPAID=\''.$txnid.'\' and ReqStatus=1 AND Served=1 AND ApprovedByEO=1 AND DateToBeServed>=(CURDATE() - INTERVAL 3 DAY)';
+// echo $sql;
 		$stmt=$link->prepare($sql); $stmt->execute();
 		
 		}

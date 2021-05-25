@@ -1,4 +1,5 @@
 <?php
+
 $path=$_SERVER['DOCUMENT_ROOT']; include_once $path.'/acrossyrs/logincodes/checkifloggedon.php'; 
 if (!allowedToOpen(59021,'1rtc')) { echo 'No permission'; exit; }
 $which=(!isset($_GET['w'])?'Default':$_GET['w']);
@@ -63,6 +64,13 @@ include_once('../backendphp/layout/linkstyle.php');
 <?php
 
 } else {
+	$sqlchkmain='(SELECT COUNT(RPAID) FROM hr_2requestpa rpa JOIN hr_2personnelaction pa ON rpa.IDNo=pa.IDNo AND rpa.DateToBeServed=pa.DateServed WHERE rpa.IDNo=ht.IDNo AND
+	(CASE
+		WHEN rpa.ActionID IN (1,2,4,6,7) THEN "1,2,5"
+		WHEN rpa.ActionID IN (3,5) THEN 3
+		ELSE 4
+	END) LIKE CONCAT("%",nopaID,"%")
+	AND ';
 	$sqlcheckothermain='SELECT 
 	(CASE
 		WHEN nopaID=1 THEN "Promotion"
@@ -93,9 +101,12 @@ include_once('../backendphp/layout/linkstyle.php');
 		WHEN nopaID=3 THEN (SELECT Remarks FROM payroll_22rates WHERE IDNo=ht.IDNo ORDER BY DateofChange DESC LIMIT 1)
 		ELSE ""
 	END)
-	AS Remarks
+	AS Remarks,
+	'.$sqlchkmain.' ReqStatus=1) AS checker,
+	'.$sqlchkmain.' ReqStatus=1 AND Served=1) AS checker2,
+	'.$sqlchkmain.' ReqStatus=1 AND Served=1 AND ApprovedByEO=1) AS checker3
 	 FROM hr_nopaholdingtable ht LEFT JOIN attend_0positions p1 ON ht.PositionIDFrom=p1.PositionID LEFT JOIN attend_0positions p2 ON ht.PositionIDTo=p2.PositionID LEFT JOIN 1branches b1 ON ht.BranchNoFrom=b1.BranchNo LEFT JOIN 1branches b2 ON ht.BranchNoTo=b2.BranchNo WHERE IDNo=';
-
+// echo $sqlcheckothermain;
 	 echo '<title>Print NOPA Letters</title>';
 		echo '<style>@media print {
 			 html, body {
@@ -343,7 +354,7 @@ switch ($which)
 					echo '<td>'.$row['Position'].'/'.$row['Branch'].'</td><td></td><td></td>';
 				}
 				
-				// echo '<td>'.(($fromwhatnopa==1 OR $fromwhatnopa==2 OR $fromwhatnopa==5)?'<input type="submit" style="background-color:orange;color:white;padding:3px;" value="Edit">':'').'</td></form><td><form action="nopa.php?w=Print&From='.$fromwhatnopa.'&TxnID='.$row['TxnID'].'" method="post"><input type="submit" style="background-color:blue;color:white;padding:3px;" value="Print"></form></td><td><form action="nopa.php?w=Remove&TxnID='.$row['TxnID'].'" method="post"><input type="submit" style="background-color:red;color:white;padding:3px;" value="Remove" OnClick="return confirm(\'Really remove from list?\');"></form></td></tr>';
+				
 				echo '<td></td></form><td><form action="nopa.php?w=Print&From='.$fromwhatnopa.'&TxnID='.$row['TxnID'].'" method="post"><input type="submit" style="background-color:blue;color:white;padding:3px;" value="Print"></form></td><td><form action="nopa.php?w=Remove&TxnID='.$row['TxnID'].'" method="post"><input type="submit" style="background-color:red;color:white;padding:3px;" value="Remove" OnClick="return confirm(\'Really remove from list?\');"></form></td></tr>';
 				$colorcount++;
 			}
@@ -373,77 +384,102 @@ switch ($which)
 	
 	case 'PrintAll':
 	
-	// $sql='SELECT ht.TxnID,RecommendedByNo,(SELECT (DateHired) + INTERVAL 6 MONTH + INTERVAL 1 DAY) AS DateofEffectivityReg,cp.Position,ht.IDNo,SalaryFrom,SalaryTo,FullName,(SELECT CONCAT(Nickname," ",UPPER(LEFT(MiddleName,1)),". ",SurName) FROM 1employees WHERE IDNo=ht.RecommendedByNo) AS RecommendedBy,(SELECT Position FROM attend_30currentpositions WHERE IDNo=ht.RecommendedByNo) AS RecommendedByPos,(SELECT Position FROM attend_30currentpositions WHERE IDNo=ht.VerifiedByNo) AS VerifiedByPos,(SELECT CONCAT(Nickname," ",UPPER(LEFT(MiddleName,1)),". ",SurName) FROM 1employees WHERE IDNo=ht.VerifiedByNo) AS VerifiedBy,cp.Branch,(SELECT MAX(DateofChange) FROM attend_2changeofpositions WHERE IDNo=cp.IDNo) AS DateofEffectivity,(SELECT MAX(DateofChange) FROM payroll_22rates WHERE IDNo=cp.IDNo) AS DateofEffectivitySalary,(SELECT Remarks FROM attend_2changeofpositions WHERE IDNo=cp.IDNo ORDER BY DateofChange DESC LIMIT 1) AS Remarks,(SELECT Remarks FROM payroll_22rates WHERE IDNo=cp.IDNo ORDER BY DateofChange DESC LIMIT 1) AS RemarksSalary,dept,p1.Position AS PositionFrom,p2.Position AS PositionTo,b1.Branch AS BranchFrom,b2.Branch AS BranchTo FROM hr_nopaholdingtable ht JOIN attend_30currentpositions cp ON ht.IDNo=cp.IDNo LEFT JOIN attend_0positions p1 ON ht.PositionIDFrom=p1.PositionID LEFT JOIN attend_0positions p2 ON ht.PositionIDTo=p2.PositionID LEFT JOIN 1branches b1 ON ht.BranchNoFrom=b1.BranchNo LEFT JOIN 1branches b2 ON ht.BranchNoTo=b2.BranchNo JOIN 1employees e ON ht.IDNo=e.IDNo WHERE nopaID='.$_GET['From'].'';
-	$sql='SELECT ht.TxnID,RecommendedByNo,(SELECT (DateHired) + INTERVAL 6 MONTH + INTERVAL 1 DAY) AS DateofEffectivityReg,cp.Position,ht.IDNo,SalaryFrom,SalaryTo,FullName,(SELECT CONCAT(Nickname," ",UPPER(LEFT(MiddleName,1)),". ",SurName) FROM 1employees WHERE IDNo=ht.RecommendedByNo) AS RecommendedBy,(SELECT Position FROM attend_30currentpositions WHERE IDNo=ht.RecommendedByNo) AS RecommendedByPos,(SELECT Position FROM attend_30currentpositions WHERE IDNo=ht.VerifiedByNo) AS VerifiedByPos,(SELECT CONCAT(Nickname," ",UPPER(LEFT(MiddleName,1)),". ",SurName) FROM 1employees WHERE IDNo=ht.VerifiedByNo) AS VerifiedBy,cp.Branch,(SELECT MAX(DateofChange) FROM attend_2changeofpositions WHERE IDNo=cp.IDNo) AS DateofEffectivity,(SELECT MAX(DateofChange) FROM payroll_22rates WHERE IDNo=cp.IDNo) AS DateofEffectivitySalary,(SELECT Remarks FROM attend_2changeofpositions WHERE IDNo=cp.IDNo ORDER BY DateofChange DESC LIMIT 1) AS Remarks,(SELECT Remarks FROM payroll_22rates WHERE IDNo=cp.IDNo ORDER BY DateofChange DESC LIMIT 1) AS RemarksSalary,dept,p1.Position AS PositionFrom,p2.Position AS PositionTo,b1.Branch AS BranchFrom,b2.Branch AS BranchTo FROM hr_nopaholdingtable ht JOIN attend_30currentpositions cp ON ht.IDNo=cp.IDNo LEFT JOIN attend_0positions p1 ON ht.PositionIDFrom=p1.PositionID LEFT JOIN attend_0positions p2 ON ht.PositionIDTo=p2.PositionID LEFT JOIN 1branches b1 ON ht.BranchNoFrom=b1.BranchNo LEFT JOIN 1branches b2 ON ht.BranchNoTo=b2.BranchNo JOIN 1employees e ON ht.IDNo=e.IDNo WHERE nopaID='.$_GET['From'].'';
+	
+	$sql='SELECT ht.TxnID,RecommendedByNo,VerifiedByNo,(SELECT (DateHired) + INTERVAL 6 MONTH + INTERVAL 1 DAY) AS DateofEffectivityReg,cp.Position,ht.IDNo,SalaryFrom,SalaryTo,FullName,(SELECT CONCAT(Nickname," ",UPPER(LEFT(MiddleName,1)),". ",SurName) FROM 1employees WHERE IDNo=ht.RecommendedByNo) AS RecommendedBy,(SELECT Position FROM attend_30currentpositions WHERE IDNo=ht.RecommendedByNo) AS RecommendedByPos,(SELECT Position FROM attend_30currentpositions WHERE IDNo=ht.VerifiedByNo) AS VerifiedByPos,(SELECT CONCAT(Nickname," ",UPPER(LEFT(MiddleName,1)),". ",SurName) FROM 1employees WHERE IDNo=ht.VerifiedByNo) AS VerifiedBy,cp.Branch,(SELECT MAX(DateofChange) FROM attend_2changeofpositions WHERE IDNo=cp.IDNo) AS DateofEffectivity,(SELECT MAX(DateofChange) FROM payroll_22rates WHERE IDNo=cp.IDNo) AS DateofEffectivitySalary,(SELECT Remarks FROM attend_2changeofpositions WHERE IDNo=cp.IDNo ORDER BY DateofChange DESC LIMIT 1) AS Remarks,(SELECT Remarks FROM payroll_22rates WHERE IDNo=cp.IDNo ORDER BY DateofChange DESC LIMIT 1) AS RemarksSalary,dept,p1.Position AS PositionFrom,p2.Position AS PositionTo,b1.Branch AS BranchFrom,b2.Branch AS BranchTo FROM hr_nopaholdingtable ht JOIN attend_30currentpositions cp ON ht.IDNo=cp.IDNo LEFT JOIN attend_0positions p1 ON ht.PositionIDFrom=p1.PositionID LEFT JOIN attend_0positions p2 ON ht.PositionIDTo=p2.PositionID LEFT JOIN 1branches b1 ON ht.BranchNoFrom=b1.BranchNo LEFT JOIN 1branches b2 ON ht.BranchNoTo=b2.BranchNo JOIN 1employees e ON ht.IDNo=e.IDNo WHERE nopaID='.$_GET['From'].'';
 
 	$stmt=$link->query($sql); $resall=$stmt->fetchAll();
 	
 	
 	foreach($resall as $res){
-	$nopaform='';
-	$nopaform.='<table style="font-size:11.5pt;font-family:Calibri;border-collapse:collapse;border:1px solid black;">';
-	$nopaform.='<tr><td colspan=5 align="center" style="border:1px solid black;"><font style="font-size:15pt;padding:3px;"><b>NOTICE OF PERSONNEL ACTION</b></font></td></tr>';
-	$nopaform.='<tr><td colspan=3 style="padding:3px;border:1px solid black;">'.$res['FullName'].' ('.$res['IDNo'].')</td><td colspan=2 style="padding:3px;border:1px solid black;">DATE: '.date('Y-m-d').'</td></tr>';
-	$nopaform.='<tr><td colspan=5 style="padding:3px;border:1px solid black;">'.$res['Position'].' / '.$res['dept'].' / '.$res['Branch'].'</td></tr>';
-	$nopaform.='<tr><td colspan=2 align="center" style="padding:3px;width:25%;border-right:1px solid black;"><b>Nature of Action</b></td><td align="center" style="padding:3px;border-right:1px solid black;width:25%;"><b>From</b></td><td align="center" style="padding:3px;border-right:1px solid black;width:25%;"><b>To</b></td><td align="center" style="padding:3px;width:25%;border-right:1px solid black;"><b>Remarks</b></td></tr>';
-	
-	
-	$sqlcheckother=$sqlcheckothermain.$res['IDNo'].'';
-	$stmtothers=$link->query($sqlcheckother); $resothers=$stmtothers->fetchAll();
-	// echo $sqlcheckother;
-	foreach($resothers AS $resother){
-		$nopaform.='<tr><td colspan=2 style="padding:3px;font-size:12pt;border-right:1px solid black;" align="center">'.$resother['NOPAaction'].'</td><td align="center" style="padding:3px;font-size:12pt;border-right:1px solid black;">'.$resother['FromWhat'].'</td><td style="padding:3px;font-size:12pt;border-right:1px solid black;" align="center">'.$resother['ToWhat'].'</td><td style="padding:3px;border-right:1px solid black;">'.$resother['Remarks'].'</td></tr>';
-	}
-
-		// if($_GET['From']==1){
-		// 	$nopaform.='<tr><td colspan=2 style="padding:25px;" align="center"><b>Promotion</b></td><td align="center">'.$res['PositionFrom'].'</td><td align="center">'.$res['PositionTo'].'</td></tr>';
-		// }
-		// if($_GET['From']==5){
-		// 	$nopaform.='<tr><td colspan=2 style="padding:25px;" align="center"><b>Change in Position</b></td><td align="center">'.$res['PositionFrom'].'</td><td align="center">'.$res['PositionTo'].'</td></tr>';
-		// }
-		// if($_GET['From']==2){
-		// 	$nopaform.='<tr><td colspan=2 style="padding:25px;" align="center"><b>Branch Transfer</b></td><td align="center">'.$res['BranchFrom'].'</td><td align="center">'.$res['BranchTo'].'</td></tr>';
-		// }
-		// if($_GET['From']==3){
-		// 	$nopaform.='<tr><td colspan=2 style="padding:25px;" align="center"><b>Salary Adjustment</b></td><td align="center">'.$res['SalaryFrom'].'</td><td align="center">'.$res['SalaryTo'].'</td></tr>';
-		// }
-		// if($_GET['From']==4){
-		// 	$nopaform.='<tr><td colspan=2 style="padding:25px;" align="center"><b>Regularization</b></td><td align="center"><b>Probationary Employment</b></td><td align="center"><b>Regular Employment</b></td></tr>';
-		// }
+		$nopaform='';
+		$nopaform.='<table style="font-size:11.5pt;font-family:Calibri;border-collapse:collapse;border:1px solid black;">';
+		$nopaform.='<tr><td colspan=5 align="center" style="border:1px solid black;"><font style="font-size:15pt;padding:3px;"><b>NOTICE OF PERSONNEL ACTION</b></font></td></tr>';
+		$nopaform.='<tr><td colspan=3 style="padding:3px;border:1px solid black;">'.$res['FullName'].' ('.$res['IDNo'].')</td><td colspan=2 style="padding:3px;border:1px solid black;">DATE: '.date('Y-m-d').'</td></tr>';
+		$nopaform.='<tr><td colspan=5 style="padding:3px;border:1px solid black;">'.$res['Position'].' / '.$res['dept'].' / '.$res['Branch'].'</td></tr>';
+		$nopaform.='<tr><td colspan=2 align="center" style="padding:3px;border-right:1px solid black;width:25%;"><b>Nature of Action</b></td><td align="center" style="padding:3px;border-right:1px solid black;width:25%;"><b>From</b></td><td align="center" style="padding:3px;border-right:1px solid black;width:25%;"><b>To</b></td><td align="center" style="padding:3px;width:25%;border-right:1px solid black;"><b>Remarks</b></td></tr>';
+		
+		
+		$sqlcheckother=$sqlcheckothermain.$res['IDNo'].'';
+		// echo $sqlcheckother;
+		$stmtothers=$link->query($sqlcheckother); $resothers=$stmtothers->fetchAll();
+		$chk=1; $chk2=1; $chk3=1;
+		foreach($resothers AS $resother){
+			$nopaform.='<tr><td colspan=2 style="padding:3px;font-size:12pt;border-right:1px solid black;" align="center">'.$resother['NOPAaction'].' '.($resother['checker']>0?'':'<font style="color:red;font-size:8pt;">not encoded</font>').'</td><td align="center" style="padding:3px;font-size:12pt;border-right:1px solid black;">'.$resother['FromWhat'].'</td><td style="padding:3px;font-size:12pt;border-right:1px solid black;" align="center">'.$resother['ToWhat'].'</td><td style="padding:3px;border-right:1px solid black;">'.$resother['Remarks'].'</td></tr>';
+			$chk=$resother['checker'];
+			$chk2=$resother['checker2'];
+			$chk3=$resother['checker3'];
+		}
 		
 		$effdate='';
-	if($_GET['From']==1 OR $_GET['From']==2 OR $_GET['From']==5){
-		$effdate=$res['DateofEffectivity'];
-		//(SELECT )
-	}
-	if($_GET['From']==3){
-		$effdate=$res['DateofEffectivitySalary'];
-	}
-	if($_GET['From']==4){
-		$effdate=$res['DateofEffectivityReg'];
-	}
-	$nopaform.='<tr><td colspan=5 style="padding:3px;border:1px solid black;">Effective Date: '.$effdate.'</td></tr>';
-		// $nopaform.='<tr><td colspan=2>Remarks</td><td colspan=2>Effective Date:</td></tr>';
-		// if($_GET['From']==1 OR $_GET['From']==2 OR $_GET['From']==5){
-		// 	$nopaform.='<tr><td colspan=2>&nbsp; &nbsp;'.$res['Remarks'].'</td><td colspan=2>&nbsp; &nbsp;'.$res['DateofEffectivity'].'</td></tr>';
-		// }
-		// if($_GET['From']==3){
-		// 	$nopaform.='<tr><td colspan=2>&nbsp; &nbsp;'.$res['RemarksSalary'].'</td><td colspan=2>&nbsp; &nbsp;'.$res['DateofEffectivitySalary'].'</td></tr>';
-		// }
-		// if($_GET['From']==4){
-		// 	$nopaform.='<tr><td colspan=2></td><td colspan=2>&nbsp; &nbsp;'.$res['DateofEffectivityReg'].'</td></tr>';
-		// }
+		if($_GET['From']==1 OR $_GET['From']==2 OR $_GET['From']==5){
+			$effdate=$res['DateofEffectivity'];
+			//(SELECT )
+		}
+		if($_GET['From']==3){
+			$effdate=$res['DateofEffectivitySalary'];
+		}
+		if($_GET['From']==4){
+			$effdate=$res['DateofEffectivityReg'];
+		}
+		$nopaform.='<tr><td colspan=5 style="padding:3px;border:1px solid black;">Effective Date: '.$effdate.'</td></tr>';
 		
-		// $nopaform.='<tr><td>Recommended by:</td><td>Verified by:</td><td colspan=3>Approved by:</td></tr>';
-		// $nopaform.='<tr><td style="padding-top:40px;" align="center"><b>'.strtoupper($res['RecommendedBy']).'</b></td><td  style="padding-top:40px;" align="center"><b>'.strtoupper($res['VerifiedBy']).'</b></td><td colspan=3 style="padding-top:40px;" align="center"><b>RC EUSEBIO'.($res['RecommendedByNo']<>'1002'?'/JY EUSEBIO':'').'</b></td></tr>';
-		// $nopaform.='<tr><td align="center">'.strtoupper($res['RecommendedByPos']).'</td><td align="center">'.strtoupper($res['VerifiedByPos']).'</td><td colspan=3 align="center">PRESIDENT'.($res['RecommendedByNo']<>'1002'?'/EVP':'').'</td></tr>';
-
+	
 		$nopaform.='<tr>';
 		$nopaform.='<td colspan=6>';
 		$nopaform.='<table width="100%" style="border-collapse:collapse;">';
 		$nopaform.='<tr><td style="padding:3px;border-right:1px solid black;">Recommended by:</td><td style="padding:3px;border-right:1px solid black;">Verified by:</td><td style="padding:3px;">Approved by:</td></tr>';
-		$nopaform.='<tr><td style="padding:3px;border-right:1px solid black;" align="center"><br><br><b>'.strtoupper($res['RecommendedBy']).'</b></td><td  style="padding:3px;border-right:1px solid black;" align="center"><br><br><b>'.strtoupper($res['VerifiedBy']).'</b></td>';
-		$nopaform.='<td style="padding:3px;" align="center"><br><br><b>RC EUSEBIO'.($res['RecommendedByNo']<>'1002'?'/JY EUSEBIO':'').'</b></td></tr>';
+		$nopaform.='<tr><td style="padding:3px;border-right:1px solid black;" align="center" valign="bottom">';
+		
+		if($chk>=1){
+		$sqlsign='SELECT `imageData`,`imageType` FROM 1_gamit.empsignature WHERE `Open`=2 AND IDNo='.$res['RecommendedByNo'].'';
+		$stmtsign=$link->prepare($sqlsign);
+		$stmtsign->execute();
+		$data=$stmtsign->fetch();
+		if($stmtsign->rowCount()>0){
+			$nopaform.='<img style="width:100px;height:50px;" src="data:'.$data['imageType'].';base64,'.base64_encode($data['imageData']).'"/><br>';
+			} else {
+				$nopaform.='<br><br>';
+			}
+		} else {
+			$nopaform.='<br><br>';
+		}
+		$nopaform.='<b>'.strtoupper($res['RecommendedBy']).'</b></td><td  style="padding:3px;border-right:1px solid black;" align="center" valign="bottom">';
+	
+	
+		if($chk2>=1){
+			$sqlsign='SELECT `imageData`,`imageType` FROM 1_gamit.empsignature WHERE `Open`=2 AND IDNo='.$res['VerifiedByNo'].'';
+			$stmtsign=$link->prepare($sqlsign);
+			$stmtsign->execute();
+			$data=$stmtsign->fetch();
+			if($stmtsign->rowCount()>0){
+				$nopaform.='<img style="width:100px;height:50px;" src="data:'.$data['imageType'].';base64,'.base64_encode($data['imageData']).'"/><br>';
+			} else {
+				$nopaform.='<br><br>';
+			}
+		} else {
+			$nopaform.='<br><br>';
+		}
+		
+		$nopaform.='<b>'.strtoupper($res['VerifiedBy']).'</b></td>';
+	
+	
+	
+		$nopaform.='<td style="padding:3px;" align="center" valign="bottom">';
+		if($chk3>=1){
+			$sqlsign='SELECT `imageData`,`imageType` FROM 1_gamit.empsignature WHERE `Open`=2 AND IDNo='.($res['RecommendedByNo']<>'1002'?'1002':'1001').'';
+			$stmtsign=$link->prepare($sqlsign);
+			$stmtsign->execute();
+			$data=$stmtsign->fetch();
+			if($stmtsign->rowCount()>0){
+				$nopaform.='<img style="width:100px;height:50px;" src="data:'.$data['imageType'].';base64,'.base64_encode($data['imageData']).'"/><br>';
+			} else {
+				$nopaform.='<br><br>';
+			}
+		} else {
+			$nopaform.='<br><br>';
+		}
+		
+		$nopaform.='<b>RC EUSEBIO'.($res['RecommendedByNo']<>'1002'?'/JY EUSEBIO':'').'</b></td></tr>';
 		$nopaform.='<tr><td align="center" style="padding:3px;border-right:1px solid black;">'.($res['RecommendedByPos']).'</td>';
 		$nopaform.='<td align="center" style="padding:3px;border-right:1px solid black;">'.($res['VerifiedByPos']).'</td>';
 		$nopaform.='<td align="center" style="padding:3px;">President'.($res['RecommendedByNo']<>'1002'?'/EVP':'').'</td></tr>';
@@ -469,10 +505,8 @@ switch ($which)
 	case 'Print':
 	$txnid=intval($_GET['TxnID']);
 	
-	// $sql='SELECT ht.TxnID,RecommendedByNo,(SELECT (DateHired) + INTERVAL 6 MONTH + INTERVAL 1 DAY) AS DateofEffectivityReg,cp.Position,ht.IDNo,SalaryFrom,SalaryTo,FullName,(SELECT CONCAT(Nickname," ",UPPER(LEFT(MiddleName,1)),". ",SurName) FROM 1employees WHERE IDNo=ht.RecommendedByNo) AS RecommendedBy,(SELECT Position FROM attend_30currentpositions WHERE IDNo=ht.RecommendedByNo) AS RecommendedByPos,(SELECT Position FROM attend_30currentpositions WHERE IDNo=ht.VerifiedByNo) AS VerifiedByPos,(SELECT CONCAT(Nickname," ",UPPER(LEFT(MiddleName,1)),". ",SurName) FROM 1employees WHERE IDNo=ht.VerifiedByNo) AS VerifiedBy,cp.Branch,(SELECT MAX(DateofChange) FROM attend_2changeofpositions WHERE IDNo=cp.IDNo) AS DateofEffectivity,(SELECT MAX(DateofChange) FROM payroll_22rates WHERE IDNo=cp.IDNo) AS DateofEffectivitySalary,(SELECT Remarks FROM attend_2changeofpositions WHERE IDNo=cp.IDNo ORDER BY DateofChange DESC LIMIT 1) AS Remarks,(SELECT Remarks FROM payroll_22rates WHERE IDNo=cp.IDNo ORDER BY DateofChange DESC LIMIT 1) AS RemarksSalary,dept,p1.Position AS PositionFrom,p2.Position AS PositionTo,b1.Branch AS BranchFrom,b2.Branch AS BranchTo FROM hr_nopaholdingtable ht JOIN attend_30currentpositions cp ON ht.IDNo=cp.IDNo LEFT JOIN attend_0positions p1 ON ht.PositionIDFrom=p1.PositionID LEFT JOIN attend_0positions p2 ON ht.PositionIDTo=p2.PositionID LEFT JOIN 1branches b1 ON ht.BranchNoFrom=b1.BranchNo LEFT JOIN 1branches b2 ON ht.BranchNoTo=b2.BranchNo JOIN 1employees e ON ht.IDNo=e.IDNo WHERE TxnID='.$txnid.'';
-	// $stmt=$link->query($sql); $res=$stmt->fetch();
 
-	$sql='SELECT ht.TxnID,RecommendedByNo,(SELECT (DateHired) + INTERVAL 6 MONTH + INTERVAL 1 DAY) AS DateofEffectivityReg,cp.Position,ht.IDNo,SalaryFrom,SalaryTo,FullName,(SELECT CONCAT(Nickname," ",UPPER(LEFT(MiddleName,1)),". ",SurName) FROM 1employees WHERE IDNo=ht.RecommendedByNo) AS RecommendedBy,(SELECT Position FROM attend_30currentpositions WHERE IDNo=ht.RecommendedByNo) AS RecommendedByPos,(SELECT Position FROM attend_30currentpositions WHERE IDNo=ht.VerifiedByNo) AS VerifiedByPos,(SELECT CONCAT(Nickname," ",UPPER(LEFT(MiddleName,1)),". ",SurName) FROM 1employees WHERE IDNo=ht.VerifiedByNo) AS VerifiedBy,cp.Branch,(SELECT MAX(DateofChange) FROM attend_2changeofpositions WHERE IDNo=cp.IDNo) AS DateofEffectivity,(SELECT MAX(DateofChange) FROM payroll_22rates WHERE IDNo=cp.IDNo) AS DateofEffectivitySalary,(SELECT Remarks FROM attend_2changeofpositions WHERE IDNo=cp.IDNo ORDER BY DateofChange DESC LIMIT 1) AS Remarks,(SELECT Remarks FROM payroll_22rates WHERE IDNo=cp.IDNo ORDER BY DateofChange DESC LIMIT 1) AS RemarksSalary,dept,p1.Position AS PositionFrom,p2.Position AS PositionTo,b1.Branch AS BranchFrom,b2.Branch AS BranchTo FROM hr_nopaholdingtable ht JOIN attend_30currentpositions cp ON ht.IDNo=cp.IDNo LEFT JOIN attend_0positions p1 ON ht.PositionIDFrom=p1.PositionID LEFT JOIN attend_0positions p2 ON ht.PositionIDTo=p2.PositionID LEFT JOIN 1branches b1 ON ht.BranchNoFrom=b1.BranchNo LEFT JOIN 1branches b2 ON ht.BranchNoTo=b2.BranchNo JOIN 1employees e ON ht.IDNo=e.IDNo WHERE TxnID='.$txnid.'';
+	$sql='SELECT ht.TxnID,RecommendedByNo,VerifiedByNo,(SELECT (DateHired) + INTERVAL 6 MONTH + INTERVAL 1 DAY) AS DateofEffectivityReg,cp.Position,ht.IDNo,SalaryFrom,SalaryTo,FullName,(SELECT CONCAT(Nickname," ",UPPER(LEFT(MiddleName,1)),". ",SurName) FROM 1employees WHERE IDNo=ht.RecommendedByNo) AS RecommendedBy,(SELECT Position FROM attend_30currentpositions WHERE IDNo=ht.RecommendedByNo) AS RecommendedByPos,(SELECT Position FROM attend_30currentpositions WHERE IDNo=ht.VerifiedByNo) AS VerifiedByPos,(SELECT CONCAT(Nickname," ",UPPER(LEFT(MiddleName,1)),". ",SurName) FROM 1employees WHERE IDNo=ht.VerifiedByNo) AS VerifiedBy,cp.Branch,(SELECT MAX(DateofChange) FROM attend_2changeofpositions WHERE IDNo=cp.IDNo) AS DateofEffectivity,(SELECT MAX(DateofChange) FROM payroll_22rates WHERE IDNo=cp.IDNo) AS DateofEffectivitySalary,(SELECT Remarks FROM attend_2changeofpositions WHERE IDNo=cp.IDNo ORDER BY DateofChange DESC LIMIT 1) AS Remarks,(SELECT Remarks FROM payroll_22rates WHERE IDNo=cp.IDNo ORDER BY DateofChange DESC LIMIT 1) AS RemarksSalary,dept,p1.Position AS PositionFrom,p2.Position AS PositionTo,b1.Branch AS BranchFrom,b2.Branch AS BranchTo FROM hr_nopaholdingtable ht JOIN attend_30currentpositions cp ON ht.IDNo=cp.IDNo LEFT JOIN attend_0positions p1 ON ht.PositionIDFrom=p1.PositionID LEFT JOIN attend_0positions p2 ON ht.PositionIDTo=p2.PositionID LEFT JOIN 1branches b1 ON ht.BranchNoFrom=b1.BranchNo LEFT JOIN 1branches b2 ON ht.BranchNoTo=b2.BranchNo JOIN 1employees e ON ht.IDNo=e.IDNo WHERE TxnID='.$txnid.'';
 	$stmt=$link->query($sql); $res=$stmt->fetch();
 	
 	
@@ -485,10 +519,14 @@ switch ($which)
 	
 	
 	$sqlcheckother=$sqlcheckothermain.$res['IDNo'].'';
-	$stmtothers=$link->query($sqlcheckother); $resothers=$stmtothers->fetchAll();
 	// echo $sqlcheckother;
+	$stmtothers=$link->query($sqlcheckother); $resothers=$stmtothers->fetchAll();
+	$chk=1; $chk2=1; $chk3=1;
 	foreach($resothers AS $resother){
-		$nopaform.='<tr><td colspan=2 style="padding:3px;font-size:12pt;border-right:1px solid black;" align="center">'.$resother['NOPAaction'].'</td><td align="center" style="padding:3px;font-size:12pt;border-right:1px solid black;">'.$resother['FromWhat'].'</td><td style="padding:3px;font-size:12pt;border-right:1px solid black;" align="center">'.$resother['ToWhat'].'</td><td style="padding:3px;border-right:1px solid black;">'.$resother['Remarks'].'</td></tr>';
+		$nopaform.='<tr><td colspan=2 style="padding:3px;font-size:12pt;border-right:1px solid black;" align="center">'.$resother['NOPAaction'].' '.($resother['checker']>0?'':'<font style="color:red;font-size:8pt;">not encoded</font>').'</td><td align="center" style="padding:3px;font-size:12pt;border-right:1px solid black;">'.$resother['FromWhat'].'</td><td style="padding:3px;font-size:12pt;border-right:1px solid black;" align="center">'.$resother['ToWhat'].'</td><td style="padding:3px;border-right:1px solid black;">'.$resother['Remarks'].'</td></tr>';
+		$chk=$resother['checker'];
+		$chk2=$resother['checker2'];
+		$chk3=$resother['checker3'];
 	}
 	
 	$effdate='';
@@ -504,20 +542,63 @@ switch ($which)
 	}
 	$nopaform.='<tr><td colspan=5 style="padding:3px;border:1px solid black;">Effective Date: '.$effdate.'</td></tr>';
 	
-		
-	// $nopaform.='<tr><td style="padding:3px;border-right:1px solid black;">Recommended by:</td><td style="padding:3px;border-right:1px solid black;">Verified by:</td><td colspan=3 style="padding:3px;">Approved by:</td></tr>';
-	// $nopaform.='<tr><td style="padding:3px;width:250px;border-right:1px solid black;" align="center"><br><br><b>'.strtoupper($res['RecommendedBy']).'</b></td><td  style="padding:3px;width:250px;border-right:1px solid black;" align="center"><br><br><b>'.strtoupper($res['VerifiedBy']).'</b></td>';
-	// $nopaform.='<td colspan=3 style="padding:3px;" align="center"><br><br><b>RC EUSEBIO'.($res['RecommendedByNo']<>'1002'?'/JY EUSEBIO':'').'</b></td></tr>';
-	// $nopaform.='<tr><td align="center" style="padding:3px;border-right:1px solid black;">'.($res['RecommendedByPos']).'</td>';
-	// $nopaform.='<td align="center" style="padding:3px;border-right:1px solid black;">'.($res['VerifiedByPos']).'</td>';
-	// $nopaform.='<td colspan=3 align="center" style="padding:3px;">President'.($res['RecommendedByNo']<>'1002'?'/EVP':'').'</td></tr>';
 
 	$nopaform.='<tr>';
 	$nopaform.='<td colspan=6>';
 	$nopaform.='<table width="100%" style="border-collapse:collapse;">';
 	$nopaform.='<tr><td style="padding:3px;border-right:1px solid black;">Recommended by:</td><td style="padding:3px;border-right:1px solid black;">Verified by:</td><td style="padding:3px;">Approved by:</td></tr>';
-	$nopaform.='<tr><td style="padding:3px;border-right:1px solid black;" align="center"><br><br><b>'.strtoupper($res['RecommendedBy']).'</b></td><td  style="padding:3px;border-right:1px solid black;" align="center"><br><br><b>'.strtoupper($res['VerifiedBy']).'</b></td>';
-	$nopaform.='<td style="padding:3px;" align="center"><br><br><b>RC EUSEBIO'.($res['RecommendedByNo']<>'1002'?'/JY EUSEBIO':'').'</b></td></tr>';
+	$nopaform.='<tr><td style="padding:3px;border-right:1px solid black;" align="center" valign="bottom">';
+	
+	if($chk>=1){
+	$sqlsign='SELECT `imageData`,`imageType` FROM 1_gamit.empsignature WHERE `Open`=2 AND IDNo='.$res['RecommendedByNo'].'';
+	$stmtsign=$link->prepare($sqlsign);
+	$stmtsign->execute();
+	$data=$stmtsign->fetch();
+	if($stmtsign->rowCount()>0){
+		$nopaform.='<img style="width:100px;height:50px;" src="data:'.$data['imageType'].';base64,'.base64_encode($data['imageData']).'"/><br>';
+		} else {
+			$nopaform.='<br><br>';
+		}
+	} else {
+		$nopaform.='<br><br>';
+	}
+	$nopaform.='<b>'.strtoupper($res['RecommendedBy']).'</b></td><td  style="padding:3px;border-right:1px solid black;" align="center" valign="bottom">';
+
+
+	if($chk2>=1){
+		$sqlsign='SELECT `imageData`,`imageType` FROM 1_gamit.empsignature WHERE `Open`=2 AND IDNo='.$res['VerifiedByNo'].'';
+		$stmtsign=$link->prepare($sqlsign);
+		$stmtsign->execute();
+		$data=$stmtsign->fetch();
+		if($stmtsign->rowCount()>0){
+			$nopaform.='<img style="width:100px;height:50px;" src="data:'.$data['imageType'].';base64,'.base64_encode($data['imageData']).'"/><br>';
+		} else {
+			$nopaform.='<br><br>';
+		}
+	} else {
+		$nopaform.='<br><br>';
+	}
+	
+	$nopaform.='<b>'.strtoupper($res['VerifiedBy']).'</b></td>';
+
+
+
+	$nopaform.='<td style="padding:3px;" align="center" valign="bottom">';
+	if($chk3>=1){
+		$sqlsign='SELECT `imageData`,`imageType` FROM 1_gamit.empsignature WHERE `Open`=2 AND IDNo='.($res['RecommendedByNo']<>'1002'?'1002':'1001').'';
+		$stmtsign=$link->prepare($sqlsign);
+		$stmtsign->execute();
+		$data=$stmtsign->fetch();
+		if($stmtsign->rowCount()>0){
+			$nopaform.='<img style="width:100px;height:50px;" src="data:'.$data['imageType'].';base64,'.base64_encode($data['imageData']).'"/><br>';
+		} else {
+			$nopaform.='<br><br>';
+		}
+	} else {
+		$nopaform.='<br><br>';
+	}
+	
+	$nopaform.='<b>RC EUSEBIO'.($res['RecommendedByNo']<>'1002'?'/JY EUSEBIO':'').'</b></td></tr>';
 	$nopaform.='<tr><td align="center" style="padding:3px;border-right:1px solid black;">'.($res['RecommendedByPos']).'</td>';
 	$nopaform.='<td align="center" style="padding:3px;border-right:1px solid black;">'.($res['VerifiedByPos']).'</td>';
 	$nopaform.='<td align="center" style="padding:3px;">President'.($res['RecommendedByNo']<>'1002'?'/EVP':'').'</td></tr>';
