@@ -178,7 +178,7 @@ switch ($which){
 		}
         else { $condition=' WHERE supervisorpositionid='.$_SESSION['&pos']; }
 		
-          echo comboBox($link,'SELECT * FROM `attend_30currentpositions` '.$condition.' ORDER BY FullName;','FullName','IDNo','employees');
+          echo comboBox($link,'SELECT CONCAT(SUBSTRING_INDEX(FullName, "-", -1)," (SLBal:",IFNULL(SLBAL,0)," VLBal:",IFNULL(VLBal,0)," BirthdayBal:",IFNULL(BirthdayBal,0),")") AS FullName,cp.IDNo FROM `attend_30currentpositions` cp LEFT JOIN attend_61leavebal lb ON cp.IDNo=lb.IDNo '.$condition.' ORDER BY FullName;','FullName','IDNo','employees');
         ?>
         <form method='post' action='leaverequest.php?w=SubmitSuperOrDeptHead'>
 			IDNo <input type='text' name='IDNo' value='' list='employees'>
@@ -192,11 +192,12 @@ switch ($which){
         <?php
         // echo comboBox($link,'SELECT * FROM `attend_0leavetype` WHERE LeaveNo IN (10,14,16,30,31,32) ORDER BY LeaveName;','LeaveNo','LeaveName','leavetype');
 		
-        $sql='SELECT TxnID, FullName, Branch, FromDate, ToDate, Reason, LeaveName as LeaveType, lr.TimeStamp as RequestTS FROM attend_3leaverequest lr JOIN `attend_30currentpositions` p ON lr.IDNo=p.IDNo
+        $sql='SELECT TxnID, FullName, Branch, FromDate, ToDate, Reason, LeaveName as LeaveType, lr.TimeStamp as RequestTS,CONCAT("SLBal: ",SLBAL," VLBal: ",VLBal," BirthdayBal: ",BirthdayBal) AS LeaveBalBeforeThisLeave FROM attend_3leaverequest lr JOIN `attend_30currentpositions` p ON lr.IDNo=p.IDNo
         JOIN `attend_0leavetype` lt ON lt.LeaveNo=lr.LeaveNo
+        JOIN attend_61leavebal lb ON lr.IDNo=lb.IDNo
         WHERE lr.FromPreApproval=1 AND HRVerifiedByNo IS NULL AND PARequestedByNo='.$_SESSION['(ak0)'].'';
 		
-        $title='Pending Verification'; $columnnames=array('FullName', 'Branch', 'FromDate', 'ToDate', 'LeaveType','Reason');
+        $title='Pending Verification'; $columnnames=array('FullName', 'Branch', 'FromDate', 'ToDate', 'LeaveType','LeaveBalBeforeThisLeave','Reason');
         $delprocess='leaverequest.php?w=DeleteSuperOrDeptHead&TxnID=';
         include('../backendphp/layout/displayastable.php');
      break;
