@@ -20,6 +20,22 @@
         
         $whichqry=$_GET['w'];
 
+		if (in_array($whichqry,array('SaleSub','SaleSubEdit'))){
+			$sqlSerial = 'SELECT RequiredSerialNo FROM invty_1items WHERE ItemCode='.$_POST['ItemCode'].';';
+			$stmtSerial=$link->query($sqlSerial);
+				$resultSerial=$stmtSerial->fetch();
+			if($resultSerial['RequiredSerialNo']==1){
+			if($_POST['SerialNo']==''){
+				echo 'Please enter SerialNo';
+				exit();
+			}
+			}
+		}
+
+		if (in_array($whichqry,array('SaleMain','SaleMainEdit'))){
+			include_once $path.'/acrossyrs/commonfunctions/letterdigitonly.php';
+		}
+
 switch ($whichqry){
 case 'SaleMain':
         if($_SESSION['bnum']==999) { if (!allowedToOpen(999,'1rtc')) {   echo 'No permission'; exit;}           
@@ -43,7 +59,7 @@ case 'SaleMain':
 	$sqlinsert='INSERT INTO `invty_2sale` SET ClientNo='.$clientno.', SoldByNo='.$soldbyno.', '; 
         $sql='';
         $columnstoadd=array('Date','Remarks','PaymentType','CheckDetails','DateofCheck','PONo','txntype');
-		$repsaleno=str_replace(' ','',$_POST['SaleNo']);
+		$repsaleno=letterdigitonly($_POST['SaleNo']);
 	foreach ($columnstoadd as $field) {
 		$sql=$sql.' `' . $field. '`=\''.$_POST[$field].'\', '; 
 	}
@@ -173,7 +189,7 @@ case 'SaleMainEdit':
         }
         $soldbyno=in_array($_REQUEST['txntype'],array(3,5))?0:comboBoxValue ($link,'`1employees`','concat(`Nickname`," ", `SurName`)',$_POST['SoldBy'],'IDNo'); 
 	
-		
+	$saleno='';
 	if (allowedToOpen(2021,'1rtc')) {
 		//revised editOk function to remove posted condition
 		$sqlmain='Select s.`Date`, s.Posted from `invty_2sale` as s where TxnID='.$txnid;
@@ -185,7 +201,8 @@ case 'SaleMainEdit':
 			} else {  $columnstoedit=array(); }
 	} else {
 	if (editOk('invty_2sale',$txnid,$link,$_REQUEST['txntype'])){
-        $columnstoedit=array('Date','SaleNo','Remarks','CheckDetails','DateofCheck','PONo');
+        $columnstoedit=array('Date','Remarks','CheckDetails','DateofCheck','PONo');
+		$saleno=', SaleNo="'.letterdigitonly($_POST['SaleNo']).'"';
 		$condition=' and (Posted=0) and (`Date`>\''.$_SESSION['nb4'].'\')';
 		} else {
         $columnstoedit=array();
@@ -196,8 +213,8 @@ case 'SaleMainEdit':
 	foreach ($columnstoedit as $field) {
 		$sql=$sql.' ' . $field. '=\''.$_POST[$field].'\', '; 
 	}
-	$sql=$sqlupdate.$sql.' EncodedByNo=\''.$_SESSION['(ak0)'].'\', TimeStamp=Now() where (TxnID='.$txnid.')' . $condition; 
-	// echo $sql; break;
+	$sql=$sqlupdate.$sql.' EncodedByNo=\''.$_SESSION['(ak0)'].'\', TimeStamp=Now() '.$saleno.' where (TxnID='.$txnid.')' . $condition; 
+	// echo $sql; exit();
         include_once 'trailinvty.php'; recordtrail($txnid,'invty_2sale',$link,0);
 	$stmt=$link->prepare($sql); $stmt->execute();
         header("Location:addeditsale.php?txntype=".$_REQUEST['txntype']."&TxnID=".$txnid);

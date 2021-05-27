@@ -18,6 +18,8 @@ allowed:
         
 	 
         $which=$_GET['w'];
+
+
         
 switch ($which){
     
@@ -78,7 +80,12 @@ case 'ApproveCRS':
         break;
 case 'RecordCRS':
 	if (!allowedToOpen(6937,'1rtc')) { echo 'No permission'; exit;}
+	include_once $path.'/acrossyrs/commonfunctions/letterdigitonly.php';
+
 	$appid=$_REQUEST['ApprovalId'];
+
+	
+
         $sql='SELECT TxnID,LastYr,Approval FROM `approvals_2salesreturns` WHERE ApprovalId='.$appid;
         if ($_SESSION['(ak0)']==1002) { echo $sql; }
         $stmt=$link->query($sql); $res=$stmt->fetch();
@@ -92,13 +99,13 @@ case 'RecordCRS':
 	}
 	$stmt=$link->query($sql0); $result0=$stmt->fetch();
 	$columnstoadd=array('ClientNo');
-	$sqlinsert='Insert into `invty_2sale` SET `Date`=Now(), SaleNo=\''.$_REQUEST['CRSNo'].'\', PaymentType=5, CheckDetails=\''.$result0['SaleNo'].'\', DateofCheck=\''.$result0['Date'].'\', PONo='.$result0['Approval'].', txntype=5, TeamLeader='.(is_null($result0['TeamLeader'])?0:$result0['TeamLeader']).', ';
+	$sqlinsert='Insert into `invty_2sale` SET `Date`=Now(), SaleNo=\''.letterdigitonly($_REQUEST['CRSNo']).'\', PaymentType=5, CheckDetails=\''.$result0['SaleNo'].'\', DateofCheck=\''.$result0['Date'].'\', PONo='.$result0['Approval'].', txntype=5, TeamLeader='.(is_null($result0['TeamLeader'])?0:$result0['TeamLeader']).', ';
 	$sql='';
 	foreach ($columnstoadd as $field) {
 		$sql=$sql.' ' . $field. '=\''.$result0[$field].'\', '; 
 	}
 	$sql=$sqlinsert.$sql.' BranchNo='.$_SESSION['bnum'].', EncodedByNo=\''.$_SESSION['(ak0)'].'\' , PostedByNo=\''.$_SESSION['(ak0)'].'\', TimeStamp=Now()'; 
-	// echo $sql;
+	// echo $sql; exit();
         $stmt=$link->prepare($sql);
 	$stmt->execute();
 	// end of main form
@@ -106,7 +113,7 @@ case 'RecordCRS':
 	// insert sub
 	$sql0='Select sr.ItemCode, (sr.Qty*-1) as Qty, (AmountofReturn/(ifnull(Qty,1))) as UnitPrice, sr.Defective, (Select SerialNo from invty_2salesub ss where ss.ItemCode=sr.ItemCode and ss.TxnID=sr.TxnID) as SerialNo from  `approvals_2salesreturns` sr where Approval='.$approvalno.' AND sr.TxnID='.$txnid; //echo $sql0;
 	$stmt=$link->query($sql0); $result=$stmt->fetchAll();
-	$sql0='Select TxnID from invty_2sale where BranchNo='.$_SESSION['bnum'].' and SaleNo=\''.$_REQUEST['CRSNo'].'\' and txntype=5';
+	$sql0='Select TxnID from invty_2sale where BranchNo='.$_SESSION['bnum'].' and SaleNo=\''.letterdigitonly($_REQUEST['CRSNo']).'\' and txntype=5';
 	$stmt=$link->query($sql0); $result0=$stmt->fetch();
 	$txnid=$result0['TxnID'];
 	foreach ($result as $row){
