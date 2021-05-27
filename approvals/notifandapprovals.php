@@ -423,19 +423,28 @@ if (allowedToOpen(6302,'1rtc')) {
     $addcondlist='';
     
     if (allowedToOpen(6303,'1rtc')){
-        $addcondlist=' AND ReqStatus=1 AND Served=0';
+        $addcondlist=' AND ReqStatus=1 AND ApprovedByEO<>2 AND Served=0';
+        $wlink='?Status=4';
+    } else if (allowedToOpen(101,'1rtc')){
+        $addcondlist=' AND ReqStatus=1 AND ApprovedByEO=0 AND Served=0';
+        $wlink='?Status=1';
     } else { //others or heads
         $addcondlist=' AND (cp.deptheadpositionid='.$_SESSION['&pos'].' OR cp.deptid=(SELECT deptid FROM attend_30currentpositions WHERE IDNo='.$_SESSION['(ak0)'].')) AND cp.IDNo<>'.$_SESSION['(ak0)'].' AND ReqStatus=0 AND Served=0 ';
+        if (allowedToOpen(100,'1rtc')){
+            $wlink='?Status=0';
+        } else {
+            $wlink='';
+        }
     }
 
     $sql='SELECT COUNT(RPAID) AS cntreq FROM attend_30currentpositions cp JOIN hr_2requestpa rpa ON cp.IDNo=rpa.IDNo WHERE 1=1 '.$addcondlist.';';
     $stmt=$link->query($sql); $res=$stmt->fetch();
-
+// echo $sql;
         if ($res['cntreq']>0){ 
         $msgcb='<br><div id="table-wrapper" style="width:80%;">Request For Personnel Action:<div><table bgcolor="FFFFF">'
             .'';
                     $sp++;
-                    $msgcb.='<tr><td><a href = "../hr/requestforpa.php">Look up '.$res['cntreq'].' request(s).</a>'.'</td>'
+                    $msgcb.='<tr><td><a href = "../hr/requestforpa.php'.$wlink.'">Look up '.$res['cntreq'].' request(s).</a>'.'</td>'
 
                             .'</tr>';
             $switchboard = $switchboard . $msgcb.'<br></table></div></div>';
@@ -451,7 +460,7 @@ if (allowedToOpen(6302,'1rtc')) {
 //Printed Invoices
 if ((allowedToOpen(78833,'1rtc')) OR (allowedToOpen(78834,'1rtc'))){
 	if (allowedToOpen(78833,'1rtc')){
-			$viewcon = 'IssuedTo IN (SELECT BranchNo FROM attend_1branchgroups WHERE OpsSpecialist='.$_SESSION['(ak0)'].')';
+			$viewcon = 'IssuedTo IN (SELECT BranchNo FROM attend_1branchgroups WHERE OpsSpecialist='.$_SESSION['(ak0)'].' OR OpsManager='.$_SESSION['(ak0)'].')';
 	} else {
 		$viewcon = '1=1 ';
 	}
