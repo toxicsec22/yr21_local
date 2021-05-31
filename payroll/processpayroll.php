@@ -337,7 +337,7 @@ $sql2='CREATE TEMPORARY TABLE `payroll_25payrolldatalookuptemp` AS SELECT p.`Txn
     `LWPBasic`,`LWPDeM`,`LWPTaxSh`,`RHBasicforDaily`,`RHDeMforDaily`,`RHTaxShforDaily`,
     `AbsenceBasicforMonthly`,`AbsenceDeMforMonthly`,`AbsenceTaxShforMonthly`,
     `UndertimeBasic`,`UndertimeDeM`,`UndertimeTaxSh`,`RegDayOT`,`RestDayOT`,`SpecOT`,`RHOT`
-    '. ($payrollwithsss==1? ', FORMAT(sb.Basis,0) AS SSSBasis,ss.SSECCredit, `SSS-EE`,`PhilHealth-EE`,`PagIbig-EE`':'')
+    '. ($payrollwithsss==1? ', FORMAT(sb.Basis,0) AS SSSBasis,ss.SSECCredit, `SSS-EE`,`PhilHealth-EE`,`PagIbig-EE`,`SSS-ER`,`PhilHealth-ER`,`PagIbig-ER`':'')
     .',`WTax`,`DisburseVia`,
     TRUNCATE((`p`.`RegDayBasic` + `p`.`VLBasic` + `p`.`SLBasic` + `p`.`LWPBasic` + `p`.`RHBasicforDaily` - `p`.`AbsenceBasicforMonthly` - `p`.`UndertimeBasic`)/(SELECT IF(LatestDorM=0,LatestBasicRate,LatestBasicRate/13.04) FROM `payroll_20latestrates` lr WHERE lr.IDNo=p.IDNo ),2) AS `DaysPaid Calculated`,concat(`e`.`FirstName`," ",`e`.`SurName`) AS `FullName`,ifnull(sum(`a`.`AdjustAmt`),0) AS `TotalAdj`,
     TRUNCATE((`RegDayBasic`+`RegDayDeM`+`RegDayTaxSh`+`VLBasic`+`VLDeM`+`VLTaxSh`+`SLBasic`+`SLDeM`+`SLTaxSh`+
