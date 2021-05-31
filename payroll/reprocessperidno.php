@@ -82,7 +82,7 @@ $sql='SELECT * FROM payroll_25payrolldatalookuptemp WHERE IDNo='.$idno;
 $stmt=$link->query($sql); $res=$stmt->fetch();
 
 // $paycolumns=array('Basic','DeM','TaxSh','OT','AbsenceBasic','UndertimeBasic','AbsenceTaxSh','UndertimeTaxSh','SSS-EE','PhilHealth-EE','PagIbig-EE','WTax','SSS-ER','PhilHealth-ER');
-$paycolumns=array('RegDayBasic','RegDayDeM','RegDayTaxSh','VLBasic','VLDeM','VLTaxSh','SLBasic','SLDeM','SLTaxSh','LWPBasic','LWPDeM','LWPTaxSh','RHBasicforDaily','RHDeMforDaily','RHTaxShforDaily','AbsenceBasicforMonthly','AbsenceDeMforMonthly','AbsenceTaxShforMonthly','UndertimeBasic','UndertimeDeM','UndertimeTaxSh','RegDayOT','RestDayOT','SpecOT','RHOT','SSS-EE','PhilHealth-EE','PagIbig-EE','SSS-ER','PhilHealth-ER','PagIbig-ER','WTax');
+$paycolumns=array('RegDayBasic','RegDayDeM','RegDayTaxSh','VLBasic','VLDeM','VLTaxSh','SLBasic','SLDeM','SLTaxSh','LWPBasic','LWPDeM','LWPTaxSh','RHBasicforDaily','RHDeMforDaily','RHTaxShforDaily','AbsenceBasicforMonthly','AbsenceDeMforMonthly','AbsenceTaxShforMonthly','UndertimeBasic','UndertimeDeM','UndertimeTaxSh','RegDayOT','RestDayOT','SpecOT','RHOT','SSS-EE','PhilHealth-EE','PagIbig-EE',`SSS-ER`,`PhilHealth-ER`,`PagIbig-ER`,'WTax');
 
 $update='';
 foreach ($paycolumns as $paycol){
