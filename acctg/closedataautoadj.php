@@ -17,13 +17,14 @@
 
 
         function checkExists($stringtomatch,$field,$table,$txnidname,$link){
-            $sql='SELECT `'.$txnidname.'` FROM `'.$table.'` WHERE '.$field.' LIKE \'%'.$stringtomatch.'%\'';	
+            $sql='SELECT `'.$txnidname.'` FROM `'.$table.'` WHERE '.$field.' LIKE \'%'.$stringtomatch.'%\'';
+            // echo $sql; exit();
             $stmt=$link->query($sql);
             $result=$stmt->fetch();
             if ($stmt->rowCount()>0){ return $result[$txnidname]; } else {   return 0;	}
         }
 
-
+       
         $sql0='SELECT CONCAT(IF(ForDB=0,"Inventory","Accounting"),":  ",`DataClosedBy`) AS ToShow FROM `00dataclosedby` WHERE ForDB IN (0,1)';
         $stmt=$link->query($sql0); $resasof=$stmt->fetchAll(); 
         echo '<br><br><h2 style="color: maroon; border: solid 1.5px; padding: 20px; text-align:center;">Data protected as of --'.str_repeat('&nbsp;', 10);
@@ -176,7 +177,7 @@ case "Step 1. Record 13th month accrual":
     $stringtomatch=(date('y',strtotime($lastdayofmonth))).'-13th-'.str_pad($month,2,'0',STR_PAD_LEFT);
 
     $jvno=checkExists($stringtomatch,'Remarks','acctg_2jvmain','JVNo',$link);
-           
+       
 	            if ($jvno==0){     
                   
                 $jvno=lastNum('JVNo','acctg_2jvmain',((date('Y',strtotime($currentyr.'-01-01')))-2000)*10000+1000000)+1;
