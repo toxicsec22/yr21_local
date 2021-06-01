@@ -160,7 +160,7 @@ $sql='SELECT RPAID AS TxnID,DateToBeServed,ActionDesc,
 	$sql='update hr_2requestpa set ReqStatus=IF("'.$which.'"="approved",1,2),StatusTS=NOW(),StatusByNo='.$_SESSION['(ak0)'].' where RPAID=\''.$txnid.'\' and ReqStatus=0';
 	$stmt=$link->prepare($sql); $stmt->execute();
 		}
-	header("Location:requestforpa.php?w=lists");
+	header("Location:requestforpa.php?Status=0");
 	break;
 
 	case 'approvedeo':
@@ -171,7 +171,7 @@ $sql='SELECT RPAID AS TxnID,DateToBeServed,ActionDesc,
 		// echo $sql; exit();
 		$stmt=$link->prepare($sql); $stmt->execute();
 	}
-		header("Location:requestforpa.php?w=lists");
+		header("Location:requestforpa.php?Status=1");
 	break;
 
 	
@@ -183,7 +183,7 @@ $sql='SELECT RPAID AS TxnID,DateToBeServed,ActionDesc,
 		// echo $sql; exit();
 		$stmt=$link->prepare($sql); $stmt->execute();
 			}
-		header("Location:requestforpa.php?w=lists");
+		header("Location:requestforpa.php?Status=4");
 		break;
 	
 	
