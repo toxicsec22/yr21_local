@@ -71,6 +71,8 @@ include_once('../backendphp/layout/linkstyle.php');
 		ELSE 4
 	END) LIKE CONCAT("%",nopaID,"%")
 	AND ';
+	$sqlchkmain2='(SELECT COUNT(TxnID) FROM hr_2personnelaction WHERE ActionID=0 AND IDNo=ht.IDNo)
+		';
 	$sqlcheckothermain='SELECT 
 	(CASE
 		WHEN nopaID=1 THEN "Promotion"
@@ -102,9 +104,9 @@ include_once('../backendphp/layout/linkstyle.php');
 		ELSE ""
 	END)
 	AS Remarks,
-	'.$sqlchkmain.' ReqStatus=1) AS checker,
-	'.$sqlchkmain.' ReqStatus=1 AND Served=1) AS checker2,
-	'.$sqlchkmain.' ReqStatus=1 AND Served=1 AND ApprovedByEO=1) AS checker3
+	IF(nopaID<>4,'.$sqlchkmain.' ReqStatus=1),'.$sqlchkmain2.') AS checker,
+	IF(nopaID<>4,'.$sqlchkmain.' ReqStatus=1 AND Served=1),'.$sqlchkmain2.') AS checker2,
+	IF(nopaID<>4,'.$sqlchkmain.' ReqStatus=1 AND Served=1 AND ApprovedByEO=1),'.$sqlchkmain2.') AS checker3
 	 FROM hr_nopaholdingtable ht LEFT JOIN attend_0positions p1 ON ht.PositionIDFrom=p1.PositionID LEFT JOIN attend_0positions p2 ON ht.PositionIDTo=p2.PositionID LEFT JOIN 1branches b1 ON ht.BranchNoFrom=b1.BranchNo LEFT JOIN 1branches b2 ON ht.BranchNoTo=b2.BranchNo WHERE IDNo=';
 // echo $sqlcheckothermain;
 	 echo '<title>Print NOPA Letters</title>';
