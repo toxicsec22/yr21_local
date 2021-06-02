@@ -46,7 +46,7 @@ switch($which){
 				$condi.=' AND PriceLevel='.$_POST['PLNo'];
 			}
 		}
-		$sql='select Area,b.BranchNo,Branch,PriceLevel,PriceLevelRemarks FROM 1branches b JOIN 0area a ON b.AreaNo=a.AreaNo WHERE Active=1 AND PseudoBranch=0 '.$condi.' ORDER BY Area,Branch';
+		$sql='select Area,b.BranchNo,Branch,PriceLevel,PriceLevelRemarks FROM 1branches b JOIN 0area a ON b.AreaNo=a.AreaNo WHERE Active=1 AND PseudoBranch IN (0,2) '.$condi.' ORDER BY Area,Branch';
 		$stmt=$link->query($sql); $rows=$stmt->fetchAll();
 		
 		$colorcount=0;
