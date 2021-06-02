@@ -26,7 +26,7 @@ if($txntype=='InvtyChargesDistri'){
 						Client Name: <input type="text" name="Remarks[]" required>
 						Telephone No.: <input type="text" name="Remarks[]" size="10" required>
 						<input type="hidden" name="action_token" value="'.$_SESSION['action_token'].'">
-						<input OnClick="return confirm(\'Are you sure you want to submit?\');" type="submit" name="submit">
+						<input type="submit" name="submit">
 					</form>';
 				exit();
 			}
@@ -84,15 +84,33 @@ left join `1employees` as e1 on s.TeamLeader=e1.IDNo where TxnID='.$txnid;
     } else {
     $columnnamesmain=array('Date','SaleNo','ClientName','TIN','Address','Remarks','SoldBy','TeamLeader','SaleType','PaymentType','CheckDetails','DateofCheck','PONo','Posted');
     }
-    $main=''; 
+    $main='';
+
+  
+    if(isset($_GET['EncodeBundle']) AND $_GET['EncodeBundle']==1){
+      include_once $path.'/acrossyrs/commonfunctions/listoptions.php';
+      echo comboBox($link,'SELECT ItemCode,ItemDesc FROM invty_1items WHERE ItemCode>=30000','ItemDesc','ItemCode','bundlelists');
+      $linkitemprbundle='<a href="addeditsale.php?TxnID='.$txnid.'&txntype='.$txntype.'">Encode By ItemCode</a>';
+
+      $columnnames=array(
+        array('field'=>'ItemCode','caption'=>'BundleID','list'=>'bundlelists','type'=>'text','size'=>10,'required'=>true),
+        array('field'=>'Qty', 'type'=>'text','size'=>10, 'required'=>true, 'value'=>0),
+        array('field'=>'UnitPrice', 'type'=>'text','size'=>10, 'required'=>true, 'value'=>0),
+        array('field'=>'SerialNo', 'type'=>'text','size'=>10, 'required'=>false),
+        array('field'=>'UnitCost', 'type'=>'hidden','size'=>0,'value'=>0),
+        array('field'=>'TxnID', 'type'=>'hidden', 'size'=>0,'value'=>$txnid)
+        );
+    } else {
+      $linkitemprbundle='<a href="addeditsale.php?TxnID='.$txnid.'&txntype='.$txntype.'&EncodeBundle=1">Encode By BundleID</a>';
     $columnnames=array(
-                    array('field'=>'ItemCode', 'type'=>'text','size'=>20,'required'=>true),
+                    array('field'=>'ItemCode', 'type'=>'text','size'=>10,'required'=>true),
                     array('field'=>'Qty', 'type'=>'text','size'=>10, 'required'=>true, 'value'=>0),
                     array('field'=>'UnitPrice', 'type'=>'text','size'=>10, 'required'=>true, 'value'=>0),
                     array('field'=>'SerialNo', 'type'=>'text','size'=>10, 'required'=>false),
                     array('field'=>'UnitCost', 'type'=>'hidden','size'=>0,'value'=>0),
                     array('field'=>'TxnID', 'type'=>'hidden', 'size'=>0,'value'=>$txnid)
                     );
+          }
     $liststoshow=array();
     
      break;
@@ -163,6 +181,7 @@ where txntype=5 and TxnID='.$txnid;
      else { if (!allowedToOpen(6927,'1rtc') and !allowedToOpen(6929,'1rtc')) {   $editok=FALSE; } else { $editok=editOk('invty_2sale',$txnid,$link,$txntype); } }
     
     if ($editok){
+      echo $linkitemprbundle;
         $editmain='<td><a href="editinvspecifics.php?edit=2&w='.$w.'&txntype='.$txntype.'&TxnID='.$txnid.'">Edit</a>&nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp<a href=..\backendphp\functions\delrecords.php?TxnID='.$txnid.'&action_token='.$_SESSION['action_token'].'&w=invty_2Sale&l=invty OnClick="return confirm(\'Really delete this?\');">Delete</a></td><td><a href=addeditsale.php?TxnID='.$txnid.'&action_token='.$_SESSION['action_token'].'&txntype='.$txntype.'&specprice=1>Request for Special Price</a></td>'.((allowedToOpen(6929,'1rtc'))?'<td><a href=praddsale.php?TxnID='.$txnid.'&action_token='.$_SESSION['action_token'].'&txntype='.$txntype.'&w=RemoveSP OnClick="return confirm(\'Really delete special prices?\');">Remove Special Prices</a></td>':'');
         $editsub=true;
         $columnsub=array('ItemCode','Category','ItemDesc','Qty','Unit','UnitPrice', 'Amount','Defective?','SerialNo');
@@ -184,7 +203,7 @@ where txntype=5 and TxnID='.$txnid;
     $main='<table><tr>'.$main.$editmain.'<tr></table>';
     $main=$main.(isset($clientconditions)?'<br><font color="red">'.$clientconditions.'</font>':'').'<br>'.(isset($_GET['msg'])?'<br><b><font color="maroon">'.strtoupper($_GET['msg']).'</font></b><br><br>':'');
     $withspecprice=false;
-    $sqlsub='Select s.*, c.Category, i.ItemDesc, i.Unit, s.UnitPrice*s.Qty as Amount, if(Defective<>0,"Defective",0) as `Defective?`,e.Nickname as EncodedBy from invty_2salesub s join invty_1items i on i.ItemCode=s.ItemCode join invty_1category c on c.CatNo=i.CatNo left join `1employees` as e on s.EncodedByNo=e.IDNo where TxnID='.$txnid;
+    $sqlsub='Select s.*, c.Category,if(s.ItemCode<30000,0,1) AS `SwitchTR`, i.ItemDesc, i.Unit, s.UnitPrice*s.Qty as Amount, if(Defective<>0,"Defective",0) as `Defective?`,e.Nickname as EncodedBy from invty_2salesub s join invty_1items i on i.ItemCode=s.ItemCode join invty_1category c on c.CatNo=i.CatNo left join `1employees` as e on s.EncodedByNo=e.IDNo where TxnID='.$txnid;
     $approvespecprice='';
     if ($txntype<>3){
     // $sqlsp='Select sp.TxnID from `invty_7specdisctapproval` sp where sp.TxnID='.$txnid;
@@ -204,13 +223,13 @@ where txntype=5 and TxnID='.$txnid;
 		   }
       }
          
-      $sqlsub='Select s.*, c.Category, i.ItemDesc, i.Unit, s.UnitPrice*s.Qty as Amount, if(Defective<>0,"Defective",0) as `Defective?`, e.Nickname as EncodedBy, a.SpecPriceRequest, a.BranchRemarks, a.SpecPriceApproved, a.SCRemarks, e1.Nickname as ApprovedBy from invty_2salesub s join invty_1items i on i.ItemCode=s.ItemCode join invty_1category c on c.CatNo=i.CatNo 
+      $sqlsub='Select s.*, c.Category,0 AS `SwitchTR`, i.ItemDesc, i.Unit, s.UnitPrice*s.Qty as Amount, if(Defective<>0,"Defective",0) as `Defective?`, e.Nickname as EncodedBy, a.SpecPriceRequest, a.BranchRemarks, a.SpecPriceApproved, a.SCRemarks, e1.Nickname as ApprovedBy from invty_2salesub s join invty_1items i on i.ItemCode=s.ItemCode join invty_1category c on c.CatNo=i.CatNo 
 left join `1employees` as e on s.EncodedByNo=e.IDNo 
 left join `invty_7specdisctapproval` a on s.TxnID=a.TxnID and s.ItemCode=a.ItemCode
 left join `1employees` as e1 on a.ApprovedByNo=e1.IDNo
 where s.TxnID='.$txnid;
    $approvespecprice=(allowedToOpen(6929,'1rtc'))?'<td><a href=praddsale.php?TxnID='.$txnid.'&action_token='.$_SESSION['action_token'].'&txntype='.$txntype.'&w=AppSpecPrice>Approve</a></td>':'';
-    
+  
     } else { // no special price
       //$sqlsub=$sqlsubnospecprice;
     }
@@ -218,6 +237,7 @@ where s.TxnID='.$txnid;
         if(($editsub==true) and allowedToOpen(6930,'1rtc')){
         $addlprocess='setasdefective.php?TxnID='.$txnid.'&which=SetDefectInSales&TxnSubId='; $addlprocesslabel='Set_as_Defective';}
     }
+    // echo $sqlsub;;
     $stmt=$link->query($sqlsub);
     $resultsub=$stmt->fetchAll();
     
@@ -272,6 +292,9 @@ if($stmtaddons->rowCount()!=0){
     $formdesc='Branch No. '.$branch.': <b>'.getNumber('BranchName',$branch).'</b>';
     //  $formdesc='Branch No. '.$_SESSION['bnum'].': <b>'.$_SESSION['@brn'].'</b>';
     $left='90%'; $leftmargin='91%'; $right='9%';
+
+    $newtargettxnidsubname="ItemCode"; $troptioneditnoedit=1; $switchtr='SwitchTR';
+    $newtargetprocess='bundleditems.php?w=Lookup&BundleID='; $newtargetprocesslabel='Lookup Bundle';
     $withsub=true;include('../backendphp/layout/inputsubform.php');
     if (in_array($txntype,array(5))){include_once('approvedcrssection.php');}
      

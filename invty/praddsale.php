@@ -6,10 +6,10 @@
         $allowed=((isset($_GET['auditreturn']))?699:array(700,728,999,2021,6927,6928,6929));
         if (!allowedToOpen($allowed,'1rtc')) {   echo 'No permission'; exit;}
         
-        if (allowedToOpen(2201,'1rtc')){
-        error_reporting(E_ALL);
-	ini_set('display_errors', 1);
-}
+//         if (allowedToOpen(2201,'1rtc')){
+//         error_reporting(E_ALL);
+// 	ini_set('display_errors', 1);
+// }
             
 	include_once('../backendphp/functions/getnumber.php');
 	include_once('../backendphp/functions/editok.php');
@@ -101,22 +101,60 @@ case 'SaleSub':
 	//to check if editable
 	include('../backendphp/functions/checkeditablesub.php');
 	//to check minprice
-	// if('.$_SESSION['bnum'].' in (Select BranchNo from 1branches b where b.ProvincialBranch=0), PriceLevel3, PriceLevel4)
+
+	$sqls='Select ClientNo,`Date` from invty_2sale where TxnID='.$txnid.'';
+	$stmts=$link->query($sqls);
+	$results=$stmts->fetch();
+
+
+
+		if($_REQUEST['ItemCode']<30000){
 	$sql='Select 
 	(SELECT 
 						'.$plcase.'
 					FROM `1branches` b1 where b1.BranchNo='.$_SESSION['bnum'].'
 				)
 		as SellPrice from `invty_5latestminprice` lmp where ItemCode='.$_REQUEST['ItemCode'];
+		} else {
+			//check if valid
+			$sqlbp='Select Posted from invty_1bundleditems_main where "'.$results['Date'].'" BETWEEN ValidFrom AND ValidTo';
+			$stmtbp=$link->query($sqlbp); $resultbp=$stmtbp->fetch();
+			
+			if($stmtbp->rowCount()==0){
+				echo 'Hindi pasok ang transaction date sa promo period.'; exit();
+			} else {
+				if($resultbp['Posted']==0){
+					echo 'Promo Not Yet Posted'; exit();
+				}
+			}
+
+			$sql='SELECT (SELECT 
+			(CASE 
+						WHEN
+							PriceLevel = 1 THEN SUM(bis.DiscountedPriceLevel1)
+						WHEN
+							PriceLevel = 2 THEN SUM(bis.DiscountedPriceLevel2)
+						WHEN
+							PriceLevel = 3 THEN SUM(bis.DiscountedPriceLevel3)
+						WHEN
+							PriceLevel = 4 THEN SUM(bis.DiscountedPriceLevel4)
+						ElSE
+							SUM(bis.DiscountedPriceLevel5)
+					END)
+		FROM `1branches` b1 where b1.BranchNo='.$_SESSION['bnum'].'
+		) AS SellPrice FROM invty_1bundleditems_sub bis WHERE BundleID='.$_REQUEST['ItemCode'];
+
+		}
+
 		$stmt=$link->query($sql);
 		$result=$stmt->fetch();
+
+
 	$msg=$result['SellPrice']>$_REQUEST['UnitPrice']?'&msg=Check selling price or request for special price.':'';
 	$price=$result['SellPrice']>$_REQUEST['UnitPrice']?$result['SellPrice']:$_REQUEST['UnitPrice'];
 	// end remarks for minprice
 	
-	$sqls='Select ClientNo from invty_2sale where TxnID='.$txnid.'';
-	$stmts=$link->query($sqls);
-	$results=$stmts->fetch();
+	
 	
 	$sqlc='select CreditLimit from 1clients c where c.ClientNo=\''.$results['ClientNo'].'\' ';
 	$stmtc=$link->query($sqlc);
@@ -132,12 +170,6 @@ case 'SaleSub':
 	$sqlcl='Select CreditLimit-IFNULL((sum(InvBalance)),0) AS Climit,(select CreditLimit-IFNULL((sum(InvBalance)),0)-sum(Qty*UnitPrice) from invty_2salesub ss join invty_2sale s on s.TxnID=ss.TxnID where s.ClientNo=\''.$results['ClientNo'].'\' and txntype in(2,5) and DateofCheck=CURDATE()) as Available from acctg_unpaidinv ui join 1clients c on c.ClientNo=ui.ClientNo where c.ClientNo=\''.$results['ClientNo'].'\' ';
 	$stmtcl=$link->query($sqlcl);
 	$resultcl=$stmtcl->fetch();
-	
-	
-	// echo $sqlcl; exit();;
-	// echo $resultcl['Climit']; echo '</br>';
-	// echo $resultcl['Available']; echo '</br>';
-	// echo $_POST['Qty']*$price; exit();
 	
 		
 		if(($_POST['Qty']*$price)<=$resultcl['Climit'] AND ((($_POST['Qty']*$price)<=$resultcl['Available']) XOR ($resultcl['Available']===NULL))){
