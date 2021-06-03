@@ -299,6 +299,8 @@ switch ($which){
 		 require($path."/acrossyrs/downloadedphp/PHPMailer/class.phpmailer.php");
 		include_once $path.'/acrossyrs/logincodes/checkifloggedon.php';
 		include_once($path.'/acrossyrs/dbinit/userinit.php');
+		include_once $path.'/acrossyrs/dbinit/emailpassword.php';
+	// rtciconpass()
 		$link=connect_db(''.$currentyr.'_1rtc',0);
 
 		$sql='SELECT ifnull(u.Email,b.Email) as Email, b.Branch, FullName FROM `1_gamit`.`1rtcusers` u join `attend_1defaultbranchassign` db on u.IDNo=db.IDNo join 1branches b on b.BranchNo=db.`DefaultBranchAssignNo` join `attend_30currentpositions` p on u.IDNo=p.IDNo where u.IDNo='.$_SESSION['(ak0)'];
@@ -314,7 +316,7 @@ switch ($which){
 		$mail->SMTPAuth = true;                               // Enable SMTP authentication
 		$mail->SMTPSecure = 'tls';//'ssl';
 		$mail->Username = '1rtcicon@gmail.com';                            // SMTP username
-		$mail->Password = '1RotaRy1003$';                           // SMTP password
+		$mail->Password = rtciconpass();                           // SMTP password
 
 		$mail->From = '1rtcicon@gmail.com';
 		$mail->FromName = '1Rotary - The Industry Icon';

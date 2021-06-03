@@ -463,7 +463,8 @@ case 'ApproveReturn':
 			
 			//return
 			require($path."acrossyrs/downloadedphp/PHPMailer/class.phpmailer.php");
-			
+			include_once $path.'/acrossyrs/dbinit/emailpassword.php';
+	// rtciconpass()
 			
 		$mail = new PHPMailer();
 		$mail->IsSMTP();  // telling the class to use SMTP
@@ -474,7 +475,7 @@ case 'ApproveReturn':
 		$mail->SMTPAuth = true;                               // Enable SMTP authentication
 		$mail->SMTPSecure = 'tls';//'ssl';
 		$mail->Username = '1rtcicon@gmail.com';                            // SMTP username
-		$mail->Password = '1RotaRy1003$';                           // SMTP password
+		$mail->Password = rtciconpass();                           // SMTP password
 
 		$mail->From = '1rtcicon@gmail.com';
 		$mail->FromName = 'Graphic Design Request';

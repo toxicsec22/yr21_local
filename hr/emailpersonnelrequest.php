@@ -34,16 +34,18 @@ switch ($which){
         else {
         //Send to JYE
             $msg='<a href="https://www.1rtc.biz/'.$url_folder.'/hr/emailpersonnelrequest.php?which=SendForApproval&Online=true">Go to approval page</a>'.$msg;
-        $emails[]='jyeusebio@1rotarytrading.com';
+        $emails[]='jyeusebio@1rotary.com.ph';
         $subject='Request for Personnel';
         // Check which need to go to JOR -- REMOVED SINCE BRANCHES ARE NOW DIFF DEPT
 //        $sqlsales='SELECT pr.* FROM hr_2personnelrequest pr WHERE (EntityID BETWEEN 1 AND 94) AND Approved=0;';
 //        $stmtsales=$link->query($sqlsales); 
-//        if ($stmtsales->rowCount()>0){ $emails[]='jackie.ramos@1rotarytrading.com';}
+//        if ($stmtsales->rowCount()>0){ $emails[]='jackie.ramos@1rotary.com.ph';}
         }
     break;
 
     case 'SendToHR':
+        include_once $path.'/acrossyrs/dbinit/emailpassword.php';
+	 // rtciconpass()
         $sql='SELECT pr.*, Entity, Position, TargetDate, e.Nickname as RequestedBy, pr.TimeStamp as RequestTS, e1.Nickname as ApprovedBy, pr.ApproveTS, IF(Approved=1,"Approved","Denied") AS `Approved?`
         FROM hr_2personnelrequest pr
         JOIN attend_0positions p ON p.PositionID=pr.PositionID        
@@ -64,7 +66,7 @@ switch ($which){
         $msg='Approved today:<br><br><table border=1, collapsed><th>Entity</th><th>Position</th><th>Remarks</th><th>TargetDate</th><th>RequestedBy</th><th>ApproveComments</th><th>Approve?</th>'.$msg.'</table>';
         $msg=$msg.'<br><br><a href="https://www.1rtc.biz/'.$url_folder.'/hr/personnelrequest.php">Lookup</a>';
         //Send to HR, Controller (for budget), and requester
-        $emails[]='hrd@1rotarytrading.com';$emails[]='jyeusebio@1rotarytrading.com';
+        $emails[]='hrd@1rotary.com.ph';$emails[]='jyeusebio@1rotary.com.ph';
         $sqlemail='SELECT Email FROM `1_gamit`.`1rtcusers` u join `attend_30currentpositions` p on u.IDNo=p.IDNo WHERE u.IDNo IN ('.rtrim($requester,",").')'; 
         $stmt=$link->query($sqlemail); $resemail=$stmt->fetchAll();
         foreach ($resemail as $reqemail){$emails[]=$reqemail['Email'];}
@@ -81,7 +83,7 @@ $mail->IsHTML(true);
 $mail->SMTPAuth = true;                               // Enable SMTP authentication
 $mail->SMTPSecure = 'tls';//'ssl';
 $mail->Username = '1rtcicon@gmail.com';                            // SMTP username
-$mail->Password = '1RotaRy1003$';                           // SMTP password
+$mail->Password = rtciconpass();                           // SMTP password
 
 $mail->From = '1rtcicon@gmail.com';
 $mail->FromName = '1Rotary - The Industry Icon';

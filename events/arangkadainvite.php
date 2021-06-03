@@ -44,7 +44,8 @@ switch ($which){
 	
 	case 'PrEmailInvite':
 	 require($path."/acrossyrs/downloadedphp/PHPMailer/class.phpmailer.php");
-	
+	 include_once $path.'/acrossyrs/dbinit/emailpassword.php';
+	 // rtciconpass()
 		
 		if (isset($_REQUEST['clientno'])){
 				foreach ($_REQUEST['clientno'] AS $clientno){
@@ -61,7 +62,7 @@ switch ($which){
 				$mail->SMTPAuth = true;                               // Enable SMTP authentication
 				$mail->SMTPSecure = 'tls';//'ssl';
 				$mail->Username = '1rtcicon@gmail.com';                            // SMTP username
-				$mail->Password = '1RotaRy1003$';                           // SMTP password
+				$mail->Password = rtciconpass();                           // SMTP password
 
 				$mail->From = '1rtcicon@gmail.com';
 				$mail->FromName = '1Rotary';
