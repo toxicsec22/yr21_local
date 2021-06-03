@@ -534,8 +534,13 @@ case 'Resigned13th':
           <form action='lookupwithedit.php?w=Resigned13th' method='POST'>Calculate 13th month for ID number?<input type=text name='IDNo'>
       <input type=submit name=submit value='Submit'></form>";
    
-   $sql='SELECT 13th.IDNo, FORMAT(`WholeYrBasic`,2) AS WholeYrBasic, FORMAT(`WholeYrTaxSh`,2) AS WholeYrTaxSh, FORMAT(`13thBasicCalc`,2) AS 13thBasicCalc, FORMAT(`13thTaxShCalc`,2) AS 13thTaxShCalc, FORMAT(`13thBasicActual`,2) AS 13thBasicPaid, FORMAT(`13thTaxShActual`,2) AS 13thTaxShPaid, e.Nickname,FirstName,MiddleName,SurName FROM payroll_26yrtotaland13thmonthcalc 13th LEFT join `1employees` e on e.IDNo=13th.IDNo where (e.Resigned<>0 OR e.IDNo IS NULL) and 13th.IDNo='.$_POST['IDNo'];
-   $columnnames=array('IDNo','Nickname','FirstName','MiddleName','SurName','WholeYrBasic','WholeYrTaxSh','13thBasicCalc','13thTaxShCalc','13thBasicPaid','13thTaxShPaid');
+//    $sql='SELECT 13th.IDNo, FORMAT(`WholeYrBasic`,2) AS WholeYrBasic, FORMAT(`WholeYrTaxSh`,2) AS WholeYrTaxSh, FORMAT(`13thBasicCalc`,2) AS 13thBasicCalc, FORMAT(`13thTaxShCalc`,2) AS 13thTaxShCalc, FORMAT(`13thBasicActual`,2) AS 13thBasicPaid, FORMAT(`13thTaxShActual`,2) AS 13thTaxShPaid, e.Nickname,FirstName,MiddleName,SurName FROM payroll_26yrtotaland13thmonthcalc 13th LEFT join `1employees` e on e.IDNo=13th.IDNo where (e.Resigned<>0 OR e.IDNo IS NULL) and 13th.IDNo='.$_POST['IDNo'];
+
+   $sql='SELECT 13th.IDNo, FORMAT(`WholeYrBasic`,2) AS WholeYrBasic, FORMAT(`WholeYrTaxSh`,2) AS WholeYrTaxSh, FORMAT(`13thBasicCalc`,2) AS 13thBasicCalc, FORMAT(`13thTaxShCalc`,2) AS 13thTaxShCalc, FORMAT(`13thBasicActual`,2) AS 13thBasicPaid, FORMAT(`13thTaxShActual`,2) AS 13thTaxShPaid, e.Nickname,e.FirstName,e.MiddleName,e.SurName,((DATEDIFF(id.DateResigned,IF(e.DateHired<="'.$lastyr.'-12-21","'.$lastyr.'-12-21",e.DateHired))/365))
+
+   AS Multiplier,IF(WithLeaves=1,TRUNCATE((((lb.VLfromTenure+lb.VLfromPosition)*(SELECT Multiplier))-IFNULL(VLUsed,0)),2),0) AS ProratedVLBalance,IF(WithLeaves=1,TRUNCATE((((lb.SLThisYr)*(SELECT Multiplier))-IFNULL(SLUsed,0)),2),0) AS ProratedSLBalance,(SELECT IF(ProratedVLBalance>0,ProratedVLBalance,0)) AS ProratedVLBal,(SELECT IF(ProratedSLBalance>0,ProratedSLBalance,0)) AS ProratedSLBal FROM payroll_26yrtotaland13thmonthcalc 13th LEFT join `1employees` e on e.IDNo=13th.IDNo LEFT JOIN attend_61leavebal lb ON 13th.IDNo=lb.IDNo JOIN 1_gamit.0idinfo id ON 13th.IDNo=id.IDNo where (e.Resigned<>0 OR e.IDNo IS NULL) and 13th.IDNo='.$_POST['IDNo'];
+// echo $sql;
+   $columnnames=array('IDNo','Nickname','FirstName','MiddleName','SurName','WholeYrBasic','WholeYrTaxSh','13thBasicCalc','13thTaxShCalc','13thBasicPaid','13thTaxShPaid','ProratedVLBal','ProratedSLBal');
    include('../backendphp/layout/displayastable.php');
    
    break;
