@@ -32,6 +32,7 @@ $total=0; $grandtotal=0;
 $fromBRtoN = array("<br>", "<br/>", "<br />", "<BR>", "<BR/>", "<BR />");
 foreach($datatoshow as $rows){
 
+        if(!isset($troptioneditnoedit) OR (isset($rows[$switchtr]) AND $rows[$switchtr]==0)){ //with action to edit
         $textfordisplay=$textfordisplay."<tr bgcolor=". $rcolor[$colorcount%2]."><form method='post' action=".$editprocess.$rows[$txnsubid].">";
         $colorcount++;
         //$textfordisplay=$textfordisplay."<tr>";
@@ -49,6 +50,23 @@ foreach($datatoshow as $rows){
 					 .(isset($addlprocess)?'<td><a href='.$addlprocess.$rows[$txnsubid].'&action_token='.$_SESSION['action_token'].'>'.$addlprocesslabel.'</a></td>':'')
 					 .(isset($addlprocess2)?'<td><a href='.$addlprocess2.$rows[$txnsubid].'&action_token='.$_SESSION['action_token'].'>'.$addlprocesslabel2.'</a></td>':'')
 					 ."</form></tr>");
+    } else { //not allowed to edit
+        $textfordisplay=$textfordisplay."<tr bgcolor='#eeeedd' style='border:3px solid green;'><form method='post' action=".$editprocess.$rows[$txnsubid].">";
+            $colorcount++;
+            //$textfordisplay=$textfordisplay."<tr>";
+            foreach($fields as $col){
+            if (in_array($col,$columnstoedit)){
+            $textfordisplay=$textfordisplay."<td>". addslashes($rows[$col]) . "</td>"; //fieldname variable is still unsuccessfully used
+            } else{
+        $textfordisplay=$textfordisplay."<td>". nl2br(htmlspecialchars(str_replace($fromBRtoN,"\n",addslashes($rows[$col])))) . "</td>";	
+            }
+            }
+        $total=(isset($coltototal)?$total+$rows[$coltototal]:0);  
+            $textfordisplay=$textfordisplay.((key($rows)!=$keyoflast)?"":(isset($runtotal)?"<td>".number_format($total,2)."</td>":'').'<input type="hidden" name="action_token" value="'.$_SESSION['action_token'].'"><td><a target=")blank" href='.$newtargetprocess.$rows[$newtargettxnidsubname].'&action_token='.$_SESSION['action_token'].'>'.$newtargetprocesslabel.'</a></td>'
+                        
+                        .((isset($delprocess) and $editok)?'<td><a href='.$delprocess.$rows[$txnsubid].'&action_token='.$_SESSION['action_token'].' OnClick="return confirm(\'Really delete this?\');">Delete</a></td>':'') 
+                        ."</form></tr>");
+    } 
 	//$grandtotal=$grandtotal+$total;
 } //end foreach
 $textfordisplay=$textfordisplay."</tbody></table><br>";
