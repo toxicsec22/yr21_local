@@ -3,13 +3,66 @@ $path=$_SERVER['DOCUMENT_ROOT']; include_once $path.'/acrossyrs/logincodes/check
 if (!allowedToOpen(100,'1rtc')) { echo 'No permission'; exit; }
 $showbranches=false;
 include_once('../switchboard/contents.php');
-$title='Vaccine Registration';
-// case 'Results':
+$hidecount=true;
+$w=!isset($_GET['w'])?'V':$_GET['w'];
+?>
+<br><br><a href='bakunaresults.php?w=V'>Vaccinated</a> &nbsp; <a href='bakunaresults.php?w=R'>Registered with 1Rotary</a><br><br>
+<?php
+
+switch ($w){
+    case 'V':
+?>
+<div width='100%'><div width='35%'  style='float: left; margin-left: 3%'>
+<?php
+$title='Vaccinated';
+
+$sql0='CREATE TEMPORARY TABLE vaccinated AS
+SELECT BranchorDept, Pseudobranch, SUM(CASE WHEN LGU IS NOT NULL THEN 1 ELSE 0 END) AS Registered,
+SUM(CASE WHEN DateVac1 IS NOT NULL THEN 1 ELSE 0 END) AS Dose1,
+SUM(CASE WHEN DateVac2 IS NOT NULL THEN 1 ELSE 0 END) AS Dose2,
+COUNT(cp.IDNo) AS NoofEmployees, IF(`b`.`PseudoBranch` <> 1, cp.BranchNo, cp.deptid+800) AS BranchOrDeptNo
+FROM event_1bakuna ba RIGHT JOIN attend_30currentpositions cp ON ba.IDNo=cp.IDNo
+JOIN 1branches b ON b.BranchNo=cp.BranchNo
+GROUP BY BranchOrDeptNo;';
+$stmt0=$link->prepare($sql0); $stmt0->execute();
+
+$subtitle='Total';
+$columnnames=array('Dose1','Dose2','TotalNoofEmployees','PercentVax');
+$sql='SELECT SUM(Dose1) AS Dose1, SUM(Dose2) AS Dose2, SUM(NoofEmployees) AS TotalNoofEmployees, TRUNCATE((GREATEST(SUM(Dose1),SUM(Dose2))/SUM(NoofEmployees))*100,2) AS PercentVax FROM vaccinated ;';
+include ('../backendphp/layout/displayastablenosort.php');
+
+echo '<br><br>';
+
+$sql1='SELECT BranchorDept, IF(Dose1=0,"",Dose1) AS Dose1, IF(Dose2=0,"",Dose2) AS Dose2, NoofEmployees, TRUNCATE((GREATEST(Dose1,Dose2)/NoofEmployees)*100,2) AS PercentVax FROM vaccinated WHERE ';
+$sql2=' ORDER BY PercentVax DESC, BranchORDept ASC;';
+$columnnames=array('BranchorDept', 'Dose1','Dose2','NoofEmployees','PercentVax');
+$title='';
+$subtitle='Offices';
+$sql=$sql1.'BranchOrDeptNo >= 800'.$sql2;
+include ('../backendphp/layout/displayastablenosort.php');
+
+$subtitle='Warehouses';
+$sql=$sql1.'Pseudobranch=2'.$sql2;
+include ('../backendphp/layout/displayastablenosort.php');
+
+?></div>
+
+<div width='50%' style='float: left;margin-left:10%; '>
+<?php
+$subtitle='Stores & Warehouses';
+$sql=$sql1.' Pseudobranch=0 '.$sql2;
+include ('../backendphp/layout/displayastable.php');
+
+?>
+</div></div>
+<?php
+break;
+case 'R':
 ?>
 <div width='100%'><div width='30%'  style='float: left; margin-left: 3%'>
 <?php
-$hidecount=true;
 
+$title='Vaccine Registration';
 $subtitle='Total Responses';
     $sql='SELECT COUNT(ba.IDNo) AS Responses, COUNT(cp.IDNo) AS Employees, CONCAT(TRUNCATE((COUNT(ba.IDNo)/COUNT(cp.IDNo))*100,2),"%") AS ResponseRate FROM event_1bakuna ba RIGHT JOIN attend_30currentpositions cp ON ba.IDNo=cp.IDNo;';
     $columnnames=array('Responses', 'Employees','ResponseRate');
@@ -39,16 +92,7 @@ END)/COUNT(IDNo))*100),2),"%") AS `AgreeRate` FROM event_1bakuna ;';
 
     include ('../backendphp/layout/displayastableonlynoheaders.php');
 
-    echo '<br><br>';
-    $subtitle='Registered and Vaccinated';
-    $sql='SELECT SUM(CASE WHEN LGU IS NOT NULL THEN 1 ELSE 0 END) AS Registered,
-    SUM(CASE WHEN DateVac1 IS NOT NULL THEN 1 ELSE 0 END) AS Dose1,
-    SUM(CASE WHEN DateVac2 IS NOT NULL THEN 1 ELSE 0 END) AS Dose2,
-    (SELECT COUNT(IDNo) FROM 1employees WHERE Resigned=0) AS NoofEmployees
-    FROM 2021_1rtc.event_1bakuna ;';
-    $columnnames=array('Registered', 'Dose1','Dose2','NoofEmployees');
-
-    include ('../backendphp/layout/displayastableonlynoheaders.php');
+    
 
 ?></div>
 
@@ -81,3 +125,5 @@ include ('../backendphp/layout/displayastablenosort.php');
 
 </div>
     
+<?php
+}
