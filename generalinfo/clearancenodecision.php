@@ -1,6 +1,8 @@
 <?php
 	$path=$_SERVER['DOCUMENT_ROOT']; 
 	include_once $path.'/acrossyrs/dbinit/userinit.php';
+	include_once $path.'/acrossyrs/dbinit/emailpassword.php';
+	 // rtciconpass()
 	$link=!isset($link)?connect_db($currentyr.'_1rtc',0):$link;
 	date_default_timezone_set('Asia/Manila');
 	
@@ -44,7 +46,7 @@
 		$mail->SMTPAuth = true;                               // Enable SMTP authentication
 		$mail->SMTPSecure = 'tls';//'ssl';
 		$mail->Username = '1rtcicon@gmail.com';                            // SMTP username
-		$mail->Password = '1RotaRy1003$';                           // SMTP password
+		$mail->Password = rtciconpass();                           // SMTP password
 
 		$mail->From = '1rtcicon@gmail.com';
 		$mail->FromName = '1Rotary - The Industry Icon';

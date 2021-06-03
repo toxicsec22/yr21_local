@@ -678,7 +678,8 @@ switch ($which)
 	$stmt=$link->query($sql); $res=$stmt->fetch();
 
 	require($path."/acrossyrs/downloadedphp/PHPMailer/class.phpmailer.php");
-
+	include_once $path.'/acrossyrs/dbinit/emailpassword.php';
+	// rtciconpass()
 		$msg='To: '.$res['Nickname'].' '.$res['SurName'].'<br>Re: Status of Employment<br><br>Dear '.$res['Gder'].' '.$res['SurName'].':<br><br>In response to your query about your employment status, you have been a <b><font style="font-size:12pt">regular employee</font></b> of the company upon reaching six (6) months tenure with the company. As such, you have been enjoying the benefits given to all regular employees since that time.<br><br>Sincerely,<br><br>HR Dept';
 		
 		 
@@ -691,7 +692,7 @@ switch ($which)
 		$mail->SMTPAuth = true;                               // Enable SMTP authentication
 		$mail->SMTPSecure = 'tls';//'ssl';
 		$mail->Username = '1rtcicon@gmail.com';                            // SMTP username
-		$mail->Password = '1RotaRy1003$';                           // SMTP password
+		$mail->Password = rtciconpass();                           // SMTP password
 
 		$mail->From = '1rtcicon@gmail.com';
 		$mail->FromName = 'HR Department';

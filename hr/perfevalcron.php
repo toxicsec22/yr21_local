@@ -7,7 +7,8 @@
 	
 	$path=$_SERVER['DOCUMENT_ROOT']; 
 	require($path."/acrossyrs/downloadedphp/PHPMailer/class.phpmailer.php");
-	
+	include_once $path.'/acrossyrs/dbinit/emailpassword.php';
+	// rtciconpass()
 	
    $month=date('m');
    //insert main
@@ -97,7 +98,7 @@
 // 		$mail->SMTPAuth = true;                               // Enable SMTP authentication
 // 		$mail->SMTPSecure = 'tls';//'ssl';
 // 		$mail->Username = '1rtcicon@gmail.com';                            // SMTP username
-// 		$mail->Password = '1RotaRy1003$';                           // SMTP password
+// 		$mail->Password = rtciconpass();                           // SMTP password
 
 // 		$mail->From = '1rtcicon@gmail.com';
 // 		$mail->FromName = 'Performance Evaluation';

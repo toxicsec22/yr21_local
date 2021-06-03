@@ -707,7 +707,7 @@ switch ($which)
 		$sql1=str_replace("bd.TxnID","bd.Paid AS TxnID",$sql1);
 		$sql=$sql1.$sql2.' AND Paid<>0 '.$sql3;
 		
-		
+		// echo '<br><br>'.$sql;
 		$newtab=true;
 		$txnidname='TxnID';
 		if (allowedToOpen(8005,'1rtc')){
@@ -905,12 +905,12 @@ switch ($which)
 		//Auto Populate acctg_4billsdue
 		if ($_POST['CutOffDay']<$_POST['DueDay']){
 			$lessthan='yes';
-			$monthco=date('m');
+			$monthco=(date('m')-1);
 		} else {
 			$lessthan='no';
-			$monthco=date('m')+1;
+			$monthco=date('m');
 		}
-		$monthdd=(($lessthan=='yes')?$monthco:$monthco+1);
+		$monthdd=(($lessthan=='yes')?($monthco-1):$monthco);
 		while ($monthco<=12){
 			if ($monthdd==13){ //nxt yr january only for due date
 				$monthdd=1;
