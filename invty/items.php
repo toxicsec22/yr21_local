@@ -50,7 +50,7 @@ if(isset($_POST['btnLookup'])){
 
 
 
-$columnstoadd=array('ItemCode','ItemDesc',  'Unit', 'Auto', 'Ref', 'Aircon', 'WholesaleUnit', 'Remarks', 'WithBarcode','RequiredSerialNo'); //'ItemDesc2',
+$columnstoadd=array('ItemCode','ItemDesc',  'Unit', 'Auto', 'Ref', 'Aircon', 'WholesaleUnit', 'Remarks', 'WithBarcode','RequiredSerialNo','Brand'); //'ItemDesc2',
 if (in_array($which,array('List','EditSpecifics'))){
    //$sql0='CREATE TEMPORARY TABLE movementtype AS SELECT 0 AS MoveType, "Active" as MovementType UNION SELECT 1,"Non-Stock" UNION SELECT 3,"Non-Moving" UNION SELECT 5,"Obsolete"';
    //$stmt0=$link->prepare($sql0); $stmt0->execute();
@@ -63,7 +63,7 @@ if (in_array($which,array('List','EditSpecifics'))){
         JOIN `invty_1category` t ON t.CatNo=i.CatNo JOIN invty_0movetype m ON m.MoveType=i.MoveType
    LEFT JOIN `1employees` e ON e.IDNo=i.EncodedByNo '.$sqlcondition.' ';
    // echo $sql;
-   $columnnameslist=array('ItemCode','Category', 'ItemDesc', 'Unit', 'Auto?', 'Ref?', 'Aircon?', 'WholesaleUnit', 'Remarks', 'MovementType','With_Barcode','Required_Serial_No','ItemSince');//,'EncodedBy','TimeStamp');
+   $columnnameslist=array('ItemCode','Category', 'ItemDesc', 'Unit', 'Auto?', 'Ref?', 'Aircon?', 'WholesaleUnit', 'Remarks', 'MovementType','With_Barcode','Required_Serial_No','ItemSince','Brand');//,'EncodedBy','TimeStamp');
 
 }
 
@@ -114,13 +114,15 @@ switch ($which){
                     array('field'=>'Remarks','type'=>'text','size'=>10,'required'=>false),
 		    array('field'=>'MovementType','type'=>'text','size'=>5,'required'=>false, 'value'=>"Active", 'list'=>'movetype'),
                     array('field'=>'WithBarcode', 'caption'=>'With Barcode? (1=yes, 0=no)','type'=>'text','size'=>2,'required'=>true),
-										array('field'=>'RequiredSerialNo', 'caption'=>'Required SerialNo? (1=yes, 0=no)','type'=>'text','size'=>2,'required'=>true));
+										array('field'=>'RequiredSerialNo', 'caption'=>'Required SerialNo? (1=yes, 0=no)','type'=>'text','size'=>2,'required'=>true),
+										array('field'=>'Brand','type'=>'text','size'=>10,'required'=>false)
+									);
 
 	 $method='post'; $fieldsinrow=8;
 	 include('../backendphp/layout/inputmainform.php');}
 	 $delprocess='items.php?w=Delete&ItemCode=';
 	 $editprocess='items.php?w=EditSpecifics&ItemCode='; $editprocesslabel='Edit';
-         $columnstoedit=array('Category','ItemCode','ItemDesc', 'Unit', 'WholesaleUnit', 'Remarks', 'MovementType','WithBarcode','RequiredSerialNo');
+         $columnstoedit=array('Category','ItemCode','ItemDesc', 'Unit', 'WholesaleUnit', 'Remarks', 'MovementType','WithBarcode','RequiredSerialNo','Brand');
 	 } else { $columnstoedit=array();}
       echo '<form method="post" action="items.php">
 	  <input type="hidden" name="Category" value="'.(isset($_POST['Category'])?$_POST['Category']:'').'">
@@ -186,53 +188,14 @@ switch ($which){
 
    case 'Purged':
        $title='Purged Items in '.$currentyr.''; $txnidname='ItemCode';
-       $columnnames=array('ItemCode','Category', 'ItemDesc', 'Unit', 'WholesaleUnit', 'Remarks', 'MovementType','With_Barcode','Required_Serial_No','EncodedBy','TimeStamp');//'ItemDesc2',
+       $columnnames=array('ItemCode','Category', 'ItemDesc', 'Unit', 'WholesaleUnit', 'Remarks', 'MovementType','With_Barcode','Required_Serial_No','Brand','EncodedBy','TimeStamp');//'ItemDesc2',
         $sortfield=(isset($_POST['sortfield'])?$_POST['sortfield']:' Category,ItemCode'); $columnsub=$columnnames;
-        $sql='SELECT i.*, Category, e.Nickname as EncodedBy, i.ItemCode AS TxnID, MovementType, IF(WithBarcode=1,"Yes","No") AS With_Barcode AND IF(RequiredSerialNo=1,"Yes","No") AS Required_Serial_No FROM purgedin'.$currentyr.' i
+        $sql='SELECT i.*, Category, e.Nickname as EncodedBy, i.ItemCode AS TxnID, MovementType, IF(WithBarcode=1,"Yes","No") AS With_Barcode,IF(RequiredSerialNo=1,"Yes","No") AS Required_Serial_No FROM purgedin'.$currentyr.' i
         LEFT JOIN `invty_1category` t ON t.CatNo=i.CatNo JOIN invty_0movetype m ON m.MoveType=i.MoveType
         LEFT JOIN `1employees` e ON e.IDNo=i.EncodedByNo ORDER BY '.$sortfield.(isset($_POST['sortarrange'])?' '.$_POST['sortarrange']:' ASC');
       include('../backendphp/layout/displayastable.php');
        break;
 
-	/* case'InvtyPlanning':
-			echo '<form method="post" action="items.php?w=InvtyPlanning">
-				Auto: <input type="checkbox" name="Auto">
-				Ref: <input type="checkbox" name="Ref">
-				Aircon: <input type="checkbox" name="Aircon">
-				<input type="submit" name="submit" value="Lookup">
-			</form><br/>';
-
-		if(isset($_POST['submit'])){
-			if(isset($_POST['Auto']) and !isset($_POST['Ref']) and !isset($_POST['Aircon'])){
-				$condition='Where Auto=1';
-				$title='Auto';
-			}elseif(isset($_POST['Ref']) and !isset($_POST['Auto']) and !isset($_POST['Aircon'])){
-				$condition='Where Ref=1';
-				$title='Ref';
-			}elseif(isset($_POST['Aircon']) and !isset($_POST['Auto']) and !isset($_POST['Ref'])){
-				$condition='Where Aircon=1';
-				$title='Aircon';
-			}elseif(isset($_POST['Auto']) and isset($_POST['Ref']) and !isset($_POST['Aircon'])){
-				$condition='Where Auto=1 OR Ref=1';
-				$title='Auto and Ref';
-			}elseif(isset($_POST['Auto']) and isset($_POST['Aircon']) and !isset($_POST['Ref'])){
-				$condition='Where Auto=1 OR Aircon=1';
-				$title='Auto and Aircon';
-			}elseif(isset($_POST['Auto']) and isset($_POST['Ref']) and isset($_POST['Aircon'])){
-				$condition='Where Auto=1 OR Ref=1 OR Aircon=1';
-				$title='Auto, Ref, and Aircon';
-			}elseif(isset($_POST['Ref']) and isset($_POST['Aircon']) and !isset($_POST['Auto'])){
-				$condition='Where Ref=1 OR Aircon=1';
-				$title='Ref and Aircon';
-			}
-		$sql='select ItemCode,Category,ItemDesc,Unit,WholesaleUnit,Remarks,WithBarcode from invty_1items i left join invty_1category c on c.CatNo=i.CatNo '.$condition.'';
-		$columnnames=array('ItemCode','Category','ItemDesc','Unit','WholesaleUnit','Remarks','WithBarcode','RequiredSerialNo');
-		// echo $sql; exit();
-		include('../backendphp/layout/displayastable.php');
-			}
-
-
-	break; */
 
 }
   $link=null; $stmt=null;
