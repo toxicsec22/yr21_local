@@ -17,14 +17,13 @@
 
 
         function checkExists($stringtomatch,$field,$table,$txnidname,$link){
-            $sql='SELECT `'.$txnidname.'` FROM `'.$table.'` WHERE '.$field.' LIKE \'%'.$stringtomatch.'%\'';
-            // echo $sql; exit();
+            $sql='SELECT `'.$txnidname.'` FROM `'.$table.'` WHERE '.$field.' LIKE \'%'.$stringtomatch.'%\'';	
             $stmt=$link->query($sql);
             $result=$stmt->fetch();
             if ($stmt->rowCount()>0){ return $result[$txnidname]; } else {   return 0;	}
         }
 
-       
+
         $sql0='SELECT CONCAT(IF(ForDB=0,"Inventory","Accounting"),":  ",`DataClosedBy`) AS ToShow FROM `00dataclosedby` WHERE ForDB IN (0,1)';
         $stmt=$link->query($sql0); $resasof=$stmt->fetchAll(); 
         echo '<br><br><h2 style="color: maroon; border: solid 1.5px; padding: 20px; text-align:center;">Data protected as of --'.str_repeat('&nbsp;', 10);
@@ -177,7 +176,7 @@ case "Step 1. Record 13th month accrual":
     $stringtomatch=(date('y',strtotime($lastdayofmonth))).'-13th-'.str_pad($month,2,'0',STR_PAD_LEFT);
 
     $jvno=checkExists($stringtomatch,'Remarks','acctg_2jvmain','JVNo',$link);
-       
+           
 	            if ($jvno==0){     
                   
                 $jvno=lastNum('JVNo','acctg_2jvmain',((date('Y',strtotime($currentyr.'-01-01')))-2000)*10000+1000000)+1;
@@ -471,10 +470,10 @@ FROM `acctg_2jvsub` s JOIN `banktxns_1maintaining` m ON  m.AccountID=s.DebitAcco
 
 case 'Update Closed-By Date for Invty':
 	if(allowedToOpen(6455,'1rtc')){
-      $sql='UPDATE `00dataclosedby` SET `DataClosedBy`=\''.$lastdayofmonth.'\' WHERE `ForDB`=0';
+      $sql='UPDATE `00dataclosedby` SET `DataClosedBy`=\''.$lastdayofmonth.'\',UpdatedByNo='.$_SESSION['(ak0)'].',TimeStamp=NOW() WHERE `ForDB`=0';
 	$stmt=$link->prepare($sql); $stmt->execute();
         if($currentyr==date('Y')){
-            $sql='UPDATE `00dataclosedby` SET `BranchesUnprotected` = NULL, `UnprotectedAfterDate` = NULL WHERE `ForDB`=0';
+            $sql='UPDATE `00dataclosedby` SET `BranchesUnprotected` = NULL, `UnprotectedAfterDate` = NULL,UpdatedByNo='.$_SESSION['(ak0)'].',TimeStamp=NOW() WHERE `ForDB`=0';
             $stmt=$link->prepare($sql); $stmt->execute();
         }
 	$link=connect_db("".$currentyr."_1rtc",1);
@@ -487,11 +486,11 @@ break;
 
 case 'Step 6. Update Closed-By Date for Acctg':
 	if(allowedToOpen(6455,'1rtc')){
-      $sql='UPDATE `00dataclosedby` SET `DataClosedBy`=\''.$lastdayofmonth.'\' WHERE `ForDB`=1';
+      $sql='UPDATE `00dataclosedby` SET `DataClosedBy`=\''.$lastdayofmonth.'\',UpdatedByNo='.$_SESSION['(ak0)'].',TimeStamp=NOW() WHERE `ForDB`=1';
 	$stmt=$link->prepare($sql); $stmt->execute();
         if($_SESSION['(ak0)']==1002){echo 'step 0 done.<br><br>'; echo $sql;}
         if($currentyr==date('Y')){
-            $sql='UPDATE `00dataclosedby` SET `BranchesUnprotected` = NULL, `UnprotectedAfterDate` = NULL WHERE `ForDB`=0';
+            $sql='UPDATE `00dataclosedby` SET `BranchesUnprotected` = NULL, `UnprotectedAfterDate` = NULL,UpdatedByNo='.$_SESSION['(ak0)'].',TimeStamp=NOW() WHERE `ForDB`=0';
             $stmt=$link->prepare($sql); $stmt->execute();
         }
         }
