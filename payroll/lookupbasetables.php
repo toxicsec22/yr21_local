@@ -16,6 +16,7 @@ include_once('../switchboard/contents.php');
    <font size=4 face='sans-serif'>     
 		<?php if (allowedToOpen(8032,'1rtc')) {?>
 		 <a id="link" href='/acrossyrs/infoandfaq/govtminwages.php'> Minimum Wage Rates</a><?php echo str_repeat('&nbsp',5)?>
+         <a id="link" href='lookupbasetables.php?w=StructureStores'>Salary Structure - Stores</a><?php echo str_repeat('&nbsp',5)?>
 		<?php } ?> 
         <?php if (allowedToOpen(805,'1rtc')) {?>
         <a id="link" href='lookupbasetables.php?w=PHIC'>Philhealth Table</a><?php echo str_repeat('&nbsp',5)?>
@@ -212,6 +213,47 @@ include '../backendphp/layout/displayastablenosort.php';
 
             <?php
             break;
+
+case 'StructureStores':
+                if (!allowedToOpen(6473,'1rtc')) { echo 'No permission'; exit;}
+            $title='Salary Structure - Stores'; 
+                
+              //  $daysofmonth=26.08; 
+            $formdesc='This serves as our guide. Note that all figures are based on current daily rate recorded in <a href="/acrossyrs/infoandfaq/govtminwages.php" target="_blank">Minimum Wages Table</a>.  Provincial hiring rate is 10% higher than the provincial minimum wage or NCR minimum wage rate, whichever is lower.<br><br>';
+
+            $sql0='CREATE TEMPORARY TABLE effectivedate AS
+            SELECT MAX(DateEffective) AS DateEffective, MinWageAreaID FROM `1_gamit`.`payroll_4wageorders` WHERE YEAR(DateEffective)<='.$currentyr.' GROUP BY MinWageAreaID;'; 
+            $stmt0=$link->prepare($sql0); $stmt0->execute();
+
+            $sql0='SELECT TotalMinWage AS NCRrate FROM `1_gamit`.`payroll_4wageorders` wo JOIN `effectivedate` ed ON ed.DateEffective=wo.DateEffective AND ed.MinWageAreaID=wo.MinWageAreaID WHERE wo.MinWageAreaID=1';
+            $stmt0=$link->query($sql0); $result0=$stmt0->fetch();
+            $ncrrate=$result0['NCRrate']; $multiplier=1.1; //10% above provincial rate
+
+            $sql1='SELECT wo.DateEffective, TotalMinWage AS EffectiveMinWage, CONCAT(RegionMinWageArea," ",Region) as Place, GROUP_CONCAT(" ", Branch) AS Branches FROM `1_gamit`.`payroll_4wageorders` wo JOIN `effectivedate` ed ON ed.DateEffective=wo.DateEffective AND ed.MinWageAreaID=wo.MinWageAreaID LEFT JOIN `1_gamit`.`payroll_0regionsminwageareas` r ON r.MinWageAreaID=wo.MinWageAreaID LEFT JOIN 1branches b ON b.EffectiveMinWageAreaID=r.MinWageAreaID AND Pseudobranch IN (0,2) WHERE Active="1" GROUP BY wo.MinWageAreaID ORDER BY wo.MinWageAreaID;';
+            $stmt1=$link->query($sql1); $result1=$stmt1->fetchAll();
+            $increaserate=1.1; $steprate=1.1;
+            foreach($result1 as $region){ 
+                $regionalrate=$region['EffectiveMinWage'];
+                $subtitle=$region['Place'].' &nbsp; (Effective Minimum Wage Rate: '.$regionalrate.
+                    ')<br><h5>Branches: '.$region['Branches'].'</h5>';
+                $startrate=($regionalrate*$multiplier)>=$ncrrate?$ncrrate:$regionalrate*$multiplier;
+                $sql='SELECT jl.JobLevelNo, GROUP_CONCAT(Position) AS Positions, 
+                TRUNCATE('.$startrate.'*IF(JobClassNo>1,POWER('.$increaserate.', JobClassNo+1),1),2) AS `Hiring Rate`, 
+                TRUNCATE('.$startrate.'*IF(JobClassNo>1,POWER('.$increaserate.',(JobClassNo+1)),1)*'.pow($steprate,1).',2) AS `Performer 1 yr (2 to 4 years)`, 
+                TRUNCATE('.$startrate.'*IF(JobClassNo>1,POWER('.$increaserate.',(JobClassNo+1)),1)*'.pow($steprate,2).',2) AS `Performer 2 yrs (4 to 6 years)`, 
+                TRUNCATE('.$startrate.'*IF(JobClassNo>1,POWER('.$increaserate.',(JobClassNo+1)),1)*'.pow($steprate,3).',2) AS `Performer 3 yrs (6 to 8 years)`, 
+                TRUNCATE('.$startrate.'*IF(JobClassNo>1,POWER('.$increaserate.',(JobClassNo+1)),1)*'.pow($steprate,4).',2) AS `Performer 4 yrs (8 to 10 years)`, 
+                TRUNCATE('.$startrate.'*IF(JobClassNo>1,POWER('.$increaserate.',(JobClassNo+1)),1)*'.pow($steprate,5).',2) AS `Maximum Rate` 
+                FROM attend_1joblevel jl LEFT JOIN attend_0positions p ON jl.JobLevelNo=p.JobLevelNo AND PreferredRateType=0
+                WHERE jl.JLID<=6 GROUP BY jl.JoblevelNo ORDER BY jl.JobClassNo;';
+
+                $columnnames=array('JobLevelNo','Hiring Rate','Performer 1 yr (2 to 4 years)','Performer 2 yrs (4 to 6 years)','Performer 3 yrs (6 to 8 years)','Performer 4 yrs (8 to 10 years)','Maximum Rate','Positions');
+                $hidecount=TRUE; $columnsub=$columnnames; //echo $sql.'<br><br>';
+                include('../backendphp/layout/displayastablenosort.php');
+                $title='';$formdesc='';
+            }
+break;
+
 case'DataClosedBy':
 	$sql='Update 00dataclosedby set DataClosedBy=Curdate() where ForDB=\'3\'';
 	$stmt=$link->prepare($sql); $stmt->execute();
