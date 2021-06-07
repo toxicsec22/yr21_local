@@ -181,9 +181,9 @@ switch ($which){
                     Date Needed <input type='date' name='DateNeeded' size=5 required=true> &nbsp &nbsp
 			<input type="hidden" name="action_token" value="<?php echo html_escape($_SESSION['action_token']); ?>"> &nbsp &nbsp
             <br><br><div style='background-color: edf0ed; width: 65%; border: solid 1px black; margin-left: 5%; padding: 5px;'>
-            <input type="checkbox"> By submitting this request, I acknowledge that if I fail to submit my liquidation five (5) days after the end of the purpose of my budget request, the entire amount will be charged to me, and will be paid via salary deduction.  I am also aware that any delay in liquidation is an offense in the Company's Code of Conduct.
+            <input type="checkbox"  onchange="document.getElementById('addrequest').disabled = !this.checked;" /> By submitting this request, I acknowledge that if I fail to submit my liquidation five (5) days after the end of the purpose of my budget request, the entire amount will be charged to me, and will be paid via salary deduction.  I am also aware that any delay in liquidation is an offense in the Company's Code of Conduct.
             <br><br>
-			<input type='submit' size=10 name='submit' value='Submit Request'></div>&nbsp &nbsp &nbsp</form>
+			<input type='submit' size=10 name='submit' value='Submit Request' id="addrequest" disabled="true"></div>&nbsp &nbsp &nbsp</form>
             </div>    
                 <br><br>
                 <div style='background-color: dcdedc; width: 85%; padding: 15px;'>
@@ -193,9 +193,9 @@ switch ($which){
                     ID Number of Original Requester <input type='text' name='EncodedByNo' size=5 required=true><br>
 			<input type="hidden" name="action_token" value="<?php echo html_escape($_SESSION['action_token']); ?>"> &nbsp &nbsp
             <div style='background-color: edf0ed; width: 65%; border: solid 1px black; margin-left: 5%; padding: 5px;'>
-            <input type="checkbox"> By submitting this request, I acknowledge that if I fail to submit my liquidation five (5) days after the end of the purpose of my budget request, the entire amount will be charged to me, and will be paid via salary deduction.  I am also aware that any delay in liquidation is an offense in the Company's Code of Conduct.
+            <input type="checkbox"  onchange="document.getElementById('claimrequest').disabled = !this.checked;" /> By submitting this request, I acknowledge that if I fail to submit my liquidation five (5) days after the end of the purpose of my budget request, the entire amount will be charged to me, and will be paid via salary deduction.  I am also aware that any delay in liquidation is an offense in the Company's Code of Conduct.
             <br><br>
-			<input type='submit' size=10 name='submit' value='Claim Request'></div></form>
+			<input type='submit' size=10 name='submit' id="claimrequest" value='Claim Request' disabled="true"></div></form>
             </div>
 <?php
 		echo comboBox($link,'SELECT BranchNo, Branch FROM `1branches` WHERE Active=1 AND BranchNo>=0 AND BranchNo NOT IN (95)','BranchNo','Branch','branchnames');
