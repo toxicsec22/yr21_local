@@ -102,7 +102,7 @@ switch ($which){
     
    case 'Training':
 	 $title='Training';
-	 $txnid=intval($_GET['TxnID']); $main='hr_2trainsched';	 
+	 $txnid=intval($_GET['TxnID']); $main='hr_2trainsched'; $table=$main; $txnidname='TxnID';
 	 $sortfield=(isset($_POST['sortfield'])?$_POST['sortfield']:'s.Trainee');
 	 $columnstoeditmain=$columnstoaddmain;
 	 $columnnames=array(
