@@ -170,8 +170,9 @@ switch ($which){
 	
         case 'NewRequest':
             $title='New Request for Budget';
-            ?><title><?php  echo $title; ?></title>
-                <br><br><h4><?php  echo $title; ?></h4><br><br>
+            ?><title><?php  echo $title; ?></title><br><br>
+            <div style='background-color: dcdedc; width: 85%; padding: 15px;'>
+                <h4><?php  echo $title; ?></h4><br><br>
                 
 		<form method='POST' action='requestforbudget.php?w=Add' style='display: inline;' >
                     Purpose <input type='text' name='Purpose' size=100 required=true><br><br>
@@ -179,14 +180,23 @@ switch ($which){
                     Charge to Branch <input type='text' name='Branch' size=10 required=true list='branchnames'> &nbsp; &nbsp;
                     Date Needed <input type='date' name='DateNeeded' size=5 required=true> &nbsp &nbsp
 			<input type="hidden" name="action_token" value="<?php echo html_escape($_SESSION['action_token']); ?>"> &nbsp &nbsp
-			<input type='submit' size=10 name='submit' value='Enter'>&nbsp &nbsp &nbsp</form>
-                
-                <br><br><br><h4>Claim another request</h4><br>
+            <br><br><div style='background-color: edf0ed; width: 65%; border: solid 1px black; margin-left: 5%; padding: 5px;'>
+            <input type="checkbox"> By submitting this request, I acknowledge that if I fail to submit my liquidation five (5) days after the end of the purpose of my budget request, the entire amount will be charged to me, and will be paid via salary deduction.  I am also aware that any delay in liquidation is an offense in the Company's Code of Conduct.
+            <br><br>
+			<input type='submit' size=10 name='submit' value='Submit Request'></div>&nbsp &nbsp &nbsp</form>
+            </div>    
+                <br><br>
+                <div style='background-color: dcdedc; width: 85%; padding: 15px;'>
+                <h4>Claim another request</h4><br>
                 <form method='POST' action='requestforbudget.php?w=Claim' style='display: inline;' >
                     TxnID of Budget Request <input type='text' name='TxnID' size=5 required=true>&nbsp; &nbsp; 
-                    ID Number of Original Requester <input type='text' name='EncodedByNo' size=5 required=true>
+                    ID Number of Original Requester <input type='text' name='EncodedByNo' size=5 required=true><br>
 			<input type="hidden" name="action_token" value="<?php echo html_escape($_SESSION['action_token']); ?>"> &nbsp &nbsp
-			<input type='submit' size=10 name='submit' value='Claim'>&nbsp &nbsp &nbsp</form>
+            <div style='background-color: edf0ed; width: 65%; border: solid 1px black; margin-left: 5%; padding: 5px;'>
+            <input type="checkbox"> By submitting this request, I acknowledge that if I fail to submit my liquidation five (5) days after the end of the purpose of my budget request, the entire amount will be charged to me, and will be paid via salary deduction.  I am also aware that any delay in liquidation is an offense in the Company's Code of Conduct.
+            <br><br>
+			<input type='submit' size=10 name='submit' value='Claim Request'></div></form>
+            </div>
 <?php
 		echo comboBox($link,'SELECT BranchNo, Branch FROM `1branches` WHERE Active=1 AND BranchNo>=0 AND BranchNo NOT IN (95)','BranchNo','Branch','branchnames');
                 ?>
@@ -194,15 +204,15 @@ switch ($which){
                 <BR><b>Complete Process:</b>
     <BR><BR>
     <ol style="padding-left: 100px; font-size: normal;">
-        <li>Requester must fill out online form, then submit.</li>
-        <li>Dept Head shall approve online. The request will no longer be editable once approved.</li>
-        <li>Accounting will prepare check and release cash to the requester. Payee of funds is the requester.</li>
-        <li>Requester shall indicate on system that funds were received. </li>
+        <li>Requester must fill out the online form, then submit.</li>
+        <li>The requester's Dept Head shall approve online. The request will no longer be editable once approved.</li>
+        <li>Accounting will prepare the check and release the funds to the requester. Payee of the check is the requester.</li>
+        <li>Requester shall indicate on the system that funds have been received. </li>
         <li>Requester shall encode all expenses with the corresponding details.  Best would be everyday encoding so budget balance is updated.  Only the requester/payee can encode expenses for liquidation.</li>
         <li>After the trip/event, requester shall organize the receipts on bond paper to coincide with encoded report. Requester must number and initialize each page. </li>
         <li>Requester shall print the report from the system and submit the report with the arranged receipts to the Dept Head for approval.</li>
         <li>Dept Head checks receipts and expenses, and signs approval.  Returns the report to the requester.</li>
-        <li>Requester submits the report, arranged receipts, and excess cash to Acctg.</li>
+        <li>Requester submits the report, arranged receipts, and excess cash to Acctg.  Deadline for submission is 3 days after the end of the trip/event.</li>
         <li>Accounting checks if all are in order, and tags the system report as "documents complete". If this has to be edited, only the requester may unset.</li>
         <li>Accounting will continue the process as usual.  All cash returns must be deposited immediately. Encoding in vouchers must be completed in 2 days.</li>
         <li>After the voucher has been checked and cleared, Acctg Team Leaders must finally set as "liquidated".  This cannot be undone.</li>        
