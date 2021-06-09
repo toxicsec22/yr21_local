@@ -46,6 +46,39 @@ $subtitle='Add-on for approval';
         include '../backendphp/layout/displayastableonlynoheaders.php';
        }
 
+// No encoded Salary Rate
+if (allowedToOpen(624,'1rtc')) { 
+    $sql='SELECT COUNT(IDNo) AS cntreq FROM 1employees WHERE IDNo NOT IN (SELECT DISTINCT(IDNo) FROM payroll_22rates);';
+    $stmt=$link->query($sql); $res=$stmt->fetch();
+
+    if ($res['cntreq']>0){
+        $cntres+=$res['cntreq'];
+    $msgcb='<br><div id="table-wrapper" style="width:80%;">For Encoding Salary Rates :<div><table bgcolor="FFFFF">'
+         .'';
+                $msgcb.='<tr><td><a href = "../attendance/newemployee.php?w=ForSalaryRate"> No encoded salary rate for '.$res['cntreq'].' employee(s).</a>'.'</td>'
+
+                        .'</tr>';
+          $switchboard = $switchboard . $msgcb.'<br></table></div></div>';
+    }
+	  
+}
+
+// Employee Approval Approval
+if (allowedToOpen(62411,'1rtc')) { 
+    $sql='SELECT COUNT(IDNo) AS cntreq FROM 1employeesforapproval;';
+    $stmt=$link->query($sql); $res=$stmt->fetch();
+
+    if ($res['cntreq']>0){
+        $cntres+=$res['cntreq'];
+    $msgcb='<br><div id="table-wrapper" style="width:80%;">Employee For Approval :<div><table bgcolor="FFFFF">'
+         .'';
+                $msgcb.='<tr><td><a href = "../attendance/newemployee.php?w=ForApprovalList"> '.$res['cntreq'].' employee(s) waiting for approval.</a>'.'</td>'
+
+                        .'</tr>';
+          $switchboard = $switchboard . $msgcb.'<br></table></div></div>';
+    }
+	  
+}
 
 // APPROVE RATES -- will now open a new page
 if (allowedToOpen(7911,7912,'1rtc')) { 

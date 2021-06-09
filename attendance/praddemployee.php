@@ -120,13 +120,23 @@ case 2:
 		}
 		
 	}
-	
+
         //add to attend_2attendance table: 
         $sql='Insert into `attend_2attendance` (`IDNo`,`BranchNo`,`HREncby`,`DateToday`,`LeaveNo`)
             Select '.addslashes($_POST['IDNo']) .', '.addslashes($_POST['BranchNo']) .', '.$user . ', `attend_2attendancedates`.`DateToday`, if(TypeOfDayNo=0,if(Weekday(DateToday)='.addslashes($_POST['RestDay']) .',15,18),if(TypeOfDayNo=4,18,TypeOfDayNo+10)) from `attend_2attendancedates` where (`DateToday`>=\''. addslashes($_POST['DateHired']).'\' '.$dateto.')'; 
         $stmt=$link->prepare($sql);
         $stmt->execute();
-	if ($_REQUEST['calledfrom']==1){ header("Location:../payroll/addentry.php?w=Rates");} else { header("Location:encodeattend.php?w=AddAttendRecords&IDNo=".$_POST['IDNo']);}
+
+
+    //delete data in holding table 
+        $sqlth='DELETE FROM 1employeesforapproval WHERE IDNo='.$_POST['IDNo']; 
+        $stmtth=$link->prepare($sqlth);
+	    $stmtth->execute();
+
+
+	if ($_REQUEST['calledfrom']==1){ header("Location:newemployee.php?w=ForApprovalList"); } else { 
+        header("Location:encodeattend.php?w=AddAttendRecords&IDNo=".$_POST['IDNo']);
+    }
         break;
 
 default:
