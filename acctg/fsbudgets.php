@@ -2,7 +2,7 @@
 $path=$_SERVER['DOCUMENT_ROOT']; include_once $path.'/acrossyrs/logincodes/checkifloggedon.php';
 if (!allowedToOpen(536,'1rtc')) { echo 'No permission'; exit; }
 $showbranches=false;
-    
+
 include_once $path.'/acrossyrs/commonfunctions/listoptions.php';
 $which=!isset($_GET['w'])?'lists':$_GET['w'];
 
@@ -12,8 +12,8 @@ include_once('../switchboard/contents.php');
         $link=!isset($link)?connect_db(''.$currentyr.'_1rtc',0):$link;
 }
 
-echo comboBox($link,'SELECT BranchNo, Branch FROM `1branches` ORDER BY Branch','BranchNo','Branch','branches'); 
-echo comboBox($link,'SELECT CompanyNo, Company FROM `1companies` where CompanyNo in (1,2,3,4,5) ORDER BY Company','CompanyNo','Company','companies'); 
+echo comboBox($link,'SELECT BranchNo, Branch FROM `1branches` ORDER BY Branch','BranchNo','Branch','branches');
+echo comboBox($link,'SELECT CompanyNo, Company FROM `1companies` where CompanyNo in (1,2,3,4,5) ORDER BY Company','CompanyNo','Company','companies');
 
 //budget planning module vs actual expenses filtering
 $sqldepartments='select GROUP_CONCAT(d.deptid) as deptid,PositionID,cp.deptheadpositionid from attend_30currentpositions cp join 1departments d on d.deptheadpositionid=cp.deptheadpositionid  WHERE IDNo='.$_SESSION['(ak0)'].'';
@@ -27,7 +27,7 @@ $stmtdepartments = $link->query($sqldepartments); $resultdepartments = $stmtdepa
  }
 //
 
-echo comboBox($link,'SELECT  department, deptid, deptheadpositionid FROM `1departments` '.$fcondition.' ORDER BY department','department','deptid','departments'); 
+echo comboBox($link,'SELECT  department, deptid, deptheadpositionid FROM `1departments` '.$fcondition.' ORDER BY department','department','deptid','departments');
 
 ?>
 	<style>
@@ -61,8 +61,8 @@ if (in_array($which,array('LookupExpenses','lists'))){
 if(isset($_REQUEST['department'])){
 // $sqls='select max(DateEffective),TotalMinWage,TimeStamp from `1_gamit`.`payroll_4wageorders` where MinWageAreaID=\'1\' ';
 // $stmts=$link->query($sqls); $results=$stmts->fetch();
-// $minwage=$results['TotalMinWage']; $daysofmonth=26.08; 
-		
+// $minwage=$results['TotalMinWage']; $daysofmonth=26.08;
+
 $plan=3600;
 $onetimeexpenses='30700';
 
@@ -74,46 +74,46 @@ $quarterhiredcomputation='(((MinRate*(1+PercentMintoMed/100)*(1+PercentMedtoMax/
 $quartercomputationne='(((MinRate*(1+PercentMintoMed/100)*(1+PercentMedtoMax/100))+(select Employer from '.$lastyr.'_1rtc.payroll_0ssstable where (MinRate*(1+PercentMintoMed/100)*(1+PercentMedtoMax/100)) BETWEEN RangeMin AND RangeMax)+(SELECT if(`monthlybasic`<=MinBasic,MinPremium,if(`monthlybasic` < MaxBasic,(`monthlybasic`*PremiumRate/100),MaxPremium))/2 FROM '.$lastyr.'_1rtc.payroll_0phicrate WHERE ApplicableYear='.$currentyr.')+\'100\')*3+('.$plan.'/4)+((MinRate*(1+PercentMintoMed/100)*(1+PercentMedtoMax/100))/4))+(((MinRate*(1+PercentMintoMed/100)*(1+PercentMedtoMax/100))/26.08)*5)/4+((MinRate*(1+PercentMintoMed/100)*(1+PercentMedtoMax/100))/4)';
 
 $union='UNION All select dam.deptid,\'\' as AccountID,\'\' as Account,\'\' as Details,\'\' as monthlybasic,
-'.$quartercomputation.' as Q1, '.$quartercomputation.' as Q2, 
+'.$quartercomputation.' as Q1, '.$quartercomputation.' as Q2,
 '.$quartercomputation.' as Q3, '.$quartercomputation.' as Q4
 from '.$lastyr.'_1rtc.payroll_21dailyandmonthly dam left join attend_0positions p on p.PositionID=dam.PositionID left join 1branches b on b.BranchNo=dam.BranchNo where dam.deptid=\''.$_REQUEST['department'].'\' Group by if(dam.deptid=10,dam.BranchNo,"") ';
-		
+
 $sqlee='Create temporary table EmployeeExpenses select bp.deptid, bp.AccountID, \'Employee\' as Account,bp.Details,(MinRate*(1+PercentMintoMed/100)*(1+PercentMedtoMax/100)) as `monthlybasic`,
 
 		if(substring(Details,LOCATE(\'-\', Details)+1,100)=1,
-		'.$quarterhiredcomputation.'	
+		'.$quarterhiredcomputation.'
 		,"") as Q1,
-		
+
 		if(substring(Details,LOCATE(\'-\', Details)+1,100)=2,
 		'.$quarterhiredcomputation.'
-			
+
 		,if(substring(Details,LOCATE(\'-\', Details)+1,100)<2,
 		'.$quartercomputationne.'
-			
+
 		,"")) as Q2,
-		
+
 		if(substring(Details,LOCATE(\'-\', Details)+1,100)=3,
 		'.$quarterhiredcomputation.'
-			
+
 		,if(substring(Details,LOCATE(\'-\', Details)+1,100)<3,
 		'.$quartercomputationne.'
-			
+
 		,"")) as Q3,
-		
+
 		if(substring(Details,LOCATE(\'-\', Details)+1,100)=4,
 		'.$quarterhiredcomputation.'
-			
+
 		,if(substring(Details,LOCATE(\'-\', Details)+1,100)<4,
 		'.$quartercomputationne.'
-		
+
 		,"")) as Q4
-		
-		
-		from '.$lastyr.'_1rtc.budget_2budgetplanning bp join acctg_1chartofaccounts ca on ca.AccountID=bp.AccountID  join attend_0positions p on p.PositionID=SUBSTRING_INDEX(bp.Details,\'-\',\'1\') join attend_1joblevel jl on jl.JobLevelNo=p.JobLevelNo  where bp.deptid=\''.$_REQUEST['department'].'\' and bp.AccountID=\'965\' 
-		
+
+
+		from budget_2budgetplanning bp join acctg_1chartofaccounts ca on ca.AccountID=bp.AccountID  join attend_0positions p on p.PositionID=SUBSTRING_INDEX(bp.Details,\'-\',\'1\') join attend_1joblevel jl on jl.JobLevelNo=p.JobLevelNo  where bp.deptid=\''.$_REQUEST['department'].'\' and bp.AccountID=\'965\'
+
 		'.$union.'
 		';
-		// echo $sqlee; exit();
+
 		$stmtee=$link->prepare($sqlee); $stmtee->execute();
 }
 //
@@ -128,9 +128,9 @@ $stmtd=$link->query($sqld); $resultd=$stmtd->fetch();
 
 $sqla='select ShortAcctID from acctg_1chartofaccounts where AccountID=\''.$_GET['AccountID'].'\'';
 $stmta=$link->query($sqla); $resulta=$stmta->fetch();
-//	
+//
 
-	$sql='select Q1, Q2, Q3, Q4 , b.AccountID, Details from '.$lastyr.'_1rtc.budget_2budgetplanning b left join acctg_1chartofaccounts ca on ca.AccountID=b.AccountID where b.deptid=\''.$_GET['deptid'].'\' and b.AccountID=\''.$_GET['AccountID'].'\'';
+	$sql='select Q1, Q2, Q3, Q4 , b.AccountID, Details from budget_2budgetplanning b left join acctg_1chartofaccounts ca on ca.AccountID=b.AccountID where b.deptid=\''.$_GET['deptid'].'\' and b.AccountID=\''.$_GET['AccountID'].'\'';
 	$stmt=$link->query($sql); $result=$stmt->fetch();
 	if ($stmt->rowCount()==0){
 		echo'<title>Add?</title><h3>Add?</h3>Department: <b>'.$resultd['dept'].'</b> '.str_repeat('&nbsp;',5).' Account: <b>'.$resulta['ShortAcctID'].'</b></br>';
@@ -153,60 +153,60 @@ $stmta=$link->query($sqla); $resulta=$stmta->fetch();
 				<input type="submit" name="submit" value="Edit">
 			</form>';
 	}
-	
+
 	break;
-	
+
 	case'AddEditProcess':
 	require_once $path.'/acrossyrs/logincodes/confirmtoken.php';
 	if(isset($_REQUEST['add'])){
-		$sql='insert into '.$lastyr.'_1rtc.budget_2budgetplanning set deptid=\''.$_REQUEST['deptid'].'\',AccountID=\''.$_REQUEST['AccountID'].'\',Q1=\''.$_REQUEST['Q1'].'\',Q2=\''.$_REQUEST['Q2'].'\',Q3=\''.$_REQUEST['Q3'].'\',Q4=\''.$_REQUEST['Q4'].'\',Details=\''.$_REQUEST['Details'].'\',EncodedByNo=\''.$_SESSION['(ak0)'].'\',TimeStamp=Now()';
+		$sql='insert into budget_2budgetplanning set deptid=\''.$_REQUEST['deptid'].'\',AccountID=\''.$_REQUEST['AccountID'].'\',Q1=\''.$_REQUEST['Q1'].'\',Q2=\''.$_REQUEST['Q2'].'\',Q3=\''.$_REQUEST['Q3'].'\',Q4=\''.$_REQUEST['Q4'].'\',Details=\''.$_REQUEST['Details'].'\',EncodedByNo=\''.$_SESSION['(ak0)'].'\',TimeStamp=Now()';
 	}else{
-		$sql='UPDATE '.$lastyr.'_1rtc.budget_2budgetplanning set Q1=\''.$_REQUEST['Q1'].'\',Q2=\''.$_REQUEST['Q2'].'\',Q3=\''.$_REQUEST['Q3'].'\',Q4=\''.$_REQUEST['Q4'].'\',Details=\''.$_REQUEST['Details'].'\',EncodedByNo=\''.$_SESSION['(ak0)'].'\',TimeStamp=Now() where deptid=\''.$_REQUEST['deptid'].'\' and AccountID=\''.$_REQUEST['AccountID'].'\'';
-		
+		$sql='UPDATE budget_2budgetplanning set Q1=\''.$_REQUEST['Q1'].'\',Q2=\''.$_REQUEST['Q2'].'\',Q3=\''.$_REQUEST['Q3'].'\',Q4=\''.$_REQUEST['Q4'].'\',Details=\''.$_REQUEST['Details'].'\',EncodedByNo=\''.$_SESSION['(ak0)'].'\',TimeStamp=Now() where deptid=\''.$_REQUEST['deptid'].'\' and AccountID=\''.$_REQUEST['AccountID'].'\'';
+
 	}
 	// echo $sql; exit();
 		$stmt=$link->prepare($sql); $stmt->execute();
 		header('Location:fsbudgets.php?w=lists&departmentlookup=1&department='.$_REQUEST['deptid'].'');
-	
+
 	break;
-	
+
 	case'LookupExpenses':
 	if($_GET['AccountID']==-1){
-		
+
 		$sqlb='select format(sum(floor(Q1)+floor(Q2)+floor(Q3)+floor(Q4)),0) as Budget from EmployeeExpenses';
 		// echo $sqlb; exit();
 		$stmt=$link->query($sqlb); $resultb=$stmt->fetch();
-	
-	 $sql='select format(floor(@running_total:=@running_total - Actual),0) AS RemainingBudget,format(floor(Actual),0) as Actual,Date,ControlNo,`Supplier/Customer/Branch`,Particulars,FromBudgetOf from 
-		(select ControlNo,`Supplier/Customer/Branch`,Particulars,Amount as Actual,Date,Branch as FromBudgetOf from acctg_0unialltxns ut left join 1branches b on b.BranchNo=ut.FromBudgetOf left join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID where ut.FromBudgetOf=\''.($_GET['department']+800).'\' AND ut.AccountID in (901,301,966,905,974,501,502,503,908,909,910) and ControlNo not like \'%BegBal\') Actual JOIN 
+
+	 $sql='select format(floor(@running_total:=@running_total - Actual),0) AS RemainingBudget,format(floor(Actual),0) as Actual,Date,ControlNo,`Supplier/Customer/Branch`,Particulars,FromBudgetOf from
+		(select ControlNo,`Supplier/Customer/Branch`,Particulars,Amount as Actual,Date,Branch as FromBudgetOf from acctg_0unialltxns ut left join 1branches b on b.BranchNo=ut.FromBudgetOf left join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID where ut.FromBudgetOf=\''.($_GET['department']+800).'\' AND ut.AccountID in (901,301,966,905,974,501,502,503,908,909,910) and ControlNo not like \'%BegBal\') Actual JOIN
 		(SELECT @running_total:=sum(Q1+Q2+Q3+Q4) from EmployeeExpenses) Budget Order By Date';
 		// echo $sql; exit();
-		$stmt=$link->query($sql); 
+		$stmt=$link->query($sql);
 		$result=$stmt->fetchAll();
-		
+
 	}else{
-	$sqlb='select format(sum(Q1+Q2+Q3+Q4),0) as Budget from '.$lastyr.'_1rtc.budget_2budgetplanning b left join acctg_1chartofaccounts ca on ca.AccountID=b.AccountID where b.deptid=\''.$_GET['department'].'\' AND b.AccountID=\''.$_GET['AccountID'].'\' ';
+	$sqlb='select format(sum(Q1+Q2+Q3+Q4),0) as Budget from budget_2budgetplanning b left join acctg_1chartofaccounts ca on ca.AccountID=b.AccountID where b.deptid=\''.$_GET['department'].'\' AND b.AccountID=\''.$_GET['AccountID'].'\' ';
 		// echo $sqlb; exit();
 		$stmt=$link->query($sqlb); $resultb=$stmt->fetch();
-	
-	 $sql='select format(@running_total:=@running_total - Actual,0) AS RemainingBudget,format(Actual,0) as Actual,Date,ControlNo,`Supplier/Customer/Branch`,Particulars,FromBudgetOf from 
-		(select ControlNo,`Supplier/Customer/Branch`,Particulars,Amount as Actual,Date,Branch as FromBudgetOf from acctg_0unialltxns ut left join 1branches b on b.BranchNo=ut.FromBudgetOf left join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID where ut.FromBudgetOf=\''.($_GET['department']+800).'\' AND ut.AccountID=\''.$_GET['AccountID'].'\' and ControlNo not like \'%BegBal\') Actual JOIN 
-		(SELECT @running_total:=sum(Q1+Q2+Q3+Q4) from '.$lastyr.'_1rtc.budget_2budgetplanning b where b.deptid=\''.$_GET['department'].'\' AND b.AccountID=\''.$_GET['AccountID'].'\') Budget Order By Date';
+
+	 $sql='select format(@running_total:=@running_total - Actual,0) AS RemainingBudget,format(Actual,0) as Actual,Date,ControlNo,`Supplier/Customer/Branch`,Particulars,FromBudgetOf from
+		(select ControlNo,`Supplier/Customer/Branch`,Particulars,Amount as Actual,Date,Branch as FromBudgetOf from acctg_0unialltxns ut left join 1branches b on b.BranchNo=ut.FromBudgetOf left join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID where ut.FromBudgetOf=\''.($_GET['department']+800).'\' AND ut.AccountID=\''.$_GET['AccountID'].'\' and ControlNo not like \'%BegBal\') Actual JOIN
+		(SELECT @running_total:=sum(Q1+Q2+Q3+Q4) from budget_2budgetplanning b where b.deptid=\''.$_GET['department'].'\' AND b.AccountID=\''.$_GET['AccountID'].'\') Budget Order By Date';
 		// echo $sql; exit();
-		$stmt=$link->query($sql); 
+		$stmt=$link->query($sql);
 		$result=$stmt->fetchAll();
 	}
-		
-		
+
+
 		echo'</br><table id="table">
 		<tr><th>Date</th><th>ControlNo</th><th>Supplier/Customer/Branch</th><th>Particulars</th><th>FromBudgetOf</th><th>Actual</th><th>RemainingBudget</th></tr>
 		<tr><td>Budget for the year:</td><td></td><td></td><td></td><td></td><td></td><td>'.($resultb['Budget']).'</td></tr>';
 
 		foreach($result as $res){
 			echo'<tr><td>'.$res['Date'].'</td><td>'.$res['ControlNo'].'</td><td>'.$res['Supplier/Customer/Branch'].'</td><td>'.$res['Particulars'].'</td>
-			<td>'.$res['FromBudgetOf'].'</td><td>'.$res['Actual'].'</td><td>'.$res['RemainingBudget'].'</td></tr>';		
+			<td>'.$res['FromBudgetOf'].'</td><td>'.$res['Actual'].'</td><td>'.$res['RemainingBudget'].'</td></tr>';
 		}
-	
+
 	break;
 	case'lists':
 	echo'<title>Budget vs Actual</title>';
@@ -214,16 +214,16 @@ $stmta=$link->query($sqla); $resulta=$stmta->fetch();
 	if(!isset($_POST['submit'])){
 		$_POST['branch']='';
 		$_POST['company']='';
-		
+
 	}
-	
+
 	$reportmonth=date('m');
 	echo'</br>';
-	if (allowedToOpen(5362,'1rtc')) {  
+	if (allowedToOpen(5362,'1rtc')) {
 			echo'<div style="float:left; margin-left: 20px; width:300px; padding: 2px; border: 2px solid black;">
 				<h5 style="text-align:center; color: darkblue;">MONTH Columns</h5>
 				<form style="display:inline;" method="post" action="fsbudgets.php">
-				<br>'.str_repeat('&nbsp;',4).'<input type=radio name="groupby" value=0>Per Branch 
+				<br>'.str_repeat('&nbsp;',4).'<input type=radio name="groupby" value=0>Per Branch
 				<input type=text size=8 name="branch" list="branches" size="10" autocomplete="off" value="'.$_POST['branch'].'">
 				<br>'.str_repeat('&nbsp;',4).'<input type=radio name="groupby" value=1  checked=true>
 				Per Company <input type="text" name="company" list="companies" size=10 autocomplete="off" value="'.$_POST['company'].'">
@@ -232,7 +232,7 @@ $stmta=$link->query($sqla); $resulta=$stmta->fetch();
 				<br><br>'.str_repeat('&nbsp;',30).'<input type=submit name="submit" value="Lookup"  size=100px>
 				</form></div>';
 	}
-	if (allowedToOpen(5173,'1rtc')) {  			
+	if (allowedToOpen(5173,'1rtc')) {
 			echo'<div style="float:left; margin-left: 20px; width:300px; padding: 2px; border: 2px solid black;">
 				<h5 style="text-align:center; color: darkblue;">QUARTER Columns</h5>
 				<form style="display:inline;" method="post" action="fsbudgets.php">
@@ -241,14 +241,14 @@ $stmta=$link->query($sqla); $resulta=$stmta->fetch();
 				<input type="submit" name="departmentlookup" value="Lookup">
 				</form></div>';
 	}
-	if (allowedToOpen(5362,'1rtc')) {  
+	if (allowedToOpen(5362,'1rtc')) {
 	echo'</br></br></br></br></br></br></br></br></br></br>';
 	}else{
 		echo'</br></br></br></br>';
 	}
-	
+
 	if(isset($_REQUEST['departmentlookup'])){
-				
+
 		$frombudgetof=$_REQUEST['department']+800;
 		$sqlt='Create temporary table Actual select FromBudgetOf, ut.AccountID, month(Date) as Month, sum(Amount) as Amount from acctg_0unialltxns ut left join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID where ControlNo not like \'%BegBal\' Group By ut.AccountID,month(Date),FromBudgetOf';
 		// echo $sqlt; exit();
@@ -263,22 +263,22 @@ $stmta=$link->query($sqla); $resulta=$stmta->fetch();
 		$stmta=$link->prepare($sqla); $stmta->execute();
 //TOTAL Table
 
-$sqlt='create temporary table TOTAL as select b.AccountID,ShortAcctID as Account, Details, 
+$sqlt='create temporary table TOTAL as select b.AccountID,ShortAcctID as Account, Details,
 			format(Q1,0) as Q1Budget, format(Q1Actual,0) as Q1Actual,
 			format(Q2,0) as Q2Budget, format(Q2Actual,0) as Q2Actual,
 			format(Q3,0) as Q3Budget, format(Q3Actual,0) as Q3Actual,
 			format(Q4,0) as Q4Budget, format(Q4Actual,0) as Q4Actual,
 			format((Q1+Q2+Q3+Q4),0) AS TotalBudget,format((ifnull(Q1Actual,0)+ifnull(Q2Actual,0)+ifnull(Q3Actual,0)+ifnull(Q4Actual,0)),0) as TotalActual,
-			
+
 			Q1 as Q1BudgetValue, Q1Actual as Q1ActualValue,
 			Q2 as Q2BudgetValue, Q2Actual as Q2ActualValue,
 			Q3 as Q3BudgetValue, Q3Actual as Q3ActualValue,
 			Q4 as Q4BudgetValue, Q4Actual as Q4ActualValue,
 			(Q1+Q2+Q3+Q4) AS TotalBudgetValue,(ifnull(Q1Actual,0)+ifnull(Q2Actual,0)+ifnull(Q3Actual,0)+ifnull(Q4Actual,0)) as TotalActualValue
-			
-			
-			from '.$lastyr.'_1rtc.budget_2budgetplanning b left join QuarterActual a on a.AccountID=b.AccountID and a.FromBudgetOf=b.deptid+800 left join acctg_1chartofaccounts ca on ca.AccountID=b.AccountID left join 1departments d on d.deptid=b.deptid where b.deptid=\''.$_REQUEST['department'].'\' and b.AccountID<>965 Group By b.AccountID
-			
+
+
+			from budget_2budgetplanning b left join QuarterActual a on a.AccountID=b.AccountID and a.FromBudgetOf=b.deptid+800 left join acctg_1chartofaccounts ca on ca.AccountID=b.AccountID left join 1departments d on d.deptid=b.deptid where b.deptid=\''.$_REQUEST['department'].'\' and b.AccountID<>965 Group By b.AccountID
+
 			UNION ALL select \'-1\' as AccountID,\'Employee\' as Account,\'\' as Details,
 			format(sum(floor(Q1)),0) as Q1Budget,
 			(select format(sum(floor(Q1Actual)),0) from QuarterActual where AccountID in (901,301,966,905,974,501,502,503,908,909,910)) as Q1Actual,
@@ -290,7 +290,7 @@ $sqlt='create temporary table TOTAL as select b.AccountID,ShortAcctID as Account
 			(select format(sum(floor(Q4Actual)),0) from QuarterActual where AccountID in (901,301,966,905,974,501,502,503,908,909,910)) as Q4Actual,
 			format((sum(floor(Q1))+sum(floor(Q2))+sum(floor(Q3))+sum(floor(Q4))),0) as TotalBudget,
 			(select format(sum(floor(ifnull(Q1Actual,0))+floor(ifnull(Q2Actual,0))+floor(ifnull(Q3Actual,0))+floor(ifnull(Q4Actual,0))),0) from QuarterActual where AccountID in (901,301,966,905,974,501,502,503,908,909,910)) as TotalActual,
-			
+
 			sum(floor(Q1)) as Q1BudgetValue,
 			(select sum(floor(Q1Actual)) from QuarterActual where AccountID in (901,301,966,905,974,501,502,503,908,909,910)) as Q1ActualValue,
 			sum(floor(Q2)) as Q2BudgetValue,
@@ -302,52 +302,53 @@ $sqlt='create temporary table TOTAL as select b.AccountID,ShortAcctID as Account
 			(sum(floor(Q1))+sum(floor(Q2))+sum(floor(Q3))+sum(floor(Q4))) as TotalBudgetValue,
 			(select sum(floor(ifnull(Q1Actual,0))+floor(ifnull(Q2Actual,0))+floor(ifnull(Q3Actual,0))+floor(ifnull(Q4Actual,0))) from QuarterActual where AccountID in (901,301,966,905,974,501,502,503,908,909,910)) as TotalActualValue
 
-			from EmployeeExpenses 
-			
+			from EmployeeExpenses
+
 			UNION ALL
-			
-			select 
+
+			select
 			qa.AccountID, \'\' AS Account, \'\' as Details,
-			\'0\' Q1Budget, 
+			\'0\' Q1Budget,
 			format(sum(floor(Q1Actual)),0) as Q1Actual,
 			\'0\' as Q2Budget,
 			format(sum(floor(Q2Actual)),0) as Q2Actual,
-			\'0\' as Q3Budget, 
+			\'0\' as Q3Budget,
 			format(sum(floor(Q3Actual)),0) as Q3Actual,
 			\'0\' as Q4Budget,
 			format(sum(floor(Q4Actual)),0) as Q4Actual,
 			\'0\' as TotalBudget,
-format(sum(floor(ifnull(Q1Actual,0))+floor(ifnull(Q2Actual,0))+floor(ifnull(Q3Actual,0))+floor(ifnull(Q4Actual,0))),0) as TotalActual,
+      format(sum(floor(ifnull(Q1Actual,0))+floor(ifnull(Q2Actual,0))+floor(ifnull(Q3Actual,0))+floor(ifnull(Q4Actual,0))),0) as TotalActual,
 
-			\'0\' Q1BudgetValue, 
+			\'0\' Q1BudgetValue,
 			sum(floor(Q1Actual)) as Q1ActualValue,
 			\'0\' as Q2BudgetValue,
 			sum(floor(Q2Actual)) as Q2ActualValue,
-			\'0\' as Q3BudgetValue, 
+			\'0\' as Q3BudgetValue,
 			sum(floor(Q3Actual)) as Q3ActualValue,
 			\'0\' as Q4BudgetValue,
 			sum(floor(Q4Actual)) as Q4ActualValue,
 			\'0\' as TotalBudgetValue,
-sum(floor(ifnull(Q1Actual,0))+floor(ifnull(Q2Actual,0))+floor(ifnull(Q3Actual,0))+floor(ifnull(Q4Actual,0))) as TotalActualValue from QuarterActual qa left join acctg_1chartofaccounts ca on ca.AccountID=qa.AccountID where qa.AccountID not in (select AccountID from '.$lastyr.'_1rtc.budget_2budgetplanning where deptid=\''.$_REQUEST['department'].'\' Group by AccountID) and Budgeted=1';
-$stmtt=$link->prepare($sqlt); $stmtt->execute();			
+sum(floor(ifnull(Q1Actual,0))+floor(ifnull(Q2Actual,0))+floor(ifnull(Q3Actual,0))+floor(ifnull(Q4Actual,0))) as TotalActualValue from QuarterActual qa left join acctg_1chartofaccounts ca on ca.AccountID=qa.AccountID where qa.AccountID not in (select AccountID from budget_2budgetplanning where deptid=\''.$_REQUEST['department'].'\' Group by AccountID) and Budgeted=1';
+
+$stmtt=$link->prepare($sqlt); $stmtt->execute();
 
 //
-			$sqlm='select b.AccountID,ShortAcctID,ShortAcctID as Account, Details, 
+			$sqlm='select b.AccountID,ShortAcctID,ShortAcctID as Account, Details,
 			format(Q1,0) as Q1Budget, format(Q1Actual,0) as Q1Actual,
 			format(Q2,0) as Q2Budget, format(Q2Actual,0) as Q2Actual,
 			format(Q3,0) as Q3Budget, format(Q3Actual,0) as Q3Actual,
 			format(Q4,0) as Q4Budget, format(Q4Actual,0) as Q4Actual,
 			format((Q1+Q2+Q3+Q4),0) AS TotalBudget,format((ifnull(Q1Actual,0)+ifnull(Q2Actual,0)+ifnull(Q3Actual,0)+ifnull(Q4Actual,0)),0) as TotalActual,
-			
+
 			Q1 as Q1BudgetValue, Q1Actual as Q1ActualValue,
 			Q2 as Q2BudgetValue, Q2Actual as Q2ActualValue,
 			Q3 as Q3BudgetValue, Q3Actual as Q3ActualValue,
 			Q4 as Q4BudgetValue, Q4Actual as Q4ActualValue,
-			(Q1+Q2+Q3+Q4) AS TotalBudgetValue,(ifnull(Q1Actual,0)+ifnull(Q2Actual,0)+ifnull(Q3Actual,0)+ifnull(Q4Actual,0)) as TotalActualValue
-			
-			
-			from '.$lastyr.'_1rtc.budget_2budgetplanning b left join QuarterActual a on a.AccountID=b.AccountID and a.FromBudgetOf=b.deptid+800 left join acctg_1chartofaccounts ca on ca.AccountID=b.AccountID left join 1departments d on d.deptid=b.deptid where b.deptid=\''.$_REQUEST['department'].'\' and b.AccountID<>965 Group By b.AccountID
-			
+			(Q1+Q2+Q3+Q4) AS TotalBudgetValue,(ifnull(Q1Actual,0)+ifnull(Q2Actual,0)+ifnull(Q3Actual,0)+ifnull(Q4Actual,0)) as TotalActualValue, b.TimeStamp, CONCAT(e.Nickname," ",e.SurName) as EncodedBy
+
+
+			from budget_2budgetplanning b left join QuarterActual a on a.AccountID=b.AccountID and a.FromBudgetOf=b.deptid+800 left join acctg_1chartofaccounts ca on ca.AccountID=b.AccountID left join 1departments d on d.deptid=b.deptid left join 1employees e on b.EncodedByNo=e.IDNo where b.deptid=\''.$_REQUEST['department'].'\' and b.AccountID<>965 Group By b.AccountID, b.Details
+
 			UNION ALL select \'-1\' as AccountID,Account as ShortAcctID,\'Employee\' as Account,\'\' as Details,
 			format(sum(floor(Q1)),0) as Q1Budget,
 			(select format(sum(floor(Q1Actual)),0) from QuarterActual where AccountID in (901,301,966,905,974,501,502,503,908,909,910)) as Q1Actual,
@@ -359,7 +360,7 @@ $stmtt=$link->prepare($sqlt); $stmtt->execute();
 			(select format(sum(floor(Q4Actual)),0) from QuarterActual where AccountID in (901,301,966,905,974,501,502,503,908,909,910)) as Q4Actual,
 			format((sum(floor(Q1))+sum(floor(Q2))+sum(floor(Q3))+sum(floor(Q4))),0) as TotalBudget,
 			(select format(sum(floor(ifnull(Q1Actual,0))+floor(ifnull(Q2Actual,0))+floor(ifnull(Q3Actual,0))+floor(ifnull(Q4Actual,0))),0) from QuarterActual where AccountID in (901,301,966,905,974,501,502,503,908,909,910)) as TotalActual,
-			
+
 			sum(floor(Q1)) as Q1BudgetValue,
 			(select sum(floor(Q1Actual)) from QuarterActual where AccountID in (901,301,966,905,974,501,502,503,908,909,910)) as Q1ActualValue,
 			sum(floor(Q2)) as Q2BudgetValue,
@@ -369,59 +370,59 @@ $stmtt=$link->prepare($sqlt); $stmtt->execute();
 			sum(floor(Q4)) as Q4BudgetValue,
 			(select sum(floor(Q4Actual)) from QuarterActual where AccountID in (901,301,966,905,974,501,502,503,908,909,910)) as Q4ActualValue,
 			(sum(floor(Q1))+sum(floor(Q2))+sum(floor(Q3))+sum(floor(Q4))) as TotalBudgetValue,
-			(select sum(floor(ifnull(Q1Actual,0))+floor(ifnull(Q2Actual,0))+floor(ifnull(Q3Actual,0))+floor(ifnull(Q4Actual,0))) from QuarterActual where AccountID in (901,301,966,905,974,501,502,503,908,909,910)) as TotalActualValue from EmployeeExpenses 
-			
+			(select sum(floor(ifnull(Q1Actual,0))+floor(ifnull(Q2Actual,0))+floor(ifnull(Q3Actual,0))+floor(ifnull(Q4Actual,0))) from QuarterActual where AccountID in (901,301,966,905,974,501,502,503,908,909,910)) as TotalActualValue, "", "" from EmployeeExpenses 
+
 			UNION ALL select \'\' as AccountID,\'z\' AS ShortAcctID,\'\' AS Account,\'TOTAL\' as Details,
-			format(sum(floor(Q1BudgetValue)),0) as Q1Budget, 
+			format(sum(floor(Q1BudgetValue)),0) as Q1Budget,
 			format(sum(floor(Q1ActualValue)),0) as Q1Actual,
 			format(sum(floor(Q2BudgetValue)),0) as Q2Budget,
 			format(sum(floor(Q2ActualValue)),0) as Q2Actual,
-			format(sum(floor(Q3BudgetValue)),0) as Q3Budget, 
+			format(sum(floor(Q3BudgetValue)),0) as Q3Budget,
 			format(sum(floor(Q3ActualValue)),0) as Q3Actual,
 			format(sum(floor(Q4BudgetValue)),0) as Q4Budget,
 			format(sum(floor(Q4ActualValue)),0) as Q4Actual,
 format((sum(floor(TotalBudgetValue))),0) as TotalBudget,
 format((sum(floor(TotalActualValue))),0) as TotalActual,
-			sum(floor(Q1BudgetValue)) as Q1BudgetValue, 
+			sum(floor(Q1BudgetValue)) as Q1BudgetValue,
 			sum(floor(Q1ActualValue)) as Q1ActualValue,
 			sum(floor(Q2BudgetValue)) as Q2BudgetValue,
 			sum(floor(Q2ActualValue)) as Q2ActualValue,
-			sum(floor(Q3BudgetValue)) as Q3BudgetValue, 
+			sum(floor(Q3BudgetValue)) as Q3BudgetValue,
 			sum(floor(Q3ActualValue)) as Q3ActualValue,
 			sum(floor(Q4BudgetValue)) as Q4BudgetValue,
 			sum(floor(Q4ActualValue)) as Q4ActualValue,
 			(sum(floor(TotalBudgetValue))) as TotalBudgetValue,
-			(sum(floor(TotalActualValue))) as TotalActualValue from TOTAL
-			
+			(sum(floor(TotalActualValue))) as TotalActualValue, "","" from TOTAL 
+
 			UNION ALL
-			
-			select 
+
+			select
 			qa.AccountID, ShortAcctID, ShortAcctID AS Account, \'\' as Details,
-			\'\' Q1Budget, 
+			\'\' Q1Budget,
 			format((floor(Q1Actual)),0) as Q1Actual,
 			\'\' as Q2Budget,
 			format((floor(Q2Actual)),0) as Q2Actual,
-			\'\' as Q3Budget, 
+			\'\' as Q3Budget,
 			format((floor(Q3Actual)),0) as Q3Actual,
 			\'\' as Q4Budget,
 			format((floor(Q4Actual)),0) as Q4Actual,
 			\'\' as TotalBudget,
 format((floor(ifnull(Q1Actual,0))+floor(ifnull(Q2Actual,0))+floor(ifnull(Q3Actual,0))+floor(ifnull(Q4Actual,0))),0) as TotalActual,
 
-			\'0\' Q1BudgetValue, 
+			\'0\' Q1BudgetValue,
 			(floor(Q1Actual)) as Q1ActualValue,
 			\'0\' as Q2BudgetValue,
 			(floor(Q2Actual)) as Q2ActualValue,
-			\'0\' as Q3BudgetValue, 
+			\'0\' as Q3BudgetValue,
 			(floor(Q3Actual)) as Q3ActualValue,
 			\'0\' as Q4BudgetValue,
 			(floor(Q4Actual)) as Q4ActualValue,
 			\'0\' as TotalBudgetValue,
-(floor(ifnull(Q1Actual,0))+floor(ifnull(Q2Actual,0))+floor(ifnull(Q3Actual,0))+floor(ifnull(Q4Actual,0))) as TotalActualValue from QuarterActual qa left join acctg_1chartofaccounts ca on ca.AccountID=qa.AccountID where qa.AccountID not in (select AccountID from '.$lastyr.'_1rtc.budget_2budgetplanning where deptid=\''.$_REQUEST['department'].'\' Group by AccountID) and Budgeted=1 Order By ShortAcctID';
-			
+(floor(ifnull(Q1Actual,0))+floor(ifnull(Q2Actual,0))+floor(ifnull(Q3Actual,0))+floor(ifnull(Q4Actual,0))) as TotalActualValue, "", "" from  QuarterActual qa left join acctg_1chartofaccounts ca on ca.AccountID=qa.AccountID where qa.AccountID not in (select AccountID from budget_2budgetplanning where deptid=\''.$_REQUEST['department'].'\' Group by AccountID) and Budgeted=1 Order By ShortAcctID';
+
 			$stmtm=$link->query($sqlm); $resultm=$stmtm->fetchAll();
-			
-			$sqld='select department from 1departments where deptid=\''.$_REQUEST['department'].'\'';
+
+      $sqld='select department from 1departments where deptid=\''.$_REQUEST['department'].'\'';
 			$stmtd=$link->query($sqld); $resultd=$stmtd->fetch();
 			$sqlac='select group_concat(concat(AccountID,\'-\',ShortAcctID) separator \', \') as Accounts from acctg_1chartofaccounts where AccountID in (901,301,966,905,974,501,502,503,908,909,910)';
 			$stmtac=$link->query($sqlac); $resultac=$stmtac->fetch();
@@ -433,7 +434,7 @@ format((floor(ifnull(Q1Actual,0))+floor(ifnull(Q2Actual,0))+floor(ifnull(Q3Actua
 			<th>Account</th><th>Details</th>
 				<th>Q1Budget</th><th>Q1Actual</th><th>Q2Budget</th><th>Q2Actual</th>
 				<th>Q3Budget</th><th>Q3Actual</th><th>Q4Budget</th><th>Q4Actual</th>
-			<th>TotalBudget</th><th>TotalActual</th>	
+			<th>TotalBudget</th><th>TotalActual</th><th>TimeStamp</th><th>EncodedBy</th>
 			</tr>';
 			foreach($resultm as $resm){
 				$percentq1actual=($resm['Q1ActualValue']/$resm['Q1BudgetValue'])*100;
@@ -441,50 +442,53 @@ format((floor(ifnull(Q1Actual,0))+floor(ifnull(Q2Actual,0))+floor(ifnull(Q3Actua
 				$percentq3actual=($resm['Q3ActualValue']/$resm['Q3BudgetValue'])*100;
 				$percentq4actual=($resm['Q4ActualValue']/$resm['Q4BudgetValue'])*100;
 				$percenttotalactual=($resm['TotalActualValue']/$resm['TotalBudgetValue'])*100;
-				
+        
+
 				if($percentq1actual>=80){
 					$bgcolor1='bgcolor="red"';
 				}else{
-					$bgcolor1='';		
+					$bgcolor1='';
 				}
-				
+
 				if($percentq2actual>=80){
 					$bgcolor2='bgcolor="red"';
 				}else{
-					$bgcolor2='';		
+					$bgcolor2='';
 				}
-				
+
 				if($percentq3actual>=80){
 					$bgcolor3='bgcolor="red"';
 				}else{
-					$bgcolor3='';		
+					$bgcolor3='';
 				}
-				
+
 				if($percentq4actual>=80){
 					$bgcolor4='bgcolor="red"';
 				}else{
-					$bgcolor4='';		
+					$bgcolor4='';
 				}
-				
+
 				if($percenttotalactual>=80){
 					$bgcolor5='bgcolor="red"';
 				}else{
-					$bgcolor5='';		
+					$bgcolor5='';
 				}
+
+       
 if (allowedToOpen(5174,'1rtc')) {
 	$edit='<td><a href="fsbudgets.php?w=Edit&deptid='.$_REQUEST['department'].'&AccountID='.$resm['AccountID'].'">Edit</a></td>';
 
  }else{
 	 $edit='';
 
- }				
+ }
 				echo'<tr>
 			<td>'.$resm['Account'].'</td><td>'.$resm['Details'].'</td>
 				<td>'.$resm['Q1Budget'].'</td><td '.$bgcolor1.'>'.$resm['Q1Actual'].'</td><td>'.$resm['Q2Budget'].'</td><td '.$bgcolor2.'>'.$resm['Q2Actual'].'</td>
 				<td>'.$resm['Q3Budget'].'</td><td '.$bgcolor3.'>'.$resm['Q3Actual'].'</td><td>'.$resm['Q4Budget'].'</td><td '.$bgcolor4.'>'.$resm['Q4Actual'].'</td>
-			<td>'.$resm['TotalBudget'].'</td><td '.$bgcolor5.'>'.$resm['TotalActual'].'</td><td><a href=""  onclick="window.open(\'fsbudgets.php?w=LookupExpenses&department='.$_REQUEST['department'].'&AccountID='.$resm['AccountID'].'\', \'newwindow\',\'width=1000,height=500\');return false;">Lookup</a></td>'.$edit.'
+			<td>'.$resm['TotalBudget'].'</td><td '.$bgcolor5.'>'.$resm['TotalActual'].'</td><td>'.$resm['TimeStamp'].'</td><td>'.$resm['EncodedBy'].'</td><td><a href=""  onclick="window.open(\'fsbudgets.php?w=LookupExpenses&department='.$_REQUEST['department'].'&AccountID='.$resm['AccountID'].'\', \'newwindow\',\'width=1000,height=500\');return false;">Lookup</a></td>'.$edit.'
 			</tr>';
-				
+
 			}
 		exit();
 	}
@@ -551,7 +555,7 @@ if (allowedToOpen(5174,'1rtc')) {
 							$yearcondib='';
 							$filter='';
 					break;
-					
+
 				}
 		}
 if(isset($_POST['submit'])){
@@ -559,7 +563,7 @@ if(isset($_POST['submit'])){
 					$sql1='create temporary table SalesActual as select sum(Amount)*-1 as Actual,ut.BranchNo as BranchNo,CompanyNo,month(Date) as Month from acctg_0unialltxns ut left join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID left join 1branches b on b.BranchNo=ut.BranchNo '.$condi.' '.$groupby.'';
 					// echo $sql1; exit();
 					$stmt1=$link->prepare($sql1); $stmt1->execute();
-					
+
 					//Temporary table acctid
 					$sql1='create temporary table AcctBudget as select AccountID,sum(Budget) as Budget,BranchNo,CompanyNo, Month from budget_1budgets bu left join 1branches b on b.BranchNo=bu.EntityID '.$acctidcondi.' '.$acctidgroupby.'';
 					// echo $sql1; exit();
@@ -574,7 +578,7 @@ if(isset($_POST['submit'])){
 						$sql1='create temporary table AcctYearActual as select ut.AccountID as AccountID,sum(Amount)*-1 as YearActual from acctg_0unialltxns ut left join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID left join 1branches b on b.BranchNo=ut.BranchNo '.$yearcondia.' Group By ut.AccountID';
 						// echo $sql1; exit();
 						$stmt1=$link->prepare($sql1); $stmt1->execute();
-						
+
 					$sqlcs='';
 					$sqlcogs='';
 					$sqlcogst='';
@@ -591,24 +595,24 @@ if(isset($_POST['submit'])){
 					$c=1;
 		while($c<=$_POST['reportmonth']){
 					if(strlen($c)==1){
-						$col=str_pad($c,2,"0",STR_PAD_LEFT);						
+						$col=str_pad($c,2,"0",STR_PAD_LEFT);
 					}else{
 						$col=$c;
 					}
-					
+
 						switch($c){
 							case'1':$colnameB='JanBudget'; $colnameA='JanActual'; break; case'2':$colnameB='FebBudget'; $colnameA='FebActual';break; case'3':$colnameB='MarBudget'; $colnameA='MarActual';break;
 							case'4':$colnameB='AprBudget'; $colnameA='AprActual';break; case'5':$colnameB='MayBudget'; $colnameA='MayActual';break; case'6':$colnameB='JunBudget'; $colnameA='JunActual';break;
 							case'7':$colnameB='JulBudget'; $colnameA='JulActual';break; case'8':$colnameB='AugBudget'; $colnameA='AugActual';break; case'9':$colnameB='SepBudget'; $colnameA='SepActual';break;
 							case'10':$colnameB='OctBudget'; $colnameA='OctActual';break; case'11':$colnameB='NovBudget'; $colnameA='NovActual';break; case'12':$colnameB='DecBudget'; $colnameA='DecActual';break;
-							
+
 						}
 						if($_POST['groupby']==10){
 						$sqlcs.='case when \''.$c.'\'=\''.$c.'\' then sum(`'.$col.'`) end as '.$colnameB.',sum(CASE WHEN Month=\''.$c.'\' then Actual end) as '.$colnameA.', ';
 						}elseif($_POST['groupby']==1){
 						$sqlcs.='case when \''.$c.'\'=\''.$c.'\' then sum(`'.$col.'`) end as '.$colnameB.',sum(CASE WHEN Month=\''.$c.'\' then Actual end) as '.$colnameA.', ';}else{
 							$sqlcs.='case when \''.$c.'\'=\''.$c.'\' then `'.$col.'` end as '.$colnameB.',sum(CASE WHEN Month=\''.$c.'\' then Actual end) as '.$colnameA.', ';
-							
+
 						}
 						$sqlcogst.='case when \''.$c.'\'=\''.$c.'\' then sum(`'.$col.'`)*.75 end as '.$colnameB.', ';
 						$sqlcogs.='case when \''.$c.'\'=\''.$c.'\' then format(sum(`'.$col.'`)*.75,2) end as '.$colnameB.', ';
@@ -618,7 +622,7 @@ if(isset($_POST['submit'])){
 						$COGSActualt.='(select sum(Amount) from acctg_0unialltxns ut left join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID left join 1branches b on b.BranchNo=ut.BranchNo '.$cogscondi.' month(Date)=\''.$c.'\' and AccountType=\'101\') as  '.$colnameA.',';
 						// echo $COGSActualt; exit();
 						$COGSActual.='(select format(sum(Amount),2) from acctg_0unialltxns ut left join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID left join 1branches b on b.BranchNo=ut.BranchNo '.$cogscondi.' month(Date)=\''.$c.'\' and AccountType=\'101\') as  '.$colnameA.',';
-						$acctidt.='avg(case when bu.Month=\''.$c.'\' then Budget end) as '.$colnameB.',avg(case when ut.Month=\''.$c.'\' then Actual end) as '.$colnameA.',';		
+						$acctidt.='avg(case when bu.Month=\''.$c.'\' then Budget end) as '.$colnameB.',avg(case when ut.Month=\''.$c.'\' then Actual end) as '.$colnameA.',';
 						}else{
 						$COGSActualt.='(select sum(Qty*`'.$col.'`) FROM invty_2sale s JOIN invty_2salesub ss ON ss.TxnID=s.TxnID JOIN `'.$currentyr.'_static`.`invty_weightedavecost` wac ON wac.ItemCode=ss.ItemCode left join 1branches b on b.BranchNo=s.BranchNo '.$cogscondi.' month(Date)=\''.$c.'\') as  '.$colnameA.',';
 						$COGSActual.='(select format(sum(Qty*`'.$col.'`),2) FROM invty_2sale s JOIN invty_2salesub ss ON ss.TxnID=s.TxnID JOIN `'.$currentyr.'_static`.`invty_weightedavecost` wac ON wac.ItemCode=ss.ItemCode left join 1branches b on b.BranchNo=s.BranchNo '.$cogscondi.' month(Date)=\''.$c.'\') as  '.$colnameA.',';
@@ -633,12 +637,12 @@ if(isset($_POST['submit'])){
 						// echo $acctid; exit();
 						$columnnames[]=$colnameB;
 						$columnnames[]=$colnameA;
-						
+
 						$c++;
 		}
-		
-					
-				
+
+
+
 					$title='';
 					$formdesc='';
 					if($_POST['groupby']==10){
@@ -653,7 +657,7 @@ if(isset($_POST['submit'])){
 					$sql='select '.$sqlcs.' \'\' as AccountID,\'Sales\' as AccountDescription '.$yearsales.' from acctg_1yearsalestargets sa left join 1branches b on b.BranchNo=sa.branchno left join SalesActual yst on yst.BranchNo=b.BranchNo '.$newcondi.'';
 					// echo $sql; exit();
 					$stmt=$link->query($sql); $result=$stmt->fetch();
-						
+
 					}
 
 					$columnnames[]='YearBudget'; $columnnames[]='YearActual';
@@ -663,7 +667,7 @@ if(isset($_POST['submit'])){
 					//header
 					echo'<tr>';
 					foreach($columnnames as $col){
-						echo'<th>'.$col.'</th>';	
+						echo'<th>'.$col.'</th>';
 					}
 					echo'</tr>';
 					//table data for sales
@@ -671,7 +675,7 @@ if(isset($_POST['submit'])){
 					foreach($columnnames as $col){
 						if($result[$col]=='' OR $result[$col]=='Sales'){
 							$result[$col]=$result[$col];
-							
+
 						}else{
 							$result[$col]=number_format($result[$col],2);
 						}
@@ -679,7 +683,7 @@ if(isset($_POST['submit'])){
 					}
 					echo'</tr>';
 					$fields=$columnnames;
-					
+
 					//COGS
 					$sql1='Create Temporary table COGStotal as select \'1\' as Con,'.$sqlcogst.' '.$COGSActualt.' \'\' as AccountID,\'COGS Budgeted at 75%\' as AccountDescription '.$yearcogst	.' from acctg_1yearsalestargets sa left join 1branches b on b.BranchNo=sa.branchno '.$cogsgroupby.'';
 					// echo $sql1; exit();
@@ -687,12 +691,12 @@ if(isset($_POST['submit'])){
 					$sql='select '.$sqlcogs.' '.$COGSActual.' \'\' as AccountID,\'COGS Budgeted at 75%\' as AccountDescription '.$yearcogs	.' from acctg_1yearsalestargets sa left join 1branches b on b.BranchNo=sa.branchno '.$cogsgroupby.'';
 					// echo $sql; exit();
 					include('../backendphp/layout/displayassubtable.php');
-					
+
 					//expenses per AccountID
 					$sql='select '.$acctid.' ut.AccountID,ShortAcctID as AccountDescription '.$yearacct.' from AcctActual ut left join 1branches b on b.BranchNo=ut.branchno left join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID left join AcctBudget bu on bu.AccountID=ut.AccountID left join AcctYearActual ya on ya.AccountID=ut.AccountID left join AcctYearBudget yb on yb.AccountID=bu.AccountID Group By AccountID';
 					// echo $sql; exit();
 					include('../backendphp/layout/displayassubtable.php');
-					
+
 					//total expenses
 					$sql1='Create Temporary table total as select '.$acctidt.' ut.AccountID,ShortAcctID as AccountDescription '.$yearacctt.' from AcctActual ut left join 1branches b on b.BranchNo=ut.branchno left join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID left join AcctBudget bu on bu.AccountID=ut.AccountID left join AcctYearActual ya on ya.AccountID=ut.AccountID left join AcctYearBudget yb on yb.AccountID=bu.AccountID Group By AccountID';
 					$stmt=$link->prepare($sql1); $stmt->execute();
@@ -701,22 +705,22 @@ if(isset($_POST['submit'])){
 					$sql='select \'\' as AccountID,\'Total Expenses\' as AccountDescription, '.$totalacctid.' format(sum(YearBudget),2) as YearBudget,format(sum(YearActual),2) as YearActual from total';
 					// echo $sql; exit();
 					include('../backendphp/layout/displayassubtable.php');
-					
+
 					//Gross Income
 					$sql1='Create Temporary table GrossIncomeTotal as select \'1\' as Con,\'\' as AccountID,\'Gross Income\' as AccountDescription, '.$grossincomet.' st.YearBudget-ct.YearBudget as YearBudget,st.YearActual-ct.YearActual as YearActual from SalesTotal st left join COGStotal ct on ct.Con=st.Con';
 					$stmt=$link->prepare($sql1); $stmt->execute();
 					$sql='select \'\' as AccountID,\'Gross Income\' as AccountDescription, '.$grossincome.' format(st.YearBudget-ct.YearBudget,2) as YearBudget,format(st.YearActual-ct.YearActual,2) as YearActual from SalesTotal st left join COGStotal ct on ct.Con=st.Con';
 					// echo $sql; exit();
 					include('../backendphp/layout/displayassubtable.php');
-					
+
 					//Net Income
 					$sql='select \'\' as AccountID,\'Net Income\' as AccountDescription, '.$netincome.' format(gi.YearBudget-te.YearBudget,2) as YearBudget,format(gi.YearActual-te.YearActual,2) as YearActual from TotalExpenses te left join GrossIncomeTotal gi on gi.Con=te.Con';
 					// echo $sql; exit();
 					include('../backendphp/layout/displayassubtable.php');
-					
-	
+
+
 }
-	
+
 	break;
 }
 
