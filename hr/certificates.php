@@ -72,7 +72,7 @@ if (!isset($_GET['TxnID'])) {
                    'President' AS 'President';";
     
 } else {
-    $sqlgethrpresmain="SELECT SUBSTRING_INDEX(FullName, '-', -1) AS FullName,Position FROM attend_30currentpositions  WHERE PositionID = (SELECT AllowedPos FROM permissions_2allprocesses WHERE ProcessID = ";
+    $sqlgethrpresmain="SELECT CONCAT(Nickname,' ',LEFT(MiddleName,1),'. ',SurName) AS FullName,Position FROM attend_30currentpositions cp JOIN 1employees e ON cp.IDNo=e.IDNo  WHERE PositionID = (SELECT AllowedPos FROM permissions_2allprocesses WHERE ProcessID = ";
 
     //for HR Signatory
     $getHR = $sqlgethrpresmain." 6902)";
