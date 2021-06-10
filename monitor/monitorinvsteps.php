@@ -40,7 +40,7 @@ switch($which){
 	include_once('monitorinvnum.php');
 	echo '</div>';
 	
-	$sql='SELECT ss.*, CEIL(SeriesFrom/50)*50 AS SeriesTo, txndesc AS InvType FROM monitor_2fromsuppliersub ss JOIN `invty_0txntype` tt ON ss.Invtype=tt.txntypeid WHERE ss.TxnID='.$txnid.' AND TransferredToCentralWarehouse=0 ORDER By BookletNo;';
+	$sql='SELECT ss.*, CEIL(SeriesFrom/50)*50 AS SeriesTo, txndesc AS InvType FROM monitor_2fromsuppliersub ss JOIN `invty_0txntype` tt ON ss.Invtype=tt.txntypeid WHERE ss.TxnID='.$txnid.' AND TransferredToCentralWarehouse=0 AND Expired=0 ORDER By BookletNo;';
 	$stmt=$link->query($sql);
 	
 	
@@ -107,7 +107,7 @@ else
 	echo '<b>Inventory Type:</b> ' . $rowhead['txndesc'] . '<br/>';
 	echo '<b>Remarks:</b> ' . $rowhead['Remarks'] . '<br/><br/>';
 	
-	$sql='SELECT ss.*, CEIL(SeriesFrom/50)*50 AS SeriesTo, txndesc AS InvType FROM monitor_2fromsuppliersub ss JOIN `invty_0txntype` tt ON ss.Invtype=tt.txntypeid WHERE ss.TxnID='.$txnid.' AND TransferredToCentralWarehouse=1 AND (DateIssued IS NULL OR DateIssued="0000-00-00")';
+	$sql='SELECT ss.*, CEIL(SeriesFrom/50)*50 AS SeriesTo, txndesc AS InvType FROM monitor_2fromsuppliersub ss JOIN `invty_0txntype` tt ON ss.Invtype=tt.txntypeid WHERE ss.TxnID='.$txnid.' AND TransferredToCentralWarehouse=1 AND (DateIssued IS NULL OR DateIssued="0000-00-00") AND Expired=0';
 	$stmt=$link->query($sql);
 	
 	//pseudo
