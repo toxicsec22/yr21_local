@@ -333,21 +333,21 @@ sum(floor(ifnull(Q1Actual,0))+floor(ifnull(Q2Actual,0))+floor(ifnull(Q3Actual,0)
 $stmtt=$link->prepare($sqlt); $stmtt->execute();
 
 //
-			$sqlm='select b.AccountID,ShortAcctID,ShortAcctID as Account, Details,
-			format(Q1,0) as Q1Budget, format(Q1Actual,0) as Q1Actual,
-			format(Q2,0) as Q2Budget, format(Q2Actual,0) as Q2Actual,
-			format(Q3,0) as Q3Budget, format(Q3Actual,0) as Q3Actual,
-			format(Q4,0) as Q4Budget, format(Q4Actual,0) as Q4Actual,
-			format((Q1+Q2+Q3+Q4),0) AS TotalBudget,format((ifnull(Q1Actual,0)+ifnull(Q2Actual,0)+ifnull(Q3Actual,0)+ifnull(Q4Actual,0)),0) as TotalActual,
+			$sqlm='select b.AccountID,ShortAcctID,ShortAcctID as Account, GROUP_CONCAT(DISTINCT(Details) SEPARATOR "<br>") AS Details,
+			format(SUM(Q1),0) as Q1Budget, format(SUM(Q1Actual),0) as Q1Actual,
+			format(SUM(Q2),0) as Q2Budget, format(SUM(Q2Actual),0) as Q2Actual,
+			format(SUM(Q3),0) as Q3Budget, format(SUM(Q3Actual),0) as Q3Actual,
+			format(SUM(Q4),0) as Q4Budget, format(SUM(Q4Actual),0) as Q4Actual,
+			format((SUM(Q1)+SUM(Q2)+SUM(Q3)+SUM(Q4)),0) AS TotalBudget,format((ifnull(SUM(Q1Actual),0)+ifnull(SUM(Q2Actual),0)+ifnull(SUM(Q3Actual),0)+ifnull(SUM(Q4Actual),0)),0) as TotalActual,
 
-			Q1 as Q1BudgetValue, Q1Actual as Q1ActualValue,
-			Q2 as Q2BudgetValue, Q2Actual as Q2ActualValue,
-			Q3 as Q3BudgetValue, Q3Actual as Q3ActualValue,
-			Q4 as Q4BudgetValue, Q4Actual as Q4ActualValue,
-			(Q1+Q2+Q3+Q4) AS TotalBudgetValue,(ifnull(Q1Actual,0)+ifnull(Q2Actual,0)+ifnull(Q3Actual,0)+ifnull(Q4Actual,0)) as TotalActualValue, b.TimeStamp, CONCAT(e.Nickname," ",e.SurName) as EncodedBy
+			SUM(Q1) as Q1BudgetValue, SUM(Q1Actual) as Q1ActualValue,
+			SUM(Q2) as Q2BudgetValue, SUM(Q2Actual) as Q2ActualValue,
+			SUM(Q3) as Q3BudgetValue, SUM(Q3Actual) as Q3ActualValue,
+			SUM(Q4) as Q4BudgetValue, SUM(Q4Actual) as Q4ActualValue,
+			(SUM(Q1)+SUM(Q2)+SUM(Q3)+SUM(Q4)) AS TotalBudgetValue,(ifnull(SUM(Q1Actual),0)+ifnull(SUM(Q2Actual),0)+ifnull(SUM(Q3Actual),0)+ifnull(SUM(Q4Actual),0)) as TotalActualValue, b.TimeStamp, CONCAT(e.Nickname," ",e.SurName) as EncodedBy
 
 
-			from budget_2budgetplanning b left join QuarterActual a on a.AccountID=b.AccountID and a.FromBudgetOf=b.deptid+800 left join acctg_1chartofaccounts ca on ca.AccountID=b.AccountID left join 1departments d on d.deptid=b.deptid left join 1employees e on b.EncodedByNo=e.IDNo where b.deptid=\''.$_REQUEST['department'].'\' and b.AccountID<>965 Group By b.AccountID, b.Details
+			from budget_2budgetplanning b left join QuarterActual a on a.AccountID=b.AccountID and a.FromBudgetOf=b.deptid+800 left join acctg_1chartofaccounts ca on ca.AccountID=b.AccountID left join 1departments d on d.deptid=b.deptid left join 1employees e on b.EncodedByNo=e.IDNo where b.deptid=\''.$_REQUEST['department'].'\' and b.AccountID<>965 Group By b.AccountID
 
 			UNION ALL select \'-1\' as AccountID,Account as ShortAcctID,\'Employee\' as Account,\'\' as Details,
 			format(sum(floor(Q1)),0) as Q1Budget,
