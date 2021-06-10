@@ -135,7 +135,7 @@ foreach ($result as $row){
 
            '<div class="maindiv"><span class="label"></span><span class="label"></span></div>'
 
-            .'</div id="wrap"></div></div>'.($colcount%2==0?'<footer></footer>':'<br><br><br>');
+            .'</div id="wrap"></div></div>'.($colcount%2==0?'<footer></footer>':'<footer></footer>');
 echo $cert;
 }
 
