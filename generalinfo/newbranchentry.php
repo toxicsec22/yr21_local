@@ -15,8 +15,8 @@ $columnnameslist=array('BranchNo', 'RegionMinWageArea','Branch', 'Company', 'Are
 $columnstoadd=array_diff($columnnameslist,array('Area','Company','RegionMinWageArea'));
 $columnstoadd[]='AreaNo'; $columnstoadd[]='CompanyNo'; $columnstoadd[]='EffectiveMinWageAreaID';
 } else {
-	$columnnameslist=array('BranchNo', 'Branch', 'ProgCookie', 'OnBiometrics');
-	$columnstoadd=array('ProgCookie', 'OnBiometrics');
+	$columnnameslist=array('BranchNo', 'Branch','ProgCookie','IPAdd', 'OnBiometrics');
+	$columnstoadd=array('ProgCookie','IPAdd', 'OnBiometrics');
 }
 
 $columnstoedit=$columnstoadd;
