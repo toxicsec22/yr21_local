@@ -559,7 +559,7 @@ foreach($resultsssloanmain as $mainrow){
    
    foreach ($resultsssloan as $row){
    $sqlinsert='Insert into `'.$payrollprefix.'1rtc`.`acctg_2cvsub` (CVNo, Particulars,FromBudgetOf, BranchNo, DebitAccountID, Amount, EncodedByNo, `TimeStamp`)
-   Select '.$cvno.', concat("SSSLoan (Calamity) - ", "'.$row['FullName']. ' ",\'('.$row['From_Budget_Of']. ')\') as Particulars,'.$row['FromBudgetOf']. ', '.$row['RecordInBranchNo']. ' as BranchNo, 507 as DebitAccountID, "'.$row['SSSLoan'].'" as Amount, \''.$_SESSION['(ak0)'].'\' as EncodedByNo, Now() as TimeStamp';
+   Select '.$cvno.', concat("SSSLoan (Calamity) - ", "'.$row['FullName']. ' ",\'('.$row['From_Budget_Of']. ')\') as Particulars,'.$row['FromBudgetOf']. ', '.$row['RecordInBranchNo']. ' as BranchNo, 5071 as DebitAccountID, "'.$row['SSSLoan'].'" as Amount, \''.$_SESSION['(ak0)'].'\' as EncodedByNo, Now() as TimeStamp';
         $stmt=$link->prepare($sqlinsert); $stmt->execute();
 }   
 }
