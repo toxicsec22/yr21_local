@@ -490,7 +490,7 @@ $login=addslashes($_POST['attendid']);
 						goto end;
 						}
 				} else {  //password incorrect
-					header("Location:/index.php?noid=2");
+					header("Location:/index.php?noid=5");
 					goto end;
 				}
 	} elseif (isset($_POST['MyAttend']) or 
