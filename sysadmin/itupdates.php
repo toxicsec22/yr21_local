@@ -79,49 +79,168 @@ switch($which){
 	case 'UserComments':
 $title='User Comments and Suggestions';
 
-$sqlmain='select TxnID,Comments,DetailsOrReply,slc.TimeStamp,FullName AS EncodedBy,Position,IF(deptid IN (2,10),Branch,dept) AS Branch FROM events_2syslayoutcomments slc left join attend_30currentpositions cp on cp.IDNo=slc.EncodedByNo  ';
+$sqlmain='select TxnID,Comments,DetailsOrReply,
+(CASE
+		WHEN Done=0 THEN "Pending"
+		WHEN Done=1 THEN "Read and Agree"
+		WHEN Done=2 THEN "Read and No Decision"
+		WHEN Done=3 THEN "Read and Disagree"
+		WHEN Done=4 THEN "Read and Done"
+		WHEN Done=5 THEN "Read Comments"
+END)
+
+AS Status, slc.TimeStamp,FullName AS EncodedBy,Position,IF(deptid IN (2,10),Branch,dept) AS Branch FROM events_2syslayoutcomments slc left join attend_30currentpositions cp on cp.IDNo=slc.EncodedByNo  ';
 $orderby='Order By slc.TimeStamp DESC';
 $sql=$sqlmain.' WHERE Done=0 '.$orderby;
-$columnnames=array('Comments','EncodedBy','Position','Branch','TimeStamp','DetailsOrReply');
+$columnnames=array('Comments','EncodedBy','Position','Branch','TimeStamp','DetailsOrReply','Status');
 $columnstoedit=array('DetailsOrReply');
-$txnidname='TxnID'; $txnid='TxnID';
+
+$columnstoeditselect=array('Status');
+
+$sqlforselect = '
+SELECT 0 AS Done, "Pending" AS `Status` UNION 
+SELECT 1 AS Done, "Read and Agree" AS `Status` UNION 
+SELECT 2 AS Done, "Read and No Decision" AS `Status` UNION 
+SELECT 3 AS Done, "Read and Disagree" AS `Status` UNION 
+SELECT 4 AS Done, "Read and Done" AS `Status` UNION
+SELECT 5 AS Done, "Read Comments" AS `Status`
+';
+$stmtselect = $link->query($sqlforselect);
+$options='';
+while($rowselect = $stmtselect->fetch())
+{
+	$options .= '<option value="'.$rowselect['Done'].'">'.$rowselect['Done'].' - '.$rowselect['Status'].'</option>';
+}
+
+
+$txnidname='TxnID'; //$txnid='TxnID';
 
 $editprocess='itupdates.php?w=Reply&TxnID='; $editprocesslabel='Enter';
-$addlprocess='itupdates.php?w=Done&TxnID='; $addlprocesslabel='Mark as Read';
 
 include('../backendphp/layout/displayastableeditcells.php');
 
 
 
 unset($editprocess, $editprocesslabel);
-$columnstoedit=array(); $editprocess=''; $editprocesslabel='';
-$formdesc='<br><br></i><b>Read<b><i>'; $title='';
-$sql=$sqlmain.' WHERE Done=1 '.$orderby;
-$addlprocess='itupdates.php?w=Undo&TxnID='; $addlprocesslabel='Undo';
+$columnstoedit=array(); $editprocess=''; $editprocesslabel=''; $title='';
 
-include('../backendphp/layout/displayastableeditcellspercolumn.php');
+$addlprocess='itupdates.php?w=Undo&TxnID='; $addlprocesslabel='Undo';
+$editprocess='itupdates.php?w=EmailMessages&TxnID='; $editprocesslabel='Email';
+
+$columnnames=array('Comments','EncodedBy','Position','Branch','TimeStamp','DetailsOrReply');
+
+$formdesc='<br><br></i><b>Read and Agree<b><i>'; 
+$sql=$sqlmain.' WHERE Done=1 '.$orderby;
+include('../backendphp/layout/displayastablenosort.php');
+
+
+$formdesc='<br><br></i><b>Read and No Decision<b><i>'; 
+$sql=$sqlmain.' WHERE Done=2 '.$orderby;
+include('../backendphp/layout/displayastablenosort.php');
+
+
+$formdesc='<br><br></i><b>Read and Disagree<b><i>'; 
+$sql=$sqlmain.' WHERE Done=3 '.$orderby;
+include('../backendphp/layout/displayastablenosort.php');
+
+
+$formdesc='<br><br></i><b>Read and Done<b><i>'; 
+$sql=$sqlmain.' WHERE Done=4 '.$orderby;
+include('../backendphp/layout/displayastablenosort.php');
+
+
+$formdesc='<br><br></i><b>Read Comments<b><i>'; 
+$sql=$sqlmain.' WHERE Done=5 '.$orderby;
+include('../backendphp/layout/displayastablenosort.php');
 
 	break;
 
 	case 'Reply':
-
-		$sql='update events_2syslayoutcomments set DetailsOrReply=\''.addslashes($_POST['DetailsOrReply']).'\' where TxnID=\''.$_GET['TxnID'].'\' ';
-
+		if($_POST['Status']=='Pending'){
+			$stat=0;
+		} else {
+			$stat=$_POST['Status'];
+		}
+		$sql='update events_2syslayoutcomments set Done='.$stat.',DetailsOrReply=\''.addslashes($_POST['DetailsOrReply']).'\' where TxnID=\''.$_GET['TxnID'].'\' ';
 		$stmt=$link->prepare($sql); $stmt->execute();
 		header("Location:itupdates.php?w=UserComments");
 		break;
 
-		case 'Done':
-
+		
 		case 'Undo':
-			$sql='update events_2syslayoutcomments set Done=IF(Done=1,0,1) where TxnID=\''.$_GET['TxnID'].'\' ';
-
+			$sql='update events_2syslayoutcomments set Done=0 where TxnID=\''.$_GET['TxnID'].'\' ';
 			$stmt=$link->prepare($sql); $stmt->execute();
 			header("Location:itupdates.php?w=UserComments");
 
 		break;
 
+
+case 'EmailMessages':
+
+$title='Email Message';
+echo '<title>'.$title.'</title>';
+
+	$sqlf = 'SELECT slc.EncodedByNo,Done,Comments,FullName,deptid,IF(deptid<>10,ru.Email,b.Email) AS EmailRUB,IF((SELECT EmailRUB)="",(SELECT Email FROM 1_gamit.1rtcusers WHERE IDNo=LatestSupervisorIDNo),(SELECT EmailRUB)) AS Email,`Position` FROM events_2syslayoutcomments slc JOIN 1_gamit.1rtcusers ru ON slc.EncodedByNo=ru.IDNo LEFT JOIN attend_30currentpositions cp ON ru.IDNo=cp.IDNo JOIN 1branches b ON cp.BranchNo=b.BranchNo WHERE TxnID='.$_GET['TxnID'].';
+	';
+	// echo $sqlf;
+	$stmtf = $link->query($sqlf);
+	$rowf = $stmtf->fetch();
+	
+	if($rowf['Done']==1){
+		$msg='Thank you very much for your suggestion. We appreciate the time and effort you have spent to share your comments, which will be considered and implemented. We always welcome bright ideas from interested individuals like you and we hope that you continue to share them with us in the future.';
+	} else if($rowf['Done']==2){
+		$msg='Your suggestion is very interesting. We are going to study it thoroughly. Please keep on sharing ideas that will help us improve our processes. Thank you for your valued input.';
+	} else if($rowf['Done']==3){
+		$msg='Thank you for your suggestion. We reviewed and studied it carefully. Unfortunately, we cannot implement it at this time. Please continue to share more ideas. Thank you.';
+	} else if($rowf['Done']==4){
+		$msg='This is to inform you that your suggestion has been implemented. Thank you. We look forward to more new ideas for improvements.';
+	}  else {
+		$msg='Thank you! we really appreciate your comment.';
+	}
+
+
+
+
+
+	$message='';
+if(isset($_POST['btnEmail'])){
+	require $path.'/acrossyrs/downloadedphp/PHPMailer/class.phpmailer.php';
+    include_once $path.'/acrossyrs/dbinit/emailpassword.php';
+
+    $mail = new PHPMailer;
+    $mail->IsSMTP();								//Sets Mailer to send message using SMTP
+    $mail->Host = 'smtp.gmail.com';		//Sets the SMTP hosts of your Email hosting, this for Godaddy
+    $mail->Port = '587';								//Sets the default SMTP server port
+    $mail->SMTPAuth = true;							//Sets SMTP authentication. Utilizes the Username and Password variables
+    $mail->Username = '1rtcicon@gmail.com';					//Sets SMTP username
+    $mail->Password = rtciconpass();					//Sets SMTP password
+    $mail->SMTPSecure = 'tls';							//Sets connection prefix. Options are "", "ssl" or "tls"
+    $mail->From = '1rtcicon@gmail.com';			//Sets the From email address for the message
+    $mail->FromName = '1Rotary - The Industry Icon';			//Sets the From name of the message
+    $mail->AddAddress($rowf['Email']);		//Adds a "To" address
+    $mail->WordWrap = 50;							//Sets word wrapping on the body of the message to a given number of characters
+    $mail->IsHTML(true);							//Sets message type to HTML			    				
+    $mail->Subject = 'ARWAN Comments/Suggestions';			//Sets the Subject of the message
+    $mail->Body = $msg.'<br><br><i>re: '.($rowf['EmailRUB']==""?$rowf['FullName'].': ':'').''.$rowf['Comments'].'</i><br><br>Regards,<br><br>IT Team';				//An HTML or plain text message body
+    if($mail->Send())								//Send an Email. Return true on success or false on error
+    {
+        $message = '<font color="green">Email was sent successfully.</font>';
+    } else {
+		$message = '<font color="red">Email is not delivered.</font>';
+	}
+
+}
+
+echo '<br><div style="background-color:#fff;border:1px solid black;padding:10px;">';
+echo '<a href="itupdates.php?w=UserComments">Go back</a><br><br><b>Subject:</b> ARWAN Comments/Suggestions<br>';
+	echo '<b>Body:</b> '.$msg.'';
+	echo '<br><br>-- re: '.$rowf['Comments'];
+	echo '<br><form action="#" method="POST"><input type="submit" name="btnEmail" value="Email to '.$rowf['Email'].'"></form><br>'.$message.'';
+echo '</div>';
+break;
 		
+
+
 
 
 		
