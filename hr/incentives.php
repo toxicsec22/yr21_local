@@ -126,7 +126,7 @@ echo '</div></div>';
 				IF(Score>=115,200,150)
 		END) AS RatePerUnit,IF(NoOfDays>=NoOfSaleDays,"100",TRUNCATE((((SELECT TRUNCATE(IFNULL(SUM(Qty*UnitPrice),0),2) FROM invty_2sale sm JOIN invty_2salesub ss ON sm.TxnID=ss.TxnID WHERE BranchNo=his.BranchNo AND MONTH(`Date`)=his.MonthNo AND `Date` IN (SELECT DateToday FROM attend_2attendance WHERE IDNo=his.IDNo AND BranchNo=his.BranchNo AND LeaveNo IN (11,15)))/(SELECT TRUNCATE(IFNULL(SUM(Qty*UnitPrice),0),2) FROM invty_2sale sm JOIN invty_2salesub ss ON sm.TxnID=ss.TxnID WHERE BranchNo=his.BranchNo AND MONTH(`Date`)=his.MonthNo))*100),2))
          AS PercentSale FROM hr_2incentivesub his JOIN 1branches b ON his.BranchNo=b.BranchNo JOIN acctg_6targetscores ts ON `his`.BranchNo=`ts`.BranchNo AND `his`.MonthNo=ts.MonthNo JOIN 1employees e ON `his`.IDNo=e.IDNo JOIN attend_0positions p ON his.PositionID=p.PositionID JOIN attend_1joblevel jl ON jl.JobLevelNo=p.JobLevelNo WHERE his.MonthNo='.$txndate.' ORDER BY Branch,JLID DESC,FullName';
-        
+        // echo $sql;
 	
 	$stmt=$link->query($sql); $result=$stmt->fetchAll();
 	
@@ -376,8 +376,17 @@ GROUP BY e.IDNo,a.BranchNo,PositionID ORDER BY IDNo,Branch;
 		if($cntc==5){
 			$cntc=1;
 		}
+
 		if($editallow==1){
-			echo '<form action="incentives.php?w=Update&MonthNo='.$txndate.'&TxnSubId='.$res['TxnSubId'].'" method="POST"><tr style="padding:30px;" bgcolor="'.$color[$cntc].'">'.($oldbranch<>$res['Branch']?'<td>'.$res['Branch'].'</td><td>'.$res['Score'].'</td>':str_repeat('<td></td>',2)).'<td>'.$res['IDNo'].'</td><td>'.((($res['NoOfDays']<$res['TotalDays']) OR $res['Resigned']==1)?'<blink><b>':'').''.$res['FullName'].''.((($res['NoOfDays']<$res['TotalDays']) OR $res['Resigned']==1)?'</b></blink>':'').'</td><td>'.$res['Position'].'</td><td>'.($res['NoOfDays']<$res['TotalDays']?$res['NoOfDays']."/".$res['TotalDays']:'').'</td><td>'.$res['Units'].'</td><td>'.$res['RatePerUnit'].'</td><td>'.$res['PercentSale'].'</td><td align="right" style="padding-right:5px;"><input style="text-align:right;" type="text" size="5" name="Amount" value="'.$res['Amount'].'"></td><td><input type="text" name="Remarks" value="'.$res['Remarks'].'" size="15"></td><td><input style="background-color:#20B2AA;color:white;padding:4px;" type="submit" value="Edit"></td><tr></form>';
+			$sqlpositions='SELECT DISTINCT(PositionID) AS PositionID,Position FROM attend_30currentpositions WHERE deptid=10';
+			$stmtpositions=$link->query($sqlpositions); $resultpositions=$stmtpositions->fetchAll();
+
+			$pos='';
+			foreach($resultpositions AS $resultposition){
+				$pos.='<option value="'.$resultposition['PositionID'].'" '.($res['Position']==$resultposition['Position']?'selected':'').'>'.$resultposition['Position'].'</option>';
+			}
+
+			echo '<form action="incentives.php?w=Update&MonthNo='.$txndate.'&TxnSubId='.$res['TxnSubId'].'" method="POST"><tr style="padding:30px;" bgcolor="'.$color[$cntc].'">'.($oldbranch<>$res['Branch']?'<td>'.$res['Branch'].'</td><td>'.$res['Score'].'</td>':str_repeat('<td></td>',2)).'<td>'.$res['IDNo'].'</td><td>'.((($res['NoOfDays']<$res['TotalDays']) OR $res['Resigned']==1)?'<blink><b>':'').''.$res['FullName'].''.((($res['NoOfDays']<$res['TotalDays']) OR $res['Resigned']==1)?'</b></blink>':'').'</td><td><select name="PositionID">'.$pos.'</select></td><td>'.($res['NoOfDays']<$res['TotalDays']?$res['NoOfDays']."/".$res['TotalDays']:'').'</td><td>'.$res['Units'].'</td><td>'.$res['RatePerUnit'].'</td><td>'.$res['PercentSale'].'</td><td align="right" style="padding-right:5px;"><input style="text-align:right;" type="text" size="5" name="Amount" value="'.$res['Amount'].'"></td><td><input type="text" name="Remarks" value="'.$res['Remarks'].'" size="15"></td><td><input style="background-color:#20B2AA;color:white;padding:4px;" type="submit" value="Edit"></td><tr></form>';
 		} else {
 			echo '<tr style="padding:30px;" bgcolor="'.$color[$cntc].'">'.($oldbranch<>$res['Branch']?'<td>'.$res['Branch'].'</td><td>'.$res['Score'].'</td>':str_repeat('<td></td>',2)).'<td>'.$res['IDNo'].'</td><td>'.((($res['NoOfDays']<$res['TotalDays']) OR $res['Resigned']==1)?'<blink><b>':'').''.$res['FullName'].''.((($res['NoOfDays']<$res['TotalDays']) OR $res['Resigned']==1)?'</b></blink>':'').'</td><td>'.$res['Position'].'</td><td>'.($res['NoOfDays']<$res['TotalDays']?$res['NoOfDays']."/".$res['TotalDays']:'').'</td><td>'.$res['Units'].'</td><td>'.$res['RatePerUnit'].'</td><td>'.$res['PercentSale'].'</td><td align="right" style="padding-right:5px;">'.$res['Amount'].'</td><td>'.$res['Remarks'].'</td><td style="padding:4px;"></td><tr>';
 		}
@@ -431,7 +440,8 @@ GROUP BY e.IDNo,a.BranchNo,PositionID ORDER BY IDNo,Branch;
    
    case 'Update':
    if(!allowedToOpen(2014,'1rtc')){ echo 'No Permission'; exit(); }
-   $sql1='UPDATE hr_2incentivesub SET Amount="'.$_POST['Amount'].'",Remarks="'.$_POST['Remarks'].'",EncodedByNo='.$_SESSION['(ak0)'].',TimeStamp=NOW() WHERE TxnSubId='.intval($_GET['TxnSubId']).'';
+//    print_r($_POST); exit();
+   $sql1='UPDATE hr_2incentivesub SET PositionID='.$_POST['PositionID'].',Amount="'.$_POST['Amount'].'",Remarks="'.$_POST['Remarks'].'",EncodedByNo='.$_SESSION['(ak0)'].',TimeStamp=NOW() WHERE TxnSubId='.intval($_GET['TxnSubId']).'';
 	$stmt1=$link->prepare($sql1); $stmt1->execute();
 	header('Location:incentives.php?w=CalcIncentives&MonthNo='.$_GET['MonthNo']);
    break;
