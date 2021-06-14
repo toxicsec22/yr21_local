@@ -147,19 +147,26 @@ if (!allowedToOpen(783,'1rtc')) { echo 'No permission'; exit;}
 			$sqlcondition.=' AND InvType='.$_POST['InvType'].'';
 		}
 		
-		$columnnames=array('Date','SupplierName','Branch', 'Remarks', 'InvoiceType', 'SeriesFrom', 'SeriesTo','BookletNoFrom','BookletNoTo');  
+		$columnnames=array('Date','SupplierName','Branch', 'Remarks', 'InvoiceType', 'SeriesFrom', 'SeriesTo','BookletNoFrom','BookletNoTo','BookletStatus');  
 		$sql='SELECT fm.`TxnID`,`Date`,`SupplierName`,`Branch`, `InvType`,`Remarks`, `txndesc` as `InvoiceType`,
 		(SELECT COUNT(TxnSubId) FROM `monitor_2fromsuppliersub` fs WHERE fm.TxnID=fs.TxnID AND TransferredToCentralWarehouse=0) AS ShowCount,		
 		(SELECT Min(SeriesFrom) FROM `monitor_2fromsuppliersub` fs WHERE fm.TxnID=fs.TxnID) AS SeriesFrom,
 		(SELECT MAX(CEIL(`NumericOnly`(SeriesFrom)/50)*50) FROM `monitor_2fromsuppliersub` fs WHERE fm.TxnID=fs.TxnID) AS SeriesTo, 
 		(SELECT Min(BookletNo) FROM `monitor_2fromsuppliersub` fs WHERE fm.TxnID=fs.TxnID) AS BookletNoFrom,
-		(SELECT Max(BookletNo) FROM `monitor_2fromsuppliersub` fs WHERE fm.TxnID=fs.TxnID) AS BookletNoTo,
+		(SELECT Max(BookletNo) FROM `monitor_2fromsuppliersub` fs WHERE fm.TxnID=fs.TxnID) AS BookletNoTo,(SELECT GROUP_CONCAT(DISTINCT(
+(CASE 
+	WHEN Expired=0 THEN "Active"
+    WHEN Expired=1 THEN "Expired"
+    WHEN Expired=2 THEN "Retired"
+    WHEN Expired=3 THEN "Discarded"
+END)
+) ORDER BY Expired) FROM monitor_2fromsuppliersub WHERE TxnID=fm.TxnID AND BookletNo BETWEEN (SELECT BookletNoFrom) AND (SELECT BookletNoTo)) AS BookletStatus,
 		concat(`Nickname`," ",`SurName`) as `EncodedBy`, fm.`TimeStamp` FROM `monitor_2fromsuppliermain` fm
 		JOIN `1branches` b ON b.BranchNo=fm.BranchNo
 		JOIN `1employees` e ON e.IDNo=fm.EncodedByNo
 		JOIN `1suppliers` s ON s.SupplierNo=fm.SupplierNo
 		JOIN `invty_0txntype` tt ON tt.txntypeid=fm.InvType '.$sqlcondition.' '.($_POST['Transferred']==0?'HAVING ShowCount>0':'').';';
-		
+
 		
 		$txnidname='TxnID'; $fieldname='TxnID';
 		$process1='fromsupplier.php?which=ListReceived&';
@@ -220,7 +227,7 @@ if (!allowedToOpen(78831,'1rtc') AND !allowedToOpen(78832,'1rtc')) { echo 'No pe
 		}
 		
 		
-		$columnnames=array('Date','SupplierName','Branch', 'Remarks', 'InvoiceType', 'SeriesFrom', 'SeriesTo','BookletNoFrom','BookletNoTo');  
+		$columnnames=array('Date','SupplierName','Branch', 'Remarks', 'InvoiceType', 'SeriesFrom', 'SeriesTo','BookletNoFrom','BookletNoTo','BookletStatus');  
 		
 		$sql='SELECT fm.`TxnID`,`Date`,`SupplierName`,`Branch`, `InvType`,`Remarks`, `txndesc` as `InvoiceType`,
 		(SELECT COUNT(TxnSubId) FROM `monitor_2fromsuppliersub` fs WHERE fm.TxnID=fs.TxnID AND ((IssuedByNo=0 OR IssuedByNo IS NULL) AND TransferredToCentralWarehouse<>0)) AS ShowCount,		
@@ -228,6 +235,14 @@ if (!allowedToOpen(78831,'1rtc') AND !allowedToOpen(78832,'1rtc')) { echo 'No pe
 		(SELECT MAX(CEIL(`NumericOnly`(SeriesFrom)/50)*50) FROM `monitor_2fromsuppliersub` fs WHERE fm.TxnID=fs.TxnID) AS SeriesTo, 
 		(SELECT Min(BookletNo) FROM `monitor_2fromsuppliersub` fs WHERE fm.TxnID=fs.TxnID) AS BookletNoFrom,
 		(SELECT Max(BookletNo) FROM `monitor_2fromsuppliersub` fs WHERE fm.TxnID=fs.TxnID) AS BookletNoTo,
+		(SELECT GROUP_CONCAT(DISTINCT(
+(CASE 
+	WHEN Expired=0 THEN "Active"
+    WHEN Expired=1 THEN "Expired"
+    WHEN Expired=2 THEN "Retired"
+    WHEN Expired=3 THEN "Discarded"
+END)
+) ORDER BY Expired) FROM monitor_2fromsuppliersub WHERE TxnID=fm.TxnID AND BookletNo BETWEEN (SELECT BookletNoFrom) AND (SELECT BookletNoTo)) AS BookletStatus,
 		concat(`Nickname`," ",`SurName`) as `EncodedBy`, fm.`TimeStamp` FROM `monitor_2fromsuppliermain` fm
 		JOIN `1branches` b ON b.BranchNo=fm.BranchNo
 		JOIN `1employees` e ON e.IDNo=fm.EncodedByNo
@@ -256,7 +271,7 @@ if (!allowedToOpen(78831,'1rtc') AND !allowedToOpen(78832,'1rtc')) { echo 'No pe
 		if((allowedToOpen(array(78836,78836,78839),'1rtc'))){
 			$sqlcondi=' AND fm.InvType IN (2,30,11)'; //Charge,SI,CR
 		} else if((allowedToOpen(78835,'1rtc'))){
-			$sqlcondi=' AND fm.InvType IN (30)'; //CR
+			$sqlcondi=' '; //CR
 		}
 
 		$sql='SELECT fm.`TxnID`,SeriesFrom,TxnSubId,IssuedTo,`Remarks`,`txndesc` as `InvoiceType`,CEIL(`SeriesFrom`/50)*50 AS SeriesTo FROM monitor_2fromsuppliermain fm JOIN `1branches` b ON b.BranchNo=fm.BranchNo JOIN `1employees` e ON e.IDNo=fm.EncodedByNo JOIN `1suppliers` s ON s.SupplierNo=fm.SupplierNo JOIN `invty_0txntype` tt ON tt.txntypeid=fm.InvType JOIN monitor_2fromsuppliersub fs ON fm.TxnID=fs.TxnID WHERE IssuedTo='.$_SESSION['bnum'].' AND (AcceptedByNo=0 OR AcceptedByNo IS NULL) '.$sqlcondi.' ORDER BY Date DESC';
