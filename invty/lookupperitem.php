@@ -352,6 +352,11 @@ where Date is not null and Date<=Now() and i.ItemCode='.$itemcode.' group by Bra
    }
     $showtotals=false; $width='50%';
     include('../backendphp/layout/displayastable.php');
+
+    $sqltot='Select SUM(GoodItem) AS TotalGoodItems from endinvperbranch ';
+    $stmttot=$link->query($sqltot);
+    $resulttot=$stmttot->fetch();
+    echo 'Total Good Items: '.$resulttot['TotalGoodItems'];
    break;
 case 'EndInvPerCatAllBranches':
     if (!allowedToOpen(744,'1rtc')) {   echo 'No permission'; exit;}
