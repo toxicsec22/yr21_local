@@ -26,7 +26,7 @@ if (isset($_GET['done'])){
 
 $filename='ForPriceTag_'.$_POST['CountFrom'].'.txt';
 // CONCAT("P ",FORMAT(IF(ProvincialBranch=0,PriceLevel3,PriceLevel4),2))
-	 $sql='Select s.ItemCode,concat(`c`.`Category`, \', \', `i`.`ItemDesc`) AS `ItemDesc`, i.Unit,concat(ConvertDigit(LPAD(b.BranchNo,2,0),2),ConvertDigit(date_format(m.Date,"%m%y"),2)) AS BranchDate, 
+	 $sql='Select s.ItemCode,concat(`c`.`Category`, \', \', `i`.`ItemDesc`) AS `ItemDesc`, i.Unit,concat(ConvertDigit(LPAD(b.BranchNo,3,0),2),ConvertDigit(date_format(m.Date,"%m%y"),2)) AS BranchDate, 
 	 
 	 
 	CONCAT("P ",FORMAT(

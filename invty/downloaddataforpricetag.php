@@ -26,7 +26,7 @@ if (isset($_GET['done'])){
 
 $filename='ForPriceTag_'.$_POST['TransferFrom'].'_'.$_POST['TransferTo'].'.txt';
 $sql='select 
-		concat(ConvertDigit(LPAD(t.ToBranchNo, 2, "0"),2),ConvertDigit(date_format(t.DateOUT,"%m%y"),2)) AS BranchDateOUT,
+		concat(ConvertDigit(LPAD(t.ToBranchNo, 3, "0"),2),ConvertDigit(date_format(t.DateOUT,"%m%y"),2)) AS BranchDateOUT,
 		ts.ItemCode,
 		i.Unit,
         concat(`c`.`Category`, \', \', `i`.`ItemDesc`) AS `ItemDesc`, 
