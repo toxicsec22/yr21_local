@@ -16,7 +16,7 @@ include_once('../switchboard/contents.php');
    <font size=4 face='sans-serif'>     
 		<?php if (allowedToOpen(8032,'1rtc')) {?>
 		 <a id="link" href='/acrossyrs/infoandfaq/govtminwages.php'> Minimum Wage Rates</a><?php echo str_repeat('&nbsp',5)?>
-         <a id="link" href='lookupbasetables.php?w=StructureStores'>Salary Structure - Stores</a><?php echo str_repeat('&nbsp',5)?>
+         <a id="link" href='lookupbasetables.php?w=StructureStores'>Salary Structure - Stores (Daily Paid)</a><?php echo str_repeat('&nbsp',5)?>
 		<?php } ?> 
         <?php if (allowedToOpen(805,'1rtc')) {?>
         <a id="link" href='lookupbasetables.php?w=PHIC'>Philhealth Table</a><?php echo str_repeat('&nbsp',5)?>
@@ -237,13 +237,20 @@ case 'StructureStores':
                 $subtitle=$region['Place'].' &nbsp; (Effective Minimum Wage Rate: '.$regionalrate.
                     ')<br><h5>Branches: '.$region['Branches'].'</h5>';
                 $startrate=($regionalrate*$multiplier)>=$ncrrate?$ncrrate:$regionalrate*$multiplier;
-                $sql='SELECT jl.JobLevelNo, GROUP_CONCAT(Position) AS Positions, 
-                TRUNCATE('.$startrate.'*IF(JobClassNo>1,POWER('.$increaserate.', JobClassNo+1),1),2) AS `Hiring Rate`, 
-                TRUNCATE('.$startrate.'*IF(JobClassNo>1,POWER('.$increaserate.',(JobClassNo+1)),1)*'.pow($steprate,1).',2) AS `Performer 1 yr (2 to 4 years)`, 
-                TRUNCATE('.$startrate.'*IF(JobClassNo>1,POWER('.$increaserate.',(JobClassNo+1)),1)*'.pow($steprate,2).',2) AS `Performer 2 yrs (4 to 6 years)`, 
-                TRUNCATE('.$startrate.'*IF(JobClassNo>1,POWER('.$increaserate.',(JobClassNo+1)),1)*'.pow($steprate,3).',2) AS `Performer 3 yrs (6 to 8 years)`, 
-                TRUNCATE('.$startrate.'*IF(JobClassNo>1,POWER('.$increaserate.',(JobClassNo+1)),1)*'.pow($steprate,4).',2) AS `Performer 4 yrs (8 to 10 years)`, 
-                TRUNCATE('.$startrate.'*IF(JobClassNo>1,POWER('.$increaserate.',(JobClassNo+1)),1)*'.pow($steprate,5).',2) AS `Maximum Rate` 
+
+                $sql='SELECT jl.JobLevelNo, GROUP_CONCAT(Position) AS Positions,
+                TRUNCATE(SalaryStructureDaily('.$startrate.',JobClassNo,'.$increaserate.',1,1),2) AS `Hiring Rate`, 
+                TRUNCATE(SalaryStructureDaily('.$startrate.',JobClassNo,'.$increaserate.','.$steprate.',1),2) AS `Performer 1 yr (2 to 4 years)`, 
+
+                TRUNCATE(SalaryStructureDaily('.$startrate.',JobClassNo,'.$increaserate.','.$steprate.',2),2) AS `Performer 2 yrs (4 to 6 years)`, 
+
+
+                TRUNCATE(SalaryStructureDaily('.$startrate.',JobClassNo,'.$increaserate.','.$steprate.',3),2) AS `Performer 3 yrs (6 to 8 years)`, 
+
+                
+                TRUNCATE(SalaryStructureDaily('.$startrate.',JobClassNo,'.$increaserate.','.$steprate.',4),2) AS `Performer 4 yrs (8 to 10 years)`,
+                
+                TRUNCATE(SalaryStructureDaily('.$startrate.',JobClassNo,'.$increaserate.','.$steprate.',5),2) AS `Maximum Rate`
                 FROM attend_1joblevel jl LEFT JOIN attend_0positions p ON jl.JobLevelNo=p.JobLevelNo AND PreferredRateType=0
                 WHERE jl.JLID<=6 GROUP BY jl.JoblevelNo ORDER BY jl.JobClassNo;';
 
