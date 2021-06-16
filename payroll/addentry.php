@@ -45,21 +45,43 @@ include_once('../switchboard/contents.php');
 
 			$idno=$_POST['IDNo'];
 			$basic=$_POST['BasicRate'];
-
+			
+			$monthly=$_POST['DailyORMonthly'];
+			
+			$maxmsg='';
 			//check if max
-			//monthly condition only
+		if($monthly==1){  //monthly condition only
 			$sqlmax='SELECT TRUNCATE(MinRate*(1+PercentMintoMed/100)*(1+PercentMedtoMax/100),2) AS MAXIMUM FROM attend_1joblevel jl JOIN attend_0jobclass jc ON jc.JobClassNo=jl.JobClassNo JOIN attend_0positions p ON jl.JobLevelNo=p.JobLevelNo AND p.PositionID=(SELECT NewPositionID FROM attend_2changeofpositions WHERE IDNo='.$idno.' ORDER BY DateofChange LIMIT 1)';
 			
 			$stmtmax=$link->query($sqlmax); $rowmax=$stmtmax->fetch();
-			if($basic>$rowmax['MAXIMUM']){
-				echo '<br><font color="red">
-				<b>ERROR! MAXIMUM LIMIT. Pls contact JYE if you want that salary rate. </b></font>
-				<br><br>Encoded Rate = '.$basic.'<br>Max Rate = '.$rowmax['MAXIMUM'].''; 
-				exit();
-			}
+			
+		} else {
+			include_once("tempdata/effectiveminwage.php");
+
+			
+			$sql1='SELECT TotalMinWage AS EffectiveMinWage,JobClassNo FROM `1_gamit`.`payroll_4wageorders` wo JOIN `effectivedate` ed ON ed.DateEffective=wo.DateEffective AND ed.MinWageAreaID=wo.MinWageAreaID LEFT JOIN `1_gamit`.`payroll_0regionsminwageareas` r ON r.MinWageAreaID=wo.MinWageAreaID LEFT JOIN 1branches b ON b.EffectiveMinWageAreaID=r.MinWageAreaID AND Pseudobranch IN (0,2) JOIN attend_30currentpositions cp ON cp.BranchNo=b.BranchNo WHERE Active="1" AND IDNo='.$idno.';';
+			
+            $stmt1=$link->query($sql1); $result1=$stmt1->fetch();
+
+			$regionalrate=$result1['EffectiveMinWage'];
+			$jobclassno=$result1['JobClassNo'];
+			
+			$startrate=($regionalrate*$multiplier)>=$ncrrate?$ncrrate:$regionalrate*$multiplier;
+
+			$sqlm='SELECT TRUNCATE(SalaryStructureDaily('.$startrate.','.$jobclassno.','.$increaserate.','.$steprate.',5),2) AS `MAXIMUM`';
+			$stmtm=$link->query($sqlm); $rowmax=$stmtm->fetch();
+			
+		}
+		
+		if($basic>$rowmax['MAXIMUM']){
+			$maxmsg='<br><div style="border:1px solid #000;background-color:#fff;width:30%;padding:5px;"><font color="red">
+			<b>MAXIMUM LIMIT. Approver must be JYE.</b></font>
+			<br><br>Encoded Rate = '.$basic.'<br>Max Rate = '.$rowmax['MAXIMUM'].'</div>'; 
+		}
+
+
 
 	       $dateofchange=$_POST['DateofChange'];
-	       $monthly=$_POST['DailyORMonthly'];
 	       // $cola=$_POST['ColaRate'];
 	       $dem=$_POST['DeMinimisRate'];
 	       $allow=$_POST['TaxShield'];
@@ -133,7 +155,8 @@ include_once('../switchboard/contents.php');
             Monthly Gross Tax Shield <?php echo number_format($grossallow,2); ?><br>
             Monthly Total Gross <?php echo number_format($monthlygrosstotal,2); ?><br>
 	    <input type="hidden" name="action_token" value="<?php echo html_escape($_SESSION['action_token']) ?>" /> 
-	<input type='submit' name='confirm' value='Confirm and get approval'>
+		
+		<?php echo $maxmsg; ?><br><input type='submit' name='confirm' value='Confirm and get approval'>
 	 </form>
 	 <?php } ?>
 	 
