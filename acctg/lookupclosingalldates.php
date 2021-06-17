@@ -201,7 +201,7 @@ $sql0='CREATE TEMPORARY TABLE withapproval AS SELECT `TimeStamp`,`Approval`,`Bra
 		
 $sql0='create temporary table Spent as SELECT  de.`BranchNo`, de.`ApprovalNo`, Sum(de.Amount) as `Spent` FROM `acctg_2depencashsub` de group by de.`ApprovalNo`;';
 			$stmt=$link->prepare($sql0); $stmt->execute();
-			$sql='SELECT `TimeStamp`,Approval, Branch, ee.Amount AS ApprovedAmount, IFNULL(s.Spent,0) AS Spent,ROUND(ee.Amount-IFNULL(s.Spent,0),2) AS Net FROM `withapproval` ee LEFT JOIN `Spent` s ON ee.Approval=s.ApprovalNo JOIN `1branches` b ON b.BranchNo=ee.BranchNo HAVING Spent>ApprovedAmount+1';
+			$sql='SELECT ee.`TimeStamp`,Approval, Branch, ee.Amount AS ApprovedAmount, IFNULL(s.Spent,0) AS Spent,ROUND(ee.Amount-IFNULL(s.Spent,0),2) AS Net FROM `withapproval` ee LEFT JOIN `Spent` s ON ee.Approval=s.ApprovalNo JOIN `1branches` b ON b.BranchNo=ee.BranchNo HAVING Spent>ApprovedAmount+1';
 			
     $columnnames=array('TimeStamp','Branch','Approval','ApprovedAmount','Spent');    
     include('../backendphp/layout/displayastableonlynoheaders.php');
@@ -288,13 +288,13 @@ skipincorrectdatesacctg: //UNION ALL SELECT  1 AS DB, "acctg_2depositmain" AS `T
     
 if (allowedToOpen(5571,'1rtc')) { $conditionbranch=' AND BranchNo='.$_SESSION['bnum']; $conditionbranchseries=' AND BranchSeriesNo='.$_SESSION['bnum'];} 
 else { $conditionbranch=''; $conditionbranchseries='';}
-$sql='SELECT  0 AS DB, "invty_2mrr" AS `Table`, "Date" AS DateField, "MRR/PR" AS `FromTxn`, `TxnID`, `Date`, `BranchNo`, `EncodedByNo`, `TimeStamp` FROM `invty_2mrr` WHERE (`Date`=\'0000-00-00\' OR YEAR(`Date`)<>'.$currentyr.') '.$conditionbranch.'
-UNION ALL SELECT  0 AS DB, "invty_2sale" AS `Table`, "Date" AS DateField, "Sale", `TxnID`, `Date`, `BranchNo`, `EncodedByNo`, `TimeStamp` FROM `invty_2sale` WHERE (`Date`=\'0000-00-00\' OR YEAR(`Date`)<>'.$currentyr.') '.$conditionbranch.'
-UNION ALL SELECT  0 AS DB, "invty_2transfer" AS `Table`, "DateOUT" AS DateField, "Transfer OUT", `TxnID`, `DateOUT`, `BranchNo`, `FromEncodedByNo`, `FromTimeStamp` FROM `invty_2transfer` WHERE (`DateOUT`=\'0000-00-00\' OR YEAR(`DateOUT`)>'.$currentyr.') '.$conditionbranch.'
-UNION ALL SELECT  0 AS DB, "invty_2transfer" AS `Table`, "DateIN" AS DateField, "Transfer IN", `TxnID`, `DateIN`, `ToBranchNo`, `ToEncodedByNo`, `ToTimeStamp` FROM `invty_2transfer` WHERE (`DateIN`=\'0000-00-00\' OR YEAR(`DateIN`)>'.$currentyr.') '.$conditionbranch.'
-UNION ALL SELECT  0 AS DB, "invty_4adjust" AS `Table`, "Date" AS DateField, "JVment", `TxnID`, `Date`, `BranchNo`, `EncodedByNo`, `TimeStamp` FROM `invty_4adjust` WHERE (`Date`=\'0000-00-00\' OR YEAR(`Date`)<>'.$currentyr.') '.$conditionbranch.'
-UNION ALL SELECT  1 AS DB, "acctg_2collectmain" AS `Table`, "Date" AS DateField, "Collection", `TxnID`, `Date`, `BranchSeriesNo`, `EncodedByNo`, `TimeStamp` FROM `acctg_2collectmain` WHERE (`Date`=\'0000-00-00\' OR YEAR(`Date`)<>'.$currentyr.') '.$conditionbranchseries.'
-UNION ALL SELECT  1 AS DB, "acctg_2purchasemain" AS `Table`, "Date" AS DateField, "Purchase", `TxnID`, `Date`, `BranchNo`, `EncodedByNo`, `TimeStamp` FROM `acctg_2purchasemain` WHERE (`Date`=\'0000-00-00\' OR YEAR(`Date`)<>'.$currentyr.') '.$conditionbranch.';';
+$sql='SELECT  0 AS DB, "invty_2mrr" AS `Table`,"TxnID" AS TxnIDName, "Date" AS DateField, "MRR/PR" AS `FromTxn`, `TxnID`, `Date`, `BranchNo`, `EncodedByNo`, `TimeStamp` FROM `invty_2mrr` WHERE (`Date`=\'0000-00-00\' OR YEAR(`Date`)<>'.$currentyr.') '.$conditionbranch.'
+UNION ALL SELECT  0 AS DB, "invty_2sale" AS `Table`,"TxnID" AS TxnIDName, "Date" AS DateField, "Sale", `TxnID`, `Date`, `BranchNo`, `EncodedByNo`, `TimeStamp` FROM `invty_2sale` WHERE (`Date`=\'0000-00-00\' OR YEAR(`Date`)<>'.$currentyr.') '.$conditionbranch.'
+UNION ALL SELECT  0 AS DB, "invty_2transfer" AS `Table`,"TxnID" AS TxnIDName, "DateOUT" AS DateField, "Transfer OUT", `TxnID`, `DateOUT`, `BranchNo`, `FromEncodedByNo`, `FromTimeStamp` FROM `invty_2transfer` WHERE (`DateOUT`=\'0000-00-00\' OR YEAR(`DateOUT`)>'.$currentyr.') '.$conditionbranch.'
+UNION ALL SELECT  0 AS DB, "invty_2transfer" AS `Table`,"TxnID" AS TxnIDName, "DateIN" AS DateField, "Transfer IN", `TxnID`, `DateIN`, `ToBranchNo`, `ToEncodedByNo`, `ToTimeStamp` FROM `invty_2transfer` WHERE (`DateIN`=\'0000-00-00\' OR YEAR(`DateIN`)>'.$currentyr.') '.$conditionbranch.'
+UNION ALL SELECT  0 AS DB, "invty_4adjust" AS `Table`,"TxnID" AS TxnIDName, "Date" AS DateField, "JVment", `TxnID`, `Date`, `BranchNo`, `EncodedByNo`, `TimeStamp` FROM `invty_4adjust` WHERE (`Date`=\'0000-00-00\' OR YEAR(`Date`)<>'.$currentyr.') '.$conditionbranch.'
+UNION ALL SELECT  1 AS DB, "acctg_2collectmain" AS `Table`,"TxnID" AS TxnIDName, "Date" AS DateField, "Collection", `TxnID`, `Date`, `BranchSeriesNo`, `EncodedByNo`, `TimeStamp` FROM `acctg_2collectmain` WHERE (`Date`=\'0000-00-00\' OR YEAR(`Date`)<>'.$currentyr.') '.$conditionbranchseries.'
+UNION ALL SELECT  1 AS DB, "acctg_2purchasemain" AS `Table`,"TxnID" AS TxnIDName, "Date" AS DateField, "Purchase", `TxnID`, `Date`, `BranchNo`, `EncodedByNo`, `TimeStamp` FROM `acctg_2purchasemain` WHERE (`Date`=\'0000-00-00\' OR YEAR(`Date`)<>'.$currentyr.') '.$conditionbranch.';';
 $stmt=$link->query($sql); $result=$stmt->fetchAll();
 if ($stmt->rowCount()==0){ goto skipincorrectdatesinvty;}
 $sub='';$subheadings='';
@@ -306,7 +306,7 @@ foreach ($result as $row){
             $sub=$sub.'<td>'.$row[$colsub].'</td>';
         }
         if (allowedToOpen(5572,'1rtc')) {
-        $sub=$sub.'<td><a href="setastoday.php?tbl='.$row['Table'].'&DB='.$row['DB'].'&Date='.$row['DateField'].'&TxnID='.$row['TxnID'].'" target=_blank>Set_as_Today</a>';}
+        $sub=$sub.'<td><a href="setastoday.php?tbl='.$row['Table'].'&TxnIDName='.$row['TxnIDName'].'&DB='.$row['DB'].'&Date='.$row['DateField'].'&TxnID='.$row['TxnID'].'" target=_blank>Set_as_Today</a>';}
         $sub=$sub.'</tr>';
    $colorcount++;
 }
@@ -497,7 +497,7 @@ $columnnames=array('Date','MRRNo','SupplierName','TxnID');
 if($_SESSION['(ak0)']==1002) { echo 'As of '.date('Y-m-d h:i:s l').'<br><br>';}
 
 // purchase return
-$sql='select *,\'0\' as DB, \'invty_2pr\' as `Table`,\'Date\' as DateField,\'purchasereturn\' as filetoopen,\'addeditpr\' as w from invty_2pr where Date=\'0000-00-00\'';
+$sql='select *,\'0\' as DB,"TxnID" AS TxnIDName, \'invty_2pr\' as `Table`,\'Date\' as DateField,\'purchasereturn\' as filetoopen,\'addeditpr\' as w from invty_2pr where Date=\'0000-00-00\'';
 // echo $sql; exit();
 $stmt=$link->query($sql); $result=$stmt->fetchAll();
 if ($stmt->rowCount()!=0){ 
@@ -511,7 +511,7 @@ foreach ($result as $row){
         }
         if (allowedToOpen(5572,'1rtc')) {
             $toopen=$row['filetoopen'].'.php?w='.$row['w'].'&TxnID='.$row['TxnID'];
-            $sub=$sub.'<td><a href="setastoday.php?tbl='.$row['Table'].'&DB='.$row['DB'].'&Date='.$row['DateField'].'&TxnID='.$row['TxnID'].'&ToOpen='.$toopen.'" target=_blank>Set_as_Today</a>';}
+            $sub=$sub.'<td><a href="setastoday.php?tbl='.$row['Table'].'&TxnIDName='.$row['TxnIDName'].'&DB='.$row['DB'].'&Date='.$row['DateField'].'&TxnID='.$row['TxnID'].'&ToOpen='.$toopen.'" target=_blank>Set_as_Today</a>';}
         $sub=$sub.'<td><a href="../invty/'.$toopen.'"  target=_blank>Lookup</a></tr>';
    $colorcount++;
 }
