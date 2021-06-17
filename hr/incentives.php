@@ -174,7 +174,7 @@ SELECT t.IDNo,AssignedBranchNo,NewPositionID,"'.$currentyr.'-'.$txndate.'-01" AS
 		}
 		
 		$sqltemp='CREATE TEMPORARY TABLE attend_2attendanceEdited AS
-SELECT IDNo,TimeIn,DateToday,LeaveNo,BranchNo,if(isnull((SELECT NewPositionID FROM unionall WHERE IDNo=a.IDNo AND DateofEffectivity=a.DateToday)),@n,(@n:=(SELECT NewPositionID FROM unionall WHERE IDNo=a.IDNo AND DateofEffectivity=a.DateToday))) PositionID FROM '.$tabletouse.' a join(select @n:="") n WHERE MONTH(`DateToday`)='.$txndate.' AND YEAR(`DateToday`)='.$currentyr.' AND BranchNo IN (SELECT BranchNo FROM acctg_6targetscores WHERE Score>=100 AND MonthNo='.$txndate.') ORDER BY IDNo;';
+SELECT IDNo,TimeIn,DateToday,LeaveNo,BranchNo,if(isnull((SELECT NewPositionID FROM unionall WHERE IDNo=a.IDNo AND DateofEffectivity=a.DateToday)),@n,(@n:=(SELECT NewPositionID FROM unionall WHERE IDNo=a.IDNo AND DateofEffectivity=a.DateToday))) PositionID FROM '.$tabletouse.' a join(select @n:="") n WHERE MONTH(`DateToday`)='.$txndate.' AND YEAR(`DateToday`)='.$currentyr.' AND BranchNo IN (SELECT BranchNo FROM acctg_6targetscores WHERE Score>=100 AND MonthNo='.$txndate.') ORDER BY IDNo,DateToday;';
 		// echo $sqltemp.'<br><br>';
 $stmttemp=$link->prepare($sqltemp); $stmttemp->execute();
 	
