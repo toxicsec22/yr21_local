@@ -52,7 +52,7 @@ switch ($_GET['w']){
 	
 	$sql='INSERT INTO '.$nextyr.'_1rtc.payroll_2requestoicallowance
 SELECT * FROM '.$currentyr.'_1rtc.payroll_2requestoicallowance WHERE YEAR(DATE_ADD(`Date`, INTERVAL `Duration` MONTH))=\''.$nextyr.'\' and Valid=1
-AND IDNo NOT IN (SELECT IDNo FROM 2021_1rtc.payroll_2requestoicallowance);';
+AND IDNo NOT IN (SELECT IDNo FROM '.$nextyr.'_1rtc.payroll_2requestoicallowance);';
 	$stmt=$link->prepare($sql); $stmt->execute();
 	
 	
@@ -885,12 +885,17 @@ select clp.`VoucherNo` AS `VoucherNo`,
         $link=connect_db($currentyr.'_1rtc',1);
         overwrite($link,'`acctg_1begbal`');
     
-        $sql0='CREATE TEMPORARY TABLE active as SELECT b.BranchNo FROM `'.$nextyr.'_1rtc`.`1branches` b WHERE b.Active=1;'; $stmt=$link->prepare($sql0); $stmt->execute();
+        $sql0='CREATE TEMPORARY TABLE active AS 
+        SELECT b.BranchNo AS OldBranch, b.BranchNo AS NewBranch FROM `'.$nextyr.'_1rtc`.`1branches` b WHERE b.Active=1
+        UNION SELECT b.MovedBranch AS OldBranch, BranchNo AS NewBranch  FROM `'.$nextyr.'_1rtc`.`1branches` b WHERE b.Active=1 AND MovedBranch<>-1  AND Pseudobranch=0
+        UNION SELECT b1.BranchNo AS OldBranch, b2.BranchNo AS NewBranch  FROM `'.$nextyr.'_1rtc`.`1branches` b1 JOIN `'.$nextyr.'_1rtc`.`1branches` b2 ON b1.CompanyNo=b2.CompanyNo AND b2.Pseudobranch=1 AND b2.BranchNo<>95 WHERE b1.Active<>1 AND b1.MovedBranch=-1 AND b1.BranchNo NOT IN (SELECT MovedBranch from `'.$nextyr.'_1rtc`.`1branches`) '; 
+        $stmt=$link->prepare($sql0); $stmt->execute();
         $sql0='CREATE TEMPORARY TABLE endbal 
         (`AccountID` int(4) not null, `BegBalance` double, `BranchNo` int(4) not null)
-        SELECT t.`AccountID`, TRUNCATE(sum(ifnull(Amount,0)),2) AS `BegBalance`, 
-        IF(t.BranchNo IN (SELECT b.BranchNo FROM `active` b),t.BranchNo,(SELECT  b.BranchNo FROM `'.$nextyr.'_1rtc`.`1branches` b WHERE b.MovedBranch=t.BranchNo)) as `BranchNo`
-        FROM `' . $currentyr . '_static`.`acctg_unialltxns` t JOIN `acctg_1chartofaccounts` c ON t.AccountID=c.AccountID WHERE YEAR(`Date`)=' . $currentyr . ' GROUP BY c.`AccountID`, t.`BranchNo`;';
+        SELECT t.`AccountID`, ROUND(SUM(IFNULL(Amount,0)),2) AS `BegBalance`, `NewBranch` AS `BranchNo`
+        FROM `'.$currentyr.'_static`.`acctg_unialltxns` t JOIN `acctg_1chartofaccounts` c ON t.AccountID=c.AccountID 
+        JOIN `active` ac ON ac.OldBranch=t.BranchNo
+        WHERE YEAR(`Date`)='.$currentyr.' GROUP BY c.`AccountID`, `NewBranch`;';
         $stmt=$link->prepare($sql0);
         $stmt->execute();
         // add BS accounts
