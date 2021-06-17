@@ -210,8 +210,9 @@ case 'DepSubEdit':
 	} else {
 		$credit=', ClientNo='.$clientno.', CreditAccountID='.$acctid.', ForChargeInvNo='.$invno.',';
 		if (allowedToOpen(5992,'1rtc')){
-		$columnstoedit=array('DepDetails','Type','CheckNo','Amount');
+		$columnstoedit=array('DepDetails','Type','CheckNo','Amount','Forex');
                 $branchno=', BranchNo='.(getNumber('Branch',$_POST['Branch']));
+				
 		} else {
 			$columnstoedit=array('Amount'); $branchno='';
 		}
@@ -223,7 +224,9 @@ case 'DepSubEdit':
 	foreach ($columnstoedit as $field) {
 		$sql=$sql.' `' . $field. '`=\''.$_POST[$field].'\', '; 
 	}
+	// print_r($_POST);
 	$sql=$sqlupdate.$sql.' EncodedByNo=\''.$_SESSION['(ak0)'].'\', TimeStamp=Now() where TxnSubId='.$txnsubid; 
+	// echo $sql; exit();
 	 if($_SESSION['(ak0)']==1002){ echo $sql;}
         $stmt=$link->prepare($sql);
 	$stmt->execute();

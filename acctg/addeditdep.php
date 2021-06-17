@@ -69,7 +69,7 @@ if (allowedToOpen(5992,'1rtc')) { //acctg personnel
 
     include_once '../generalinfo/unionlists/ECList.php';
 
-    $sqlsub='Select s.*, DepType, CRNo AS CRNo, b.Branch, c.BECSName AS ClientName, ca.ShortAcctID as CreditAccount, e.Nickname as EncodedBy from acctg_2depositsub s join acctg_1chartofaccounts ca on ca.AccountID=s.CreditAccountID left join `1employees` as e on s.EncodedByNo=e.IDNo
+    $sqlsub='Select s.*,(Amount*Forex) AS PHPAmount, DepType, CRNo AS CRNo, b.Branch, c.BECSName AS ClientName, ca.ShortAcctID as CreditAccount, e.Nickname as EncodedBy from acctg_2depositsub s join acctg_1chartofaccounts ca on ca.AccountID=s.CreditAccountID left join `1employees` as e on s.EncodedByNo=e.IDNo
     join `1branches` b on b.BranchNo=s.BranchNo
     left join `ECList` c on c.BECSNo=s.ClientNo AND c.BECS=IF(s.`ClientNo`<9999,"E","C") LEFT JOIN acctg_1deptype dt ON dt.DepTypeID=s.Type
     join acctg_2depositmain m on m.TxnID=s.TxnID WHERE m.TxnID='.$txnid.$sqlcondition;
@@ -193,8 +193,9 @@ Client No <input type=text name="ClientNo" value="10000" size=3>
 Dep Details <input type=text name="DepDetails" size=5>
 Dep Type <input type=text name="Type" list="deptypes" size=8>
 Check No <input type=text name="CheckNo" size=5>
-CreditAccountID <input type=text name="CreditAccountID" list="accounts" size=10>
+CreditAccountID <input type=text name="CreditAccountID" list="accounts" size=10><br><br>
 Amount <input type=text name="Amount" size=4>
+Forex <input type=text name="Forex" size=4 value=1>
 <input type=submit name=submit value="Add">  
 </form>
 <br><br>';
@@ -209,7 +210,7 @@ $addencash='';
 $addcondi='where EntityID='.$_SESSION['bnum'].'';
 }
 echo comboBox($link,'SELECT EntityID,Entity FROM `acctg_1budgetentities` '.$addcondi.' ORDER BY Entity;','EntityID','Entity','entities');
-echo comboBox($link,'SELECT * FROM acctg_1deptype;','DepTypeValue','DepType','deptypes');
+echo comboBox($link,'SELECT * FROM acctg_1deptype;','DepTypeID','DepType','deptypes');
 include_once $path.'/acrossyrs/commonfunctions/renderspeciallist.php';
 genericList('SELECT * FROM acctg_1branchpreapprovedbudgetlist order by BudgetDesc',$link,'budgetlist','BudgetDesc','TypeID');
 

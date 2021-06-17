@@ -153,9 +153,9 @@ include('../backendphp/layout/rendersubform.php');
 case 'DepSubEdit':
     if (!allowedToOpen(5991,'1rtc')) { echo 'No permission'; exit; }  
 $txnsubid=$_REQUEST['TxnSubId'];
-$columnnames=array('Client','ClientNo','DepDetails','ForChargeInvNo','Type','CRNo','CheckDraweeBank','CheckNo','CreditAccount','Amount');
+$columnnames=array('Client','ClientNo','DepDetails','ForChargeInvNo','Type','CRNo','CheckDraweeBank','CheckNo','CreditAccount','Amount','Forex');
 if (allowedToOpen(5992,'1rtc')){
-$columnstoedit=array('Branch','Client','ForChargeInvNo','DepDetails','Type','CheckDraweeBank','CheckNo','CreditAccount','Amount');
+$columnstoedit=array('Branch','Client','ForChargeInvNo','DepDetails','Type','CheckDraweeBank','CheckNo','CreditAccount','Amount','Forex');
 $columnslist=array('Branch','CreditAccount','Client');
 $listsname=array('Branch'=>'branchnames','CreditAccount'=>'accounts','Client'=>'clients');
 $liststoshow=array('clients','branchnames');

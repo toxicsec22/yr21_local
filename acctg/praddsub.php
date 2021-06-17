@@ -200,7 +200,7 @@ case 'DepSubAdd':
 	$type=comboBoxValue ($link,'acctg_1deptype','DepType',$_POST['Type'],'DepTypeID');
 	$sqlinsert='INSERT INTO `acctg_2depositsub` SET `TxnID`=\''.$txnid.'\', CreditAccountID='.$accountid.', ';
         $sql='';
-        $columnstoadd=array('ClientNo','DepDetails','CheckNo','Amount');
+        $columnstoadd=array('ClientNo','DepDetails','CheckNo','Amount','Forex');
        
 	foreach ($columnstoadd as $field) {
 		$sql=$sql.' `' . $field. '`=\''.$_POST[$field].'\', '; 
