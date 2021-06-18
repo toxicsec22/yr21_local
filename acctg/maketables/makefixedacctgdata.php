@@ -5,13 +5,13 @@ $sql0='SELECT MONTH(`DataClosedBy`) as ClosedMonth FROM `00dataclosedby` WHERE (
 $stmt=$link->query($sql0); $res0=$stmt->fetch(); $closedmonth=((substr($_SESSION['nb4A'],0,4)<$currentyr))?0:$res0['ClosedMonth'];
 switch ($whichdata){
     case 'withcurrent':
-        $sql0='drop table if exists `acctg_0unialltxns`'; $stmt=$link1->prepare($sql0); $stmt->execute();        
+        $sql0='drop table if exists `'.$currentyr.'_static`.`acctg_0unialltxns`'; $stmt=$link1->prepare($sql0); $stmt->execute();        
         $condition='Month(`Date`)>'.$closedmonth.' AND YEAR(`Date`)='.$currentyr.''; $conditionpaid='Month(`DatePaid`)>'.$closedmonth.' AND YEAR(`DatePaid`)='.$currentyr.'';
         $conditionin='Month(`DateIN`)>'.$closedmonth.' '; $conditionbounced='Month(`DateBounced`)>'.$closedmonth.' ';
         
         $conditiondepr='Month(`DeprDate`)>'.$closedmonth.' AND Month(`DeprDate`)<=MONTH(CURDATE()) AND YEAR(`DeprDate`)='.$currentyr.'';
         $conditionprepd='Month(`AmortDate`)>'.$closedmonth.' AND Month(`AmortDate`)<=MONTH(CURDATE()) AND YEAR(`AmortDate`)='.$currentyr.'';
-        $sql0='CREATE TABLE `acctg_0unialltxns` (
+        $sql0='CREATE TABLE `'.$currentyr.'_static`.`acctg_0unialltxns` (
            `Date` date NOT NULL,
           `ControlNo` varchar(200) NOT NULL DEFAULT \'\', `BECS` VARCHAR(1),
           `SuppNo/ClientNo`  smallint(6) DEFAULT NULL,
@@ -45,7 +45,7 @@ switch ($whichdata){
        
         if ($reportmonth>$closedmonth) {
         include_once('sqlphp/sqlalltxnsforfixed.php'); 
-        $sql0=$sql0.' UNION ALL '.$sql1; // if($_SESSION['(ak0)']==1002) {echo $sql0;}
+        $sql0=$sql0.' UNION ALL '.$sql1;  if($_SESSION['(ak0)']==1002) {echo $sql0; exit();}
         }
         $stmt=$link1->prepare($sql0); $stmt->execute(); 
         break;

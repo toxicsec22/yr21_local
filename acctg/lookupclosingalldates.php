@@ -538,7 +538,7 @@ if($_SESSION['(ak0)']==1002) { echo 'As of '.date('Y-m-d h:i:s l').'<br><br>';}
 
 $subtitle='Reconciliation Account Not Equal to Zero -- may need static data update';
 
-$sql='SELECT FORMAT(SUM(PHPAmount),0) AS NetValue FROM '.$currentyr.'_static.acctg_unialltxns u WHERE AccountID=105 HAVING NetValue>0.10 OR NetValue<-0.10;';
+$sql='SELECT FORMAT(SUM(PHPAmount),0) AS NetValue FROM '.$currentyr.'_static.acctg_0unialltxns u WHERE AccountID=105 HAVING NetValue>0.10 OR NetValue<-0.10;';
 $columnnames=array('NetValue');    
     include('../backendphp/layout/displayastableonlynoheaders.php');
 if($_SESSION['(ak0)']==1002) { echo 'As of '.date('Y-m-d h:i:s l').'<br><br>';}
@@ -551,12 +551,12 @@ $stmt=$link->prepare('DROP TEMPORARY TABLE IF EXISTS BSAssetsBalance;'); $stmt->
 $stmt=$link->prepare('DROP TEMPORARY TABLE IF EXISTS AssetList;'); $stmt->execute();
 
 $stmt=$link->prepare('CREATE TEMPORARY TABLE BSAssets as 
-SELECT BranchNo,  u.AccountID, Sum(Amount) as AssetVal  FROM '.$currentyr.'_static.acctg_unialltxns u 
+SELECT BranchNo,  u.AccountID, Sum(Amount) as AssetVal  FROM '.$currentyr.'_static.acctg_0unialltxns u 
 WHERE u.AccountID IN (SELECT AccountID FROM acctg_1chartofaccounts WHERE AccountType IN (6,7) AND NormBal=1 AND AccountID<>150)
 GROUP BY u.BranchNo, u.AccountID;'); $stmt->execute();
 
 $stmt=$link->prepare('CREATE TEMPORARY TABLE BSAccumDep AS
-SELECT BranchNo,  u.AccountID, ca.ContraAccountOf, Sum(Amount)*-1 as AccumDep  FROM '.$currentyr.'_static.acctg_unialltxns u JOIN acctg_1chartofaccounts ca ON ca.AccountID=u.AccountID
+SELECT BranchNo,  u.AccountID, ca.ContraAccountOf, Sum(Amount)*-1 as AccumDep  FROM '.$currentyr.'_static.acctg_0unialltxns u JOIN acctg_1chartofaccounts ca ON ca.AccountID=u.AccountID
 WHERE AccountType IN (6,7) AND NormBal=-1
 GROUP BY u.BranchNo, u.AccountID;'); $stmt->execute();
 
@@ -566,7 +566,7 @@ SELECT a.*, d.AccountID AS DeprAcctID, AccumDep, AssetVal-AccumDep AS NetBSVal F
 
 
 $stmt=$link->prepare('CREATE TEMPORARY TABLE AccumDep AS
-SELECT `BranchNo`, a.`AssetAccountID`,SUM(CASE WHEN ((Year(`DeprDate`)<'.$currentyr.') OR (Year(`DeprDate`)='.$currentyr.' AND MONTH(`DeprDate`)<=(IF(YEAR(CURDATE())>'.$currentyr.',12,(SELECT MONTH(DataClosedBy) FROM `00dataclosedby` WHERE ForDB=1))))) THEN  IFNULL(d.`Amount`,0) END) AS `AccumDep` FROM `acctg_1assets` a LEFT JOIN `acctg_1assetsdepr` d ON a.AssetID=d.AssetID GROUP BY `BranchNo`,a.AssetAccountID;'); $stmt->execute();
+SELECT `BranchNo`, a.`AssetAccountID`,SUM(CASE WHEN ((Year(`DeprDate`)<'.$currentyr.') OR (Year(`DeprDate`)='.$currentyr.' AND MONTH(`DeprDate`)<=(IF(YEAR(CURDATE())>'.$currentyr.',12,MONTH(CURDATE()))))) THEN  IFNULL(d.`Amount`,0) END) AS `AccumDep` FROM `acctg_1assets` a LEFT JOIN `acctg_1assetsdepr` d ON a.AssetID=d.AssetID GROUP BY `BranchNo`,a.AssetAccountID;'); $stmt->execute();
 
 $stmt=$link->prepare('CREATE TEMPORARY TABLE AssetList AS
 SELECT a.BranchNo, a.AssetAccountID, TRUNCATE(SUM(`AcqCost`),2)  AS `GrossAssetValue`
@@ -588,7 +588,7 @@ if($_SESSION['(ak0)']==1002) { echo 'As of '.date('Y-m-d h:i:s l').'<br><br>';}
 $subtitle='No Account ID in Chart of Accounts -- may need static data update';
 
 $sql='SELECT `uni`.Date, uni.BranchNo, uni.AccountID, uni.ControlNo, Particulars,  Amount, Branch, IF(b.Active=1,"","CLOSED BRANCH") AS Status
-FROM '.$currentyr.'_static.acctg_unialltxns uni  LEFT JOIN acctg_1begbal bb ON (uni.AccountID = bb.AccountID) AND (uni.BranchNo = bb.BranchNo)
+FROM '.$currentyr.'_static.acctg_0unialltxns uni  LEFT JOIN acctg_1begbal bb ON (uni.AccountID = bb.AccountID) AND (uni.BranchNo = bb.BranchNo)
 JOIN `1branches` b ON b.BranchNo=uni.BranchNo
 WHERE bb.AccountID Is Null '.$conditionerr; 
 
@@ -602,12 +602,12 @@ $stmt=$link->prepare('DROP TEMPORARY TABLE IF EXISTS BSPrepaid;'); $stmt->execut
 $stmt=$link->prepare('DROP TEMPORARY TABLE IF EXISTS PrepaidList;'); $stmt->execute();
 
 $stmt=$link->prepare('CREATE TEMPORARY TABLE BSPrepaid as 
-SELECT BranchNo,  u.AccountID, Sum(u.Amount) as NetBSVal  FROM '.$currentyr.'_static.acctg_unialltxns u 
+SELECT BranchNo,  u.AccountID, Sum(u.Amount) as NetBSVal  FROM '.$currentyr.'_static.acctg_0unialltxns u 
 WHERE u.AccountID IN (Select PrepaidAccountID FROM `acctg_2prepaid`) OR (u.AccountID IN (150,151))
 GROUP BY u.BranchNo, u.AccountID;'); $stmt->execute();
 
 $stmt=$link->prepare('CREATE TEMPORARY TABLE amortized AS
-SELECT `BranchNo`,`PrepaidAccountID`,SUM(CASE WHEN ((Year(`AmortDate`)<'.$currentyr.') OR (Year(`AmortDate`)='.$currentyr.' AND IF(Year(`AmortDate`)=YEAR(CURDATE()),MONTH(`AmortDate`)<=(SELECT MONTH(DataClosedBy) FROM `00dataclosedby` WHERE ForDB=1),MONTH(`AmortDate`)<=12))) THEN  IFNULL(s.`Amount`,0) END) AS `TotalAmort` FROM `acctg_2prepaid` m JOIN `acctg_2prepaidamort` s ON m.PrepaidID=s.PrepaidID GROUP BY `BranchNo`,`PrepaidAccountID`;');  $stmt->execute();
+SELECT `BranchNo`,`PrepaidAccountID`,SUM(CASE WHEN ((Year(`AmortDate`)<'.$currentyr.') OR (Year(`AmortDate`)='.$currentyr.' AND IF(Year(`AmortDate`)=YEAR(CURDATE()),MONTH(`AmortDate`)<=MONTH(CURDATE()),MONTH(`AmortDate`)<=12))) THEN  IFNULL(s.`Amount`,0) END) AS `TotalAmort` FROM `acctg_2prepaid` m JOIN `acctg_2prepaidamort` s ON m.PrepaidID=s.PrepaidID GROUP BY `BranchNo`,`PrepaidAccountID`;');  $stmt->execute();
 $stmt=$link->prepare('CREATE TEMPORARY TABLE PrepaidList as 
 SELECT m.BranchNo, m.PrepaidAccountID, TRUNCATE(SUM(m.`Amount`)-IFNULL(a.`TotalAmort`,0),2) AS `NetValueThisYr` FROM `acctg_2prepaid` m LEFT JOIN `amortized` a ON m.`PrepaidAccountID`=a.`PrepaidAccountID` AND m.`BranchNo`=a.`BranchNo` GROUP BY m.BranchNo, m.PrepaidAccountID;'); $stmt->execute();
 
