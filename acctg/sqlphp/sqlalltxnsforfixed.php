@@ -113,7 +113,7 @@ if(isnull(vchs.TIN),"", concat(" TIN#",vchs.TIN, " ", t.CompanyName," ", t.Addre
         `vchm`.`CreditAccountID` AS `CreditAccountID`,
         `vchs`.`BranchNo` AS `BranchNo`,
 		`vchs`.`FromBudgetOf` AS `FromBudgetOf`,
-        (`vchs`.`Amount` * -(1)) AS `Amount`,IFNULL(`Forex`,1) AS `FOREX`,IFNULL(`Forex`,1)*`Amount` AS `PHPAmount`,
+        (`vchs`.`Amount` * -(1)) AS `Amount`,IFNULL(`Forex`,1) AS `FOREX`,IFNULL(`Forex`,1)*`Amount`*-1 AS `PHPAmount`,
         "CR" AS `CR`,
         "CV" AS `CV`,
         `vchm`.`CVNo` AS `CVNo`
