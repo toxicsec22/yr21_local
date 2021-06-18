@@ -78,7 +78,7 @@ case 'UpdateComputerEnd':
 		ComputerEndGood double default 0,
 		ComputerEndDefective double default 0
 	)
-	select `a`.`ItemCode`, SUM(CASE WHEN `a`.`Defective`<>1 THEN Qty ELSE 0 END) as ComputerEndGood, SUM(CASE WHEN `a`.`Defective`=1 THEN Qty ELSE 0 END) as ComputerEndDefective from
+	select `a`.`ItemCode`, SUM(CASE WHEN `a`.`Defective`=0 THEN Qty ELSE 0 END) as ComputerEndGood, SUM(CASE WHEN `a`.`Defective`<>0 THEN Qty ELSE 0 END) as ComputerEndDefective from
         `invty_20uniallposted` `a` where ((`a`.`Date` is not null)
             and (`a`.`Date` <=\''.$endinvasofdate .'\') and `a`.`BranchNo`='.$result['BranchNo'].') 
 	    group by `a`.`ItemCode`';// $_SESSION['bnum']
