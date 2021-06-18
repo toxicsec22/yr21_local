@@ -55,7 +55,7 @@ skipquery:
 switch($which){
 case 'ClearedUncleared':
 if (!allowedToOpen(6250,'1rtc')) {   echo 'No permission'; exit;} 
-$txnidname='CVNo'; $editprocesslabel='Lookup'; $editprocess='../acctg/formcv.php?w=CV&CVNo='; $txnidname='CVNo';
+$txnidname='CVNo'; $editprocesslabel='Lookup'; $editprocess='../acctg/addeditsupplyside.php?w=CV&CVNo='; $txnidname='CVNo';
 $sql='SELECT acc.*, FORMAT(SUM(AmountofCheck),2) as Amount, ca.ShortAcctID as DebitAccount, ca1.ShortAcctID as CreditAccount, if(CurrentYr=1,"True","False") as CurrentYr FROM accruedunion acc JOIN `acctg_1chartofaccounts` ca on ca.AccountID=acc.DR JOIN `acctg_1chartofaccounts` ca1 on ca1.AccountID=acc.CR GROUP BY CheckNo, Payee ORDER BY Particulars, Amount';
 $columnnames=array('VchDate','DateofCheck', 'Cleared', 'CheckNo', 'Payee','Particulars','Amount', 'DebitAccount','CreditAccount','CurrentYr');
 $showgrandtotal=true; $coltototal='AmountofCheck';
@@ -73,7 +73,7 @@ echo '<h3>'.$title.'</h3><i>To update data, open Data Errors first.</i><br><br>'
 ?>
 <p style='font-size: large'>Bank Balance ending <?php echo str_repeat('&nbsp', 8).$_POST['bank']. str_repeat('&nbsp', 8).$res0['DateofBal'].  str_repeat('&nbsp', 20). number_format($bankbal,2); ?></p>
 <?php
-$sqlbal='SELECT AccountID,(IFNULL(SUM(`Amount`),0)) as `EndBal` FROM `acctg_0unialltxns` uni WHERE AccountID='.$acctid.' AND '.($reportmonth==1?'w="BegBal"':'MONTH(`Date`)<='.$reportmonth);
+$sqlbal='SELECT AccountID,(IFNULL(SUM(`Amount`),0)) as `EndBal` FROM `'.$currentyr.'_static`.`acctg_0unialltxns` uni WHERE AccountID='.$acctid.' AND '.($reportmonth==1?'w="BegBal"':'MONTH(`Date`)<='.$reportmonth);
 $stmtbal=$link->query($sqlbal); $resbal=$stmtbal->fetch(); 
 $sql='SELECT (SUM(CASE WHEN DR='.$acctid.' THEN AmountofCheck END)) as Debit, '
         . '(SUM(CASE WHEN CR='.$acctid.' THEN AmountofCheck END)) as Credit FROM accruedunion acc ';
@@ -85,7 +85,7 @@ echo '<br>Add Total Uncleared '.number_format($res['Debit'],2);
 // echo '<br>Less Total Cleared '.number_format($res['Credit'],2);
 echo '<br><br><b>Net Book Balance '.number_format($calcbookbal,2).'</b>';
 echo '<br><br>Difference: '.number_format(($bankbal-$calcbookbal),2).'<br><br>';
-$txnidname='CVNo'; $editprocesslabel='Lookup'; $editprocess='../acctg/formcv.php?w=CV&TxnID=';
+$txnidname='CVNo'; $editprocesslabel='Lookup'; $editprocess='../acctg/addeditsupplyside.php?w=Vouchers&TxnID=';
 
 $righttabletitle='Cleared This Month From Previous Months Total: '.number_format($res['Credit'],2);
 $sqlright='SELECT acc.*, FORMAT(SUM(AmountofCheck),2) as Amount, if(CurrentYr=1,"True","False") as CurrentYr FROM accruedunion acc JOIN `acctg_1chartofaccounts` ca1 on ca1.AccountID=acc.CR WHERE txntype=1 AND CR='.$acctid.' GROUP BY CheckNo, Payee ORDER BY  CheckNo';

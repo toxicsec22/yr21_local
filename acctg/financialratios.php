@@ -90,7 +90,7 @@ switch ($which){
 				}
 				
 			//total equity
-			$sqlte='select ifnull(format(sum(Amount),2),0) as TotalEquity,ifnull(TRUNCATE(sum(Amount),2),0) as TotalEquityValue from acctg_0unialltxns ut join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID join 1branches b on b.BranchNo=ut.BranchNo where AccountType=11 '.$condition.' AND month(ut.Date)='.$month.' ';
+			$sqlte='select ifnull(format(sum(Amount),2),0) as TotalEquity,ifnull(TRUNCATE(sum(Amount),2),0) as TotalEquityValue from '.$currentyr.'_static.acctg_0unialltxns ut join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID join 1branches b on b.BranchNo=ut.BranchNo where AccountType=11 '.$condition.' AND month(ut.Date)='.$month.' ';
 			// echo $sqlte; exit();
 			$stmtte=$link->query($sqlte);
 			$resultte=$stmtte->fetch();
@@ -98,12 +98,12 @@ switch ($which){
 			// echo $sqlte;exit();
 			
 			//Total Asset
-			$sqlta='select ifnull(format(sum(Amount),2),0) as TotalAsset,ifnull(TRUNCATE(sum(Amount),2),0) as TotalAssetValue from acctg_0unialltxns ut join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID join 1branches b on b.BranchNo=ut.BranchNo where AccountType in (1,2,3,4,5,6,7) '.$condition.' AND month(ut.Date)='.$month.'';
+			$sqlta='select ifnull(format(sum(Amount),2),0) as TotalAsset,ifnull(TRUNCATE(sum(Amount),2),0) as TotalAssetValue from '.$currentyr.'_static.acctg_0unialltxns ut join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID join 1branches b on b.BranchNo=ut.BranchNo where AccountType in (1,2,3,4,5,6,7) '.$condition.' AND month(ut.Date)='.$month.'';
 			$stmtta=$link->query($sqlta);
 			$resultta=$stmtta->fetch();
 				
 			//Receivable Turnover	
-			$sqlrt='select ifnull(format((sum(Qty*UnitPrice)/( ((select sum(Amount) from acctg_0unialltxns ut join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID where AccountType in (200,201,202) '.$condition.' AND month(ut.Date)=('.$month.'-1))+(select sum(Amount) from acctg_0unialltxns ut join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID join 1branches b on b.BranchNo=ut.BranchNo where AccountType in (200,201,202) '.$condition.' AND month(ut.Date)='.$month.'))/2 )),2),0) as Rturnover from invty_2sale s join invty_2salesub ss on ss.TxnID=s.TxnID join 1branches b on b.BranchNo=s.BranchNo where PaymentType=2 '.$condition.' AND month(s.Date)='.$month.'';
+			$sqlrt='select ifnull(format((sum(Qty*UnitPrice)/( ((select sum(Amount) from '.$currentyr.'_static.acctg_0unialltxns ut join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID where AccountType in (200,201,202) '.$condition.' AND month(ut.Date)=('.$month.'-1))+(select sum(Amount) from '.$currentyr.'_static.acctg_0unialltxns ut join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID join 1branches b on b.BranchNo=ut.BranchNo where AccountType in (200,201,202) '.$condition.' AND month(ut.Date)='.$month.'))/2 )),2),0) as Rturnover from invty_2sale s join invty_2salesub ss on ss.TxnID=s.TxnID join 1branches b on b.BranchNo=s.BranchNo where PaymentType=2 '.$condition.' AND month(s.Date)='.$month.'';
 			$stmtrt=$link->query($sqlrt);
 			$resultrt=$stmtrt->fetch();
 			
@@ -112,39 +112,39 @@ switch ($which){
 			// $dso=intval($dso,0).' days';
 			
 			//Average Total Asset
-			$sqlata='select ifnull(format(( ((select sum(Amount) from acctg_1chartofaccounts ca join acctg_0unialltxns ut on ut.AccountID=ca.AccountID join 1branches b on b.BranchNo=ut.BranchNo where AccountType in (1,2,3,4,5,6,7) '.$condition.' AND month(ut.Date)=('.$month.'-1))+(select (sum(Amount)) from acctg_1chartofaccounts ca join acctg_0unialltxns ut on ut.AccountID=ca.AccountID join 1branches b on b.BranchNo=ut.BranchNo where AccountType in (1,2,3,4,5,6,7) '.$condition.' AND month(ut.Date)='.$month.'))/2 ),2),0) as AveTA,ifnull(truncate(( ((select sum(Amount) from acctg_1chartofaccounts ca join acctg_0unialltxns ut on ut.AccountID=ca.AccountID join 1branches b on b.BranchNo=ut.BranchNo where AccountType in (1,2,3,4,5,6,7) '.$condition.' AND month(ut.Date)=('.$month.'-1))+(select (sum(Amount)) from acctg_1chartofaccounts ca join acctg_0unialltxns ut on ut.AccountID=ca.AccountID join 1branches b on b.BranchNo=ut.BranchNo where AccountType in (1,2,3,4,5,6,7) '.$condition.' AND month(ut.Date)='.$month.'))/2 ),2),0) as AveTAValue';
+			$sqlata='select ifnull(format(( ((select sum(Amount) from acctg_1chartofaccounts ca join '.$currentyr.'_static.acctg_0unialltxns ut on ut.AccountID=ca.AccountID join 1branches b on b.BranchNo=ut.BranchNo where AccountType in (1,2,3,4,5,6,7) '.$condition.' AND month(ut.Date)=('.$month.'-1))+(select (sum(Amount)) from acctg_1chartofaccounts ca join '.$currentyr.'_static.acctg_0unialltxns ut on ut.AccountID=ca.AccountID join 1branches b on b.BranchNo=ut.BranchNo where AccountType in (1,2,3,4,5,6,7) '.$condition.' AND month(ut.Date)='.$month.'))/2 ),2),0) as AveTA,ifnull(truncate(( ((select sum(Amount) from acctg_1chartofaccounts ca join '.$currentyr.'_static.acctg_0unialltxns ut on ut.AccountID=ca.AccountID join 1branches b on b.BranchNo=ut.BranchNo where AccountType in (1,2,3,4,5,6,7) '.$condition.' AND month(ut.Date)=('.$month.'-1))+(select (sum(Amount)) from acctg_1chartofaccounts ca join '.$currentyr.'_static.acctg_0unialltxns ut on ut.AccountID=ca.AccountID join 1branches b on b.BranchNo=ut.BranchNo where AccountType in (1,2,3,4,5,6,7) '.$condition.' AND month(ut.Date)='.$month.'))/2 ),2),0) as AveTAValue';
 			$stmtata=$link->query($sqlata);
 			$resultata=$stmtata->fetch();
 			
 			//Current Ratios
-			$sqlcr='select truncate(( (select ifnull(sum(Amount),0) from acctg_1chartofaccounts ca join acctg_0unialltxns ut on ut.AccountID=ca.AccountID join 1branches b on b.BranchNo=ut.BranchNo where AccountType in (1,2,3,4,5) '.$condition.' AND month(ut.Date)='.$month.')/(select ifnull(sum(Amount),0) from acctg_1chartofaccounts ca join acctg_0unialltxns ut on ut.AccountID=ca.AccountID join 1branches b on b.BranchNo=ut.BranchNo where AccountType in (8,9) '.$condition.' AND month(ut.Date)='.$month.') ),2) as CurrentRatios';
+			$sqlcr='select truncate(( (select ifnull(sum(Amount),0) from acctg_1chartofaccounts ca join '.$currentyr.'_static.acctg_0unialltxns ut on ut.AccountID=ca.AccountID join 1branches b on b.BranchNo=ut.BranchNo where AccountType in (1,2,3,4,5) '.$condition.' AND month(ut.Date)='.$month.')/(select ifnull(sum(Amount),0) from acctg_1chartofaccounts ca join '.$currentyr.'_static.acctg_0unialltxns ut on ut.AccountID=ca.AccountID join 1branches b on b.BranchNo=ut.BranchNo where AccountType in (8,9) '.$condition.' AND month(ut.Date)='.$month.') ),2) as CurrentRatios';
 			$stmtcr=$link->query($sqlcr);
 			$resultcr=$stmtcr->fetch();
 			// echo $resultcr['CurrentRatios']; exit();
 			
 			//Cash Ratio
-			$sqlchr='select truncate(( (select ifnull(sum(Amount),0) from acctg_1chartofaccounts ca join acctg_0unialltxns ut on ut.AccountID=ca.AccountID join 1branches b on b.BranchNo=ut.BranchNo where AccountType=1 '.$condition.' AND month(ut.Date)='.$month.')/(select ifnull(sum(Amount),0) from acctg_1chartofaccounts ca join acctg_0unialltxns ut on ut.AccountID=ca.AccountID join 1branches b on b.BranchNo=ut.BranchNo where AccountType in (8,9) '.$condition.' AND month(ut.Date)='.$month.') ),2) as CashRatios';
+			$sqlchr='select truncate(( (select ifnull(sum(Amount),0) from acctg_1chartofaccounts ca join '.$currentyr.'_static.acctg_0unialltxns ut on ut.AccountID=ca.AccountID join 1branches b on b.BranchNo=ut.BranchNo where AccountType=1 '.$condition.' AND month(ut.Date)='.$month.')/(select ifnull(sum(Amount),0) from acctg_1chartofaccounts ca join '.$currentyr.'_static.acctg_0unialltxns ut on ut.AccountID=ca.AccountID join 1branches b on b.BranchNo=ut.BranchNo where AccountType in (8,9) '.$condition.' AND month(ut.Date)='.$month.') ),2) as CashRatios';
 			$stmtchr=$link->query($sqlchr);
 			$resultchr=$stmtchr->fetch();
 			
 			//Debt Ratio
-			$sqldr='select truncate(( (select ifnull(sum(Amount),0) from acctg_1chartofaccounts ca join acctg_0unialltxns ut on ut.AccountID=ca.AccountID join 1branches b on b.BranchNo=ut.BranchNo where AccountType in (8,9,10) '.$condition.' AND month(ut.Date)='.$month.')/(select ifnull(sum(Amount),0) from acctg_1chartofaccounts ca join acctg_0unialltxns ut on ut.AccountID=ca.AccountID join 1branches b on b.BranchNo=ut.BranchNo where AccountType in (1,2,3,4,5,6,7) '.$condition.' AND month(ut.Date)='.$month.') ),2) as DebtRatio ';
+			$sqldr='select truncate(( (select ifnull(sum(Amount),0) from acctg_1chartofaccounts ca join '.$currentyr.'_static.acctg_0unialltxns ut on ut.AccountID=ca.AccountID join 1branches b on b.BranchNo=ut.BranchNo where AccountType in (8,9,10) '.$condition.' AND month(ut.Date)='.$month.')/(select ifnull(sum(Amount),0) from acctg_1chartofaccounts ca join '.$currentyr.'_static.acctg_0unialltxns ut on ut.AccountID=ca.AccountID join 1branches b on b.BranchNo=ut.BranchNo where AccountType in (1,2,3,4,5,6,7) '.$condition.' AND month(ut.Date)='.$month.') ),2) as DebtRatio ';
 			$stmtdr=$link->query($sqldr);
 			$resultdr=$stmtdr->fetch();
 			
 			//Accounts Payable Turnover
-			$sqlapt='select ifnull(truncate(sum(Amount)/( ((select ifnull(sum(Amount),0) from acctg_0unialltxns ut join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID where ut.AccountID=400 '.$condition.' AND month(ut.Date)=('.$month.'-1))+(select ifnull(sum(Amount),0) from acctg_0unialltxns ut join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID where ut.AccountID=400 '.$condition.' AND month(ut.Date)='.$month.'))/2 ),2),0) as AccountPayableTurnover from acctg_2purchasemain pm join 1suppliers s on s.SupplierNo=pm.SupplierNo join acctg_2purchasesub ps on ps.TxnID=pm.TxnID join 1branches b on b.BranchNo=pm.BranchNo where InvtySupplier=1 '.$condition.' AND month(pm.Date)='.$month.' ';
+			$sqlapt='select ifnull(truncate(sum(Amount)/( ((select ifnull(sum(Amount),0) from '.$currentyr.'_static.acctg_0unialltxns ut join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID where ut.AccountID=400 '.$condition.' AND month(ut.Date)=('.$month.'-1))+(select ifnull(sum(Amount),0) from '.$currentyr.'_static.acctg_0unialltxns ut join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID where ut.AccountID=400 '.$condition.' AND month(ut.Date)='.$month.'))/2 ),2),0) as AccountPayableTurnover from acctg_2purchasemain pm join 1suppliers s on s.SupplierNo=pm.SupplierNo join acctg_2purchasesub ps on ps.TxnID=pm.TxnID join 1branches b on b.BranchNo=pm.BranchNo where InvtySupplier=1 '.$condition.' AND month(pm.Date)='.$month.' ';
 			$stmtapt=$link->query($sqlapt);
 			$resultapt=$stmtapt->fetch();
 			
 			//Acid Test Ratio
-			$sqlatr='select truncate(( (select ifnull(sum(Amount),0) from acctg_1chartofaccounts ca join acctg_0unialltxns ut on ut.AccountID=ca.AccountID join 1branches b on b.BranchNo=ut.BranchNo where (AccountType=4) '.$condition.' AND month(ut.Date)='.$month.')/(select ifnull(sum(Amount),0) from acctg_1chartofaccounts ca join acctg_0unialltxns ut on ut.AccountID=ca.AccountID join 1branches b on b.BranchNo=ut.BranchNo where ut.AccountID=400 '.$condition.' AND month(ut.Date)='.$month.') ),2) as AcidTestRatio';
+			$sqlatr='select truncate(( (select ifnull(sum(Amount),0) from acctg_1chartofaccounts ca join '.$currentyr.'_static.acctg_0unialltxns ut on ut.AccountID=ca.AccountID join 1branches b on b.BranchNo=ut.BranchNo where (AccountType=4) '.$condition.' AND month(ut.Date)='.$month.')/(select ifnull(sum(Amount),0) from acctg_1chartofaccounts ca join '.$currentyr.'_static.acctg_0unialltxns ut on ut.AccountID=ca.AccountID join 1branches b on b.BranchNo=ut.BranchNo where ut.AccountID=400 '.$condition.' AND month(ut.Date)='.$month.') ),2) as AcidTestRatio';
 			$stmtatr=$link->query($sqlatr);
 			$resultatr=$stmtatr->fetch();
 			// echo $resultatr['AcidTestRatio']; echo '<br>'; exit();
 				
 			//Inventory Turnover
-			$sql='SELECT ifnull(truncate(sum(Amount)/(((select ifnull(sum(amount),0) from acctg_0unialltxns ut join acctg_1chartofaccounts  ca on ca.AccountID=ut.AccountID join 1branches b on b.BranchNo=ut.BranchNo where AccountType=4 '.$condition.' AND month(ut.Date)='.$month.')+(select ifnull(sum(amount),0) from acctg_0unialltxns ut join acctg_1chartofaccounts  ca on ca.AccountID=ut.AccountID join 1branches b on b.BranchNo=ut.BranchNo where AccountType=4 '.$condition.' AND month(ut.Date)=('.$month.'-1)))/2),2),0) as Turnover FROM acctg_0unialltxns ut join acctg_1chartofaccounts  ca on ca.AccountID=ut.AccountID join 1branches b on b.BranchNo=ut.BranchNo where AccountType in (101) '.$condition.' AND month(ut.Date)='.$month.'';
+			$sql='SELECT ifnull(truncate(sum(Amount)/(((select ifnull(sum(amount),0) from '.$currentyr.'_static.acctg_0unialltxns ut join acctg_1chartofaccounts  ca on ca.AccountID=ut.AccountID join 1branches b on b.BranchNo=ut.BranchNo where AccountType=4 '.$condition.' AND month(ut.Date)='.$month.')+(select ifnull(sum(amount),0) from '.$currentyr.'_static.acctg_0unialltxns ut join acctg_1chartofaccounts  ca on ca.AccountID=ut.AccountID join 1branches b on b.BranchNo=ut.BranchNo where AccountType=4 '.$condition.' AND month(ut.Date)=('.$month.'-1)))/2),2),0) as Turnover FROM '.$currentyr.'_static.acctg_0unialltxns ut join acctg_1chartofaccounts  ca on ca.AccountID=ut.AccountID join 1branches b on b.BranchNo=ut.BranchNo where AccountType in (101) '.$condition.' AND month(ut.Date)='.$month.'';
 			$stmt=$link->query($sql);
 			$result=$stmt->fetch();
 			
@@ -153,11 +153,11 @@ switch ($which){
 			// echo $dio; exit();
 			
 			//Net Sales
-			$sqlns='select ifnull(format(sum(Amount*-1),2),0) as NetSales,ifnull(TRUNCATE(sum(Amount*-1),2),0) as NetSalesValue from acctg_1chartofaccounts ca join acctg_0unialltxns ut on ut.AccountID=ca.AccountID join 1branches b on b.BranchNo=ut.BranchNo where (AccountType=100 or ut.AccountID=810) '.$condition.' AND month(ut.Date)='.$month.''; 
+			$sqlns='select ifnull(format(sum(Amount*-1),2),0) as NetSales,ifnull(TRUNCATE(sum(Amount*-1),2),0) as NetSalesValue from acctg_1chartofaccounts ca join '.$currentyr.'_static.acctg_0unialltxns ut on ut.AccountID=ca.AccountID join 1branches b on b.BranchNo=ut.BranchNo where (AccountType=100 or ut.AccountID=810) '.$condition.' AND month(ut.Date)='.$month.''; 
 			$stmtns=$link->query($sqlns); $resns=$stmtns->fetch();
 			
 			//Gross Profit
-			$sqlgp='select ifnull(format(sum(Amount*-1),2),0) as GrossProfit,ifnull(TRUNCATE(sum(Amount*-1),2),0) as GrossProfitValue from acctg_1chartofaccounts ca join acctg_0unialltxns ut on ut.AccountID=ca.AccountID join 1branches b on b.BranchNo=ut.BranchNo where (AccountType=100 or AccountType=101 or ut.AccountID=810) '.$condition.' AND month(ut.Date)='.$month.''; 
+			$sqlgp='select ifnull(format(sum(Amount*-1),2),0) as GrossProfit,ifnull(TRUNCATE(sum(Amount*-1),2),0) as GrossProfitValue from acctg_1chartofaccounts ca join '.$currentyr.'_static.acctg_0unialltxns ut on ut.AccountID=ca.AccountID join 1branches b on b.BranchNo=ut.BranchNo where (AccountType=100 or AccountType=101 or ut.AccountID=810) '.$condition.' AND month(ut.Date)='.$month.''; 
 			$stmtgp=$link->query($sqlgp); $resgp=$stmtgp->fetch();
 			
 			//Gross Profit Rate
@@ -165,7 +165,7 @@ switch ($which){
 			$gpr=number_format($gpr,2).'%';
 			
 			//Net Income
-			$sqlni='select ifnull(format(sum(Amount*-1),2),0) as NetIncome,ifnull(TRUNCATE(sum(Amount*-1),2),0) as NetIncomeValue from acctg_1chartofaccounts ca join acctg_0unialltxns ut on ut.AccountID=ca.AccountID join 1branches b on b.BranchNo=ut.BranchNo where (AccountType=210 or AccountType=200 or AccountType=220 or AccountType=201 or AccountType=230 or AccountType=150 or AccountType=100 or AccountType=101 or AccountType=240 or AccountType=250) '.$condition.' AND month(ut.Date)='.$month.' '; 
+			$sqlni='select ifnull(format(sum(Amount*-1),2),0) as NetIncome,ifnull(TRUNCATE(sum(Amount*-1),2),0) as NetIncomeValue from acctg_1chartofaccounts ca join '.$currentyr.'_static.acctg_0unialltxns ut on ut.AccountID=ca.AccountID join 1branches b on b.BranchNo=ut.BranchNo where (AccountType=210 or AccountType=200 or AccountType=220 or AccountType=201 or AccountType=230 or AccountType=150 or AccountType=100 or AccountType=101 or AccountType=240 or AccountType=250) '.$condition.' AND month(ut.Date)='.$month.' '; 
 			$stmtni=$link->query($sqlni); $resni=$stmtni->fetch();
 			$ros=($resni['NetIncomeValue']/$resns['NetSalesValue']);
 			$ros=number_format($ros,2).'%';

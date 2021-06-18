@@ -47,7 +47,7 @@ switch ($which){
 	case 'Lookup':
 		unset($formdesc);
 		$title='Lookup';
-		$sql='select Date,ControlNo,`Supplier/Customer/Branch`,Particulars,format(Amount,2) as Amount from acctg_0unialltxns ut where FromBudgetOf=\''.$_GET['FromBudgetOf'].'\' AND AccountID=\''.$_GET['AccountID'].'\'';
+		$sql='select Date,ControlNo,`Supplier/Customer/Branch`,Particulars,format(Amount,2) as Amount from '.$currentyr.'_static.acctg_0unialltxns ut where FromBudgetOf=\''.$_GET['FromBudgetOf'].'\' AND AccountID=\''.$_GET['AccountID'].'\'';
 		$columnnames=array('Date','ControlNo','Supplier/Customer/Branch','Particulars','Amount');
 		include('../backendphp/layout/displayastablenosort.php'); break;
 		// echo $sql; exit();
@@ -689,7 +689,7 @@ case 'DeptMonth':
 					$sqln='Create temporary table joiner as select * from budget_1budgets Group By AccountID';
 					// echo $sqln.'<br><br>';
 					$stmtn=$link->prepare($sqln); $stmtn->execute();
-					$sqlte='Create temporary table arrange select month(Date) as Month,ut.AccountID,sum(Amount) as Amount,\'1\' AS Col from acctg_0unialltxns ut left join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID left join joiner j on j.AccountID=ut.AccountID where ControlNo not like \'%BegBal\' AND Budgeted=1  Group By ut.AccountID,month(Date) 
+					$sqlte='Create temporary table arrange select month(Date) as Month,ut.AccountID,sum(Amount) as Amount,\'1\' AS Col from '.$currentyr.'_static.acctg_0unialltxns ut left join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID left join joiner j on j.AccountID=ut.AccountID where ControlNo not like \'%BegBal\' AND Budgeted=1  Group By ut.AccountID,month(Date) 
 					UNION
 					select Month,AccountID,sum(Budget) as Amount,\'2\' AS Col from budget_1budgets Group By AccountID,Month';
 					// echo $sqlte.'<br><br>';
@@ -826,7 +826,7 @@ case 'DeptMonth':
 				</form>';
 					
 	//arrange unialltxns 
-    $sql='Create Temporary table Actual as select ut.AccountID,ShortAcctID,FromBudgetOf,sum(Amount) as Actual,month(Date) as month from acctg_0unialltxns ut left join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID where FromBudgetOf=\''.$entity.'\' and ControlNo not like \'%BegBal\' and Budgeted=\'1\' Group By month(Date),AccountID,FromBudgetOf;';
+    $sql='Create Temporary table Actual as select ut.AccountID,ShortAcctID,FromBudgetOf,sum(Amount) as Actual,month(Date) as month from '.$currentyr.'_static.acctg_0unialltxns ut left join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID where FromBudgetOf=\''.$entity.'\' and ControlNo not like \'%BegBal\' and Budgeted=\'1\' Group By month(Date),AccountID,FromBudgetOf;';
 	// echo $sql; exit();
 	$stmt=$link->prepare($sql); $stmt->execute();
 	
@@ -996,7 +996,7 @@ $sqleb='Create temporary table ExpensesWithAndWithoutBudget as select mb.ShortAc
 		</form>';
 			
 //arrange unialltxns 
-$sql='Create Temporary table Actual as select ut.AccountID,ShortAcctID,FromBudgetOf,sum(Amount) as Actual,month(Date) as month from acctg_0unialltxns ut left join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID where ut.AccountID=\''.$accountid.'\' and ControlNo not like \'%BegBal\' and Budgeted=\'1\' Group By month(Date),AccountID,FromBudgetOf;';
+$sql='Create Temporary table Actual as select ut.AccountID,ShortAcctID,FromBudgetOf,sum(Amount) as Actual,month(Date) as month from '.$currentyr.'_static.acctg_0unialltxns ut left join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID where ut.AccountID=\''.$accountid.'\' and ControlNo not like \'%BegBal\' and Budgeted=\'1\' Group By month(Date),AccountID,FromBudgetOf;';
 // echo $sql.'<br><br>';
 $stmt=$link->prepare($sql); $stmt->execute();
 

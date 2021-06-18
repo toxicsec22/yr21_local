@@ -182,7 +182,7 @@ $sql0='drop table if exists `acctg_endacctgvalues`'; $stmt=$link1->prepare($sql0
 $sql1='Create table acctg_endacctgvalues as
 SELECT Month(m.Date) as `Month`, round(sum(Amount),2) as EndValue, "AcctgSales" as Col, m.BranchNo, 4 as Compare FROM `acctg_2salesub` s join `acctg_2salemain` m on m.TxnID=s.TxnID where CreditAccountID BETWEEN 700 AND 703 group by Month(m.Date), m.BranchNo 
 union all
-SELECT Month(m.Date) as `Month`, round(sum(Amount),2) as EndValue, "AcctgReturns" as Col, m.BranchNo, 5 as Compare FROM `acctg_0unialltxns` m where AccountID=705 group by Month(m.Date), m.BranchNo
+SELECT Month(m.Date) as `Month`, round(sum(Amount),2) as EndValue, "AcctgReturns" as Col, m.BranchNo, 5 as Compare FROM `'.$currentyr.'_static`.`acctg_0unialltxns` m where AccountID=705 group by Month(m.Date), m.BranchNo
 union all
 SELECT Month(m.Date) as `Month`, round(sum(Amount),2) as EndValue, "AcctgTxfrOut" as Col, m.FromBranchNo, 2 as Compare FROM `acctg_2txfrsub` s join `acctg_2txfrmain` m on m.TxnID=s.TxnID where s.DebitAccountID in (204,805) group by Month(m.Date), m.FromBranchNo
 union all

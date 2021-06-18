@@ -178,7 +178,7 @@ $stmta=$link->query($sqla); $resulta=$stmta->fetch();
 		$stmt=$link->query($sqlb); $resultb=$stmt->fetch();
 
 	 $sql='select format(floor(@running_total:=@running_total - Actual),0) AS RemainingBudget,format(floor(Actual),0) as Actual,Date,ControlNo,`Supplier/Customer/Branch`,Particulars,FromBudgetOf from
-		(select ControlNo,`Supplier/Customer/Branch`,Particulars,Amount as Actual,Date,Branch as FromBudgetOf from acctg_0unialltxns ut left join 1branches b on b.BranchNo=ut.FromBudgetOf left join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID where ut.FromBudgetOf=\''.($_GET['department']+800).'\' AND ut.AccountID in (901,301,966,905,974,501,502,503,908,909,910) and ControlNo not like \'%BegBal\') Actual JOIN
+		(select ControlNo,`Supplier/Customer/Branch`,Particulars,Amount as Actual,Date,Branch as FromBudgetOf from '.$currentyr.'_static.acctg_0unialltxns ut left join 1branches b on b.BranchNo=ut.FromBudgetOf left join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID where ut.FromBudgetOf=\''.($_GET['department']+800).'\' AND ut.AccountID in (901,301,966,905,974,501,502,503,908,909,910) and ControlNo not like \'%BegBal\') Actual JOIN
 		(SELECT @running_total:=sum(Q1+Q2+Q3+Q4) from EmployeeExpenses) Budget Order By Date';
 		// echo $sql; exit();
 		$stmt=$link->query($sql);
@@ -190,7 +190,7 @@ $stmta=$link->query($sqla); $resulta=$stmta->fetch();
 		$stmt=$link->query($sqlb); $resultb=$stmt->fetch();
 
 	 $sql='select format(@running_total:=@running_total - Actual,0) AS RemainingBudget,format(Actual,0) as Actual,Date,ControlNo,`Supplier/Customer/Branch`,Particulars,FromBudgetOf from
-		(select ControlNo,`Supplier/Customer/Branch`,Particulars,Amount as Actual,Date,Branch as FromBudgetOf from acctg_0unialltxns ut left join 1branches b on b.BranchNo=ut.FromBudgetOf left join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID where ut.FromBudgetOf=\''.($_GET['department']+800).'\' AND ut.AccountID=\''.$_GET['AccountID'].'\' and ControlNo not like \'%BegBal\') Actual JOIN
+		(select ControlNo,`Supplier/Customer/Branch`,Particulars,Amount as Actual,Date,Branch as FromBudgetOf from '.$currentyr.'_static.acctg_0unialltxns ut left join 1branches b on b.BranchNo=ut.FromBudgetOf left join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID where ut.FromBudgetOf=\''.($_GET['department']+800).'\' AND ut.AccountID=\''.$_GET['AccountID'].'\' and ControlNo not like \'%BegBal\') Actual JOIN
 		(SELECT @running_total:=sum(Q1+Q2+Q3+Q4) from budget_2budgetplanning b where b.deptid=\''.$_GET['department'].'\' AND b.AccountID=\''.$_GET['AccountID'].'\') Budget Order By Date';
 		// echo $sql; exit();
 		$stmt=$link->query($sql);
@@ -250,7 +250,7 @@ $stmta=$link->query($sqla); $resulta=$stmta->fetch();
 	if(isset($_REQUEST['departmentlookup'])){
 
 		$frombudgetof=$_REQUEST['department']+800;
-		$sqlt='Create temporary table Actual select FromBudgetOf, ut.AccountID, month(Date) as Month, sum(Amount) as Amount from acctg_0unialltxns ut left join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID where ControlNo not like \'%BegBal\' Group By ut.AccountID,month(Date),FromBudgetOf';
+		$sqlt='Create temporary table Actual select FromBudgetOf, ut.AccountID, month(Date) as Month, sum(Amount) as Amount from '.$currentyr.'_static.acctg_0unialltxns ut left join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID where ControlNo not like \'%BegBal\' Group By ut.AccountID,month(Date),FromBudgetOf';
 		// echo $sqlt; exit();
 		$stmtt=$link->prepare($sqlt); $stmtt->execute();
 		$sqla='Create Temporary table QuarterActual as select AccountID, FromBudgetOf,
@@ -496,9 +496,9 @@ if (allowedToOpen(5174,'1rtc')) {
 				switch($_POST['groupby']){
 					case'0':  //Branch
 							$branchno=companyandbranchValue($link, '1branches', 'Branch', $_POST['branch'], 'BranchNo');
-							$yearsales=',(`01`+`02`+`03`+`04`+`05`+`06`+`07`+`08`+`09`+`10`+`11`+`12`) as YearBudget,(select sum(Amount)*NormBal from acctg_0unialltxns ut left join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID where AccountType=\'100\' and BranchNo=\''.$branchno.'\') as YearActual';
-							$yearcogst=',(select sum(Amount) from acctg_0unialltxns ut left join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID left join 1branches b on b.BranchNo=ut.BranchNo where ut.BranchNo=\''.$branchno.'\' and AccountType=\'101\') as YearActual,(select sum(`01`+`02`+`03`+`04`+`05`+`06`+`07`+`08`+`09`+`10`+`11`+`12`)*.75 from acctg_1yearsalestargets ut left join 1branches b on b.BranchNo=ut.BranchNo where ut.BranchNo=\''.$branchno.'\') as YearBudget';
-							$yearcogs=',(select format(sum(Amount),2) from acctg_0unialltxns ut left join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID left join 1branches b on b.BranchNo=ut.BranchNo where ut.BranchNo=\''.$branchno.'\' and AccountType=\'101\') as YearActual,(select format(sum(`01`+`02`+`03`+`04`+`05`+`06`+`07`+`08`+`09`+`10`+`11`+`12`)*.75,2) from acctg_1yearsalestargets ut left join 1branches b on b.BranchNo=ut.BranchNo where ut.BranchNo=\''.$branchno.'\') as YearBudget';
+							$yearsales=',(`01`+`02`+`03`+`04`+`05`+`06`+`07`+`08`+`09`+`10`+`11`+`12`) as YearBudget,(select sum(Amount)*NormBal from '.$currentyr.'_static.acctg_0unialltxns ut left join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID where AccountType=\'100\' and BranchNo=\''.$branchno.'\') as YearActual';
+							$yearcogst=',(select sum(Amount) from '.$currentyr.'_static.acctg_0unialltxns ut left join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID left join 1branches b on b.BranchNo=ut.BranchNo where ut.BranchNo=\''.$branchno.'\' and AccountType=\'101\') as YearActual,(select sum(`01`+`02`+`03`+`04`+`05`+`06`+`07`+`08`+`09`+`10`+`11`+`12`)*.75 from acctg_1yearsalestargets ut left join 1branches b on b.BranchNo=ut.BranchNo where ut.BranchNo=\''.$branchno.'\') as YearBudget';
+							$yearcogs=',(select format(sum(Amount),2) from '.$currentyr.'_static.acctg_0unialltxns ut left join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID left join 1branches b on b.BranchNo=ut.BranchNo where ut.BranchNo=\''.$branchno.'\' and AccountType=\'101\') as YearActual,(select format(sum(`01`+`02`+`03`+`04`+`05`+`06`+`07`+`08`+`09`+`10`+`11`+`12`)*.75,2) from acctg_1yearsalestargets ut left join 1branches b on b.BranchNo=ut.BranchNo where ut.BranchNo=\''.$branchno.'\') as YearBudget';
 							$condi='where b.BranchNo=\''.$branchno.'\' and month(Date) between \'1\' and \''.$_POST['reportmonth'].'\' and AccountType=\'100\'';
 							$cogscondi='where b.BranchNo=\''.$branchno.'\' and';
 							$acctidcondi='where BranchNo=\''.$branchno.'\' and Month between \'1\' and \''.$_POST['reportmonth'].'\'';
@@ -517,9 +517,9 @@ if (allowedToOpen(5174,'1rtc')) {
 					break;
 					case'1':  //Company
 							$companyno=companyandbranchValue($link, '1companies', 'Company', $_POST['company'], 'CompanyNo');
-							$yearsales=',(sum(`01`)+sum(`02`)+sum(`03`)+sum(`04`)+sum(`05`)+sum(`06`)+sum(`07`)+sum(`08`)+sum(`09`)+sum(`10`)+sum(`11`)+sum(`12`)) as YearBudget,(select sum(Amount)*NormBal from acctg_0unialltxns ut left join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID left join 1branches b on b.BranchNo=ut.BranchNo where AccountType=\'100\' and b.CompanyNo=\''.$companyno.'\') as YearActual';
-							$yearcogst=',(select sum(Amount) from acctg_0unialltxns ut left join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID left join 1branches b on b.BranchNo=ut.BranchNo where CompanyNo=\''.$companyno.'\' and AccountType=\'101\') as YearActual,(select sum(`01`+`02`+`03`+`04`+`05`+`06`+`07`+`08`+`09`+`10`+`11`+`12`)*.75 from acctg_1yearsalestargets ut left join 1branches b on b.BranchNo=ut.BranchNo where CompanyNo=\''.$companyno.'\') as YearBudget';
-							$yearcogs=',(select format(sum(Amount),2) from acctg_0unialltxns ut left join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID left join 1branches b on b.BranchNo=ut.BranchNo where CompanyNo=\''.$companyno.'\' and AccountType=\'101\') as YearActual,(select format(sum(`01`+`02`+`03`+`04`+`05`+`06`+`07`+`08`+`09`+`10`+`11`+`12`)*.75,2) from acctg_1yearsalestargets ut left join 1branches b on b.BranchNo=ut.BranchNo where CompanyNo=\''.$companyno.'\') as YearBudget';
+							$yearsales=',(sum(`01`)+sum(`02`)+sum(`03`)+sum(`04`)+sum(`05`)+sum(`06`)+sum(`07`)+sum(`08`)+sum(`09`)+sum(`10`)+sum(`11`)+sum(`12`)) as YearBudget,(select sum(Amount)*NormBal from '.$currentyr.'_static.acctg_0unialltxns ut left join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID left join 1branches b on b.BranchNo=ut.BranchNo where AccountType=\'100\' and b.CompanyNo=\''.$companyno.'\') as YearActual';
+							$yearcogst=',(select sum(Amount) from '.$currentyr.'_static.acctg_0unialltxns ut left join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID left join 1branches b on b.BranchNo=ut.BranchNo where CompanyNo=\''.$companyno.'\' and AccountType=\'101\') as YearActual,(select sum(`01`+`02`+`03`+`04`+`05`+`06`+`07`+`08`+`09`+`10`+`11`+`12`)*.75 from acctg_1yearsalestargets ut left join 1branches b on b.BranchNo=ut.BranchNo where CompanyNo=\''.$companyno.'\') as YearBudget';
+							$yearcogs=',(select format(sum(Amount),2) from '.$currentyr.'_static.acctg_0unialltxns ut left join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID left join 1branches b on b.BranchNo=ut.BranchNo where CompanyNo=\''.$companyno.'\' and AccountType=\'101\') as YearActual,(select format(sum(`01`+`02`+`03`+`04`+`05`+`06`+`07`+`08`+`09`+`10`+`11`+`12`)*.75,2) from acctg_1yearsalestargets ut left join 1branches b on b.BranchNo=ut.BranchNo where CompanyNo=\''.$companyno.'\') as YearBudget';
 							$condi='where CompanyNo=\''.$companyno.'\' and month(Date) between \'1\' and \''.$_POST['reportmonth'].'\' and AccountType=\'100\'';
 							$cogscondi='where CompanyNo=\''.$companyno.'\' and';
 							$acctidcondi='where CompanyNo=\''.$companyno.'\' and Month between \'1\' and \''.$_POST['reportmonth'].'\'';
@@ -537,9 +537,9 @@ if (allowedToOpen(5174,'1rtc')) {
 							$filter=''.$_POST['company'].'';
 					break;
 					case'10':  //All
-							$yearsales=',sum(`01`+`02`+`03`+`04`+`05`+`06`+`07`+`08`+`09`+`10`+`11`+`12`) as YearBudget,(select sum(Amount)*NormBal from acctg_0unialltxns ut left join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID where AccountType=\'100\' ) as YearActual';
-							$yearcogst=',(select sum(Amount) from acctg_0unialltxns ut left join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID left join 1branches b on b.BranchNo=ut.BranchNo where AccountType=\'101\') as YearActual,(select sum(`01`+`02`+`03`+`04`+`05`+`06`+`07`+`08`+`09`+`10`+`11`+`12`)*.75 from acctg_1yearsalestargets ) as YearBudget';
-							$yearcogs=',(select format(sum(Amount),2) from acctg_0unialltxns ut left join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID left join 1branches b on b.BranchNo=ut.BranchNo where AccountType=\'101\') as YearActual,(select format(sum(`01`+`02`+`03`+`04`+`05`+`06`+`07`+`08`+`09`+`10`+`11`+`12`)*.75,2) from acctg_1yearsalestargets ) as YearBudget';
+							$yearsales=',sum(`01`+`02`+`03`+`04`+`05`+`06`+`07`+`08`+`09`+`10`+`11`+`12`) as YearBudget,(select sum(Amount)*NormBal from '.$currentyr.'_static.acctg_0unialltxns ut left join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID where AccountType=\'100\' ) as YearActual';
+							$yearcogst=',(select sum(Amount) from '.$currentyr.'_static.acctg_0unialltxns ut left join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID left join 1branches b on b.BranchNo=ut.BranchNo where AccountType=\'101\') as YearActual,(select sum(`01`+`02`+`03`+`04`+`05`+`06`+`07`+`08`+`09`+`10`+`11`+`12`)*.75 from acctg_1yearsalestargets ) as YearBudget';
+							$yearcogs=',(select format(sum(Amount),2) from '.$currentyr.'_static.acctg_0unialltxns ut left join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID left join 1branches b on b.BranchNo=ut.BranchNo where AccountType=\'101\') as YearActual,(select format(sum(`01`+`02`+`03`+`04`+`05`+`06`+`07`+`08`+`09`+`10`+`11`+`12`)*.75,2) from acctg_1yearsalestargets ) as YearBudget';
 							$condi='where AccountType=\'100\'';
 							$cogscondi='where ';
 							$acctidcondi='where Month between \'1\' and \''.$_POST['reportmonth'].'\'';
@@ -560,7 +560,7 @@ if (allowedToOpen(5174,'1rtc')) {
 		}
 if(isset($_POST['submit'])){
 					//Temporary table for SalesActual
-					$sql1='create temporary table SalesActual as select sum(Amount)*-1 as Actual,ut.BranchNo as BranchNo,CompanyNo,month(Date) as Month from acctg_0unialltxns ut left join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID left join 1branches b on b.BranchNo=ut.BranchNo '.$condi.' '.$groupby.'';
+					$sql1='create temporary table SalesActual as select sum(Amount)*-1 as Actual,ut.BranchNo as BranchNo,CompanyNo,month(Date) as Month from '.$currentyr.'_static.acctg_0unialltxns ut left join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID left join 1branches b on b.BranchNo=ut.BranchNo '.$condi.' '.$groupby.'';
 					// echo $sql1; exit();
 					$stmt1=$link->prepare($sql1); $stmt1->execute();
 
@@ -568,14 +568,14 @@ if(isset($_POST['submit'])){
 					$sql1='create temporary table AcctBudget as select AccountID,sum(Budget) as Budget,BranchNo,CompanyNo, Month from budget_1budgets bu left join 1branches b on b.BranchNo=bu.EntityID '.$acctidcondi.' '.$acctidgroupby.'';
 					// echo $sql1; exit();
 					$stmt1=$link->prepare($sql1); $stmt1->execute();
-					$sql1='create temporary table AcctActual as select ut.AccountID as AccountID,sum(Amount)*-1 as Actual,ut.BranchNo as BranchNo,CompanyNo, month(Date) as Month from acctg_0unialltxns ut left join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID left join 1branches b on b.BranchNo=ut.BranchNo '.$acctidactualcondi.' '.$acctidactualgroupby.'';
+					$sql1='create temporary table AcctActual as select ut.AccountID as AccountID,sum(Amount)*-1 as Actual,ut.BranchNo as BranchNo,CompanyNo, month(Date) as Month from '.$currentyr.'_static.acctg_0unialltxns ut left join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID left join 1branches b on b.BranchNo=ut.BranchNo '.$acctidactualcondi.' '.$acctidactualgroupby.'';
 					// echo $sql1; exit();
 					$stmt1=$link->prepare($sql1); $stmt1->execute();
 						//yearbudget and yearactyual
 						$sql1='create temporary table AcctYearBudget as select AccountID,sum(Budget) as YearBudget from budget_1budgets bu left join 1branches b on b.BranchNo=bu.EntityID '.$yearcondib.' Group By bu.AccountID';
 						// echo $sql1; exit();
 						$stmt1=$link->prepare($sql1); $stmt1->execute();
-						$sql1='create temporary table AcctYearActual as select ut.AccountID as AccountID,sum(Amount)*-1 as YearActual from acctg_0unialltxns ut left join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID left join 1branches b on b.BranchNo=ut.BranchNo '.$yearcondia.' Group By ut.AccountID';
+						$sql1='create temporary table AcctYearActual as select ut.AccountID as AccountID,sum(Amount)*-1 as YearActual from '.$currentyr.'_static.acctg_0unialltxns ut left join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID left join 1branches b on b.BranchNo=ut.BranchNo '.$yearcondia.' Group By ut.AccountID';
 						// echo $sql1; exit();
 						$stmt1=$link->prepare($sql1); $stmt1->execute();
 
@@ -619,9 +619,9 @@ if(isset($_POST['submit'])){
 						$datem=date("m",strtotime($_SESSION['nb4A']));
 						// echo $datem; exit();
 						if($c<$datem){
-						$COGSActualt.='(select sum(Amount) from acctg_0unialltxns ut left join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID left join 1branches b on b.BranchNo=ut.BranchNo '.$cogscondi.' month(Date)=\''.$c.'\' and AccountType=\'101\') as  '.$colnameA.',';
+						$COGSActualt.='(select sum(Amount) from '.$currentyr.'_static.acctg_0unialltxns ut left join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID left join 1branches b on b.BranchNo=ut.BranchNo '.$cogscondi.' month(Date)=\''.$c.'\' and AccountType=\'101\') as  '.$colnameA.',';
 						// echo $COGSActualt; exit();
-						$COGSActual.='(select format(sum(Amount),2) from acctg_0unialltxns ut left join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID left join 1branches b on b.BranchNo=ut.BranchNo '.$cogscondi.' month(Date)=\''.$c.'\' and AccountType=\'101\') as  '.$colnameA.',';
+						$COGSActual.='(select format(sum(Amount),2) from '.$currentyr.'_static.acctg_0unialltxns ut left join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID left join 1branches b on b.BranchNo=ut.BranchNo '.$cogscondi.' month(Date)=\''.$c.'\' and AccountType=\'101\') as  '.$colnameA.',';
 						$acctidt.='avg(case when bu.Month=\''.$c.'\' then Budget end) as '.$colnameB.',avg(case when ut.Month=\''.$c.'\' then Actual end) as '.$colnameA.',';
 						}else{
 						$COGSActualt.='(select sum(Qty*`'.$col.'`) FROM invty_2sale s JOIN invty_2salesub ss ON ss.TxnID=s.TxnID JOIN `'.$currentyr.'_static`.`invty_weightedavecost` wac ON wac.ItemCode=ss.ItemCode left join 1branches b on b.BranchNo=s.BranchNo '.$cogscondi.' month(Date)=\''.$c.'\') as  '.$colnameA.',';

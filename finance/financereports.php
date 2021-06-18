@@ -134,7 +134,7 @@ if(isset($_POST['submit'])){
 		$sql='CREATE TEMPORARY TABLE gen_info_1financereportsUNION AS ';
 			$fmn=1; $tmn=12;
 			while($fmn<=$tmn){
-				$sql.='SELECT Branch AS ColName, b.BranchNo,'.$fmn.' AS MonthName, '.$sumamount.' AS ColSum FROM 1branches b  left join acctg_0unialltxns ut on ut.BranchNo=b.BranchNo left join acctg_1chartofaccounts ca  on ca.AccountID=ut.AccountID  where '.$accountype.' AND month(ut.Date)='.$fmn.' '.$condition.'  GROUP BY BranchNo,MonthName UNION ';
+				$sql.='SELECT Branch AS ColName, b.BranchNo,'.$fmn.' AS MonthName, '.$sumamount.' AS ColSum FROM 1branches b  left join '.$currentyr.'_static.acctg_0unialltxns ut on ut.BranchNo=b.BranchNo left join acctg_1chartofaccounts ca  on ca.AccountID=ut.AccountID  where '.$accountype.' AND month(ut.Date)='.$fmn.' '.$condition.'  GROUP BY BranchNo,MonthName UNION ';
 				$fmn++;
 			}
 			$sql=substr($sql, 0, -6);
@@ -165,7 +165,7 @@ if(isset($_POST['submit'])){
 					$sql2='CREATE TEMPORARY TABLE TOTAL AS ';
 			$c=1; $c1=12;
 			while($c<=$c1){
-				$sql2.='SELECT Branch AS ColName, b.BranchNo,'.$c.' AS MonthName, '.$sumamount.' AS ColSum FROM 1branches b  left join acctg_0unialltxns ut on ut.BranchNo=b.BranchNo left join acctg_1chartofaccounts ca  on ca.AccountID=ut.AccountID  where '.$accountype.' AND month(ut.Date)='.$c.' '.$condition.' UNION ';
+				$sql2.='SELECT Branch AS ColName, b.BranchNo,'.$c.' AS MonthName, '.$sumamount.' AS ColSum FROM 1branches b  left join '.$currentyr.'_static.acctg_0unialltxns ut on ut.BranchNo=b.BranchNo left join acctg_1chartofaccounts ca  on ca.AccountID=ut.AccountID  where '.$accountype.' AND month(ut.Date)='.$c.' '.$condition.' UNION ';
 				$c++;
 			}
 			$sql2=substr($sql2, 0, -6);
@@ -316,7 +316,7 @@ if(isset($_POST['submit'])){
 		$sql='CREATE TEMPORARY TABLE GrossProfit AS ';
 			$fmn=1; $tmn=12;
 			while($fmn<=$tmn){
-				$sql.='SELECT Branch AS ColName, b.BranchNo,'.$fmn.' AS MonthName, '.$sumamount.' AS ColSum FROM 1branches b  left join acctg_0unialltxns ut on ut.BranchNo=b.BranchNo left join acctg_1chartofaccounts ca  on ca.AccountID=ut.AccountID  where '.$accountype.' AND month(ut.Date)='.$fmn.' '.$condition.'  GROUP BY BranchNo,MonthName UNION ';
+				$sql.='SELECT Branch AS ColName, b.BranchNo,'.$fmn.' AS MonthName, '.$sumamount.' AS ColSum FROM 1branches b  left join '.$currentyr.'_static.acctg_0unialltxns ut on ut.BranchNo=b.BranchNo left join acctg_1chartofaccounts ca  on ca.AccountID=ut.AccountID  where '.$accountype.' AND month(ut.Date)='.$fmn.' '.$condition.'  GROUP BY BranchNo,MonthName UNION ';
 				$fmn++;
 			}
 			$sql=substr($sql, 0, -6);
@@ -348,7 +348,7 @@ if(isset($_POST['submit'])){
 					$sql2='CREATE TEMPORARY TABLE TOTAL AS ';
 			$c=1; $c1=12;
 			while($c<=$c1){
-				$sql2.='SELECT Branch AS ColName, b.BranchNo,'.$c.' AS MonthName, '.$sumamount.' AS ColSum FROM 1branches b  left join acctg_0unialltxns ut on ut.BranchNo=b.BranchNo left join acctg_1chartofaccounts ca  on ca.AccountID=ut.AccountID  where '.$accountype.' AND month(ut.Date)='.$c.' '.$condition.' UNION ';
+				$sql2.='SELECT Branch AS ColName, b.BranchNo,'.$c.' AS MonthName, '.$sumamount.' AS ColSum FROM 1branches b  left join '.$currentyr.'_static.acctg_0unialltxns ut on ut.BranchNo=b.BranchNo left join acctg_1chartofaccounts ca  on ca.AccountID=ut.AccountID  where '.$accountype.' AND month(ut.Date)='.$c.' '.$condition.' UNION ';
 				$c++;
 			}
 			$sql2=substr($sql2, 0, -6);
@@ -358,7 +358,7 @@ if(isset($_POST['submit'])){
 		$sql1='CREATE TEMPORARY TABLE NetSales AS ';
 			$fmn=1; $tmn=12;
 			while($fmn<=$tmn){
-				$sql1.='SELECT Branch AS ColName, b.BranchNo,'.$fmn.' AS MonthName, sum(ut.Amount*-1) AS ColSum FROM 1branches b  left join acctg_0unialltxns ut on ut.BranchNo=b.BranchNo left join acctg_1chartofaccounts ca  on ca.AccountID=ut.AccountID  where (AccountType=100 or ut.AccountID=810) AND month(ut.Date)='.$fmn.' '.$condition.'  GROUP BY BranchNo,MonthName UNION ';
+				$sql1.='SELECT Branch AS ColName, b.BranchNo,'.$fmn.' AS MonthName, sum(ut.Amount*-1) AS ColSum FROM 1branches b  left join '.$currentyr.'_static.acctg_0unialltxns ut on ut.BranchNo=b.BranchNo left join acctg_1chartofaccounts ca  on ca.AccountID=ut.AccountID  where (AccountType=100 or ut.AccountID=810) AND month(ut.Date)='.$fmn.' '.$condition.'  GROUP BY BranchNo,MonthName UNION ';
 				$fmn++;
 			}
 			$sql1=substr($sql1, 0, -6);
@@ -534,7 +534,7 @@ if(isset($_POST['submit'])){
 		$sql1='CREATE TEMPORARY TABLE NetSales AS ';
 			$fmn=1; $tmn=12;
 			while($fmn<=$tmn){
-				$sql1.='SELECT Branch AS ColName, b.BranchNo,'.$fmn.' AS MonthName, sum(ut.Amount*-1) AS ColSum FROM 1branches b  left join acctg_0unialltxns ut on ut.BranchNo=b.BranchNo left join acctg_1chartofaccounts ca  on ca.AccountID=ut.AccountID  where (AccountType=100 or ut.AccountID=810) AND month(ut.Date)='.$fmn.' '.$condition.'  GROUP BY BranchNo,MonthName UNION ';
+				$sql1.='SELECT Branch AS ColName, b.BranchNo,'.$fmn.' AS MonthName, sum(ut.Amount*-1) AS ColSum FROM 1branches b  left join '.$currentyr.'_static.acctg_0unialltxns ut on ut.BranchNo=b.BranchNo left join acctg_1chartofaccounts ca  on ca.AccountID=ut.AccountID  where (AccountType=100 or ut.AccountID=810) AND month(ut.Date)='.$fmn.' '.$condition.'  GROUP BY BranchNo,MonthName UNION ';
 				$fmn++;
 			}
 			$sql1=substr($sql1, 0, -6);
@@ -544,7 +544,7 @@ if(isset($_POST['submit'])){
 		$sql2='CREATE TEMPORARY TABLE NetIncome AS ';
 			$fmn=1; $tmn=12;
 			while($fmn<=$tmn){
-				$sql2.='SELECT Branch AS ColName, b.BranchNo,'.$fmn.' AS MonthName, sum(ut.Amount*-1) AS ColSum FROM 1branches b  left join acctg_0unialltxns ut on ut.BranchNo=b.BranchNo left join acctg_1chartofaccounts ca  on ca.AccountID=ut.AccountID  where AccountType in(100,101,150,201,200,210,220,230,240,250) AND month(ut.Date)='.$fmn.' and month(Date)<=\''.$monthdate.'\' '.$condition.' GROUP BY BranchNo,MonthName UNION ';
+				$sql2.='SELECT Branch AS ColName, b.BranchNo,'.$fmn.' AS MonthName, sum(ut.Amount*-1) AS ColSum FROM 1branches b  left join '.$currentyr.'_static.acctg_0unialltxns ut on ut.BranchNo=b.BranchNo left join acctg_1chartofaccounts ca  on ca.AccountID=ut.AccountID  where AccountType in(100,101,150,201,200,210,220,230,240,250) AND month(ut.Date)='.$fmn.' and month(Date)<=\''.$monthdate.'\' '.$condition.' GROUP BY BranchNo,MonthName UNION ';
 				$fmn++;
 			}
 			$sql2=substr($sql2, 0, -6);

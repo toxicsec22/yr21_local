@@ -374,7 +374,7 @@ header("Location:annualbudgets.php?w=lists&Message=".$Message."");
 		when month(ut.Date)=11 then "November"
 		when month(ut.Date)=12 then "December"
 
-		end as Month,month(ut.Date) as MonthValue from acctg_0unialltxns ut left join acctg_1budgetentities be on be.EntityID=ut.FromBudgetOf left join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID where ut.FromBudgetOf=\''.$entity.'\' AND ut.AccountID=\''.$account.'\' and ControlNo not like \'%BegBal\' Group By month(Date) ) Actual JOIN 
+		end as Month,month(ut.Date) as MonthValue from '.$currentyr.'_static.acctg_0unialltxns ut left join acctg_1budgetentities be on be.EntityID=ut.FromBudgetOf left join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID where ut.FromBudgetOf=\''.$entity.'\' AND ut.AccountID=\''.$account.'\' and ControlNo not like \'%BegBal\' Group By month(Date) ) Actual JOIN 
 		(SELECT @running_total:=sum(Budget) from budget_1budgets b where b.EntityID=\''.$entity.'\' AND b.AccountID=\''.$account.'\' ) Budget 
 		JOIN (select sum(Budget) as `1` from budget_1budgets b where b.EntityID=\''.$entity.'\' AND b.AccountID=\''.$account.'\' AND Month=1) as `1` 
 		JOIN (select sum(Budget) as `2` from budget_1budgets b where b.EntityID=\''.$entity.'\' AND b.AccountID=\''.$account.'\' AND Month=2) as `2`
@@ -445,7 +445,7 @@ header("Location:annualbudgets.php?w=lists&Message=".$Message."");
 	
 	$txnid=intval($_GET['TxnID']);
 	 $sql='select format(@running_total:=@running_total - Actual,2) AS RemainingBudget,format(Actual,2) as Actual,Date,TxnID,ControlNo,`Supplier/Customer/Branch`,Particulars,Branch from 
-		(select ControlNo,`Supplier/Customer/Branch`,Particulars,ut.TxnID,Amount as Actual,Date,Branch from acctg_0unialltxns ut left join acctg_1budgetentities be on be.EntityID=ut.FromBudgetOf left join 1branches b on b.BranchNo=ut.BranchNo left join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID where ut.FromBudgetOf=\''.$entity.'\' AND ut.AccountID=\''.$account.'\' AND month(ut.Date) between \''.$m1.'\' AND \''.$_GET['MonthValue'].'\' and ControlNo not like \'%BegBal\'  ) Actual JOIN 
+		(select ControlNo,`Supplier/Customer/Branch`,Particulars,ut.TxnID,Amount as Actual,Date,Branch from '.$currentyr.'_static.acctg_0unialltxns ut left join acctg_1budgetentities be on be.EntityID=ut.FromBudgetOf left join 1branches b on b.BranchNo=ut.BranchNo left join acctg_1chartofaccounts ca on ca.AccountID=ut.AccountID where ut.FromBudgetOf=\''.$entity.'\' AND ut.AccountID=\''.$account.'\' AND month(ut.Date) between \''.$m1.'\' AND \''.$_GET['MonthValue'].'\' and ControlNo not like \'%BegBal\'  ) Actual JOIN 
 		(SELECT @running_total:=sum(Budget) from budget_1budgets b where b.EntityID=\''.$entity.'\' AND b.AccountID=\''.$account.'\' ) Budget Order By Date';
 		// echo $sql; exit();
 		$stmt=$link->query($sql); 
@@ -481,7 +481,7 @@ header("Location:annualbudgets.php?w=lists&Message=".$Message."");
 		// echo $sql1; exit();
 		$stmt1=$link->prepare($sql1); $stmt1->execute();
 		
-		$sql2='Create Temporary table Actual as select sum(Amount) as Actual,AccountID from acctg_0unialltxns where FromBudgetOf=\''.$entity.'\' and month(Date)=\''.$_POST['month'].'\' Group By AccountID';
+		$sql2='Create Temporary table Actual as select sum(Amount) as Actual,AccountID from '.$currentyr.'_static.acctg_0unialltxns where FromBudgetOf=\''.$entity.'\' and month(Date)=\''.$_POST['month'].'\' Group By AccountID';
 		$stmt2=$link->prepare($sql2); $stmt2->execute();
 		
 		

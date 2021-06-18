@@ -8,7 +8,7 @@ if ($showcurrent==0){
     
    $whichdata='withcurrent'; $month=$reportmonth;require ('maketables/makefixedacctgdata.php');
   $sql0='CREATE TEMPORARY TABLE `'.$currentyr.'_static`.`acctg_tbvalues` as 
-Select b.BranchNo,b.Branch,ca.AccountID,truncate(sum(Amount),2) as `Balance`, ca.GroupID, ca.NormBal from `acctg_0unialltxns` uni join acctg_1chartofaccounts ca on ca.AccountID=uni.AccountID join `acctg_1accounttype` at on ca.AccountType=at.AccountType  JOIN `1branches` b on b.BranchNo=uni.BranchNo WHERE b.CompanyNo='.$co.' and Month(Date)<='.$reportmonth.' group by ca.AccountID, b.BranchNo having Balance<>0';
+Select b.BranchNo,b.Branch,ca.AccountID,truncate(sum(Amount),2) as `Balance`, ca.GroupID, ca.NormBal from `'.$currentyr.'_static`.`acctg_0unialltxns` uni join acctg_1chartofaccounts ca on ca.AccountID=uni.AccountID join `acctg_1accounttype` at on ca.AccountType=at.AccountType  JOIN `1branches` b on b.BranchNo=uni.BranchNo WHERE b.CompanyNo='.$co.' and Month(Date)<='.$reportmonth.' group by ca.AccountID, b.BranchNo having Balance<>0';
 }
 // echo $sql0.'<br>'.$reportmonth.'<br>'.$closedmonth; break;
 $stmt=$link->prepare($sql0);

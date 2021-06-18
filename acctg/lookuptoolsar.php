@@ -104,7 +104,7 @@ $stmt=$link->prepare($sql0); $stmt->execute();
     
 if (in_array($whichqry,array('BadDebts','ARGrowthandSummary')))
 { $sql0='CREATE TEMPORARY TABLE `BadDebts` AS
-SELECT `BranchNo` AS `BranchNo`, TRUNCATE(SUM(Amount), 2) AS `BadDebts` FROM `acctg_0unialltxns` WHERE AccountID IN (932,202) GROUP BY `BranchNo`;';
+SELECT `BranchNo` AS `BranchNo`, TRUNCATE(SUM(Amount), 2) AS `BadDebts` FROM `'.$currentyr.'_static`.`acctg_0unialltxns` WHERE AccountID IN (932,202) GROUP BY `BranchNo`;';
  $stmt=$link->prepare($sql0); $stmt->execute();}
    
 $hidecount=true;

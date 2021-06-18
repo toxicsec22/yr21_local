@@ -15,7 +15,7 @@ $sql0='DROP TABLE IF EXISTS `'.$currentyr.'_static`.`acctg_deptvalues`;'; $stmt=
     $sql0is=$sql0is.', FORMAT(IFNULL(SUM(case when Month(Date)='.$monthcol.' then `Amount` end)*ca.NormBal,0)*IF(ContraAccountOf<>0,(-1),1),0) as `'.$monthname.'`';
    $sqlvalues=$sqlvalues.', (IFNULL(SUM(case when Month(Date)='.$monthcol.' then `Amount` end),0)) as `'.$monthcol.'`';
    }
-   $sql0is='CREATE TABLE `'.$currentyr.'_static`.`acctg_deptvalues` as SELECT d.department AS Department, ca.DeptID, ca.AccountID, FORMAT(IFNULL(SUM(`Amount`),0)*ca.NormBal*IF(ContraAccountOf<>0,(-1),1),0) as `Year`, (IFNULL(SUM(`Amount`),0)) as `YearValue` '.$sql0is.$sqlvalues.',  ca.NormBal FROM `acctg_0unialltxns` fs JOIN acctg_1chartofaccounts ca on ca.AccountID=fs.AccountID JOIN  `1departments` d ON d.deptid=ca.DeptID where ca.AccountType BETWEEN 200 AND 249 '.$deptcondition.' GROUP BY fs.AccountID, ca.DeptID;';
+   $sql0is='CREATE TABLE `'.$currentyr.'_static`.`acctg_deptvalues` as SELECT d.department AS Department, ca.DeptID, ca.AccountID, FORMAT(IFNULL(SUM(`Amount`),0)*ca.NormBal*IF(ContraAccountOf<>0,(-1),1),0) as `Year`, (IFNULL(SUM(`Amount`),0)) as `YearValue` '.$sql0is.$sqlvalues.',  ca.NormBal FROM `'.$currentyr.'_static`.`acctg_0unialltxns` fs JOIN acctg_1chartofaccounts ca on ca.AccountID=fs.AccountID JOIN  `1departments` d ON d.deptid=ca.DeptID where ca.AccountType BETWEEN 200 AND 249 '.$deptcondition.' GROUP BY fs.AccountID, ca.DeptID;';
       
 //echo $sql0is.'<br>'.$reportmonth.'<br>'.$closedmonth; break;
 // print_r ($months); break;

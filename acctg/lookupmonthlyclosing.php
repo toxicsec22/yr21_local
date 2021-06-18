@@ -136,7 +136,7 @@ $month=$_POST['month'];
 
 $title='Totals for Closing for '.strtoupper(date('F',strtotime(''.$currentyr.'-'.$month.'-1')));
 if (($month>substr($_SESSION['nb4A'],5,2)) OR (($month==1) AND (date('Y')<>substr($_SESSION['nb4A'],0,4)))){
-   $table='`acctg_0unialltxns`'; $reportmonth=(date('Y')<>substr($_SESSION['nb4A'],0,4)?13:date('m')); $whichdata='withcurrent'; require('maketables/makefixedacctgdata.php');
+   $table='`'.$currentyr.'_static`.`acctg_0unialltxns`'; $reportmonth=(date('Y')<>substr($_SESSION['nb4A'],0,4)?13:date('m')); $whichdata='withcurrent'; require('maketables/makefixedacctgdata.php');
 } else {$table='`' . $currentyr . '_static`.`acctg_unialltxns`';}
 
 $sql0='Create temporary table acctg_endvalues(
@@ -253,7 +253,7 @@ $sql='SELECT  tm.TxnID, Date as DateOUT,`btm`.`Branch` AS `FromBranch`, bts.Bran
 //MONTH(tm.Date)='.$_REQUEST[$fieldname].' AND
 
 $columnnames=array('DateOUT','FromBranch','ClientBranch','Particulars','Amount','DateIN');
-$coltototal='Amount'; $txnidname='TxnID';$showgrandtotal=true;
+$coltototal='Amount'; $txnid='TxnID';$showgrandtotal=true;
 $filetoopen='addeditclientside'; $w='Interbranch';
 $editprocess=$filetoopen.'.php?w='.$w.'&TxnID=';$editprocesslabel='Lookup';   
     include('../backendphp/layout/displayastable.php');

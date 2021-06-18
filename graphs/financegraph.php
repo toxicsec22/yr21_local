@@ -131,7 +131,7 @@ $sqlunion='CREATE TEMPORARY TABLE gen_info_1financereportsUNION AS ';
 		$i=(strlen($i)<>2?'0'.$i:$i);
 		
 		//Expenses
-		$sqle='select ifnull(truncate(sum(Amount),2),0) as Expenses from acctg_1chartofaccounts ca join acctg_0unialltxns ut on ut.AccountID=ca.AccountID join 1branches b on b.BranchNo=ut.BranchNo where '.$conditions.' AND AccountType in (210,200,201,220,230,150,240,250)  AND month(Date)='.$i.' '; //echo $sql0.'<br>';
+		$sqle='select ifnull(truncate(sum(Amount),2),0) as Expenses from acctg_1chartofaccounts ca join '.$currentyr.'_static.acctg_0unialltxns ut on ut.AccountID=ca.AccountID join 1branches b on b.BranchNo=ut.BranchNo where '.$conditions.' AND AccountType in (210,200,201,220,230,150,240,250)  AND month(Date)='.$i.' '; //echo $sql0.'<br>';
 		// echo $sqle; exit();
 		$stmte=$link->query($sqle); $rese=$stmte->fetch();
 		if($stmte->rowCount()==0){
@@ -141,7 +141,7 @@ $sqlunion='CREATE TEMPORARY TABLE gen_info_1financereportsUNION AS ';
 		}
 		
 		//GrossProfit
-		$sqlgp='select ifnull(truncate(sum(Amount*-1),2),0) as GrossProfit from acctg_1chartofaccounts ca join acctg_0unialltxns ut on ut.AccountID=ca.AccountID join 1branches b on b.BranchNo=ut.BranchNo where '.$conditions.' AND (AccountType=100 or AccountType=101 or ut.AccountID=810) AND month(Date)='.$i.' '; //echo $sql0.'<br>';
+		$sqlgp='select ifnull(truncate(sum(Amount*-1),2),0) as GrossProfit from acctg_1chartofaccounts ca join '.$currentyr.'_static.acctg_0unialltxns ut on ut.AccountID=ca.AccountID join 1branches b on b.BranchNo=ut.BranchNo where '.$conditions.' AND (AccountType=100 or AccountType=101 or ut.AccountID=810) AND month(Date)='.$i.' '; //echo $sql0.'<br>';
 		// echo $sqlold; exit();
 		$stmtgp=$link->query($sqlgp); $resgp=$stmtgp->fetch();
 		if($stmtgp->rowCount()==0){
@@ -151,7 +151,7 @@ $sqlunion='CREATE TEMPORARY TABLE gen_info_1financereportsUNION AS ';
 		}
 		
 		//NetSales
-		$sqlns='select ifnull(truncate(sum(Amount*-1),2),0) as NetSales from acctg_1chartofaccounts ca join acctg_0unialltxns ut on ut.AccountID=ca.AccountID join 1branches b on b.BranchNo=ut.BranchNo where  '.$conditions.' AND (AccountType=100 or ut.AccountID=810) AND month(Date)='.$i.' '; //echo $sql0.'<br>';
+		$sqlns='select ifnull(truncate(sum(Amount*-1),2),0) as NetSales from acctg_1chartofaccounts ca join '.$currentyr.'_static.acctg_0unialltxns ut on ut.AccountID=ca.AccountID join 1branches b on b.BranchNo=ut.BranchNo where  '.$conditions.' AND (AccountType=100 or ut.AccountID=810) AND month(Date)='.$i.' '; //echo $sql0.'<br>';
 		// echo $sqlold; exit();
 		$stmtns=$link->query($sqlns); $resns=$stmtns->fetch();
 		if($stmtns->rowCount()==0){
@@ -161,7 +161,7 @@ $sqlunion='CREATE TEMPORARY TABLE gen_info_1financereportsUNION AS ';
 		}
 		
 		//COGS
-		$sqlcogs='select ifnull(truncate(sum(Amount),2),0) as COGS from acctg_1chartofaccounts ca join acctg_0unialltxns ut on ut.AccountID=ca.AccountID join 1branches b on b.BranchNo=ut.BranchNo where  '.$conditions.' AND AccountType=101 AND month(Date)='.$i.' '; //echo $sql0.'<br>';
+		$sqlcogs='select ifnull(truncate(sum(Amount),2),0) as COGS from acctg_1chartofaccounts ca join '.$currentyr.'_static.acctg_0unialltxns ut on ut.AccountID=ca.AccountID join 1branches b on b.BranchNo=ut.BranchNo where  '.$conditions.' AND AccountType=101 AND month(Date)='.$i.' '; //echo $sql0.'<br>';
 		// echo $sqlold; exit();
 		$stmtcogs=$link->query($sqlcogs); $rescogs=$stmtcogs->fetch();
 		if($stmtcogs->rowCount()==0){
@@ -172,7 +172,7 @@ $sqlunion='CREATE TEMPORARY TABLE gen_info_1financereportsUNION AS ';
 		
 		
 		//Table Union
-		$sqlunion.='SELECT '.$i.' AS MonthNo,1 as type,1 as typename, ifnull(sum(ut.Amount),0) AS total FROM 1branches b left join acctg_0unialltxns ut on ut.BranchNo=b.BranchNo left join acctg_1chartofaccounts ca  on ca.AccountID=ut.AccountID  where '.$conditions.' AND AccountType in (210,200,201,220,230,150,240,250) AND month(ut.Date)='.$i.' UNION SELECT '.$i.' AS MonthNo,2 as type,2 as typename, ifnull(sum(ut.Amount*-1),0) AS total FROM 1branches b left join acctg_0unialltxns ut on ut.BranchNo=b.BranchNo left join acctg_1chartofaccounts ca  on ca.AccountID=ut.AccountID  where '.$conditions.' AND (AccountType=100 or AccountType=101 or ut.AccountID=810) AND month(ut.Date)='.$i.' UNION SELECT '.$i.' AS MonthNo,3 as type,3 as typename, ifnull(sum(ut.Amount*-1),0) AS total FROM 1branches b left join acctg_0unialltxns ut on ut.BranchNo=b.BranchNo left join acctg_1chartofaccounts ca  on ca.AccountID=ut.AccountID  where '.$conditions.' AND (AccountType=100 or ut.AccountID=810) AND month(ut.Date)='.$i.' UNION SELECT '.$i.' AS MonthNo,4 as type,4 as typename, ifnull(sum(ut.Amount),0) AS total FROM 1branches b left join acctg_0unialltxns ut on ut.BranchNo=b.BranchNo left join acctg_1chartofaccounts ca  on ca.AccountID=ut.AccountID  where '.$conditions.' AND AccountType=101 AND month(ut.Date)='.$i.' UNION SELECT '.$i.' AS MonthNo,5 as type,5 as typename, ifnull(sum(`'.$i.'`),0) AS total FROM 1branches b left join acctg_1yearsalestargets yst on yst.branchno=b.BranchNo where '.$conditions.' AND `'.$i.'`= `'.$i.'` UNION ';
+		$sqlunion.='SELECT '.$i.' AS MonthNo,1 as type,1 as typename, ifnull(sum(ut.Amount),0) AS total FROM 1branches b left join '.$currentyr.'_static.acctg_0unialltxns ut on ut.BranchNo=b.BranchNo left join acctg_1chartofaccounts ca  on ca.AccountID=ut.AccountID  where '.$conditions.' AND AccountType in (210,200,201,220,230,150,240,250) AND month(ut.Date)='.$i.' UNION SELECT '.$i.' AS MonthNo,2 as type,2 as typename, ifnull(sum(ut.Amount*-1),0) AS total FROM 1branches b left join '.$currentyr.'_static.acctg_0unialltxns ut on ut.BranchNo=b.BranchNo left join acctg_1chartofaccounts ca  on ca.AccountID=ut.AccountID  where '.$conditions.' AND (AccountType=100 or AccountType=101 or ut.AccountID=810) AND month(ut.Date)='.$i.' UNION SELECT '.$i.' AS MonthNo,3 as type,3 as typename, ifnull(sum(ut.Amount*-1),0) AS total FROM 1branches b left join '.$currentyr.'_static.acctg_0unialltxns ut on ut.BranchNo=b.BranchNo left join acctg_1chartofaccounts ca  on ca.AccountID=ut.AccountID  where '.$conditions.' AND (AccountType=100 or ut.AccountID=810) AND month(ut.Date)='.$i.' UNION SELECT '.$i.' AS MonthNo,4 as type,4 as typename, ifnull(sum(ut.Amount),0) AS total FROM 1branches b left join '.$currentyr.'_static.acctg_0unialltxns ut on ut.BranchNo=b.BranchNo left join acctg_1chartofaccounts ca  on ca.AccountID=ut.AccountID  where '.$conditions.' AND AccountType=101 AND month(ut.Date)='.$i.' UNION SELECT '.$i.' AS MonthNo,5 as type,5 as typename, ifnull(sum(`'.$i.'`),0) AS total FROM 1branches b left join acctg_1yearsalestargets yst on yst.branchno=b.BranchNo where '.$conditions.' AND `'.$i.'`= `'.$i.'` UNION ';
 		
 	}
 	$sqlunion=substr($sqlunion, 0, -6);

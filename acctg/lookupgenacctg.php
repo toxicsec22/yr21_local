@@ -392,7 +392,7 @@ case 'SendCurrtoClosing':
     $currmonth=((((date('m',strtotime($_SESSION['nb4A'])))==12)?0:(date('m',strtotime($_SESSION['nb4A']))))+1); 
     $whichdata='withcurrent'; $month=$currmonth; $reportmonth=$currmonth; require ('maketables/makefixedacctgdata.php');
   $sql0='CREATE TEMPORARY TABLE `acctg_endvalues` as 
-Select BranchNo,AccountID,truncate(sum(Amount),2) as `Balance` from `acctg_0unialltxns` uni WHERE `AccountID` IN (100,135,205,206,330,405,501,502,503,504,505,507,508,512) AND Month(Date)<='.$currmonth.' GROUP BY AccountID, BranchNo ';
+Select BranchNo,AccountID,truncate(sum(Amount),2) as `Balance` from `'.$currentyr.'_static`.`acctg_0unialltxns` uni WHERE `AccountID` IN (100,135,205,206,330,405,501,502,503,504,505,507,508,512) AND Month(Date)<='.$currmonth.' GROUP BY AccountID, BranchNo ';
     $stmt=$link->prepare($sql0); $stmt->execute();
     // first update existing data
         $stmt=$link->prepare('UPDATE `closing_2closemain` cm 

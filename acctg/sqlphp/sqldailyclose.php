@@ -9,7 +9,7 @@ $sql0='CREATE TABLE `acctg_dailyclose_1uniforendapar'.$_SESSION['(ak0)'].'` AS
         `uni`.`AccountID` AS `AccountID`,
         "EndBal" AS `DataFrom`
     FROM
-        `acctg_0unialltxns` `uni`
+        `'.$currentyr.'_static`.`acctg_0unialltxns` `uni`
     WHERE
         (((`uni`.`AccountID` >= 200)
             AND (`uni`.`AccountID` <= 202))

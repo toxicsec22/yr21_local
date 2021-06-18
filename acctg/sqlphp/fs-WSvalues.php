@@ -26,7 +26,7 @@ foreach ($months as $fsmonth){
       $sqlvalues=$sqlvalues.', (IFNULL(SUM(case when Month(Date)='.$monthcol.' then `Amount` end),0)) as `'.$monthcol.'`';
     }
    require ('maketables/makefixedacctgdata.php');
-   $sql0is='CREATE TEMPORARY TABLE `'.$currentyr.'_static`.`acctg_wsvalues` as SELECT b.BranchNo,b.Branch,ca.AccountID, 0 as `BegValue`, 0 as `Beginning`, FORMAT(IFNULL(SUM(`Amount`),0),2) as `Year`, (IFNULL(SUM(`Amount`),0)) as `YearValue` '.$sql0is.$sqlvalues.',  ca.NormBal FROM `acctg_0unialltxns` fs JOIN acctg_1chartofaccounts ca on ca.AccountID=fs.AccountID JOIN `acctg_1accounttype` at on ca.AccountType=at.AccountType JOIN `1branches` b on b.BranchNo=fs.BranchNo '.$book.$sqlgroupby;
+   $sql0is='CREATE TEMPORARY TABLE `'.$currentyr.'_static`.`acctg_wsvalues` as SELECT b.BranchNo,b.Branch,ca.AccountID, 0 as `BegValue`, 0 as `Beginning`, FORMAT(IFNULL(SUM(`Amount`),0),2) as `Year`, (IFNULL(SUM(`Amount`),0)) as `YearValue` '.$sql0is.$sqlvalues.',  ca.NormBal FROM `'.$currentyr.'_static`.`acctg_0unialltxns` fs JOIN acctg_1chartofaccounts ca on ca.AccountID=fs.AccountID JOIN `acctg_1accounttype` at on ca.AccountType=at.AccountType JOIN `1branches` b on b.BranchNo=fs.BranchNo '.$book.$sqlgroupby;
       
 } //echo $sql0is;break;
 $stmt=$link->prepare($sql0is);$stmt->execute();
