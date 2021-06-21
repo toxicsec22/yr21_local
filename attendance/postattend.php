@@ -40,7 +40,7 @@ case 4: //set restday
 	$sql='UPDATE `attend_2attendance` SET LeaveNo=18, HRTS=Now(), HREncby='.$_SESSION['(ak0)'].' where DateToday>=\''.$attenddate.'\' '.$condifuture.' AND IDNo='.$_POST['IDNo'];
         $stmt=$link->prepare($sql); $stmt->execute(); 
         // set restdays
-       if($_POST['set']==' Set Sat AND Sun as Restdays/RWS '){ 
+       if($_POST['set']==' Set Sat as RWS AND Sun as Restdays '){ 
            $sql0='SELECT WithSat FROM `1employees` WHERE IDNo='.$_POST['IDNo'].' AND WithSat=0'; //choose which have 2 restdays
            $stmt0=$link->query($sql0); 
            if($stmt0->rowCount()>0){ 
@@ -57,7 +57,8 @@ case 5: //set shift
     $attenddate=$_REQUEST['attenddate']; 
     $shift=in_array($_POST['Shift'],array(7,8,9))?$_POST['Shift']:8;
 
-    $sql='UPDATE `attend_2attendance` a JOIN attend_2attendancedates ad ON `a`.DateToday = `ad`.DateToday JOIN attend_30currentpositions p ON a.IDNo=p.IDNo SET a.Shift='.$shift.', HRTS=Now(), HREncby='.$_SESSION['(ak0)'].' WHERE a.DateToday>=\''.$attenddate.'\' AND `ad`.Posted=0 AND a.IDNo='.$_POST['IDNo'].' AND FIND_IN_SET(PositionID,(SELECT AllowedPos FROM permissions_2allprocesses WHERE ProcessID=6361))'; 
+    $sql='UPDATE `attend_2attendance` a JOIN attend_2attendancedates ad ON `a`.DateToday = `ad`.DateToday JOIN attend_30currentpositions p ON a.IDNo=p.IDNo SET a.Shift='.$shift.', ShiftTS=Now(), ShiftByNo='.$_SESSION['(ak0)'].' WHERE a.DateToday>=\''.$attenddate.'\' AND `ad`.Posted=0 AND a.IDNo='.$_POST['IDNo'].' AND FIND_IN_SET(PositionID,(SELECT AllowedPos FROM permissions_2allprocesses WHERE ProcessID=6361))'; 
+    // echo $sql; exit();
     $stmt=$link->prepare($sql); $stmt->execute();
     header("Location:encodeattend.php?w=SetRestday&IDNo=".$_POST['IDNo']); exit;
     break;

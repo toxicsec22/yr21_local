@@ -657,7 +657,7 @@ case 'SetShiftByDept':
 			else { $shiftstart=date('Y-m-d',strtotime('tomorrow')); }
 		}
 
-		$sql='UPDATE `attend_2attendance` a JOIN attend_2attendancedates ad ON `a`.DateToday = `ad`.DateToday JOIN attend_30currentpositions p ON a.IDNo=p.IDNo SET a.Shift='.$shift.', HRTS=Now(), HREncby='.$_SESSION['(ak0)'].' WHERE (`a`.DateToday BETWEEN \''.$shiftstart.'\' AND \''.$_POST['eDate'].'\')  AND `ad`.Posted=0  AND a.IDNo='.$_POST['IDNo'].' AND FIND_IN_SET(PositionID,(SELECT AllowedPos FROM permissions_2allprocesses WHERE ProcessID=6361))'; 
+		$sql='UPDATE `attend_2attendance` a JOIN attend_2attendancedates ad ON `a`.DateToday = `ad`.DateToday JOIN attend_30currentpositions p ON a.IDNo=p.IDNo SET a.Shift='.$shift.', ShiftTS=Now(), ShiftByNo='.$_SESSION['(ak0)'].' WHERE (`a`.DateToday BETWEEN \''.$shiftstart.'\' AND \''.$_POST['eDate'].'\')  AND `ad`.Posted=0  AND a.IDNo='.$_POST['IDNo'].' AND FIND_IN_SET(PositionID,(SELECT AllowedPos FROM permissions_2allprocesses WHERE ProcessID=6361))'; 
 		$stmt=$link->prepare($sql); $stmt->execute();	
 	   
 		if($_POST['editby']=='sreport'){
