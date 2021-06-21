@@ -16,7 +16,7 @@ switch ($which){
        
         $sqlmain='SELECT a.*,concat(FirstName,\' \',SurName) as `FullName`, OTType, IF(OTApproval=2,"Pre-approved",IF(OTApproval=1,"HR Approved","")) AS OT_Approval FROM attend_45lookupattend a JOIN `1employees` e ON e.IDNo=a.IDNo LEFT JOIN attend_0ottype ot ON ot.OTTypeNo=a.OTTypeNo ';
 		
-		$sql=$sqlmain.' WHERE (TimeIn IS NULL) AND DateToday=CURDATE() AND LeaveNo NOT IN (10,14,15,16,19,22,31,32) ORDER BY Branch, FullName ASC';
+		$sql=$sqlmain.' WHERE (TimeIn IS NULL) AND DateToday=CURDATE() AND LeaveNo NOT IN (10,14,15,16,19,22,31,32,25) ORDER BY Branch, FullName ASC';
         $columnnames=array('DateToday', 'IDNo', 'FullName','RemarksDept','RemarksHR', 'Branch'); $width='60%';
         include('../backendphp/layout/displayastable.php'); 
 		
