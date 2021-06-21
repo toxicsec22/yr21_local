@@ -300,7 +300,7 @@ $sql0='CREATE TEMPORARY TABLE unpaidtxfr AS '
         . ' Order by DateIN, Particulars ';
 $link->query($sql0); 
 
-$sqlbranches='SELECT ClientBranchNo FROM `unpaidtxkfr` group by ClientBranchNo';
+$sqlbranches='SELECT ClientBranchNo FROM `unpaidtxfr` group by ClientBranchNo';
 $stmt=$link->query($sqlbranches);  $resultbranches=$stmt->fetchAll();
 
 foreach ($resultbranches as $branch){
