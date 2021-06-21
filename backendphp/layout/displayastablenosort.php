@@ -81,7 +81,7 @@ if(isset($changecolorfield)){
 	$total=(isset($coltototal)?$total+$rows[$coltototal]:0);  
         $textfordisplay=$textfordisplay.((key($rows)!=$keyoflast)?"":(isset($formprocess)?'<td><form action="'.$formprocess.'">'.$formprocessfields.'<input type=hidden name='.$txnid.' value='.$rows[$txnidname].'><input type=submit name=submit value="'.$submitlabel.'"></form></td>':'')
 
-        .((isset($editprocess) AND 1==(!isset($rows['showeditprocess'])?1:$rows['showeditprocess']))?'<td><a href="'.$editprocess.$rows[$txnidname].(isset($addlfield)?'&'.$addlfield.'='.$rows[$addlfield]:'').' '.(isset($editprocessonclick)?$editprocessonclick:'').'">'.$editprocesslabel.'</a></td>':(!isset($rows['showeditprocess'])?'':'<td></td>'))
+        .((isset($editprocess) AND 1==(!isset($rows['showeditprocess'])?1:$rows['showeditprocess']))?'<td><a href="'.$editprocess.$rows[$txnidname].'&action_token='.$_SESSION['action_token'].(isset($addlfield)?'&'.$addlfield.'='.$rows[$addlfield]:'').' '.(isset($editprocessonclick)?$editprocessonclick:'').'">'.$editprocesslabel.'</a></td>':(!isset($rows['showeditprocess'])?'':'<td></td>'))
 
 	// .(isset($editprocess)?'<td><a href="'.$editprocess.$rows[$txnidname].(isset($addlfield)?'&'.$addlfield.'='.$rows[$addlfield]:'').'" '.(isset($editprocessonclick)?$editprocessonclick:'').'>'.$editprocesslabel.'</a></td>':'')
 	
