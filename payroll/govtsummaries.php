@@ -202,6 +202,7 @@ if($exporton==1){
    foreach($result as $rowexport){
       $piexportdetails.=mb_str_pad('DT'.str_replace('-','',$rowexport['PagIbigNo']),'29','~',STR_PAD_RIGHT).mb_str_pad($rowexport['SurName'],30,'~',STR_PAD_RIGHT).mb_str_pad($rowexport['FirstName'],30,'~',STR_PAD_RIGHT).mb_str_pad($rowexport['MI'],30,'~',STR_PAD_RIGHT).mb_str_pad(number_format(($paytype=='MC'?$rowexport['PagIbig-EE']:$rowexport['PagibigLoan']),2),13,'0',STR_PAD_LEFT).mb_str_pad(number_format(($paytype=='MC'?$rowexport['PagIbig-ER']:0),2),13,'0',STR_PAD_LEFT).str_repeat('~',15).$rowexport['Bdate'].PHP_EOL;
    }
+   $piexportdetails=substr($piexportdetails, 0, -1);
 }
     
    foreach($columntotals as $total){ 
@@ -212,7 +213,7 @@ if($exporton==1){
 $govtdata='<table>'.'<thead><tr><td colspan="'.$colcount.'">'.$titlepercompany.'</td></tr><tr>'.$tabletitle.'</tr></thead><tbody>'.$tabledata.'</tbody><tfoot><tr><td colspan="'.$colcount.'"> Totals '.str_repeat('&nbsp',5).$govttotals.'</td></tr></tfoot></table><br><br>';
 if($exporton==1){
    //to change/
-   $piexportheader=strtoupper(mb_str_pad('EH'.mb_str_pad($co['PBranchCode'],2,0,STR_PAD_LEFT).''.$co['PayDate'].''.$co[$cogovtno],25,'~',STR_PAD_RIGHT).mb_str_pad('P'.$paytype.''.$co['CompanyName'],103,'~',STR_PAD_RIGHT).mb_str_pad('X',100,'~',STR_PAD_RIGHT).mb_str_pad('1634~~~77512213','22','~',STR_PAD_RIGHT)).PHP_EOL;
+   $piexportheader=strtoupper(mb_str_pad('EH'.mb_str_pad($co['PBranchCode'],2,0,STR_PAD_LEFT).''.$co['PayDate'].''.$co[$cogovtno],25,'~',STR_PAD_RIGHT).mb_str_pad('P'.$paytype.''.$co['CompanyName'],103,'~',STR_PAD_RIGHT).mb_str_pad('HSS Tower 1 BGC Taguig',100,'~',STR_PAD_RIGHT).mb_str_pad('1634~~~77512213','22','~',STR_PAD_RIGHT)).PHP_EOL;
    $filename='HMDF_'.$co['Company'].'_'.date('ymd').'_'.$paytype.'.mcl';
    
 
