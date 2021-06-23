@@ -4,6 +4,13 @@ if (!allowedToOpen(800,'1rtc')) {   echo 'No permission'; exit;}
 $showbranches=false;
 if(!isset($_REQUEST['print'])){ include_once('../switchboard/contents.php');}
 $link=!isset($link)?connect_db($currentyr.'_1rtc',0):$link;
+
+function mb_str_pad( $texto, $longitud, $relleno = '', $tipo_pad = STR_PAD_RIGHT, $codificacion = null ){ 
+   $diff = empty( $codificacion ) ? ( strlen( $texto ) - mb_strlen( $texto )) : ( strlen( $texto ) - mb_strlen( $texto, $codificacion ) ); 
+   return str_pad( $texto, ($longitud + $diff), $relleno, $tipo_pad ); 
+}
+
+
 ?>
 <html>
 <head>
@@ -39,6 +46,7 @@ if(!isset($_REQUEST['print'])){
 <form method='post' action='#' enctype='multipart/form-data'>
     Lookup for Payroll ID<input type='text' name='payrollid' list='payperiods' autocomplete='off' value='<?php echo $payrollid?>'>
     <input type='submit' name='submit' value='Lookup'>
+    </form>
 <?php
 	}
 include_once '../generalinfo/lists.inc';
@@ -53,7 +61,7 @@ echo '<br/><br style="line-height:50px;" /><h4>From Payroll '.$_SESSION['payroll
 
 
 
-
+$exporton=0;
      switch ($whichqry){
       case 'SSS':
          $reportname='SSS Summary for ';
@@ -84,6 +92,10 @@ echo '<br/><br style="line-height:50px;" /><h4>From Payroll '.$_SESSION['payroll
          $columnnames=array('SurName','FirstName','MI','RecordInBranch','PagIbigNo','PagIbig-EE','PagIbig-ER','PagIbigTotal');
          $sqlsumfirst='SELECT `Company`, Round(Sum(`PagIbig-EE`),2) as PagIbigEE,Round(Sum(`PagIbig-ER`),2) as PagIbigER,Sum(`PagIbigTotal`) as PagIbigTotal FROM payroll_42pagibig WHERE PayrollID='.$_SESSION['payrollidses'];
          $columntotals=array('PagIbigEE','PagIbigER','PagIbigTotal');
+
+         
+         $exporton=1;
+         $paytype='MC';
       break;
    case 'WTax':
       $reportname='Withholding Tax Summary for ';
@@ -120,6 +132,9 @@ echo '<br/><br style="line-height:50px;" /><h4>From Payroll '.$_SESSION['payroll
          $columnnames=array('SurName','FirstName','MI','RecordInBranch','PagIbigNo','PagibigLoan');
          $sqlsumfirst='SELECT `Company`, Round(Sum(`PagibigLoan`),2) as PagibigLoan FROM payroll_45pagibigloan WHERE PayrollID='.$_SESSION['payrollidses'];
          $columntotals=array('PagibigLoan');
+
+         $exporton=1;
+         $paytype='ST';
       break;
    case 'PagIbigLoansCalamity':
          $reportname='PagIbigLoans-Calamity Summary for ';
@@ -129,11 +144,19 @@ echo '<br/><br style="line-height:50px;" /><h4>From Payroll '.$_SESSION['payroll
          $columnnames=array('SurName','FirstName','MI','RecordInBranch','PagIbigNo','PagibigLoan');
          $sqlsumfirst='SELECT `Company`, Round(Sum(`PagibigLoan`),2) as PagibigLoan FROM payroll_45pagibigloancalamity WHERE PayrollID='.$_SESSION['payrollidses'];
          $columntotals=array('PagibigLoan');
+
+         $exporton=1;
+         $paytype='CL';
       break;
      }
-if (allowedToOpen(800,'1rtc')){ $sqlcompanies='SELECT * from `1companies` WHERE Active=1';}
+     $paydatesql='';
+     if($exporton==1){
+         $paydatesql=',(SELECT CONCAT(YEAR(PayrollDate),LPAD(MONTH(PayrollDate),2,0)) FROM payroll_1paydates WHERE PayrollID='.$_SESSION['payrollidses'].') AS PayDate';
+     }
+
+if (allowedToOpen(800,'1rtc')){ $sqlcompanies='SELECT *'.$paydatesql.' from `1companies` WHERE Active=1';}
 else { 
-     $sqlcompanies='SELECT c.* from `1companies` c WHERE Active=1 ';}
+     $sqlcompanies='SELECT c.*'.$paydatesql.' from `1companies` c WHERE Active=1';}
      
 //$sqlcompanies='SELECT * from `1companies` WHERE Active=1';
 $stmtcompanies=$link->query($sqlcompanies);
@@ -166,18 +189,47 @@ $records=$records+1;
    foreach($columnnames as $col){
       $tabledata=$tabledata.'<td>'.$row[$col].'</td>';
    }
+
    $tabledata=$tabledata.'</tr>';
+
+  
+}
+if($exporton==1){
+   $piexportdetails='';
+
+   foreach($result as $rowexport){
+      $piexportdetails.=mb_str_pad('DT'.str_replace('-','',$rowexport['PagIbigNo']),'29','~',STR_PAD_RIGHT).mb_str_pad($rowexport['SurName'],30,'~',STR_PAD_RIGHT).mb_str_pad($rowexport['FirstName'],30,'~',STR_PAD_RIGHT).mb_str_pad($rowexport['MI'],30,'~',STR_PAD_RIGHT).mb_str_pad(number_format(($paytype=='MC'?$rowexport['PagIbig-EE']:$rowexport['PagibigLoan']),2),13,'0',STR_PAD_LEFT).mb_str_pad(number_format(($paytype=='MC'?$rowexport['PagIbig-ER']:0),2),13,'0',STR_PAD_LEFT).str_repeat('~',15).$rowexport['Bdate'].PHP_EOL;
+   }
 }
     
    foreach($columntotals as $total){ 
     $govttotals=$govttotals.$total.' : '.number_format($resultsum[$total],2).str_repeat('&nbsp;',8);
 
 }
+
 $govtdata='<table>'.'<thead><tr><td colspan="'.$colcount.'">'.$titlepercompany.'</td></tr><tr>'.$tabletitle.'</tr></thead><tbody>'.$tabledata.'</tbody><tfoot><tr><td colspan="'.$colcount.'"> Totals '.str_repeat('&nbsp',5).$govttotals.'</td></tr></tfoot></table><br><br>';
+if($exporton==1){
+   //to change/
+   $piexportheader=strtoupper(mb_str_pad('EH'.mb_str_pad($co['PBranchCode'],2,0,STR_PAD_LEFT).''.$co['PayDate'].''.$co[$cogovtno],25,'~',STR_PAD_RIGHT).mb_str_pad('P'.$paytype.''.$co['CompanyName'],103,'~',STR_PAD_RIGHT).mb_str_pad('X',100,'~',STR_PAD_RIGHT).mb_str_pad('1634~~~77512213','22','~',STR_PAD_RIGHT)).PHP_EOL;
+   $filename='HMDF_'.$co['Company'].'_'.date('ymd').'_'.$paytype.'.mcl';
+   
+
+   $piexport=str_replace('~',' ',$piexportheader.$piexportdetails);
+   ?>
+<form style="display: inline" action='downloadpayrollfile.php' method='post'>
+   <input type='submit' name='download' value='Download'>
+   <input type='hidden' name='fileext' value='mcl'>
+   <input type='hidden' name='payrolldata' value='<?php echo $piexport; ?>'>
+   <input type='hidden' name='filename' value='<?php echo $filename; ?>'>
+</form>
+
+   <?php
+}
+
 echo $govtdata;
 }
 
 end:
      $link=null; $stmt=null;
 ?>
-</form></body></html>
+</body></html>
