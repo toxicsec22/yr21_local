@@ -74,6 +74,8 @@ $exporton=0;
        //  $sqlsumfirst='SELECT `Company`, Round(Sum(`SSS-EE`),2) as SSSEE,Round(Sum(`SSS-ER`),2) as SSSER,Sum(`SSSTotal`) as SSSTotal FROM payroll_40sss WHERE PayrollID='.$_SESSION['payrollidses'];
          $sqlsumfirst='SELECT `Company`, Round(Sum(`SSS-EE`+`SSS-ERTotal`-`EC`-MPFER),2) as SS_Amt, ROUND(Sum(`EC`),0) as EC_Amt, ROUND(Sum(`MPFER`),0) as MPFER_Amt,Sum(`SSSTotal`) as SSSTotal FROM payroll_40sss ss JOIN 1companies c ON c.CompanyNo=ss.CompanyNo WHERE PayrollID='.$_SESSION['payrollidses'];
          $columntotals=array('SS_Amt','EC_Amt','MPFER_Amt','SSSTotal');
+
+         $exportssstoform=1;
       break;
    case 'PHIC':
          $reportname='PHIC Summary for ';
@@ -224,6 +226,10 @@ if($exporton==1){
 </form>
 
    <?php
+}
+
+if($exportssstoform==1){
+   
 }
 
 echo $govtdata;
