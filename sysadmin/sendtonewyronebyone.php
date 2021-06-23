@@ -776,7 +776,7 @@ Select ItemCode, BranchNo, m.`Date` as SoldonDate, Qty from `invty_2sale` m join
     
         $sql0='INSERT INTO `'.$nextyr.'_1rtc`.`acctg_3unpdclientinvlastperiod`
         (`ClientNo`, `Particulars`, `Date`, `Balance`, `ARAccount`, `BranchNo`, `TeamLeader`, `PONo`)
-        SELECT `ClientNo`, `Particulars`, `Date`, truncate(`InvBalance`,2) as `Balance`, `DebitAccountID` as `ARAccount`, `BranchNo`, `TeamLeader`, `PONo` FROM acctg_33qrybalperrecpt where InvBalance>0.1 OR InvBalance<-.1;
+        SELECT `ClientNo`, `Particulars`, `Date`, truncate(`InvBalance`,2) as `Balance`, `DebitAccountID` as `ARAccount`, IF(BranchNo IN (SELECT BranchNo FROM 1branches WHERE Active=0),(SELECT BranchNo FROM 1branches WHERE MovedBranch=bal.BranchNo ORDER BY BranchNo DESC LIMIT 1),BranchNo)AS `BranchNo`, `TeamLeader`, `PONo` FROM acctg_33qrybalperrecpt bal where InvBalance>0.1 OR InvBalance<-.1;
         ';
         $stmt=$link->prepare($sql0); $stmt->execute();
         

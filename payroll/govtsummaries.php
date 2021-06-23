@@ -66,11 +66,11 @@ $exporton=0;
       case 'SSS':
          $reportname='SSS Summary for ';
          $cogovtno='SSSNo';
-         $sqlfirst='SELECT ss.*,b.Branch AS RecordInBranch,`SSS-EE`+`SSS-ERTotal`-EC-MPFER as SS_Amt, EC AS EC_Amt, MPFER AS MPFER_Amt,`Company` FROM payroll_40sss ss JOIN 1companies c ON c.CompanyNo=ss.CompanyNo LEFT JOIN 1branches b ON ss.RecordInBranchNo=b.BranchNo WHERE PayrollID='.$_SESSION['payrollidses'];
+         $sqlfirst='SELECT ss.*,b.Branch AS RecordInBranch,`SSS-EE`+`SSS-ERTotal`-EC-MPFER as SS_Amt, EC AS EC_Amt, MPFER AS MPFER_Amt, FORMAT(SSECMPFCredit,0) AS TotalSalaryCredit,`Company` FROM payroll_40sss ss JOIN 1companies c ON c.CompanyNo=ss.CompanyNo LEFT JOIN 1branches b ON ss.RecordInBranchNo=b.BranchNo WHERE PayrollID='.$_SESSION['payrollidses'];
          
 		 //removed EC and ss amt for easy view
          // $columnnames=array('SurName','FirstName','MI','RecordInBranch','SSSNo','SSS-EE','SSS-ERTotal','EC_Amt','SS_Amt','SSSTotal');
-         $columnnames=array('SurName','FirstName','MI','RecordInBranch','SSSNo','SSS-EE','SSS-ERTotal','SSSTotal');
+         $columnnames=array('SurName','FirstName','MI','RecordInBranch','SSSNo','SSS-EE','SSS-ERTotal','SSSTotal','TotalSalaryCredit');
        //  $sqlsumfirst='SELECT `Company`, Round(Sum(`SSS-EE`),2) as SSSEE,Round(Sum(`SSS-ER`),2) as SSSER,Sum(`SSSTotal`) as SSSTotal FROM payroll_40sss WHERE PayrollID='.$_SESSION['payrollidses'];
          $sqlsumfirst='SELECT `Company`, Round(Sum(`SSS-EE`+`SSS-ERTotal`-`EC`-MPFER),2) as SS_Amt, ROUND(Sum(`EC`),0) as EC_Amt, ROUND(Sum(`MPFER`),0) as MPFER_Amt,Sum(`SSSTotal`) as SSSTotal FROM payroll_40sss ss JOIN 1companies c ON c.CompanyNo=ss.CompanyNo WHERE PayrollID='.$_SESSION['payrollidses'];
          $columntotals=array('SS_Amt','EC_Amt','MPFER_Amt','SSSTotal');

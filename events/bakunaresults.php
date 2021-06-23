@@ -18,24 +18,24 @@ $title='Vaccinated';
 
 $sql0='CREATE TEMPORARY TABLE vaccinated AS
 SELECT BranchorDept, Pseudobranch, SUM(CASE WHEN LGU IS NOT NULL THEN 1 ELSE 0 END) AS Registered,
-SUM(CASE WHEN DateVac1 IS NOT NULL THEN 1 ELSE 0 END) AS Dose1,
-SUM(CASE WHEN DateVac2 IS NOT NULL THEN 1 ELSE 0 END) AS Dose2,
+SUM(CASE WHEN DateVac1 IS NOT NULL AND DateVac1<=CURDATE() THEN 1 ELSE 0 END) AS Dose1,
+SUM(CASE WHEN DateVac2 IS NOT NULL AND DateVac2<=CURDATE() THEN 1 ELSE 0 END) AS Dose2,
 COUNT(cp.IDNo) AS NoofEmployees, IF(`b`.`PseudoBranch` <> 1, cp.BranchNo, cp.deptid+800) AS BranchOrDeptNo
 FROM event_1bakuna ba RIGHT JOIN attend_30currentpositions cp ON ba.IDNo=cp.IDNo
-JOIN 1branches b ON b.BranchNo=cp.BranchNo
+JOIN 1branches b ON b.BranchNo=cp.BranchNo   
 GROUP BY BranchOrDeptNo;';
 $stmt0=$link->prepare($sql0); $stmt0->execute();
 
 $subtitle='Total';
-$columnnames=array('Dose1','Dose2','TotalNoofEmployees','PercentVax');
-$sql='SELECT SUM(Dose1) AS Dose1, SUM(Dose2) AS Dose2, SUM(NoofEmployees) AS TotalNoofEmployees, TRUNCATE((GREATEST(SUM(Dose1),SUM(Dose2))/SUM(NoofEmployees))*100,2) AS PercentVax FROM vaccinated ;';
+$columnnames=array('Dose1','Dose2','TotalNoofEmployees','PercentVaxDose1','PercentVaxDose2');
+$sql='SELECT SUM(Dose1) AS Dose1, SUM(Dose2) AS Dose2, SUM(NoofEmployees) AS TotalNoofEmployees, TRUNCATE(SUM(Dose1)/SUM(NoofEmployees)*100,2) AS PercentVaxDose1, TRUNCATE(SUM(Dose2)/SUM(NoofEmployees)*100,2) AS PercentVaxDose2 FROM vaccinated ;';
 include ('../backendphp/layout/displayastablenosort.php');
 
 echo '<br><br>';
 
-$sql1='SELECT BranchorDept, IF(Dose1=0,"",Dose1) AS Dose1, IF(Dose2=0,"",Dose2) AS Dose2, NoofEmployees, TRUNCATE((GREATEST(Dose1,Dose2)/NoofEmployees)*100,2) AS PercentVax FROM vaccinated WHERE ';
-$sql2=' ORDER BY PercentVax DESC, BranchORDept ASC;';
-$columnnames=array('BranchorDept', 'Dose1','Dose2','NoofEmployees','PercentVax');
+$sql1='SELECT BranchorDept, IF(Dose1=0,"",Dose1) AS Dose1, IF(Dose2=0,"",Dose2) AS Dose2, NoofEmployees, TRUNCATE((Dose1/NoofEmployees)*100,2) AS PercentVaxDose1, TRUNCATE((Dose2/NoofEmployees)*100,2) AS PercentVaxDose2 FROM vaccinated WHERE ';
+$sql2=' ORDER BY PercentVaxDose1 DESC, BranchORDept ASC;';
+$columnnames=array('BranchorDept', 'Dose1','Dose2','NoofEmployees','PercentVaxDose1','PercentVaxDose2');
 $title='';
 $subtitle='Offices';
 $sql=$sql1.'BranchOrDeptNo >= 800'.$sql2;
