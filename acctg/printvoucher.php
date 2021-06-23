@@ -232,6 +232,117 @@ $sub=$subform.'</table><br><div style="float:left">Printed By:  '.$user.str_repe
 $voucher=$main.$sublabels.$sub.'<br>';
 echo '<div id="voucher">'.$voucher.'</div>'; 
       break;
+
+
+
+//JV print added by ryan----------------------------------------------------------------------------------
+CASE 'JV':
+Case 'FutureJV':
+if ($whichqry=='FutureJV'){$table='4future';} else {$table='2'; }
+$fromvch=$_REQUEST['FromVch'];
+$tovch=$_REQUEST['ToVch'];
+$title='JV';
+
+$sqlmain='SELECT m.JVNo, m.Remarks, date_format(Date,\'%b %d, %Y\') AS Date, date_format(JVDate,\'%b %d, %Y\') AS JVDate, ca.ShortAcctID as CreditAccount, e.Nickname as EncodedBy, Sum(s.Amount) as Total FROM `acctg_'.$table.'jvmain` m
+join `acctg_'.$table.'jvsub` s on m.JVNo=s.JVNo
+join acctg_1chartofaccounts ca on ca.AccountID=s.CreditAccountID
+left join `1employees` as e on e.IDNo=m.EncodedByNo
+WHERE m.JVNo>='.$fromvch.' and m.JVNo<='.$tovch.' AND m.Posted=1 group by m.JVNo';
+
+$stmt=$link->query($sqlmain);
+$result=$stmt->fetchAll();
+
+foreach ($result as $mainrow){
+
+      $main='<div align="right"><img src="http://'.$_SERVER['HTTP_HOST'].'/favicon.ico" width="22px" height="22px"><font size="5"><b>1RTC</b></font></div><table width="90%" >
+      <tr><td>Date:  '.$mainrow['Date'].'</td><td>JV No:  <a href="javascript:window.print()">'.$mainrow['JVNo'].'</a></td><td>Remarks: '.$mainrow['Remarks'].'</td></tr>
+</table>';
+      
+
+
+      $sqlsub='SELECT
+      s.*,
+      ca.ShortAcctID AS DebitAccount,
+      e.Nickname AS EncodedBy,
+      Entity AS FromBudgetOf ,
+      ca2.ShortAcctID AS CreditAccount
+   FROM
+      `acctg_2jvsub` s
+      JOIN acctg_1chartofaccounts ca ON ca.AccountID = s.DebitAccountID
+      JOIN acctg_1chartofaccounts ca2 ON ca2.AccountID = s.CreditAccountID
+      LEFT JOIN `1employees` AS e ON s.EncodedByNo = e.IDNo
+      JOIN acctg_1budgetentities be ON be.EntityID = s.FromBudgetOf 
+   WHERE
+      s.JVNo = '.$mainrow['JVNo'].'';
+
+      $stmt=$link->query($sqlsub);
+      $resultsub=$stmt->fetchAll();
+      
+  
+
+      $sqlsubbranch='Select s.BranchNo, b.Branch from `acctg_'.$table.'jvsub` s 
+      join `1branches` b on b.BranchNo=s.BranchNo
+      WHERE s.JVNo='.$mainrow['JVNo'].' group by s.BranchNo Order By b.Branch';
+
+      $stmt=$link->query($sqlsubbranch);
+      $resultsubbranch=$stmt->fetchAll();    
+
+      $sublabels='<table width="80%" class="subtable"><tr>
+      <td width=10%>Branch</td>
+      <td width=10%>Date</td>
+      <td width=10%>FromBudgetOf</td>
+      <td width=30%>Particulars</td>
+   
+      <td width=15%>Debit </td>
+      <td width=10%>Credit</td>
+      <td width=20%>Amount</td></tr>';
+      $sub=''; 
+      foreach ($resultsubbranch as $rowbranch){   
+      $subbranch=
+      '<tr>
+      <td width=10%>'.$rowbranch['Branch'].'</td>
+      </tr>';
+      $subform='';
+      foreach ($resultsub as $row){
+      $subform=$subform.($row['BranchNo']==$rowbranch['BranchNo']?'<tr><td width=10%></td>
+      <td width=10%>'.$row['Date'].'</td>
+      <td width=10%>'.$row['FromBudgetOf'].'</td>
+      <td width=30%>'.$row['Particulars'].'</td>
+   
+     
+      <td width=20%>'.$row['DebitAccount'].'</td>
+      <td width=20%>'.$row['CreditAccount'].'</td>
+      <td width=20%>'.number_format($row['Amount'],2).'</td></tr>':'');
+
+      }
+      $sub=$sub.$subbranch.$subform;
+      } 
+      $sub=$sublabels.$sub.'</table><center>------   NOTHING FOLLOWS  ------</center><br>';
+
+
+      $total='<div style="float:right">Total:  '.number_format($mainrow['Total'],2).str_repeat('&nbsp',7) .'</div><br>' ;
+      $sqlf='SELECT  CONCAT(left(FirstName,1),left(MiddleName,1),left(SurName,1)) as FinanceHeadNickName FROM attend_30currentpositions cp join 1employees e on e.IDNo=cp.IDNo WHERE PositionID=150;';
+      // echo $sqlf; exit();
+      $stmtf=$link->query($sqlf); $resultf=$stmtf->fetch();
+
+      if($stmtf->rowCount()>0){
+      $approvedby=$resultf['FinanceHeadNickName'].'/JYE';
+      } else {
+      $approvedby='';
+      }
+
+      
+      $controllername='';//$resfrompos['Nickname']; TEMPORARILY BLANK
+      $voucher=$main.$sub.'<br>'.$total.'<br><br>
+      <table width="100%">
+      <tr><td width=20%">Prepared By:<br><br></td><td width="20%">Checked By:</td><td width="20%">Approved By:</td><td width="40%" align="right">Received By:__________________________</td>
+      </tr><tr><td>'. $mainrow['EncodedBy'].'</td><td>'. $controllername.'</td><td>'.$approvedby.'</td><td align="right"><font size="1">Signature above printed name</font></td></tr>
+      </table>
+      <br><div style="font-size: smaller;">Printed on '.date('m/d/y h:i:s l').' by '.$user.'</div><br><hr>
+      <br><br><br>';
+      echo '<div id="voucher">'.$voucher.'</div>'; 
+}  
+  break;
     
 }
 noform: 

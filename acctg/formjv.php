@@ -175,6 +175,9 @@ include_once('../backendphp/layout/displayastable.php');
             $editprocesssublabel='Edit'; $editprocesssub='formjv.php?w=Edit'.$form.'Sub&'.$txnidname.'='.$txnid.'&TxnSubId=';
             
             $delprocesssub='..\backendphp\functions\delrecordssub.php?TxnID='.$txnid.'&w='.$subtable.'&l=acctg'.'&TxnSubId=';
+                        
+            $postedprocess='printvoucher.php?w=JV&FromVch='.$txnid.'&ToVch='.$txnid.'"';
+            $postedprocesslabel='Print JV';
             
             include('../backendphp/layout/mainandsubform.php');
             // to show totals
