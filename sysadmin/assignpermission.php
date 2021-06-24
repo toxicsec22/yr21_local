@@ -80,7 +80,7 @@ if (in_array($which,array('ViewSwitchboard','AddPermissionToPage', 'AddNewProgra
 }
 
 if (in_array($which,array('AddPermissionToPage', 'AddNewProgramCommand'))){
-  	$sql0='CREATE TEMPORARY TABLE groupdept AS SELECT p.deptid, d.Department, p.JobLevelID, JobLevelID, p.Position, p.PositionID FROM attend_1positions p JOIN `1departments` d ON d.deptid=p.deptid JOIN `attend_0joblevels` jl ON jl.JobLevelID=p.JobLevelID ORDER BY JobClassNo DESC,jl.JobLevelID DESC;';
+  	$sql0='CREATE TEMPORARY TABLE groupdept AS SELECT p.deptid, d.Department, p.JobLevelID, JobLevelID, p.Position, p.PositionID FROM attend_1positions p JOIN `1departments` d ON d.deptid=p.deptid JOIN `attend_0joblevels` jl ON jl.JobLevelID=p.JobLevelID ORDER BY JobLevelID DESC,jl.JobLevelID DESC;';
   	
 	$stmt=$link->query($sql0);
 	$sql0='SELECT DISTINCTROW deptid AS DeptID, Department FROM groupdept;';

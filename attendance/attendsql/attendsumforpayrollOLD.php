@@ -43,12 +43,12 @@ SELECT
                 THEN
                     IF(REGHOURS(`a`.`TimeIn`,
                                 `a`.`TimeOut`,
-                                `e`.`JobClassNo`,
+                                `e`.`JobLevelID`,
                                 `a`.`Shift`) / 4 > 1,
                         1,
                         REGHOURS(`a`.`TimeIn`,
                                 `a`.`TimeOut`,
-                                `e`.`JobClassNo`,
+                                `e`.`JobLevelID`,
                                 `a`.`Shift`) / 4)
                 WHEN (`a`.`LeaveNo` IN (15)
                         AND DAYOFWEEK(`a`.`DateToday`) = 7 -- Saturdays for new monthly employees
@@ -63,7 +63,7 @@ SELECT
                 THEN
                     REGHOURS(`a`.`TimeIn`,
                             `a`.`TimeOut`,
-                            `e`.`JobClassNo`,
+                            `e`.`JobLevelID`,
                             `a`.`Shift`) / 8
             END),
             0) + IFNULL(SUM(CASE
@@ -73,7 +73,7 @@ SELECT
                 THEN
                     REGHOURS(`a`.`TimeIn`,
                             `a`.`TimeOut`,
-                            `e`.`JobClassNo`,
+                            `e`.`JobLevelID`,
                             `a`.`Shift`) / 8
             END),
             0) + COUNT(IF(`a`.`OvertimeREMOVE` = 3, 1, NULL)) AS `RegDaysActual`,
@@ -82,11 +82,11 @@ SELECT
         IF(`a`.`OvertimeREMOVE` = 4,
             RDOTHOURS(`a`.`TimeIn`,
                     `a`.`TimeOut`,
-                    `e`.`JobClassNo`,
+                    `e`.`JobLevelID`,
                     `a`.`Shift`),
             REGHOURS(`a`.`TimeIn`,
                     `a`.`TimeOut`,
-                    `e`.`JobClassNo`,
+                    `e`.`JobLevelID`,
                     `a`.`Shift`)),
         0)) AS `LegalHrsOT`,
     SUM(IF(`a`.`LeaveNo` = 13
@@ -94,18 +94,18 @@ SELECT
         IF(`a`.`OvertimeREMOVE` = 4,
             RDOTHOURS(`a`.`TimeIn`,
                     `a`.`TimeOut`,
-                    `e`.`JobClassNo`,
+                    `e`.`JobLevelID`,
                     `a`.`Shift`),
             REGHOURS(`a`.`TimeIn`,
                     `a`.`TimeOut`,
-                    `e`.`JobClassNo`,
+                    `e`.`JobLevelID`,
                     `a`.`Shift`)),
         0)) AS `SpecHrsOT`,
     SUM(IF(`a`.`LeaveNo` = 15
             AND `a`.`OvertimeREMOVE` NOT IN (0 ),
         REGHOURS(`a`.`TimeIn`,
                 `a`.`TimeOut`,
-                `e`.`JobClassNo`,
+                `e`.`JobLevelID`,
                 `a`.`Shift`),
         0)) AS `RestHrsOT`,
     SUM(IF(`a`.`LeaveNo` = 15
@@ -116,7 +116,7 @@ SELECT
                     IF(`ot`.`EndOfOT` < `a`.`TimeOut`,
                         `ot`.`EndOfOT`,
                         `a`.`TimeOut`)),
-                `e`.`JobClassNo`,
+                `e`.`JobLevelID`,
                 `a`.`Shift`),
         0)) AS `ExcessRestHrsOT`,
     SUM(IFNULL(`l`.`PaidLegal`, 0)) AS `PaidLegalDays`,

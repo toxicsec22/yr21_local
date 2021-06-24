@@ -38,7 +38,7 @@ JOIN `1employees` e ON r.`EncodedByNo`=e.IDNo
             $multiplier=1.1; //10% above provincial rate
 
 
-			$sql1='CREATE TEMPORARY TABLE storesrate AS SELECT IDNo,TotalMinWage AS EffectiveMinWage,JobClassNo FROM `1_gamit`.`payroll_4wageorders` wo JOIN `effectivedate` ed ON ed.DateEffective=wo.DateEffective AND ed.MinWageAreaID=wo.MinWageAreaID LEFT JOIN `1_gamit`.`payroll_0regionsminwageareas` r ON r.MinWageAreaID=wo.MinWageAreaID LEFT JOIN 1branches b ON b.EffectiveMinWageAreaID=r.MinWageAreaID AND Pseudobranch IN (0,2) JOIN attend_30currentpositions cp ON cp.BranchNo=b.BranchNo WHERE Active="1" AND IDNo IN (SELECT IDNo FROM payroll_ratesforapproval)';
+			$sql1='CREATE TEMPORARY TABLE storesrate AS SELECT IDNo,TotalMinWage AS EffectiveMinWage,JobLevelID FROM `1_gamit`.`payroll_4wageorders` wo JOIN `effectivedate` ed ON ed.DateEffective=wo.DateEffective AND ed.MinWageAreaID=wo.MinWageAreaID LEFT JOIN `1_gamit`.`payroll_0regionsminwageareas` r ON r.MinWageAreaID=wo.MinWageAreaID LEFT JOIN 1branches b ON b.EffectiveMinWageAreaID=r.MinWageAreaID AND Pseudobranch IN (0,2) JOIN attend_30currentpositions cp ON cp.BranchNo=b.BranchNo WHERE Active="1" AND IDNo IN (SELECT IDNo FROM payroll_ratesforapproval)';
       // echo $sql1.'<br><br>';
       $stmt0=$link->prepare($sql1); $stmt0->execute();
       $increaserate=1.1; $steprate=1.1;
@@ -46,9 +46,9 @@ JOIN `1employees` e ON r.`EncodedByNo`=e.IDNo
       
     $sql='SELECT TxnId,r.IDNo,DateofChange,Remarks,FullName,Position,Branch,DorM,IF(DailyORMonthly=0,
 
-    (SELECT TRUNCATE(SalaryStructureDaily(IF((EffectiveMinWage*'.$multiplier.')>=(SELECT NCRRate FROM NCRRate),(SELECT NCRRate FROM NCRRate),(EffectiveMinWage*'.$multiplier.')),JobClassNo,'.$increaserate.','.$steprate.',5),2) FROM storesrate WHERE IDNo=r.IDNo)
+    (SELECT TRUNCATE(SalaryStructureDaily(IF((EffectiveMinWage*'.$multiplier.')>=(SELECT NCRRate FROM NCRRate),(SELECT NCRRate FROM NCRRate),(EffectiveMinWage*'.$multiplier.')),JobLevelID,'.$increaserate.','.$steprate.',5),2) FROM storesrate WHERE IDNo=r.IDNo)
     
-    ,(SELECT TRUNCATE(MinRate*(1+PercentMintoMed/100)*(1+PercentMedtoMax/100),2) FROM attend_0joblevels jl JOIN attend_0jobclass jc ON jc.JobClassNo=jl.JobClassNo JOIN attend_1positions p ON jl.JobLevelID=p.JobLevelID AND p.PositionID=(SELECT NewPositionID FROM attend_2changeofpositions WHERE IDNo=r.IDNo ORDER BY DateofChange LIMIT 1))) AS MaxRate,
+    ,(SELECT TRUNCATE(MinRate*(1+PercentMintoMed/100)*(1+PercentMedtoMax/100),2) FROM attend_0joblevels jl JOIN attend_0jobclass jc ON jc.JobLevelID=jl.JobLevelID JOIN attend_1positions p ON jl.JobLevelID=p.JobLevelID AND p.PositionID=(SELECT NewPositionID FROM attend_2changeofpositions WHERE IDNo=r.IDNo ORDER BY DateofChange LIMIT 1))) AS MaxRate,
         CONCAT(
           IF(((SELECT MaxRate)<Basic) AND DailyORMonthly=1,"<font color=\"red\">",""),
           FORMAT(Basic,2), IF(((SELECT MaxRate)<Basic) AND DailyORMonthly=1,"</font>","")

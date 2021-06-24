@@ -161,7 +161,7 @@ where b.BranchNo not in (1,12,19) and (bt.ARGroup='.$_SESSION['(ak0)'].' or bt.G
         break;
     case 'positions':
         $listname='positions';
-        $listsql='SELECT Position, PositionID FROM `attend_1positions` p JOIN `attend_0joblevels` jl ON jl.JobLevelID=p.JobLevelID ORDER BY JobClassNo,jl.JobLevelID;';
+        $listsql='SELECT Position, PositionID FROM `attend_1positions` p JOIN `attend_0joblevels` jl ON jl.JobLevelID=p.JobLevelID ORDER BY JobLevelID,jl.JobLevelID;';
         $listvalue='Position';
         $listlabel='PositionID';
         $listcaption='Position';

@@ -42,9 +42,9 @@ SELECT
                         AND DAYOFWEEK(`a`.`DateToday`) = 7 -- Saturdays for existing monthly employees 
                         AND (`e`.`WithSat` = 1 OR `e`.`WithSat` = 0 ) AND sm.IDNo IS NULL)
                 THEN
-                    IF(ShiftHours(`a`.`TimeIn`, `a`.`TimeOut`, `e`.`JobClassNo`, `a`.`Shift`) / 4 > 1,
+                    IF(ShiftHours(`a`.`TimeIn`, `a`.`TimeOut`, `e`.`JobLevelID`, `a`.`Shift`) / 4 > 1,
                         1,
-                        ShiftHours(`a`.`TimeIn`, `a`.`TimeOut`, `e`.`JobClassNo`, `a`.`Shift`) / 4)
+                        ShiftHours(`a`.`TimeIn`, `a`.`TimeOut`, `e`.`JobLevelID`, `a`.`Shift`) / 4)
                 WHEN (`a`.`LeaveNo` IN (15)
                         AND DAYOFWEEK(`a`.`DateToday`) = 7 -- Saturdays for new monthly employees
                         AND (`e`.`WithSat` = 0 ) AND sm.IDNo IS NOT NULL)
@@ -56,49 +56,49 @@ SELECT
                         AND DAYOFWEEK(`a`.`DateToday`) <> 7
                         AND (`e`.`WithSat` = 1 OR `e`.`WithSat` = 0))
                 THEN
-                    ShiftHours(`a`.`TimeIn`, `a`.`TimeOut`, `e`.`JobClassNo`, `a`.`Shift`) / 8
+                    ShiftHours(`a`.`TimeIn`, `a`.`TimeOut`, `e`.`JobLevelID`, `a`.`Shift`) / 8
             END),
             0) + IFNULL(SUM(CASE
                 WHEN
                     (`a`.`LeaveNo` IN (11 , 20, 21, 30)
                         AND `e`.`WithSat` = 2)
                 THEN
-                    ShiftHours(`a`.`TimeIn`, `a`.`TimeOut`, `e`.`JobClassNo`, `a`.`Shift`)/ 8
+                    ShiftHours(`a`.`TimeIn`, `a`.`TimeOut`, `e`.`JobLevelID`, `a`.`Shift`)/ 8
             END),
             0) + COUNT(IF(`a`.`OTTypeNo` IN (13,24), 1, NULL)) AS `RegDaysActual`,
             
     SUM(IF(`a`.`LeaveNo` = 12 AND `a`.`OTApproval` <> 0, -- Legal/Regular Holiday
             ShiftHours(`a`.`TimeIn`, IF(`ot`.`EndOfOT` IS NULL, `a`.`TimeOut`,
-                    IF(`ot`.`EndOfOT` < `a`.`TimeOut`, `ot`.`EndOfOT`, `a`.`TimeOut`)), `e`.`JobClassNo`, `a`.`Shift`),
+                    IF(`ot`.`EndOfOT` < `a`.`TimeOut`, `ot`.`EndOfOT`, `a`.`TimeOut`)), `e`.`JobLevelID`, `a`.`Shift`),
         0)) AS `LegalShiftHrsOT`,
         
 	SUM(IF(`a`.`LeaveNo` = 12 AND `a`.`OTApproval` <> 0, -- Legal/Regular Holiday Ex Shift
     ExShiftHours(`a`.`LeaveNo`, `a`.`DateToday`,`a`.`TimeIn`, IF(`ot`.`EndOfOT` IS NULL, `a`.`TimeOut`,
-                    IF(`ot`.`EndOfOT` < `a`.`TimeOut`, `ot`.`EndOfOT`, `a`.`TimeOut`)), `e`.`JobClassNo`, `a`.`Shift`,`d`.`TypeOfDayNo`, `a`.`OTTypeNo`),0)) AS `LegalExShiftHrsOT`,
+                    IF(`ot`.`EndOfOT` < `a`.`TimeOut`, `ot`.`EndOfOT`, `a`.`TimeOut`)), `e`.`JobLevelID`, `a`.`Shift`,`d`.`TypeOfDayNo`, `a`.`OTTypeNo`),0)) AS `LegalExShiftHrsOT`,
     
     SUM(IF(`a`.`LeaveNo` = 13 AND `a`.`OTApproval` <> 0, -- Special Non-Working Holiday
             ShiftHours(`a`.`TimeIn`, IF(`ot`.`EndOfOT` IS NULL, `a`.`TimeOut`,
-                    IF(`ot`.`EndOfOT` < `a`.`TimeOut`, `ot`.`EndOfOT`, `a`.`TimeOut`)), `e`.`JobClassNo`, `a`.`Shift`),
+                    IF(`ot`.`EndOfOT` < `a`.`TimeOut`, `ot`.`EndOfOT`, `a`.`TimeOut`)), `e`.`JobLevelID`, `a`.`Shift`),
         0)) AS `SpecShiftHrsOT`,
         
     SUM(IF(`a`.`LeaveNo` = 13 AND `a`.`OTApproval` <> 0, -- Special Non-Working Holiday Ex Shift
     ExShiftHours(`a`.`LeaveNo`, `a`.`DateToday`,`a`.`TimeIn`, IF(`ot`.`EndOfOT` IS NULL, `a`.`TimeOut`,
-                    IF(`ot`.`EndOfOT` < `a`.`TimeOut`, `ot`.`EndOfOT`, `a`.`TimeOut`)), `e`.`JobClassNo`, `a`.`Shift`,`d`.`TypeOfDayNo`, `a`.`OTTypeNo`),0)) AS `SpecExShiftHrsOT`,
+                    IF(`ot`.`EndOfOT` < `a`.`TimeOut`, `ot`.`EndOfOT`, `a`.`TimeOut`)), `e`.`JobLevelID`, `a`.`Shift`,`d`.`TypeOfDayNo`, `a`.`OTTypeNo`),0)) AS `SpecExShiftHrsOT`,
     
     SUM(IF(`a`.`LeaveNo` = 15 AND `a`.`OTApproval` <> 0, -- Restday
             ShiftHours(`a`.`TimeIn`, IF(`ot`.`EndOfOT` IS NULL, `a`.`TimeOut`,
-                    IF(`ot`.`EndOfOT` < `a`.`TimeOut`, `ot`.`EndOfOT`, `a`.`TimeOut`)), `e`.`JobClassNo`, `a`.`Shift`)*(CASE WHEN `d`.`TypeOfDayNo`=2 THEN (2.3/1.3) WHEN `d`.`TypeOfDayNo`=3 THEN (1.5/1.3) ELSE 1 END),
+                    IF(`ot`.`EndOfOT` < `a`.`TimeOut`, `ot`.`EndOfOT`, `a`.`TimeOut`)), `e`.`JobLevelID`, `a`.`Shift`)*(CASE WHEN `d`.`TypeOfDayNo`=2 THEN (2.3/1.3) WHEN `d`.`TypeOfDayNo`=3 THEN (1.5/1.3) ELSE 1 END),
         0)) AS `RestShiftHrsOT`,
         
 	SUM(IF(`a`.`LeaveNo` = 15 AND `a`.`OTApproval` <> 0, -- Restday Ex Shift
          ExShiftHours(`a`.`LeaveNo`, `a`.`DateToday`,`a`.`TimeIn`, IF(`ot`.`EndOfOT` IS NULL, `a`.`TimeOut`,
-                    IF(`ot`.`EndOfOT` < `a`.`TimeOut`, `ot`.`EndOfOT`, `a`.`TimeOut`)), `e`.`JobClassNo`, `a`.`Shift`,`d`.`TypeOfDayNo`, `a`.`OTTypeNo`)*(CASE WHEN `d`.`TypeOfDayNo`=2 THEN (2) WHEN `d`.`TypeOfDayNo`=3 THEN (1.5/1.3) ELSE 1 END),0))  AS `RestExShiftHrsOT`,
+                    IF(`ot`.`EndOfOT` < `a`.`TimeOut`, `ot`.`EndOfOT`, `a`.`TimeOut`)), `e`.`JobLevelID`, `a`.`Shift`,`d`.`TypeOfDayNo`, `a`.`OTTypeNo`)*(CASE WHEN `d`.`TypeOfDayNo`=2 THEN (2) WHEN `d`.`TypeOfDayNo`=3 THEN (1.5/1.3) ELSE 1 END),0))  AS `RestExShiftHrsOT`,
         
     SUM(IFNULL(`l`.`PaidLegal`, 0)) AS `PaidLegalDays`,
     
     SUM(IF(`a`.`LeaveNo` IN (11 , 20, 21, 30) AND `a`.`OTApproval` <> 0, -- Regular Workday
          ExShiftHours(`a`.`LeaveNo`, `a`.`DateToday`,`a`.`TimeIn`, IF(`ot`.`EndOfOT` IS NULL, `a`.`TimeOut`,
-                    IF(`ot`.`EndOfOT` < `a`.`TimeOut`, `ot`.`EndOfOT`, `a`.`TimeOut`)), `e`.`JobClassNo`, `a`.`Shift`,`d`.`TypeOfDayNo`, `a`.`OTTypeNo`),0))  AS `RegExShiftHrsOT`,
+                    IF(`ot`.`EndOfOT` < `a`.`TimeOut`, `ot`.`EndOfOT`, `a`.`TimeOut`)), `e`.`JobLevelID`, `a`.`Shift`,`d`.`TypeOfDayNo`, `a`.`OTTypeNo`),0))  AS `RegExShiftHrsOT`,
     
     `e`.`Resigned` AS `Resigned`
 FROM
