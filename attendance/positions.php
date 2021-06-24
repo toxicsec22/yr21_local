@@ -40,7 +40,7 @@ $listsname=array('Department'=>'departments','Supervisor'=>'supervisors','JobLev
 $listssql=array(
     array('sql'=>'SELECT * FROM `1departments`', 'listvalue'=>'department', 'label'=>'deptid','listname'=>'departments'),
     array('sql'=>'SELECT * FROM `attend_1positions`', 'listvalue'=>'Position', 'label'=>'PositionID','listname'=>'supervisors'),
-    array('sql'=>'SELECT JobLevelID, CONCAT(JobClassification," Level ", RIGHT(JobLevelID,1)) AS JobLevel FROM `attend_0joblevels` jl JOIN `attend_0jobclass` jc ON jc.JobLevelID=jl.JobLevelID ORDER BY jc.JobLevelID,JobLevelID', 'listvalue'=>'JobLevel', 'label'=>'JobLevelID','listname'=>'joblevels')
+    array('sql'=>'SELECT JobLevelID, JobLevel FROM `attend_0joblevels` jl  ORDER BY JobLevelID,JobLevelID', 'listvalue'=>'JobLevel', 'label'=>'JobLevelID','listname'=>'joblevels')
 );
 
 if($which=='AssignPermissions') {
