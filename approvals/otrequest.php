@@ -79,7 +79,7 @@ switch ($which){
             Date Today/Future Date <input type='date' name='DateToday' value='<?php echo date('Y-m-d'); ?>'>&nbsp &nbsp &nbsp
             IDNo <input type='text' name='IDNo' value='' list='employees' size=7>&nbsp &nbsp &nbsp
 			Type Of Overtime: <input type='text' name='OTType' list="ottypes" size=9 required> &nbsp &nbsp &nbsp
-            EndOfOT <input type='time' name='EndOfOT' value='19:00'> &nbsp &nbsp &nbsp<br>
+            <b>StartOfOT</b> <sup>(PreShift)</sup> / <b>EndOfOT</b> <sup>(PostShift)</sup> <input type='time' name='EndOfOT' value='19:00'> &nbsp &nbsp &nbsp<br>
             Reason <input type='text' name='Reason' size=50> &nbsp &nbsp &nbsp
             <input type="hidden" name="action_token" value="<?php echo html_escape($_SESSION['action_token']); ?>" />
             <input type='submit' name='Submit' value='Submit'>
