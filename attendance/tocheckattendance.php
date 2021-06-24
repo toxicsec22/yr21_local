@@ -166,11 +166,29 @@ if (in_array($whichqry,array('summary_for_payroll','my_attendance'))){
 	   case 'PerCompanyList':
             include_once $path.'/acrossyrs/commonfunctions/listoptions.php';
             $title='Employee List From '.companyandbranchValue($link,'1companies','CompanyNo', $_GET['RCompanyNo'],'Company') . ' Company';
-            $sql='SELECT e.IDNo, CONCAT(e.FirstName, " ", e.MiddleName, " ", e.SurName) as EmployeeName from 1employees e
-                join 1companies c on e.RCompanyNo = c.CompanyNo where e.RCompanyNo= '.intval($_GET['RCompanyNo']).' AND Resigned=0 AND DirectOrAgency=0';
-            $columnnames=array('IDNo','EmployeeName'); 
-            $width='30%'; 
-            include_once('../backendphp/layout/displayastable.php');
+            $sql='SELECT e.IDNo, CONCAT(e.FirstName, " ", e.MiddleName, " ", e.SurName) AS EmployeeName, BranchorDept FROM 1employees e
+            JOIN 1companies c ON e.RCompanyNo = c.CompanyNo JOIN attend_30currentpositions cp ON e.IDNo=cp.IDNo WHERE e.RCompanyNo= '.intval($_GET['RCompanyNo']).' AND Resigned=0 AND DirectOrAgency=0 ORDER BY BranchorDept';
+            $columnnames=array('IDNo','EmployeeName','BranchorDept'); 
+            //$width='40%'; 
+            ?>
+            <div width='100%'><div width='50%'  style='float: left; margin-left: 3%'>
+            <?php
+            include_once('../backendphp/layout/displayastablenosort.php');
+            ?>
+            </div><div width='30%' style='float: left;margin-left:5%;' >
+            <?php
+            $title='';$subtitle='Per Company Per Branch';
+            $sql='SELECT COUNT(e.IDNo) AS `EmployeeCount`, IF(`b`.`PseudoBranch` <> 1, `b`.`Branch`, "Head Office") AS BranchorHO FROM 1employees e 
+            JOIN `attend_1defaultbranchassign` `db` ON (`e`.`IDNo` = `db`.`IDNo`) 
+            JOIN `1branches` `b` ON (`db`.`DefaultBranchAssignNo` = `b`.`BranchNo`)
+            WHERE e.RCompanyNo= '.intval($_GET['RCompanyNo']).' AND Resigned=0 AND DirectOrAgency=0 GROUP BY BranchorHO';
+            
+            $columnnames=array('BranchorHO','EmployeeCount'); 
+            //$width='15%'; 
+            include_once('../backendphp/layout/displayastableonlynoheaders.php');
+            ?>
+            </div></div>
+            <?php
     break;
 
     case 'PerDeptList':
