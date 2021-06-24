@@ -65,7 +65,7 @@ END)
            LEFT JOIN `hr_80evalsched` es ON es.EvalSchedID=pf.EvalSchedID
 	       JOIN `1branches` b ON b.BranchNo=pf.CurrentBranchNo
 	       JOIN `1companies` c ON c.CompanyNo=e1.RCompanyNo
-	       LEFT JOIN `attend_0positions` p ON p.PositionID=pf.CurrentPositionID
+	       LEFT JOIN `attend_1positions` p ON p.PositionID=pf.CurrentPositionID
 	       '; 
 
 switch ($which){

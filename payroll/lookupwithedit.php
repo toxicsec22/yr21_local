@@ -613,7 +613,7 @@ GROUP BY PayrollID, b.CompanyNo ORDER BY PayrollID DESC';
                 FROM `payroll_25payrolldatalookup` p JOIN `1employees` `e` ON `p`.`IDNo` = `e`.`IDNo`
 	    JOIN `1branches` b1 ON b1.BranchNo=p.RecordInBranchNo 
 		JOIN `attend_30latestpositionsinclresigned` lir ON p.IDNo=lir.IDNo 
-		JOIN `attend_0positions` ap ON ap.PositionID=lir.PositionID 
+		JOIN `attend_1positions` ap ON ap.PositionID=lir.PositionID 
 		JOIN `1departments` d ON d.deptid=ap.deptid 
             WHERE b1.CompanyNo='.$payco['CompanyNo'].' AND p.PayrollID='.$payco['PayrollID'].' AND DisburseVia=0 ORDER BY `Branch/Dept`,RecordInBranch, FullName';
                 

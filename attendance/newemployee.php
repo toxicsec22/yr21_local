@@ -84,8 +84,8 @@ $link=!isset($link)?connect_db(''.$currentyr.'_1rtc',0):$link;
     include_once $path.'/acrossyrs/commonfunctions/listoptions.php';
     $liststoshow=array('yesno','civilstatus','companynumbers','weekdays','withsat','branches','directoragency', 'zipplaces', 'barangayortown', 'cityorprovince');//'taxclass',
     echo comboBox($link,'SELECT "Male" AS Gender, 1 AS GenderValue UNION SELECT "Female" AS GenderValue, 0 AS Gender','Gender','GenderValue','gender');
-	echo comboBox($link,'SELECT IDNo, CONCAT(Fullname," (",Branch,")") AS NameBranch FROM attend_30currentpositions ORDER BY JLID DESC;','NameBranch','IDNo','supid');
-	echo comboBox($link,'SELECT PositionID, Position FROM attend_0positions ORDER BY Position;','Position','PositionID','positions');
+	echo comboBox($link,'SELECT IDNo, CONCAT(Fullname," (",Branch,")") AS NameBranch FROM attend_30currentpositions ORDER BY JobLevelID DESC;','NameBranch','IDNo','supid');
+	echo comboBox($link,'SELECT PositionID, Position FROM attend_1positions ORDER BY Position;','Position','PositionID','positions');
 	   include_once "../generalinfo/lists.inc";
 foreach ($liststoshow as $list){
 renderlist($list);   
@@ -372,7 +372,7 @@ case 'UpdateHoldingTable':
 break;
 
 case 'ForApprovalList':
-	$sql='SELECT IDNo,Branch,Position,Firstname,MiddleName,SurName,Position,Branch FROM 1employeesforapproval ea LEFT JOIN attend_0positions p ON ea.PositionID=p.PositionID LEFT JOIN 1branches b ON ea.BranchNo=b.BranchNo';
+	$sql='SELECT IDNo,Branch,Position,Firstname,MiddleName,SurName,Position,Branch FROM 1employeesforapproval ea LEFT JOIN attend_1positions p ON ea.PositionID=p.PositionID LEFT JOIN 1branches b ON ea.BranchNo=b.BranchNo';
 	$columnnameslist=array( 'Branch', 'IDNo', 'Firstname', 'MiddleName', 'SurName', 'Position');
 
 	

@@ -58,8 +58,8 @@ if (in_array($which,array('UniformPerBranchPerArea','UniformPerQuantityPerType')
 /* 
 	$mbpwc = '(deptid IN (30,15,50,20,60,40,55,1,2,3,4,70) OR PositionID IN (50,53,30,35)) AND Gender = 1';
 	$wbpwc = '(deptid IN (30,15,50,20,60,40,55,1,2,3,4,70) OR PositionID IN (50,53,30,35)) AND Gender = 0';
-	$mbpwwt = 'PositionID IN (SELECT PositionID FROM attend_0positions WHERE Position LIKE "%Manager%") AND Gender = 1';
-	$wbpwwt = 'PositionID IN (SELECT PositionID FROM attend_0positions WHERE Position LIKE "%Manager%") AND Gender = 0';
+	$mbpwwt = 'PositionID IN (SELECT PositionID FROM attend_1positions WHERE Position LIKE "%Manager%") AND Gender = 1';
+	$wbpwwt = 'PositionID IN (SELECT PositionID FROM attend_1positions WHERE Position LIKE "%Manager%") AND Gender = 0';
 	$mbpwc34 = 'PositionID IN (36) AND Gender = 1';
 	$wbpwc34 = 'PositionID IN (36) AND Gender = 0';
 	$mbpswws = 'PositionID IN (32,81)';

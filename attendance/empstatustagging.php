@@ -42,7 +42,7 @@ switch ($w){
 			$switchaction=',IF((SELECT COUNT(TxnID) FROM hr_2personnelaction WHERE IDNo=e.IDNo AND ActionID=0)>0,1,0) AS showeditprocess ';
 		}
 		if (in_array($title,array('Resigned with Clearance','Resigned No Clearance'))){
-		$sql='SELECT e.*,ResignReason,CONCAT(e.Nickname,"-",e.FirstName," ",e.Surname) AS `Nickname-FullName`, IF(Gender=0,"F","M") AS Gender,DATEDIFF(CURDATE(),e.DateHired) AS Yrs, i.DateResigned, c.Company, p.Position, IF(p.deptid IN (1,2,3,10),Branch,Department) AS `Branch/Dept` FROM `1employees` e LEFT JOIN `1companies` c on e.RCompanyNo=c.CompanyNo JOIN `1_gamit`.`0idinfo` i ON i.IDNo=e.IDNo JOIN `attend_30latestpositionsinclresigned` cp ON cp.IDNo=e.IDNo JOIN `attend_0positions` `p` ON ((`p`.`PositionID` = `cp`.`PositionID`)) 
+		$sql='SELECT e.*,ResignReason,CONCAT(e.Nickname,"-",e.FirstName," ",e.Surname) AS `Nickname-FullName`, IF(Gender=0,"F","M") AS Gender,DATEDIFF(CURDATE(),e.DateHired) AS Yrs, i.DateResigned, c.Company, p.Position, IF(p.deptid IN (1,2,3,10),Branch,Department) AS `Branch/Dept` FROM `1employees` e LEFT JOIN `1companies` c on e.RCompanyNo=c.CompanyNo JOIN `1_gamit`.`0idinfo` i ON i.IDNo=e.IDNo JOIN `attend_30latestpositionsinclresigned` cp ON cp.IDNo=e.IDNo JOIN `attend_1positions` `p` ON ((`p`.`PositionID` = `cp`.`PositionID`)) 
 		JOIN 1departments d ON d.deptid=p.deptid JOIN attend_1defaultbranchassign dba ON cp.IDNo=dba.IDNo JOIN 1branches b ON dba.DefaultBranchAssignNo=b.BranchNo WHERE e.IDNo NOT IN (1001,1002) AND e.Resigned=1 '.$condi.' ORDER BY DateResigned DESC';
 	
 			 array_push($columnnames,'DateResigned','ResignReason');

@@ -36,7 +36,7 @@ if (in_array($which,array('FunctionalCompetencies','EditSpecificsFC'))){
  }
  
  if (in_array($which,array('FormID','FCFormID'))){
-	$sql0='CREATE TEMPORARY TABLE groupdept AS SELECT p.deptid, d.Department, p.JobLevelNo, JLID, p.Position, p.PositionID FROM attend_0positions p JOIN `1departments` d ON d.deptid=p.deptid JOIN `attend_1joblevel` jl ON jl.JobLevelNo=p.JobLevelNo ORDER BY JobClassNo DESC,jl.JobLevelNo DESC;';
+	$sql0='CREATE TEMPORARY TABLE groupdept AS SELECT p.deptid, d.Department, p.JobLevelID, JobLevelID, p.Position, p.PositionID FROM attend_1positions p JOIN `1departments` d ON d.deptid=p.deptid JOIN `attend_0joblevels` jl ON jl.JobLevelID=p.JobLevelID ORDER BY JobClassNo DESC,jl.JobLevelID DESC;';
   	
 	$stmt=$link->query($sql0);
 	$sql0='SELECT DISTINCTROW deptid AS DeptID, Department FROM groupdept;';
@@ -113,7 +113,7 @@ switch ($which)
 			echo '<div style="float:left;">';    
 			foreach($row0 as $pos){
             echo '<h4>'.$pos['Department'].'</h4>';
-            $sql1='SELECT Position, PositionID FROM groupdept WHERE DeptID='.$pos['DeptID'].' GROUP BY PositionID ORDER BY JLID DESC';
+            $sql1='SELECT Position, PositionID FROM groupdept WHERE DeptID='.$pos['DeptID'].' GROUP BY PositionID ORDER BY JobLevelID DESC';
 			
             $stmt1=$link->query($sql1); $row1=$stmt1->fetchAll();
             $deptlist='<table>';
@@ -138,7 +138,7 @@ switch ($which)
 				$sql ="SELECT Positions FROM hr_81ccmain WHERE FormID=".$FormID.";";
 				$stmt=$link->query($sql); $rowh=$stmt->fetch();
 				
-				$sql ="SELECT PositionID,Position FROM attend_0positions p JOIN attend_1joblevel jl ON jl.JobLevelNo=p.JobLevelNo WHERE PositionID IN (".$rowh['Positions'].") ORDER BY deptid,JLID DESC";
+				$sql ="SELECT PositionID,Position FROM attend_1positions p JOIN attend_0joblevels jl ON jl.JobLevelID=p.JobLevelID WHERE PositionID IN (".$rowh['Positions'].") ORDER BY deptid,JobLevelID DESC";
                                 
 				$stmt=$link->query($sql); $row=$stmt->fetchAll();
 				foreach($row AS $res){
@@ -378,7 +378,7 @@ case 'FCFormID':
 		echo '<div style="float:left;">';    
 		foreach($row0 as $pos){
 		echo '<h4>'.$pos['Department'].'</h4>';
-		$sql1='SELECT Position, PositionID FROM groupdept WHERE DeptID='.$pos['DeptID'].' GROUP BY PositionID ORDER BY JLID DESC';
+		$sql1='SELECT Position, PositionID FROM groupdept WHERE DeptID='.$pos['DeptID'].' GROUP BY PositionID ORDER BY JobLevelID DESC';
 		
 		$stmt1=$link->query($sql1); $row1=$stmt1->fetchAll();
 		$deptlist='<table>';
@@ -403,7 +403,7 @@ case 'FCFormID':
 			$sql ="SELECT DefaultPositions FROM hr_81fcmain WHERE FID=".$FormID.";";
 			$stmt=$link->query($sql); $rowh=$stmt->fetch();
 			
-			$sql ="SELECT PositionID,Position FROM attend_0positions p JOIN attend_1joblevel jl ON jl.JobLevelNo=p.JobLevelNo WHERE PositionID IN (".$rowh['DefaultPositions'].") ORDER BY deptid,JLID DESC";
+			$sql ="SELECT PositionID,Position FROM attend_1positions p JOIN attend_0joblevels jl ON jl.JobLevelID=p.JobLevelID WHERE PositionID IN (".$rowh['DefaultPositions'].") ORDER BY deptid,JobLevelID DESC";
 							
 			$stmt=$link->query($sql); $row=$stmt->fetchAll();
 			foreach($row AS $res){

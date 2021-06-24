@@ -43,10 +43,10 @@ $stmtd=$link->query($sqld); $resultd=$stmtd->fetch();
 echo comboBox($link,'SELECT  department, deptid, deptheadpositionid FROM `1departments` '.$fcondition.' '.$unionbranchwh.' ORDER BY department','department','deptid','departments');
 echo comboBox($link,'SELECT department,d.deptid as deptid,deptheadpositionid FROM `1departments` d left join  budget_2budgetplanning bp on bp.deptid=d.deptid '.$acondition.' Group By d.deptid '.$unionbranchwh.' ORDER BY department','department','deptid','adepartments');
 echo comboBox($link,'SELECT ShortAcctID, AccountID FROM `acctg_1chartofaccounts` where Budgeted=1 ORDER BY ShortAcctID','AccountID','ShortAcctID','Budgeted');
-echo comboBox($link,'SELECT PositionID, Position FROM `attend_0positions` ORDER BY Position','PositionID','Position','positions');
+echo comboBox($link,'SELECT PositionID, Position FROM `attend_1positions` ORDER BY Position','PositionID','Position','positions');
 if (in_array($which,array('Add','EditProcess'))){
 $accountid=comboBoxValue($link, 'acctg_1chartofaccounts', 'ShortAcctID', $_REQUEST['Account'], 'AccountID');
-$positionid=comboBoxValue($link, 'attend_0positions', 'Position', $_REQUEST['Position'], 'PositionID');
+$positionid=comboBoxValue($link, 'attend_1positions', 'Position', $_REQUEST['Position'], 'PositionID');
 }
 
 switch($which){
@@ -303,20 +303,20 @@ $quartercomputationne='(((MinRate*(1+PercentMintoMed/100)*(1+PercentMedtoMax/100
 		$title='';
 		$formdesc='</i><b>Employee</b>';
 if (allowedToOpen(5174,'1rtc')) {
-$union='UNION All select Branch,\'\' as TxnID,\'\' as JobLevelNo,\'\' as Account,\'\' as QuarterHired,if(dam.deptid=10,Branch,"Existing Employee") as Position,\'\' as `Hiring Rate`,\'\' as monthlybasic,\'\' as `Pag-IBIG`,\'\' as Laptop,\'\' as Mobile,\'\' as Plan,\'\' as PhilHealth,\'\' as QuarterHired,
+$union='UNION All select Branch,\'\' as TxnID,\'\' as JobLevelID,\'\' as Account,\'\' as QuarterHired,if(dam.deptid=10,Branch,"Existing Employee") as Position,\'\' as `Hiring Rate`,\'\' as monthlybasic,\'\' as `Pag-IBIG`,\'\' as Laptop,\'\' as Mobile,\'\' as Plan,\'\' as PhilHealth,\'\' as QuarterHired,
 '.$quartercomputation.' as Q1, '.$quartercomputation.' as Q2,
 '.$quartercomputation.' as Q3, '.$quartercomputation.' as Q4, \'\' as EncodedBy , \'\' as TimeStamp
 
 
 
-from payroll_21dailyandmonthly dam left join attend_0positions p on p.PositionID=dam.PositionID left join 1branches b on b.BranchNo=dam.BranchNo where dam.deptid=\''.$condition.'\' Group by if(dam.deptid=10,dam.BranchNo,"") Order By Branch';
-$union2='UNION ALL select TxnID,\'\' as Position,\'\' as JobLevelNo,\'TOTAL\' QuarterHired,format(sum(floor(Q1)),0) as Q1,format(sum(floor(Q2)),0) as Q2,format(sum(floor(Q3)),0) as Q3,format(sum(floor(Q4)),0) as Q4,format((sum(floor(Q1))+sum(floor(Q2))+sum(floor(Q3))+sum(floor(Q4))),0) as Total, \'\' as EncodedBy, \'\' as TimeStamp from EmployeeExpenses';
+from payroll_21dailyandmonthly dam left join attend_1positions p on p.PositionID=dam.PositionID left join 1branches b on b.BranchNo=dam.BranchNo where dam.deptid=\''.$condition.'\' Group by if(dam.deptid=10,dam.BranchNo,"") Order By Branch';
+$union2='UNION ALL select TxnID,\'\' as Position,\'\' as JobLevelID,\'TOTAL\' QuarterHired,format(sum(floor(Q1)),0) as Q1,format(sum(floor(Q2)),0) as Q2,format(sum(floor(Q3)),0) as Q3,format(sum(floor(Q4)),0) as Q4,format((sum(floor(Q1))+sum(floor(Q2))+sum(floor(Q3))+sum(floor(Q4))),0) as Total, \'\' as EncodedBy, \'\' as TimeStamp from EmployeeExpenses';
 }
 else{
 	$union='';
 	$union2='';
 }
-		$sqlee='Create temporary table EmployeeExpenses select \'\' as Branch,bp.TxnID,p.JobLevelNo,ShortAcctID as Account,substring(Details,LOCATE(\'-\', Details)+1,100) as QuarterHired,Position,(MinRate*(1+PercentMintoMed/100)*(1+PercentMedtoMax/100)) as `Hiring Rate` ,(MinRate*(1+PercentMintoMed/100)*(1+PercentMedtoMax/100)) as `monthlybasic` ,(select SSER+ECER+MPFER from payroll_0ssstable where `monthlybasic` BETWEEN RangeMin AND RangeMax) as SSS,\'100\' as `Pag-IBIG`,\'25,000\' as Laptop,\'5,000\' as Mobile,\''.$plan.'\' as Plan,(SELECT if(`monthlybasic`<=MinBasic,MinPremium,if(`monthlybasic` < MaxBasic,(`monthlybasic`*PremiumRate/100),MaxPremium))/2 FROM payroll_0phicrate WHERE ApplicableYear='.$currentyr.') as PhilHealth,
+		$sqlee='Create temporary table EmployeeExpenses select \'\' as Branch,bp.TxnID,p.JobLevelID,ShortAcctID as Account,substring(Details,LOCATE(\'-\', Details)+1,100) as QuarterHired,Position,(MinRate*(1+PercentMintoMed/100)*(1+PercentMedtoMax/100)) as `Hiring Rate` ,(MinRate*(1+PercentMintoMed/100)*(1+PercentMedtoMax/100)) as `monthlybasic` ,(select SSER+ECER+MPFER from payroll_0ssstable where `monthlybasic` BETWEEN RangeMin AND RangeMax) as SSS,\'100\' as `Pag-IBIG`,\'25,000\' as Laptop,\'5,000\' as Mobile,\''.$plan.'\' as Plan,(SELECT if(`monthlybasic`<=MinBasic,MinPremium,if(`monthlybasic` < MaxBasic,(`monthlybasic`*PremiumRate/100),MaxPremium))/2 FROM payroll_0phicrate WHERE ApplicableYear='.$currentyr.') as PhilHealth,
 
 		if(substring(Details,LOCATE(\'-\', Details)+1,100)=1,
 		'.$quarterhiredcomputation.'
@@ -347,25 +347,25 @@ else{
 		,"")) as Q4, CONCAT(Nickname,\' \',SurName) as EncodedBy, bp.TimeStamp
 
 
-		from budget_2budgetplanning bp join acctg_1chartofaccounts ca on ca.AccountID=bp.AccountID  join attend_0positions p on p.PositionID=SUBSTRING_INDEX(bp.Details,\'-\',\'1\') join attend_1joblevel jl on jl.JobLevelNo=p.JobLevelNo left join 1employees e on e.IDNo=bp.EncodedByNo  where bp.deptid=\''.$condition.'\' and bp.AccountID=\'965\'
+		from budget_2budgetplanning bp join acctg_1chartofaccounts ca on ca.AccountID=bp.AccountID  join attend_1positions p on p.PositionID=SUBSTRING_INDEX(bp.Details,\'-\',\'1\') join attend_0joblevels jl on jl.JobLevelID=p.JobLevelID left join 1employees e on e.IDNo=bp.EncodedByNo  where bp.deptid=\''.$condition.'\' and bp.AccountID=\'965\'
 
 		'.$union.'
 		';
 		// echo $sqlee; exit();
 		$stmtee=$link->prepare($sqlee); $stmtee->execute();
 
-		$sql='select TxnID,Position,JobLevelNo,QuarterHired,format(floor(Q1),0) as Q1,format(floor(Q2),0) as Q2,format(floor(Q3),0) as Q3,format(floor(Q4),0) as Q4,format((floor(Q1)+floor(Q2)+floor(Q3)+floor(Q4)),0) as Total, EncodedBy, TimeStamp from EmployeeExpenses
+		$sql='select TxnID,Position,JobLevelID,QuarterHired,format(floor(Q1),0) as Q1,format(floor(Q2),0) as Q2,format(floor(Q3),0) as Q3,format(floor(Q4),0) as Q4,format((floor(Q1)+floor(Q2)+floor(Q3)+floor(Q4)),0) as Total, EncodedBy, TimeStamp from EmployeeExpenses
 
 			'.$union2.'';
 
 		// echo $sql; exit();
 		if (allowedToOpen(5174,'1rtc')) {
-			$columnnames=array('Position','JobLevelNo','QuarterHired','Q1','Q2','Q3','Q4','Total');
+			$columnnames=array('Position','JobLevelID','QuarterHired','Q1','Q2','Q3','Q4','Total');
 	if ($showhidevalue==1) {
 	array_push($columnnames,'EncodedBy','TimeStamp');
 	}
 		}else{
-			$columnnames=array('QuarterHired','Position','JobLevelNo');
+			$columnnames=array('QuarterHired','Position','JobLevelID');
 		}
 		include('../backendphp/layout/displayastablenosort.php');
 
@@ -413,7 +413,7 @@ if(!isset($_GET['checker'])){
 		<input type="hidden" name="action_token" value="'.($_SESSION['action_token']).'">
 		<input OnClick="return confirm(\'Are you sure you want to submit?\');" type="submit" name="submit">';
 }else{
-	$sql='select bp.*,p.JobLevelNo,ShortAcctID as Account,substring(Details,LOCATE(\'-\', Details)+1,100) as QuarterHired,Position from budget_2budgetplanning bp join acctg_1chartofaccounts ca on ca.AccountID=bp.AccountID join attend_0positions p on p.PositionID=SUBSTRING_INDEX(bp.Details,\'-\',\'1\') join attend_1joblevel jg on jg.JobLevelNo=p.JobLevelNo where TxnID=\''.$txnid.'\'';
+	$sql='select bp.*,p.JobLevelID,ShortAcctID as Account,substring(Details,LOCATE(\'-\', Details)+1,100) as QuarterHired,Position from budget_2budgetplanning bp join acctg_1chartofaccounts ca on ca.AccountID=bp.AccountID join attend_1positions p on p.PositionID=SUBSTRING_INDEX(bp.Details,\'-\',\'1\') join attend_0joblevels jg on jg.JobLevelID=p.JobLevelID where TxnID=\''.$txnid.'\'';
 
 	
 	$stmt=$link->query($sql); $result=$stmt->fetch();

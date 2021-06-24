@@ -44,7 +44,7 @@ $sqlco='SELECT c.CompanyNo, c.Company FROM `1companies` c JOIN `1employees` e ON
     JOIN `attend_30latestpositionsinclresigned` cp ON cp.IDNo=e.IDNo 
     JOIN `1branches` b ON b.BranchNo=p.BranchNo
     JOIN `1branches` b1 ON b1.BranchNo=p.RecordInBranchNo
-	JOIN attend_0positions ps ON cp.PositionID=ps.PositionID 
+	JOIN attend_1positions ps ON cp.PositionID=ps.PositionID 
 	LEFT JOIN acctg_1budgetentities be ON IF(b.PseudoBranch=1,(800 + ps.deptid),b.BranchNo)=be.EntityID 
     WHERE p.PayrollID=' .$payrollid;
 	
@@ -52,7 +52,7 @@ $sqlco='SELECT c.CompanyNo, c.Company FROM `1companies` c JOIN `1employees` e ON
     JOIN `attend_30latestpositionsinclresigned` cp ON cp.IDNo=e.IDNo
     JOIN `1branches` b ON b.BranchNo=p.BranchNo
     JOIN `1branches` b1 ON b1.BranchNo=p.RecordInBranchNo
-	JOIN attend_0positions ps ON cp.PositionID=ps.PositionID 
+	JOIN attend_1positions ps ON cp.PositionID=ps.PositionID 
 	LEFT JOIN acctg_1budgetentities be ON IF(b.PseudoBranch=1,(800 + ps.deptid),b.BranchNo)=be.EntityID
     WHERE p.PayrollID=' .$payrollid. ' GROUP BY p.PayrollID, b1.CompanyNo, p.BranchNo,EntityID, DebitAccountID, p.DisburseVia HAVING Amount<>0';
 	
@@ -61,7 +61,7 @@ $sqlco='SELECT c.CompanyNo, c.Company FROM `1companies` c JOIN `1employees` e ON
 	JOIN `attend_30latestpositionsinclresigned` cp ON cp.IDNo=e.IDNo
     JOIN `1branches` b ON b.BranchNo=p.BranchNo
     JOIN `1branches` b1 ON b1.BranchNo=p.RecordInBranchNo
-	JOIN attend_0positions ps ON cp.PositionID=ps.PositionID 
+	JOIN attend_1positions ps ON cp.PositionID=ps.PositionID 
 	LEFT JOIN acctg_1budgetentities be ON IF(b.PseudoBranch=1,(800 + ps.deptid),b.BranchNo)=be.EntityID
     WHERE p.PayrollID=' .$payrollid. ' GROUP BY p.PayrollID, b1.CompanyNo, p.BranchNo,EntityID, p.DisburseVia HAVING Amount<>0';
 	
@@ -70,7 +70,7 @@ $sqlco='SELECT c.CompanyNo, c.Company FROM `1companies` c JOIN `1employees` e ON
 	JOIN `attend_30latestpositionsinclresigned` cp ON cp.IDNo=e.IDNo
     JOIN payroll_25payroll as p ON p.PayrollID=a.PayrollID AND p.IDNo=a.IDNo JOIN `1branches` b ON b.BranchNo=p.BranchNo
     JOIN `1branches` b1 ON b1.BranchNo=p.RecordInBranchNo
-	JOIN attend_0positions ps ON cp.PositionID=ps.PositionID 
+	JOIN attend_1positions ps ON cp.PositionID=ps.PositionID 
 	LEFT JOIN acctg_1budgetentities be ON IF(b.PseudoBranch=1,(800 + ps.deptid),b.BranchNo)=be.EntityID
     WHERE a.PayrollID=' .$payrollid. ' and a.AdjustTypeNo ';
 	
@@ -80,7 +80,7 @@ $sqlco='SELECT c.CompanyNo, c.Company FROM `1companies` c JOIN `1employees` e ON
     $sqlfromadjinv='payroll_21paydayadjustments as a join payroll_0acctid as t on a.AdjustTypeNo=t.AdjustTypeNo JOIN `1employees` as e ON a.IDNo = e.IDNo
 	JOIN `attend_30latestpositionsinclresigned` cp ON cp.IDNo=e.IDNo
     JOIN payroll_25payroll as p ON p.PayrollID=a.PayrollID AND p.IDNo=a.IDNo JOIN `1branches` b ON b.BranchNo=a.BranchNo
-	JOIN attend_0positions ps ON cp.PositionID=ps.PositionID 
+	JOIN attend_1positions ps ON cp.PositionID=ps.PositionID 
 	LEFT JOIN acctg_1budgetentities be ON IF(b.PseudoBranch=1,(800 + ps.deptid),b.BranchNo)=be.EntityID
     WHERE a.PayrollID=' .$payrollid. ' and a.AdjustTypeNo  IN (10,20,26) GROUP BY a.PayrollID, a.AdjustTypeNo, b.CompanyNo, a.BranchNo,EntityID, p.DisburseVia HAVING Amount<>0 ';
 
@@ -166,7 +166,7 @@ Select b1.CompanyNo AS RCompanyNo, CONCAT("cash payroll - ",Entity) as Particula
 FROM `payroll_25payrolldatalookup` as p JOIN `1employees` as e ON p.IDNo = e.IDNo 
 JOIN `attend_30latestpositionsinclresigned` cp ON cp.IDNo=e.IDNo
 JOIN `1branches` b ON b.BranchNo=p.BranchNo JOIN `1branches` b1 ON b1.BranchNo=p.RecordInBranchNo
-JOIN attend_0positions ps ON cp.PositionID=ps.PositionID 
+JOIN attend_1positions ps ON cp.PositionID=ps.PositionID 
 	LEFT JOIN acctg_1budgetentities be ON IF(b.PseudoBranch=1,(800 + ps.deptid),b.BranchNo)=be.EntityID
 WHERE p.PayrollID=' .$payrollid. ' and p.DisburseVia=0 GROUP BY p.PayrollID, b1.CompanyNo, p.BranchNo,EntityID, p.DisburseVia HAVING Amount<>0';
 
@@ -193,30 +193,30 @@ if(!isset($_POST['submit'])){ $_POST['submit']='Lookup';}
 if ($_POST['submit']=='Lookup'){  
 /* //QUERIES FOR GOVT PAYMENTS
 $sqlsss='SELECT PayrollID, Company, g.CompanyNo, RecordInBranchNo,IF(b.PseudoBranch<>1 OR ISNULL(cp.IDNo),b.BranchNo,(800 + ps.deptid)) AS FromBudgetOf, be.Entity AS From_Budget_Of, FORMAT(Sum(`SSS-EE`),2) as `SSS-EE`, FORMAT(Sum(`SSS-ERTotal`),2) as `SSS-ERTotal`, ROUND(Sum(`SSSTotal`),2) as SSSTotalValue, FORMAT(Sum(`SSSTotal`),2) as SSSTotal  FROM payroll_40sss g JOIN `1branches` b ON b.BranchNo=g.ActualBranchNo JOIN 1companies c ON c.CompanyNo=g.CompanyNo LEFT JOIN attend_30currentpositions cp ON g.IDNo=cp.IDNo 
-JOIN attend_0positions ps ON cp.PositionID=ps.PositionID 
+JOIN attend_1positions ps ON cp.PositionID=ps.PositionID 
 	LEFT JOIN acctg_1budgetentities be ON IF(b.PseudoBranch=1,(800 + ps.deptid),b.BranchNo)=be.EntityID
 where PayrollID=' .$payrollid. ' Group By PayrollID, FromBudgetOf, CompanyNo; '; */
 //QUERIES FOR GOVT PAYMENTS
 $sqlsss='SELECT PayrollID, Company, g.CompanyNo, RecordInBranchNo,IF(b.PseudoBranch<>1 OR ISNULL(cp.IDNo),b.BranchNo,(800 + ps.deptid)) AS FromBudgetOf, be.Entity AS From_Budget_Of, FORMAT(Sum(`SSS-EE`),2) as `SSS-EE`, FORMAT(Sum(`SSS-ERTotal`),2) as `SSS-ERTotal`, ROUND(Sum(`SSSTotal`),2) as SSSTotalValue, FORMAT(Sum(`SSSTotal`),2) as SSSTotal  FROM payroll_40sss g JOIN `1branches` b ON b.BranchNo=g.ActualBranchNo JOIN 1companies c ON c.CompanyNo=g.CompanyNo JOIN attend_30latestpositionsinclresigned cp ON g.IDNo=cp.IDNo 
-JOIN attend_0positions ps ON cp.PositionID=ps.PositionID JOIN 1departments d ON ps.deptid=d.deptid
+JOIN attend_1positions ps ON cp.PositionID=ps.PositionID JOIN 1departments d ON ps.deptid=d.deptid
 	LEFT JOIN acctg_1budgetentities be ON IF(b.PseudoBranch=1,(800 + ps.deptid),b.BranchNo)=be.EntityID
 where PayrollID=' .$payrollid. ' Group By PayrollID, FromBudgetOf, CompanyNo; ';
 $stmt=$link->query($sqlsss); $resultsss=$stmt->fetchAll();
 
 
 $sqlphic='SELECT PayrollID, Company, g.CompanyNo, RecordInBranchNo, IF(b.PseudoBranch<>1 OR ISNULL(cp.IDNo),b.BranchNo,(800 + ps.deptid)) AS FromBudgetOf, be.Entity AS From_Budget_Of, FORMAT(Sum(`PHIC-EE`),2) as `PHIC-EE`, FORMAT(Sum(`PHIC-ER`),2) as `PHIC-ER`, ROUND(Sum(`PHICTotal`),2) as PHICTotalValue, FORMAT(Sum(`PHICTotal`),2) as PHICTotal  FROM payroll_41phic g JOIN `1branches` b ON b.BranchNo=g.ActualBranchNo JOIN attend_30latestpositionsinclresigned cp ON g.IDNo=cp.IDNo 
-JOIN attend_0positions ps ON cp.PositionID=ps.PositionID JOIN 1departments d ON ps.deptid=d.deptid
+JOIN attend_1positions ps ON cp.PositionID=ps.PositionID JOIN 1departments d ON ps.deptid=d.deptid
 	LEFT JOIN acctg_1budgetentities be ON IF(b.PseudoBranch=1,(800 + ps.deptid),b.BranchNo)=be.EntityID where PayrollID=' .$payrollid. ' Group By PayrollID, FromBudgetOf, CompanyNo;';
 $stmt=$link->query($sqlphic); $resultphic=$stmt->fetchAll();
 
 $sqlpagibig='SELECT PayrollID, Company, g.CompanyNo, RecordInBranchNo, IF(b.PseudoBranch<>1 OR ISNULL(cp.IDNo),b.BranchNo,(800 + ps.deptid)) AS FromBudgetOf, be.Entity AS From_Budget_Of, FORMAT(Sum(`PagIbig-EE`),2) as `PagIbig-EE`,  FORMAT(Sum(`PagIbig-ER`),2) as `PagIbig-ER`, ROUND(Sum(`PagIbigTotal`),2) as PagIbigTotalValue, FORMAT(Sum(`PagIbigTotal`),2) as PagIbigTotal  FROM payroll_42pagibig g JOIN `1branches` b ON b.BranchNo=g.ActualBranchNo JOIN attend_30latestpositionsinclresigned cp ON g.IDNo=cp.IDNo 
-JOIN attend_0positions ps ON cp.PositionID=ps.PositionID JOIN 1departments d ON ps.deptid=d.deptid 
+JOIN attend_1positions ps ON cp.PositionID=ps.PositionID JOIN 1departments d ON ps.deptid=d.deptid 
 	LEFT JOIN acctg_1budgetentities be ON IF(b.PseudoBranch=1,(800 + ps.deptid),b.BranchNo)=be.EntityID
  where PayrollID=' .$payrollid. ' Group By PayrollID, FromBudgetOf, CompanyNo;';
 $stmt=$link->query($sqlpagibig); $resultpagibig=$stmt->fetchAll();
 
 $sqlwtax='SELECT PayrollID, Company, g.CompanyNo, RecordInBranchNo, IF(b.PseudoBranch<>1 OR ISNULL(cp.IDNo),b.BranchNo,(800 + ps.deptid)) AS FromBudgetOf, be.Entity AS From_Budget_Of, ROUND(Sum(`WTax`),2) as `WTaxValue`, FORMAT(Sum(`WTax`),2) as `WTax`  FROM payroll_43wtax g JOIN `1branches` b ON b.BranchNo=g.ActualBranchNo JOIN attend_30latestpositionsinclresigned cp ON g.IDNo=cp.IDNo 
-JOIN attend_0positions ps ON cp.PositionID=ps.PositionID JOIN 1departments d ON ps.deptid=d.deptid 
+JOIN attend_1positions ps ON cp.PositionID=ps.PositionID JOIN 1departments d ON ps.deptid=d.deptid 
 	LEFT JOIN acctg_1budgetentities be ON IF(b.PseudoBranch=1,(800 + ps.deptid),b.BranchNo)=be.EntityID where PayrollID=' .$payrollid. ' Group By PayrollID, FromBudgetOf, CompanyNo;';
 $stmt=$link->query($sqlwtax); $resultwtax=$stmt->fetchAll();
 
@@ -253,7 +253,7 @@ $stmt=$link->query($sqlwtax); $resultwtax=$stmt->fetchAll();
     
     $stmt=$link->prepare('CREATE TEMPORARY TABLE sssloan AS SELECT g.CompanyNo, Company, concat(FirstName, " ", SurName) as FullName, RecordInBranchNo, ActualBranchNo,IF(b.PseudoBranch=1,(800 + ps.deptid),b.BranchNo) AS FromBudgetOf, ROUND(Sum(`SSSLoan`),2) as `SSSLoanValue`, FORMAT(Sum(`SSSLoan`),2) as `SSSLoan`  FROM payroll_44sssloan g JOIN 1branches b ON b.BranchNo=g.ActualBranchNo'
             . '  JOIN attend_30latestpositionsinclresigned cp ON g.IDNo=cp.IDNo 
-JOIN attend_0positions ps ON cp.PositionID=ps.PositionID JOIN 1departments d ON ps.deptid=d.deptid where PayrollID=' .$payrollid. ' Group By g.IDNo, g.CompanyNo, RecordInBranchNo,FromBudgetOf;'); $stmt->execute();
+JOIN attend_1positions ps ON cp.PositionID=ps.PositionID JOIN 1departments d ON ps.deptid=d.deptid where PayrollID=' .$payrollid. ' Group By g.IDNo, g.CompanyNo, RecordInBranchNo,FromBudgetOf;'); $stmt->execute();
     foreach ($resultco as $co){
         echo '<b>'.$co['Company'].' - SSS Loans (Salary)</b><br>';
         $sql='SELECT g.*, Company, b1.Branch AS RecordInBranch, Entity AS From_Budget_Of FROM sssloan g
@@ -268,7 +268,7 @@ JOIN attend_0positions ps ON cp.PositionID=ps.PositionID JOIN 1departments d ON 
 
     $stmt=$link->prepare('CREATE TEMPORARY TABLE sssloancalamity AS SELECT g.CompanyNo, Company, concat(FirstName, " ", SurName) as FullName, RecordInBranchNo, ActualBranchNo,IF(b.PseudoBranch=1,(800 + ps.deptid),b.BranchNo) AS FromBudgetOf, ROUND(Sum(`SSSLoan`),2) as `SSSLoanValue`, FORMAT(Sum(`SSSLoan`),2) as `SSSLoan` FROM payroll_44sssloancalamity g JOIN 1branches b ON b.BranchNo=g.ActualBranchNo'
             . '  JOIN attend_30latestpositionsinclresigned cp ON g.IDNo=cp.IDNo 
-JOIN attend_0positions ps ON cp.PositionID=ps.PositionID JOIN 1departments d ON ps.deptid=d.deptid where PayrollID=' .$payrollid. ' Group By g.IDNo, g.CompanyNo, RecordInBranchNo,FromBudgetOf;'); $stmt->execute();
+JOIN attend_1positions ps ON cp.PositionID=ps.PositionID JOIN 1departments d ON ps.deptid=d.deptid where PayrollID=' .$payrollid. ' Group By g.IDNo, g.CompanyNo, RecordInBranchNo,FromBudgetOf;'); $stmt->execute();
     foreach ($resultco as $co){
         echo '<b>'.$co['Company'].' - SSS Loans (Calamity)</b><br>';
         $sql='SELECT g.*, Company, b1.Branch AS RecordInBranch, Entity AS From_Budget_Of FROM sssloan g
@@ -307,7 +307,7 @@ JOIN attend_0positions ps ON cp.PositionID=ps.PositionID JOIN 1departments d ON 
         echo '<br><br>';
     }
     $stmt=$link->prepare('CREATE TEMPORARY TABLE pagloan AS SELECT g.CompanyNo, Company, concat(FirstName, " ", SurName) as FullName, RecordInBranchNo, ActualBranchNo, IF(b.PseudoBranch=1,(800 + ps.deptid),b.BranchNo) AS FromBudgetOf,ROUND(Sum(`PagibigLoan`),2) as `PagibigLoanValue`, FORMAT(Sum(`PagibigLoan`),2) as `PagibigLoan`  FROM payroll_45pagibigloan g JOIN 1branches b ON b.BranchNo=g.ActualBranchNo  JOIN attend_30latestpositionsinclresigned cp ON g.IDNo=cp.IDNo 
-JOIN attend_0positions ps ON cp.PositionID=ps.PositionID JOIN 1departments d ON ps.deptid=d.deptid 
+JOIN attend_1positions ps ON cp.PositionID=ps.PositionID JOIN 1departments d ON ps.deptid=d.deptid 
          where PayrollID=' .$payrollid. ' Group By g.IDNo, g.CompanyNo, RecordInBranchNo,FromBudgetOf;'); $stmt->execute();
     foreach ($resultco as $co){
         echo '<b>'.$co['Company'].' - PagIbig Loans (Salary)</b><br>';
@@ -323,7 +323,7 @@ JOIN attend_0positions ps ON cp.PositionID=ps.PositionID JOIN 1departments d ON 
 	
 	
     $stmt=$link->prepare('CREATE TEMPORARY TABLE pagloancalamity AS SELECT g.CompanyNo, Company, concat(FirstName, " ", SurName) as FullName, RecordInBranchNo, ActualBranchNo, IF(b.PseudoBranch=1,(800 + ps.deptid),b.BranchNo) AS FromBudgetOf,ROUND(Sum(`PagibigLoan`),2) as `PagibigLoanValue`, FORMAT(Sum(`PagibigLoan`),2) as `PagibigLoan`  FROM payroll_45pagibigloancalamity g JOIN 1branches b ON b.BranchNo=g.ActualBranchNo  JOIN attend_30latestpositionsinclresigned cp ON g.IDNo=cp.IDNo 
-JOIN attend_0positions ps ON cp.PositionID=ps.PositionID JOIN 1departments d ON ps.deptid=d.deptid 
+JOIN attend_1positions ps ON cp.PositionID=ps.PositionID JOIN 1departments d ON ps.deptid=d.deptid 
          where PayrollID=' .$payrollid. ' Group By g.IDNo, g.CompanyNo, RecordInBranchNo,FromBudgetOf;'); $stmt->execute();
     foreach ($resultco as $co){
         echo '<b>'.$co['Company'].' - PagIbig Loans (Calamity)</b><br>';
@@ -386,7 +386,7 @@ JOIN attend_0positions ps ON cp.PositionID=ps.PositionID JOIN 1departments d ON 
 if (in_array($_POST['submit'],array('SSS','Philhealth','PagIbig','WTax'))){
     /* $sqlfromgovt1=' JOIN `1branches` b ON b.BranchNo=g.RecordInBranchNo LEFT JOIN attend_30currentpositions cp ON g.IDNo=cp.IDNo JOIN 1companies c ON c.CompanyNo=g.CompanyNo '
         . ' WHERE PayrollID=' .$payrollid. ' AND g.CompanyNo='; */
-    $sqlfromgovt1=' JOIN `1branches` b ON b.BranchNo=g.RecordInBranchNo JOIN attend_30latestpositionsinclresigned cp ON g.IDNo=cp.IDNo JOIN attend_0positions p ON cp.PositionID=p.PositionID JOIN 1departments d ON p.deptid=d.deptid JOIN 1companies c ON c.CompanyNo=g.CompanyNo '
+    $sqlfromgovt1=' JOIN `1branches` b ON b.BranchNo=g.RecordInBranchNo JOIN attend_30latestpositionsinclresigned cp ON g.IDNo=cp.IDNo JOIN attend_1positions p ON cp.PositionID=p.PositionID JOIN 1departments d ON p.deptid=d.deptid JOIN 1companies c ON c.CompanyNo=g.CompanyNo '
         . ' WHERE PayrollID=' .$payrollid. ' AND g.CompanyNo=';
 $sqlfromgovt2=' GROUP BY PayrollID, FromBudgetOf, g.CompanyNo';
 
@@ -530,7 +530,7 @@ foreach($resultsssloanmain as $mainrow){
    $sqlinsert='INSERT INTO `acctg_2cvmain` SET PayeeNo=800, Payee="Social Security System", `Posted`=0, CreditAccountID='.$mainrow['AccountID'].', Date=LAST_DAY(\''.date("Y-m-d").'\'), CVNo='.$cvno.', DateofCheck=LAST_DAY(\''.date("Y-m-d").'\'), CheckNo=CONCAT("SSSLoansSalary-",LEFT(MONTHNAME(\''.$paydate.'\'),3),"-'.$mainrow['Company'].'"), Remarks=\''.$mainrow['Company'].'  - Loans\', EncodedByNo=\''.$_SESSION['(ak0)'].'\', PostedByNo=\''.$_SESSION['(ak0)'].'\',TimeStamp=Now();'; 	
         $stmt=$link->prepare($sqlinsert); $stmt->execute();
    $sqlsssloan='SELECT g.CompanyNo,concat(FirstName, " ", SurName) as FullName, RecordInBranchNo, IF(b.PseudoBranch=1,(800 + d.deptid),b.BranchNo) AS FromBudgetOf, IF(b.PseudoBranch=1,dept,b.Branch) AS From_Budget_Of, ROUND(Sum(`SSSLoan`),2) as `SSSLoan`  FROM payroll_44sssloan g JOIN `1branches` b ON b.BranchNo=g.RecordInBranchNo  JOIN attend_30latestpositionsinclresigned cp ON g.IDNo=cp.IDNo 
-JOIN attend_0positions ps ON cp.PositionID=ps.PositionID JOIN 1departments d ON ps.deptid=d.deptid  where PayrollID=' .$payrollid. ' AND g.CompanyNo='.$mainrow['CompanyNo'].' Group By g.IDNo;';
+JOIN attend_1positions ps ON cp.PositionID=ps.PositionID JOIN 1departments d ON ps.deptid=d.deptid  where PayrollID=' .$payrollid. ' AND g.CompanyNo='.$mainrow['CompanyNo'].' Group By g.IDNo;';
    $stmt=$link->query($sqlsssloan); $resultsssloan=$stmt->fetchAll();
    
    foreach ($resultsssloan as $row){
@@ -554,7 +554,7 @@ foreach($resultsssloanmain as $mainrow){
    $cvno=$cvno+1; 
    $sqlinsert='INSERT INTO `acctg_2cvmain` SET PayeeNo=800, Payee="Social Security System", `Posted`=0, CreditAccountID='.$mainrow['AccountID'].', Date=LAST_DAY(\''.date("Y-m-d").'\'), CVNo='.$cvno.', DateofCheck=LAST_DAY(\''.date("Y-m-d").'\'), CheckNo=CONCAT("SSSLoansCalamity-",LEFT(MONTHNAME(\''.$paydate.'\'),3),"-'.$mainrow['Company'].'"), Remarks=\''.$mainrow['Company'].'  - Loans\', EncodedByNo=\''.$_SESSION['(ak0)'].'\', PostedByNo=\''.$_SESSION['(ak0)'].'\',TimeStamp=Now();'; 	
         $stmt=$link->prepare($sqlinsert); $stmt->execute();
-   $sqlsssloan='SELECT g.CompanyNo,concat(FirstName, " ", SurName) as FullName, RecordInBranchNo, IF(b.PseudoBranch=1,(800 + d.deptid),b.BranchNo) AS FromBudgetOf, IF(b.PseudoBranch=1,dept,b.Branch) AS From_Budget_Of, ROUND(Sum(`SSSLoan`),2) as `SSSLoan`  FROM payroll_44sssloancalamity g JOIN `1branches` b ON b.BranchNo=g.RecordInBranchNo  JOIN attend_30latestpositionsinclresigned cp ON g.IDNo=cp.IDNo JOIN attend_0positions ps ON cp.PositionID=ps.PositionID JOIN 1departments d ON ps.deptid=d.deptid  where PayrollID=' .$payrollid. ' AND g.CompanyNo='.$mainrow['CompanyNo'].' Group By g.IDNo;';
+   $sqlsssloan='SELECT g.CompanyNo,concat(FirstName, " ", SurName) as FullName, RecordInBranchNo, IF(b.PseudoBranch=1,(800 + d.deptid),b.BranchNo) AS FromBudgetOf, IF(b.PseudoBranch=1,dept,b.Branch) AS From_Budget_Of, ROUND(Sum(`SSSLoan`),2) as `SSSLoan`  FROM payroll_44sssloancalamity g JOIN `1branches` b ON b.BranchNo=g.RecordInBranchNo  JOIN attend_30latestpositionsinclresigned cp ON g.IDNo=cp.IDNo JOIN attend_1positions ps ON cp.PositionID=ps.PositionID JOIN 1departments d ON ps.deptid=d.deptid  where PayrollID=' .$payrollid. ' AND g.CompanyNo='.$mainrow['CompanyNo'].' Group By g.IDNo;';
    $stmt=$link->query($sqlsssloan); $resultsssloan=$stmt->fetchAll();
    
    foreach ($resultsssloan as $row){
@@ -580,7 +580,7 @@ foreach ($resultpagibigloanmain as $mainrow){
 	// echo $sqlinsert; break;
         $stmt=$link->prepare($sqlinsert); $stmt->execute();
 $sqlpagibigloan='SELECT g.CompanyNo,concat(FirstName, " ", SurName) as FullName, RecordInBranchNo, IF(b.PseudoBranch=1,(800 + d.deptid),b.BranchNo) AS FromBudgetOf, IF(b.PseudoBranch=1,dept,b.Branch) AS From_Budget_Of, ROUND(Sum(`PagibigLoan`),2) as `PagibigLoan`  FROM payroll_45pagibigloan g JOIN `1branches` b ON b.BranchNo=g.RecordInBranchNo  JOIN attend_30latestpositionsinclresigned cp ON g.IDNo=cp.IDNo 
-JOIN attend_0positions ps ON cp.PositionID=ps.PositionID JOIN 1departments d ON ps.deptid=d.deptid where PayrollID=' .$payrollid. ' AND g.CompanyNo='.$mainrow['CompanyNo'].' Group By g.IDNo;';
+JOIN attend_1positions ps ON cp.PositionID=ps.PositionID JOIN 1departments d ON ps.deptid=d.deptid where PayrollID=' .$payrollid. ' AND g.CompanyNo='.$mainrow['CompanyNo'].' Group By g.IDNo;';
    $stmt=$link->query($sqlpagibigloan); $resultpagibigloan=$stmt->fetchAll();
 
 foreach ($resultpagibigloan as $row){
@@ -606,7 +606,7 @@ foreach ($resultpagibigloanmain as $mainrow){
 	// echo $sqlinsert; break;
         $stmt=$link->prepare($sqlinsert); $stmt->execute();
 $sqlpagibigloan='SELECT g.CompanyNo,concat(FirstName, " ", SurName) as FullName, RecordInBranchNo, IF(b.PseudoBranch=1,(800 + d.deptid),b.BranchNo) AS FromBudgetOf, IF(b.PseudoBranch=1,dept,b.Branch) AS From_Budget_Of, ROUND(Sum(`PagibigLoan`),2) as `PagibigLoan`  FROM payroll_45pagibigloancalamity g JOIN `1branches` b ON b.BranchNo=g.RecordInBranchNo  JOIN attend_30latestpositionsinclresigned cp ON g.IDNo=cp.IDNo 
-JOIN attend_0positions ps ON cp.PositionID=ps.PositionID JOIN 1departments d ON ps.deptid=d.deptid where PayrollID=' .$payrollid. ' AND g.CompanyNo='.$mainrow['CompanyNo'].' Group By g.IDNo;';
+JOIN attend_1positions ps ON cp.PositionID=ps.PositionID JOIN 1departments d ON ps.deptid=d.deptid where PayrollID=' .$payrollid. ' AND g.CompanyNo='.$mainrow['CompanyNo'].' Group By g.IDNo;';
    $stmt=$link->query($sqlpagibigloan); $resultpagibigloan=$stmt->fetchAll();
 
 foreach ($resultpagibigloan as $row){

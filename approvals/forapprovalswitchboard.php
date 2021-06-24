@@ -389,7 +389,7 @@ if(allowedToOpen(64902,'1rtc')){
 			 
 $sqlsp='SELECT pr.*, Entity, Position, TargetDate, e.Nickname as RequestedBy, pr.TimeStamp as RequestTS, e1.Nickname as ApprovedBy, pr.ApproveTS
         FROM hr_2personnelrequest pr
-        JOIN attend_0positions p ON p.PositionID=pr.PositionID        
+        JOIN attend_1positions p ON p.PositionID=pr.PositionID        
         JOIN `1employees` e ON e.IDNo=pr.EncodedByNo
         LEFT JOIN `1employees` e1 ON e1.IDNo=pr.ApprovedByNo
         JOIN `acctg_1budgetentities` be ON be.EntityID=pr.EntityID
@@ -729,7 +729,7 @@ if ((allowedToOpen(220,'1rtc'))){
 			goto here;
 		}
 		here:
-        $sqlsp = 'select sp.*,ForPositionID AS TxnID,Position AS ForPosition,NickName As RequestedBy FROM approvals_systempermission sp JOIN 1_gamit.0idinfo id ON sp.RequestedByNo=id.IDNo JOIN attend_0positions p ON sp.ForPositionID=p.PositionID '.$reqcondi.' ORDER BY Position ASC';
+        $sqlsp = 'select sp.*,ForPositionID AS TxnID,Position AS ForPosition,NickName As RequestedBy FROM approvals_systempermission sp JOIN 1_gamit.0idinfo id ON sp.RequestedByNo=id.IDNo JOIN attend_1positions p ON sp.ForPositionID=p.PositionID '.$reqcondi.' ORDER BY Position ASC';
         $stmtsp=$link->query($sqlsp); $datatoshowsp=$stmtsp->fetchAll(); $sp=0;
 
         if ($stmtsp->rowCount()>0){

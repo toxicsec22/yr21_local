@@ -35,8 +35,8 @@ if (in_array($which,array('AddPS','EditPS'))){
 if (in_array($which,array('AddSA','EditSA'))){
 	// $PerfComID=comboBoxValue($link,'hr_1competency','Competency',addslashes($_POST['PerfComID']),'PerfComID');
 	$StatementID=comboBoxValue($link,'hr_1statement','Statement',addslashes($_POST['Statement']),'PerfStateID');
-	$ToEvaluate=comboBoxValue($link,'attend_0positions','Position',addslashes($_POST['ToEvaluate']),'PositionID');
-	$Evaluator=comboBoxValue($link,'attend_0positions','Position',addslashes($_POST['Evaluator']),'PositionID');
+	$ToEvaluate=comboBoxValue($link,'attend_1positions','Position',addslashes($_POST['ToEvaluate']),'PositionID');
+	$Evaluator=comboBoxValue($link,'attend_1positions','Position',addslashes($_POST['Evaluator']),'PositionID');
 	// $columnstoadd=array('StatementID');
 }
 
@@ -45,7 +45,7 @@ if (in_array($which, array('Statement','StatementAssign','EditSpecificsPS'))){
 }
 
 if (in_array($which, array('StatementAssign','EditSpecificsSA', 'StatementSummary'))){
-    echo comboBox($link,'SELECT PositionID, Position FROM attend_0positions ORDER BY PositionID','PositionID','Position','positionlist');
+    echo comboBox($link,'SELECT PositionID, Position FROM attend_1positions ORDER BY PositionID','PositionID','Position','positionlist');
     }
 
 if (in_array($which, array('StatementAssign','EditSpecificsSA'))){
@@ -172,7 +172,7 @@ switch ($which)
 	//Start of Case Statement
 	case 'StatementAssign':
 	
-	$sql='SELECT ps.*, IF(ToEvaluate=-1, "Default", p.Position) AS ToEvaluate, IF(Evaluator=-1, "Default", p1.Position) AS Evaluator, s.Statement, Weight AS WeightinPercent, c.Competency, PSID AS TxnID FROM hr_1positionstatement ps JOIN hr_1statement s ON ps.StatementID=s.PerfStateID JOIN hr_1competency c ON s.PerfComID=c.PerfComID LEFT JOIN attend_0positions p ON p.PositionID=ps.ToEvaluate LEFT JOIN attend_0positions p1 ON p1.PositionID=ps.Evaluator';
+	$sql='SELECT ps.*, IF(ToEvaluate=-1, "Default", p.Position) AS ToEvaluate, IF(Evaluator=-1, "Default", p1.Position) AS Evaluator, s.Statement, Weight AS WeightinPercent, c.Competency, PSID AS TxnID FROM hr_1positionstatement ps JOIN hr_1statement s ON ps.StatementID=s.PerfStateID JOIN hr_1competency c ON s.PerfComID=c.PerfComID LEFT JOIN attend_1positions p ON p.PositionID=ps.ToEvaluate LEFT JOIN attend_1positions p1 ON p1.PositionID=ps.Evaluator';
 
 	$columnnameslist=array('Competency', 'Statement', 'ToEvaluate', 'Evaluator', 'WeightinPercent');
 		
@@ -216,7 +216,7 @@ switch ($which)
                 echo '<form method="post" action="perfevalsettings.php?w=StatementSummary" enctype="multipart/form-data">
                     Position to Evaluate<input type=text size=10 name=ToEvaluate list=positionlist >
                     <input type=submit name=submit value=Lookup></form><br/><br/>';
-		$sql3 = 'SELECT Position, ToEvaluate FROM hr_1positionstatement ps LEFT JOIN attend_0positions p ON ps.ToEvaluate=p.PositionID WHERE '
+		$sql3 = 'SELECT Position, ToEvaluate FROM hr_1positionstatement ps LEFT JOIN attend_1positions p ON ps.ToEvaluate=p.PositionID WHERE '
                         .(isset($_POST['submit'])?' Position LIKE "'.addslashes($_POST['ToEvaluate']).'"':'PSID = '.$_GET['PSID']); 
 		$stmt3=$link->query($sql3); $row3 = $stmt3->fetch();
 		
@@ -224,7 +224,7 @@ switch ($which)
 		else { $title='Evaluation for '.$row3['Position']; $toevaluate=$row3['ToEvaluate']; }
 		echo '<title>'.$title.'</title><h3>'.$title.'</h3>'; 
 		
-	$sql0='CREATE TEMPORARY TABLE statelist AS SELECT ps.PSID, ps.StatementID, s.PerfStateID, s.PerfComID, IF(ToEvaluate=-1, "-1", p.Position) AS ToEvaluate, IF(Evaluator=-1, "Default", p1.Position) AS Evaluator, s.Statement, Weight AS WeightinPercent, PSID AS TxnID FROM hr_1positionstatement ps JOIN hr_1statement s ON ps.StatementID=s.PerfStateID LEFT JOIN attend_0positions p ON p.PositionID=ps.ToEvaluate LEFT JOIN attend_0positions p1 ON p1.PositionID=ps.Evaluator WHERE ps.ToEvaluate='.$toevaluate;
+	$sql0='CREATE TEMPORARY TABLE statelist AS SELECT ps.PSID, ps.StatementID, s.PerfStateID, s.PerfComID, IF(ToEvaluate=-1, "-1", p.Position) AS ToEvaluate, IF(Evaluator=-1, "Default", p1.Position) AS Evaluator, s.Statement, Weight AS WeightinPercent, PSID AS TxnID FROM hr_1positionstatement ps JOIN hr_1statement s ON ps.StatementID=s.PerfStateID LEFT JOIN attend_1positions p ON p.PositionID=ps.ToEvaluate LEFT JOIN attend_1positions p1 ON p1.PositionID=ps.Evaluator WHERE ps.ToEvaluate='.$toevaluate;
         $stmt=$link->query($sql0);
         $sql='SELECT * FROM statelist';
         
@@ -380,7 +380,7 @@ switch ($which)
     case 'EditSpecificsSA':
 		$title='Edit Specifics';
 		$txnid=intval($_GET['PSID']);
-                $sql='SELECT ps.*, s.Statement,pc.Competency AS PerfComID, IFNULL(p.Position,-1) AS ToEvaluate, IFNULL(p1.Position,-1) AS Evaluator, s.PerfStateID AS TxnID FROM hr_1statement AS s JOIN hr_1competency AS pc ON pc.PerfComID = s.PerfComID JOIN hr_1positionstatement ps ON ps.StatementID=s.PerfStateID LEFT JOIN attend_0positions p ON p.PositionID=ps.ToEvaluate LEFT JOIN attend_0positions p1 ON ps.Evaluator=p1.PositionID';
+                $sql='SELECT ps.*, s.Statement,pc.Competency AS PerfComID, IFNULL(p.Position,-1) AS ToEvaluate, IFNULL(p1.Position,-1) AS Evaluator, s.PerfStateID AS TxnID FROM hr_1statement AS s JOIN hr_1competency AS pc ON pc.PerfComID = s.PerfComID JOIN hr_1positionstatement ps ON ps.StatementID=s.PerfStateID LEFT JOIN attend_1positions p ON p.PositionID=ps.ToEvaluate LEFT JOIN attend_1positions p1 ON ps.Evaluator=p1.PositionID';
                 
                 $columnnameslist=array('Statement', 'ToEvaluate', 'Evaluator', 'Weight');
                 $columnstoadd=array('Statement', 'ToEvaluate', 'Evaluator', 'Weight');

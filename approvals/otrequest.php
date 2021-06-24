@@ -115,7 +115,7 @@ switch ($which){
 		JOIN attend_2attendance a ON a.IDNo=ot.IDNo AND a.DateToday=ot.DateToday
 		JOIN attend_0leavetype lt ON lt.LeaveNo=a.LeaveNo
 		JOIN attend_0typeofday td ON td.TypeofDayNo=ad.`TypeOfDayNo`
-		JOIN `1employees` e ON ot.IDNo=e.IDNo JOIN attend_1defaultbranchassign dba ON ot.IDNo=dba.IDNo JOIN 1branches b ON dba.DefaultBranchAssignNo=b.BranchNo JOIN 1employees e2 ON ot.RequestedByNo=e2.IDNo LEFT JOIN 1employees e3 ON ot.ApprovedByNo=e3.IDNo JOIN attend_30latestpositionsinclresigned lpir ON ot.IDNo=lpir.IDNo JOIN attend_0positions p ON lpir.PositionID=p.PositionID WHERE ';
+		JOIN `1employees` e ON ot.IDNo=e.IDNo JOIN attend_1defaultbranchassign dba ON ot.IDNo=dba.IDNo JOIN 1branches b ON dba.DefaultBranchAssignNo=b.BranchNo JOIN 1employees e2 ON ot.RequestedByNo=e2.IDNo LEFT JOIN 1employees e3 ON ot.ApprovedByNo=e3.IDNo JOIN attend_30latestpositionsinclresigned lpir ON ot.IDNo=lpir.IDNo JOIN attend_1positions p ON lpir.PositionID=p.PositionID WHERE ';
 		$sqlmain=$sqlmain1.$showprocesslabel.$sqlmain2.$addlcondi.' '.$morp.' AND ';
 		
         $title='Pending OT Request'; 
@@ -139,7 +139,7 @@ switch ($which){
 		
 		/*$sqlmain='SELECT OTType,ot.TxnID,Position,ApprovedTS,PayrollID,CONCAT(e.Nickname," ",e.SurName) AS FullName,CONCAT(e3.Nickname," ",e3.SurName) AS ApprovedBy,CONCAT(e3.Nickname," ",e3.SurName) AS DeniedBy,ApprovedTS AS DeniedTS,CONCAT(e2.Nickname," ",e2.SurName) AS RequestedBy,RequestedTS, Branch, ot.DateToday AS DateOfOT,EndOfOT, Reason'.$showprocesslabel.' FROM approvals_5ot ot 
 		LEFT JOIN attend_0ottype t ON t.OTTypeNo=ot.OTTypeNo
-		JOIN `1employees` e ON ot.IDNo=e.IDNo JOIN attend_1defaultbranchassign dba ON ot.IDNo=dba.IDNo JOIN 1branches b ON dba.DefaultBranchAssignNo=b.BranchNo JOIN 1employees e2 ON ot.RequestedByNo=e2.IDNo LEFT JOIN 1employees e3 ON ot.ApprovedByNo=e3.IDNo JOIN attend_2attendancedates ad ON ot.DateToday=ad.DateToday JOIN attend_30latestpositionsinclresigned lpir ON ot.IDNo=lpir.IDNo JOIN attend_0positions p ON lpir.PositionID=p.PositionID WHERE '.$addlcondi.' '.$morp.' AND ';*/
+		JOIN `1employees` e ON ot.IDNo=e.IDNo JOIN attend_1defaultbranchassign dba ON ot.IDNo=dba.IDNo JOIN 1branches b ON dba.DefaultBranchAssignNo=b.BranchNo JOIN 1employees e2 ON ot.RequestedByNo=e2.IDNo LEFT JOIN 1employees e3 ON ot.ApprovedByNo=e3.IDNo JOIN attend_2attendancedates ad ON ot.DateToday=ad.DateToday JOIN attend_30latestpositionsinclresigned lpir ON ot.IDNo=lpir.IDNo JOIN attend_1positions p ON lpir.PositionID=p.PositionID WHERE '.$addlcondi.' '.$morp.' AND ';*/
 		$sqlmain=$sqlmain1.$showprocesslabel.$sqlmain2.$addlcondi.' '.$morp.' AND ';
         $sql=$sqlmain.'Approved=1';
         $title='Approved OT Request'; 
@@ -215,7 +215,7 @@ switch ($which){
 	
 	echo '<title>'.$title.'</title>';
 	echo '<h3>'.$title.'</h3>';
-	$sqlm='SELECT e.IDNo,CONCAT(e.Nickname," ",e.SurName," (",Branch,"/",Position,")") AS FullName FROM `1employees` e JOIN attend_1defaultbranchassign dba ON e.IDNo=dba.IDNo JOIN 1branches b ON dba.DefaultBranchAssignNo=b.BranchNo JOIN attend_30latestpositionsinclresigned lpir ON e.IDNo=lpir.IDNo JOIN attend_0positions p ON lpir.PositionID=p.PositionID';
+	$sqlm='SELECT e.IDNo,CONCAT(e.Nickname," ",e.SurName," (",Branch,"/",Position,")") AS FullName FROM `1employees` e JOIN attend_1defaultbranchassign dba ON e.IDNo=dba.IDNo JOIN 1branches b ON dba.DefaultBranchAssignNo=b.BranchNo JOIN attend_30latestpositionsinclresigned lpir ON e.IDNo=lpir.IDNo JOIN attend_1positions p ON lpir.PositionID=p.PositionID';
 	$sqle=$sqlm.' WHERE e.IDNo>1002 ORDER BY FullName ASC;';
 	
 	 echo comboBox($link,$sqle,'FullName','IDNo','employees');
@@ -270,7 +270,7 @@ switch ($which){
 	echo '<title>'.$title.'</title>';
 	echo '<h3>'.$title.'</h3>';
 	echo '<form action="#" method="POST">PayrollID: <input type="text" size="5" name="payrollid" list="payperiods" value="'.$_POST['payrollid'].'"> <input type="submit" value="Lookup"></form>';
-	  $sql='SELECT e.IDNo,CONCAT(e.Nickname," ",e.SurName) AS FullName,Branch,Position,RegOTHrs,ExcessRestHrsOT FROM `1employees` e JOIN attend_1defaultbranchassign dba ON e.IDNo=dba.IDNo JOIN 1branches b ON dba.DefaultBranchAssignNo=b.BranchNo JOIN attend_30latestpositionsinclresigned lpir ON e.IDNo=lpir.IDNo JOIN attend_0positions p ON lpir.PositionID=p.PositionID JOIN attend_44sumforpayroll sp ON e.IDNo=sp.IDNo WHERE PayrollID='.$_POST['payrollid'].' HAVING RegOTHrs<>0 OR ExcessRestHrsOT<>0';
+	  $sql='SELECT e.IDNo,CONCAT(e.Nickname," ",e.SurName) AS FullName,Branch,Position,RegOTHrs,ExcessRestHrsOT FROM `1employees` e JOIN attend_1defaultbranchassign dba ON e.IDNo=dba.IDNo JOIN 1branches b ON dba.DefaultBranchAssignNo=b.BranchNo JOIN attend_30latestpositionsinclresigned lpir ON e.IDNo=lpir.IDNo JOIN attend_1positions p ON lpir.PositionID=p.PositionID JOIN attend_44sumforpayroll sp ON e.IDNo=sp.IDNo WHERE PayrollID='.$_POST['payrollid'].' HAVING RegOTHrs<>0 OR ExcessRestHrsOT<>0';
       $title=''; $columnnames=array('IDNo','FullName','Branch','Position','RegOTHrs','ExcessRestHrsOT');
       include('../backendphp/layout/displayastablenosort.php');
 	break;

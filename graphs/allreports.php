@@ -430,7 +430,7 @@ if (isset($_POST['btnSubmit'])){
 }
 
 
-$sql='SELECT TeamLeader AS IDNo,CONCAT(Fullname," (",Position,")") AS NameAndPos,JobLevelNo,JLID FROM attend_1branchgroups bg JOIN attend_30currentpositions cp ON bg.TeamLeader=cp.IDNo GROUP BY TeamLeader UNION SELECT SAM,CONCAT(Fullname," (",Position,")") AS NameAndPos,JobLevelNo,JLID FROM attend_1branchgroups bg JOIN attend_30currentpositions cp ON bg.SAM=cp.IDNo GROUP BY TeamLeader ORDER BY JLID DESC';
+$sql='SELECT TeamLeader AS IDNo,CONCAT(Fullname," (",Position,")") AS NameAndPos,JobLevelID,JobLevelID FROM attend_1branchgroups bg JOIN attend_30currentpositions cp ON bg.TeamLeader=cp.IDNo GROUP BY TeamLeader UNION SELECT SAM,CONCAT(Fullname," (",Position,")") AS NameAndPos,JobLevelID,JobLevelID FROM attend_1branchgroups bg JOIN attend_30currentpositions cp ON bg.SAM=cp.IDNo GROUP BY TeamLeader ORDER BY JobLevelID DESC';
 $stmt=$link->query($sql); $res=$stmt->fetchall();
 
 $nameandpos='';

@@ -78,7 +78,7 @@ echo'</br>';
 						
 			
 		echo comboBox($link,'SELECT BranchNo, Branch FROM 1branches WHERE BranchNo>=0 AND Pseudobranch<>1 AND Active<>0 ORDER BY Branch','BranchNo','Branch','branchlist');
-		echo comboBox($link,'SELECT e.IDNo, CONCAT(Nickname," ",SurName) AS FullName FROM 1employees e JOIN attend_30currentpositions lpir ON e.IDNo=lpir.IDNo JOIN attend_0positions p ON lpir.PositionID=p.PositionID WHERE p.deptid IN (20,60)','IDNo','FullName','AssignToNolist');
+		echo comboBox($link,'SELECT e.IDNo, CONCAT(Nickname," ",SurName) AS FullName FROM 1employees e JOIN attend_30currentpositions lpir ON e.IDNo=lpir.IDNo JOIN attend_1positions p ON lpir.PositionID=p.PositionID WHERE p.deptid IN (20,60)','IDNo','FullName','AssignToNolist');
 		echo comboBox($link,'SELECT txntypeid, txndesc FROM invty_0txntype WHERE txntypeid IN (1,2,29,30,5,4,7)','txntypeid','txndesc','Typelist');
 		$sql='SELECT a.*,b.Branch,txndesc AS InvoiceType,CONCAT(cp.Nickname," ",cp.SurName) AS AssignedTo,CONCAT (e.Nickname," ",e.SurName) AS AssignedBy,IF(Finished<>0,"Yes","") AS Finished,IF(Received<>0,"Yes","") AS Received FROM acctg_4blotterassign a JOIN 1employees e ON a.AssignedBy=e.IDNo JOIN 1branches b ON b.BranchNo=a.BranchNo LEFT JOIN 1employees cp ON cp.IDNo=a.AssignedTo JOIN invty_0txntype i ON i.txntypeid=a.InvoiceType'.$condi.' ';
 		

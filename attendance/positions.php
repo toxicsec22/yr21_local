@@ -24,23 +24,23 @@ $showbranches=false; include_once('../switchboard/contents.php');
 $which=!isset($_GET['w'])?'List':$_GET['w'];
 $title='Add New Position';  $title='';  
 include_once $path.'/acrossyrs/commonfunctions/listoptions.php';
-echo comboBox($link,'SELECT Position,PositionID FROM `attend_0positions` ORDER BY Position','Position','PositionID','poslist');
+echo comboBox($link,'SELECT Position,PositionID FROM `attend_1positions` ORDER BY Position','Position','PositionID','poslist');
 
 $list='List';
-$table='attend_0positions'; $txnidname='PositionID'; 
-$sql='SELECT p.*, department AS Department, (SELECT Position FROM `attend_0positions` WHERE PositionID=p.supervisorpositionid) AS Supervisor, IF(p.PreferredRateType=1,"Monthly","Daily") AS RateType,p.JobLevelNo
-FROM `attend_0positions` p LEFT JOIN `attend_1joblevel` jl ON jl.JobLevelNo=p.JobLevelNo
+$table='attend_1positions'; $txnidname='PositionID'; 
+$sql='SELECT p.*, department AS Department, (SELECT Position FROM `attend_1positions` WHERE PositionID=p.supervisorpositionid) AS Supervisor, IF(p.PreferredRateType=1,"Monthly","Daily") AS RateType,p.JobLevelID
+FROM `attend_1positions` p LEFT JOIN `attend_0joblevels` jl ON jl.JobLevelID=p.JobLevelID
 JOIN `1departments` d ON d.deptid=p.deptid ';
-$columnnameslist=array('PositionID', 'Position', 'Department', 'Supervisor', 'RateType', 'JobLevelNo', 'VLfromPosition','MaxVLfromTenure'); 
+$columnnameslist=array('PositionID', 'Position', 'Department', 'Supervisor', 'RateType', 'JobLevelID', 'VLfromPosition','MaxVLfromTenure'); 
 $columnstoadd=array_diff($columnnameslist,array('Department','Supervisor','RateType'));
 $columnstoadd[]='deptid'; $columnstoadd[]='supervisorpositionid'; $columnstoadd[]='PreferredRateType';
 $columnstoedit=$columnstoadd;
-$columnswithlists=array('Department','Supervisor','JobLevelNo');
-$listsname=array('Department'=>'departments','Supervisor'=>'supervisors','JobLevelNo'=>'joblevels');
+$columnswithlists=array('Department','Supervisor','JobLevelID');
+$listsname=array('Department'=>'departments','Supervisor'=>'supervisors','JobLevelID'=>'joblevels');
 $listssql=array(
     array('sql'=>'SELECT * FROM `1departments`', 'listvalue'=>'department', 'label'=>'deptid','listname'=>'departments'),
-    array('sql'=>'SELECT * FROM `attend_0positions`', 'listvalue'=>'Position', 'label'=>'PositionID','listname'=>'supervisors'),
-    array('sql'=>'SELECT JobLevelNo, CONCAT(JobClassification," Level ", RIGHT(JobLevelNo,1)) AS JobLevel FROM `attend_1joblevel` jl JOIN `attend_0jobclass` jc ON jc.JobClassNo=jl.JobClassNo ORDER BY jc.JobClassNo,JobLevelNo', 'listvalue'=>'JobLevel', 'label'=>'JobLevelNo','listname'=>'joblevels')
+    array('sql'=>'SELECT * FROM `attend_1positions`', 'listvalue'=>'Position', 'label'=>'PositionID','listname'=>'supervisors'),
+    array('sql'=>'SELECT JobLevelID, CONCAT(JobClassification," Level ", RIGHT(JobLevelID,1)) AS JobLevel FROM `attend_0joblevels` jl JOIN `attend_0jobclass` jc ON jc.JobClassNo=jl.JobClassNo ORDER BY jc.JobClassNo,JobLevelID', 'listvalue'=>'JobLevel', 'label'=>'JobLevelID','listname'=>'joblevels')
 );
 
 if($which=='AssignPermissions') {
@@ -117,7 +117,7 @@ if($which=='List') {
                 <label>Immediate Supervisor</label> <input name="supervisorpositionid" class="form-control" list="supervisors"/>
             
                 <label>Rate Type (0-Daily, 1-Monthly)</label> <input name="PreferredRateType" class="form-control" />
-                <label>JobLevelNo</label> <input name="JobLevelNo" class="form-control" list="joblevels"/>
+                <label>JobLevelID</label> <input name="JobLevelID" class="form-control" list="joblevels"/>
                 <label>VLfromPosition</label> <input name="VLfromPosition" class="form-control" />
                 <label>MaxVLfromTenure</label> <input name="MaxVLfromTenure" class="form-control" />
                 <label>Remarks</label> <input name="Remarks" class="form-control" />

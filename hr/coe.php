@@ -114,7 +114,7 @@ $cert='<center><font style="font-size:25pt;letter-spacing: 5px;font-weight:bold;
 switch($_GET['coetype']){
 	case 1: // final clearance
 		if (!allowedToOpen(array(59022),'1rtc')) { echo 'No permission'; exit; }
-		$sql='SELECT Gender,id.IDNo,DateResigned,Company,CompanyName,`Position`,CONCAT(id.FirstName," ",LEFT(id.MiddleName,1),". ",id.SurName) AS Name,if(p.deptid IN (1,2,3,4),"Supply Chain",if(p.deptid=10,"Operations",department)) AS department,id.DateHired FROM attend_30latestpositionsinclresigned cp JOIN 1_gamit.0idinfo id ON cp.IDNo=id.IDNo JOIN 1employees e ON e.IDNo=cp.IDNo JOIN 1companies c ON e.RCompanyNo=c.CompanyNo JOIN attend_0positions p ON cp.PositionID=p.PositionID JOIN 1departments d ON p.deptid=d.deptid WHERE e.Resigned=1 AND cp.IDNo='.$_POST['IDNo'];
+		$sql='SELECT Gender,id.IDNo,DateResigned,Company,CompanyName,`Position`,CONCAT(id.FirstName," ",LEFT(id.MiddleName,1),". ",id.SurName) AS Name,if(p.deptid IN (1,2,3,4),"Supply Chain",if(p.deptid=10,"Operations",department)) AS department,id.DateHired FROM attend_30latestpositionsinclresigned cp JOIN 1_gamit.0idinfo id ON cp.IDNo=id.IDNo JOIN 1employees e ON e.IDNo=cp.IDNo JOIN 1companies c ON e.RCompanyNo=c.CompanyNo JOIN attend_1positions p ON cp.PositionID=p.PositionID JOIN 1departments d ON p.deptid=d.deptid WHERE e.Resigned=1 AND cp.IDNo='.$_POST['IDNo'];
 
 		$stmt=$link->query($sql); $row=$stmt->fetch();
 
@@ -167,7 +167,7 @@ case 4: // quit claim
 include_once $path.'/acrossyrs/commonfunctions/numtowords.php';
 
 		if (!allowedToOpen(array(59022),'1rtc')) { echo 'No permission'; exit; }
-		$sql='SELECT Gender,id.IDNo,DateResigned,Company,CompanyName,CONCAT(id.StreetAddress,", ",id.BarangayOrTown,", ",id.CityOrProvince) AS PresentAddress,`Position`,CONCAT(id.FirstName," ",LEFT(id.MiddleName,1),". ",id.SurName) AS Name,if(p.deptid IN (1,2,3,4),"Supply Chain",if(p.deptid=10,"Operations",department)) AS department,id.DateHired FROM attend_30latestpositionsinclresigned cp JOIN 1_gamit.0idinfo id ON cp.IDNo=id.IDNo JOIN 1employees e ON e.IDNo=cp.IDNo LEFT JOIN `1companies` c on e.RCompanyNo=c.CompanyNo JOIN attend_0positions p ON cp.PositionID=p.PositionID JOIN 1departments d ON p.deptid=d.deptid WHERE e.Resigned=1 AND cp.IDNo='.$_POST['IDNo'];
+		$sql='SELECT Gender,id.IDNo,DateResigned,Company,CompanyName,CONCAT(id.StreetAddress,", ",id.BarangayOrTown,", ",id.CityOrProvince) AS PresentAddress,`Position`,CONCAT(id.FirstName," ",LEFT(id.MiddleName,1),". ",id.SurName) AS Name,if(p.deptid IN (1,2,3,4),"Supply Chain",if(p.deptid=10,"Operations",department)) AS department,id.DateHired FROM attend_30latestpositionsinclresigned cp JOIN 1_gamit.0idinfo id ON cp.IDNo=id.IDNo JOIN 1employees e ON e.IDNo=cp.IDNo LEFT JOIN `1companies` c on e.RCompanyNo=c.CompanyNo JOIN attend_1positions p ON cp.PositionID=p.PositionID JOIN 1departments d ON p.deptid=d.deptid WHERE e.Resigned=1 AND cp.IDNo='.$_POST['IDNo'];
 
 		$stmt=$link->query($sql); $row=$stmt->fetch();
 

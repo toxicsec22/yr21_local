@@ -312,9 +312,9 @@ $month=date('m');
 $txnidname='BranchInvNo';
 
 if (allowedToOpen(522,'1rtc') or allowedToOpen(5222,'1rtc')) {
-    $sql1='SELECT JLID AS `Rank` FROM attend_0positions p JOIN `attend_1joblevel` jl ON jl.JobLevelNo=p.JobLevelNo WHERE `PositionID`='.$_SESSION['&pos'];
+    $sql1='SELECT JobLevelID AS `Rank` FROM attend_1positions p JOIN `attend_0joblevels` jl ON jl.JobLevelID=p.JobLevelID WHERE `PositionID`='.$_SESSION['&pos'];
     $stmt1=$link->query($sql1); $res1=$stmt1->fetch();
-    $sql=$sql0.' WHERE ISNULL(Approval) '.(allowedToOpen(5222,'1rtc')?'':' AND a.BranchNo IN (Select g.BranchNo from `attend_1branchgroups` g where TeamLeader='.$_SESSION['(ak0)'].' OR SAM='.$_SESSION['(ak0)'].') AND (a.EncodedByNo<>'.$_SESSION['(ak0)'].') AND (SELECT IF (PositionID IN (32,33,37,38,81),0,JLID) FROM `attend_30currentpositions` WHERE IDNo=a.EncodedByNo)<('.$res1['Rank'].')'); 
+    $sql=$sql0.' WHERE ISNULL(Approval) '.(allowedToOpen(5222,'1rtc')?'':' AND a.BranchNo IN (Select g.BranchNo from `attend_1branchgroups` g where TeamLeader='.$_SESSION['(ak0)'].' OR SAM='.$_SESSION['(ak0)'].') AND (a.EncodedByNo<>'.$_SESSION['(ak0)'].') AND (SELECT IF (PositionID IN (32,33,37,38,81),0,JobLevelID) FROM `attend_30currentpositions` WHERE IDNo=a.EncodedByNo)<('.$res1['Rank'].')'); 
 $columnnames=array('Branch','InvNo','Amount','RequestedBy','RequestTS','OPClientName','OPClientMobile'); 
 $columnstoedit=array('Amount','OPClientName','OPClientMobile'); 
 $editprocess='praddmain.php?w=ApproveOP&action_token='.$_SESSION['action_token'].'&InvNo=';$editprocesslabel='Approve';

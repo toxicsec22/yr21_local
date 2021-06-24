@@ -49,7 +49,7 @@ switch ($which)
 	case 'List':
 	
 		$sql='SELECT DivisionDesc,FullName AS DivisionHead,dp.dept AS Department,IF(IsPosition=0,"Position","IDNo") AS DivisionBy, DID,
-        IF(IsPosition=1,(SELECT GROUP_CONCAT(FullName ORDER BY FullName SEPARATOR "<br>") FROM attend_30currentpositions WHERE FIND_IN_SET(IDNo,PositionIDsorIDNos)),((SELECT GROUP_CONCAT(Position ORDER BY Position SEPARATOR "<br>") FROM attend_0positions WHERE FIND_IN_SET(PositionID,PositionIDsorIDNos)))) AS PositionsOrEmployee
+        IF(IsPosition=1,(SELECT GROUP_CONCAT(FullName ORDER BY FullName SEPARATOR "<br>") FROM attend_30currentpositions WHERE FIND_IN_SET(IDNo,PositionIDsorIDNos)),((SELECT GROUP_CONCAT(Position ORDER BY Position SEPARATOR "<br>") FROM attend_1positions WHERE FIND_IN_SET(PositionID,PositionIDsorIDNos)))) AS PositionsOrEmployee
          FROM `1divisions` dv LEFT JOIN 1departments dp ON dv.deptid=dp.deptid LEFT JOIN attend_30currentpositions cp ON dv.DivisionHeadIDNo=cp.IDNo WHERE dv.deptid IN ('.$rowdept['deptid'].') ORDER BY dp.dept DESC';
        
 		$columnnameslist=array('Department','DivisionHead', 'DivisionDesc', 'DivisionBy', 'PositionsOrEmployee');
@@ -79,7 +79,7 @@ switch ($which)
 			$title=''; $formdesc='</i>'.comboBoxValue($link, '1departments', 'deptid', $rowalldept['ddeptid'], 'department').'<i>';
 
 			$sql='SELECT DivisionDesc,FullName AS DivisionHead,dp.dept AS Department,IF(IsPosition=0,"Position","IDNo") AS DivisionBy, DID,
-			IF(IsPosition=1,(SELECT GROUP_CONCAT(FullName ORDER BY FullName SEPARATOR "<br>") FROM attend_30currentpositions WHERE FIND_IN_SET(IDNo,PositionIDsorIDNos)),((SELECT GROUP_CONCAT(Position ORDER BY Position SEPARATOR "<br>") FROM attend_0positions WHERE FIND_IN_SET(PositionID,PositionIDsorIDNos)))) AS PositionsOrEmployee
+			IF(IsPosition=1,(SELECT GROUP_CONCAT(FullName ORDER BY FullName SEPARATOR "<br>") FROM attend_30currentpositions WHERE FIND_IN_SET(IDNo,PositionIDsorIDNos)),((SELECT GROUP_CONCAT(Position ORDER BY Position SEPARATOR "<br>") FROM attend_1positions WHERE FIND_IN_SET(PositionID,PositionIDsorIDNos)))) AS PositionsOrEmployee
 			 FROM `1divisions` dv LEFT JOIN 1departments dp ON dv.deptid=dp.deptid LEFT JOIN attend_30currentpositions cp ON dv.DivisionHeadIDNo=cp.IDNo WHERE dv.deptid='.$rowalldept['ddeptid'].' ORDER BY DivisionDesc';
 			 $columnnameslist=array('Department','DivisionHead','DivisionDesc', 'DivisionBy', 'PositionsOrEmployee');
 			 $columnnames=$columnnameslist;
@@ -135,7 +135,7 @@ switch ($which)
 				$submitlabel = "Add new division";
 			}
 
-			$sqlfetchposition='SELECT Position,PositionID FROM attend_0positions WHERE deptid IN ('.$rowdept['deptid'].')';
+			$sqlfetchposition='SELECT Position,PositionID FROM attend_1positions WHERE deptid IN ('.$rowdept['deptid'].')';
 			$stmtfetchposition=$link->query($sqlfetchposition);
 			$rowpos=$stmtfetchposition->fetchAll();
 
@@ -223,7 +223,7 @@ $(document).ready(function(){
 				
 				if ($rowh['PositionIDsorIDNos']<>0){
 					echo '<br><b>Positions/Employees</b><br>';
-					$sql ="SELECT CONCAT(Nickname,' ',SurName) AS Employee FROM 1employees WHERE IDNo IN (".$rowh['PositionIDsorIDNos'].") UNION SELECT Position FROM attend_0positions WHERE PositionID IN (".$rowh['PositionIDsorIDNos'].")";
+					$sql ="SELECT CONCAT(Nickname,' ',SurName) AS Employee FROM 1employees WHERE IDNo IN (".$rowh['PositionIDsorIDNos'].") UNION SELECT Position FROM attend_1positions WHERE PositionID IN (".$rowh['PositionIDsorIDNos'].")";
 					$stmt=$link->query($sql); $row=$stmt->fetchAll();
 					foreach($row AS $res){
 						echo '&nbsp; &nbsp; '.$res['Employee'].'<br>';

@@ -19,7 +19,7 @@ if (in_array($which,array('PositionList','AddEditPosition'))){
 		$deptcondi='';
 	}
 	else {
-		$deptcondi=' '.(isset($_POST['btnFilter'])?'AND':'WHERE').' PositionID IN (select PositionID FROM attend_0positions p JOIN 1departments d ON p.deptid=d.deptid WHERE deptheadpositionid='.$_SESSION['&pos'].')';
+		$deptcondi=' '.(isset($_POST['btnFilter'])?'AND':'WHERE').' PositionID IN (select PositionID FROM attend_1positions p JOIN 1departments d ON p.deptid=d.deptid WHERE deptheadpositionid='.$_SESSION['&pos'].')';
 	}
 }
 if (in_array($which,array('LookupPoints','LookupJobGrade','PositionList'))){
@@ -265,7 +265,7 @@ switch ($which)
 	
 	$stmt=$link->query($sql); $rows=$stmt->fetchAll();
 	echo '<a href="jobratingplan.php?w=LookupPoints&WJRID='.$wjrid.'" target="_blank"><b>Open Formula Table</b></a><br><br>';
-	$pos=comboBoxValue($link,'attend_0positions','PositionID',$_GET['PositionID'],'Position');
+	$pos=comboBoxValue($link,'attend_1positions','PositionID',$_GET['PositionID'],'Position');
 	$title=$pos;
 	echo '<title>'.$title.'</title>';
 	echo '<h3>Position: '.$title.', Formula: <font color="green"><u>'.$formulaname.'</u></font></h3>';
@@ -330,7 +330,7 @@ $cnts++;
 	$totalp=substr($totalp, 0, -1);
 	
 	
-	$sql0='CREATE TEMPORARY TABLE tempPoints AS SELECT '.$totalp.' AS `Points`,FormulaName,`A1` AS Education,`A2` AS Experience,`A3` AS `Technical Skills / Functional Skills`,`B4` AS `Analysis & Problem Solving`,`B5` AS `Nature of External Relations`,`B6` AS `Nature of Internal Relations`,`B7` AS `Complexity of Work`,`B8` AS `Physical Effort /Working Conditions`,`B9` AS `Planning and Controlling`,`B10` AS `Company Assets`,`B11` AS `Confidentiality`,`B12` AS `Leading and Responsibility`,`B13` AS `Contribution to Organization`, jrp.PositionID AS TxnID,jrp.PositionID,Position,jrp.EncodedByNo,jrp.Posted FROM hr_1jobratingplan jrp JOIN attend_0positions p ON jrp.PositionID=p.PositionID JOIN hr_1jobratingweightstemp1 jrw ON jrp.WJRID=jrw.WJRID';
+	$sql0='CREATE TEMPORARY TABLE tempPoints AS SELECT '.$totalp.' AS `Points`,FormulaName,`A1` AS Education,`A2` AS Experience,`A3` AS `Technical Skills / Functional Skills`,`B4` AS `Analysis & Problem Solving`,`B5` AS `Nature of External Relations`,`B6` AS `Nature of Internal Relations`,`B7` AS `Complexity of Work`,`B8` AS `Physical Effort /Working Conditions`,`B9` AS `Planning and Controlling`,`B10` AS `Company Assets`,`B11` AS `Confidentiality`,`B12` AS `Leading and Responsibility`,`B13` AS `Contribution to Organization`, jrp.PositionID AS TxnID,jrp.PositionID,Position,jrp.EncodedByNo,jrp.Posted FROM hr_1jobratingplan jrp JOIN attend_1positions p ON jrp.PositionID=p.PositionID JOIN hr_1jobratingweightstemp1 jrw ON jrp.WJRID=jrw.WJRID';
 	$stmt0=$link->prepare($sql0); $stmt0->execute();
 	
 	$filterc='';
@@ -418,7 +418,7 @@ $cnts++;
 	
 	
 	
-	$sqlpos='SELECT PositionID,Position FROM attend_0positions '.$deptcondi.' ORDER BY Position';
+	$sqlpos='SELECT PositionID,Position FROM attend_1positions '.$deptcondi.' ORDER BY Position';
 	$stmtpos=$link->query($sqlpos); $rowpos=$stmtpos->fetchAll();
 	
 	$poslist='';

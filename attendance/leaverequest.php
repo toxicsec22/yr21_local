@@ -104,7 +104,7 @@ switch ($which){
 		
         elseif (allowedToOpen(213,'1rtc')) { $condition=' AND (p.LatestSupervisorIDNo='.$_SESSION['(ak0)'].' OR p.BranchNo IN (SELECT BranchNo FROM attend_1branchgroups WHERE OpsManager='.$_SESSION['(ak0)'].'))'; }
         elseif (allowedToOpen(6201,'1rtc')) {  
-        $stmt0=$link->query('SELECT IDNo FROM `attend_30currentpositions` WHERE deptid IN (2,3,4,10) AND PositionID IN (32,37,81,50) AND BranchNo='.$_SESSION['bnum'].' GROUP BY PositionID ORDER BY JLID DESC LIMIT 1;');
+        $stmt0=$link->query('SELECT IDNo FROM `attend_30currentpositions` WHERE deptid IN (2,3,4,10) AND PositionID IN (32,37,81,50) AND BranchNo='.$_SESSION['bnum'].' GROUP BY PositionID ORDER BY JobLevelID DESC LIMIT 1;');
            $res0=$stmt0->fetch();
         $cond.=' AND '.$_SESSION['(ak0)'].'='.$res0['IDNo'].' AND p.BranchNo='.$_SESSION['bnum'];}
         else { $condition=' AND lr.IDNo='.$_SESSION['(ak0)'];}

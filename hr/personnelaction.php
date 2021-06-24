@@ -33,7 +33,7 @@ if (in_array($which,array('List','EditSpecifics'))){
    echo comboBox($link,'SELECT IDNo, CONCAT(FullName, " - ", Position, ", ", IF(deptid=10,Branch,department)) AS FullNamePosition FROM `attend_30currentpositions` ORDER BY FullName;','IDNo','FullNamePosition','employees');
    $sql='SELECT pa.*, e.Nickname, CONCAT(e.FirstName," ",e.SurName) AS FullName, Position, CONCAT(Department, " - ", Branch) AS `Department/Branch`, ActionDesc AS PersonnelAction, department AS Department, e2.Nickname AS EncodedBy FROM `hr_2personnelaction` pa JOIN `hr_0personnelaction` po ON po.ActionID=pa.ActionID 
 JOIN `1departments` d ON d.deptid=pa.deptID JOIN `1branches` b ON b.BranchNo=pa.BranchNo
-JOIN attend_0positions p ON p.PositionID=pa.PositionID
+JOIN attend_1positions p ON p.PositionID=pa.PositionID
 JOIN `1employees` e ON e.IDNo=pa.IDNo JOIN `1employees` e2 ON e2.IDNo=pa.EncodedByNo ';
 }
 

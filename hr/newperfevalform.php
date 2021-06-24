@@ -32,7 +32,7 @@ $sql='SELECT pf.*, e.Nickname, e.FirstName,EvalSched, LEFT(e.MiddleName,1) AS MI
         . ' CONCAT(e1.Nickname, " ",e1.SurName) AS EvaluatedBy, FORMAT((TO_DAYS(EvalDueDate) - TO_DAYS(`e`.`DateHired`)) / 365,2) AS `InYears(as of EvalDueDate)`'
         . ' FROM `hr_82perfevalmain` pf '
         . ' JOIN `1employees` e ON pf.IDNo=e.IDNo '
-        . ' JOIN attend_0positions p ON p.PositionID=pf.CurrentPositionID JOIN `1branches` b ON b.BranchNo=pf.CurrentBranchNo '
+        . ' JOIN attend_1positions p ON p.PositionID=pf.CurrentPositionID JOIN `1branches` b ON b.BranchNo=pf.CurrentBranchNo '
         . ' JOIN `1departments` d ON d.deptid=p.deptid LEFT JOIN `1employees` e1 ON pf.SIDNo=e1.IDNo LEFT JOIN `hr_80evalsched` es ON es.EvalSchedID=pf.EvalSchedID WHERE pf.TxnID='.$txnid.$printcondition;
 $stmt=$link->query($sql); $result=$stmt->fetch(); 
 

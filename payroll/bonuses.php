@@ -86,7 +86,7 @@ EncodeCalculated:
 $stmt0=$link->prepare('DROP TEMPORARY TABLE IF EXISTS evaluation;'); $stmt0->execute(); 
 
 $stmt0=$link->prepare('CREATE TEMPORARY TABLE evaluation AS
-SELECT e.IDNo, e.Nickname, e.FirstName, e.SurName, deptid, Position, IFNULL(13thBasicCalc,0)+IFNULL(13thTaxShCalc,0) AS Total13th, p.JobLevelNo, p.BranchNo,p.BranchorDept,
+SELECT e.IDNo, e.Nickname, e.FirstName, e.SurName, deptid, Position, IFNULL(13thBasicCalc,0)+IFNULL(13thTaxShCalc,0) AS Total13th, p.JobLevelID, p.BranchNo,p.BranchorDept,
  IFNULL(SuperScore,0) AS SupervisorEval, 
 e1.Nickname AS EvaluatedBy, e2.Nickname AS DeptHead, DeptHeadIDNo, ((TO_DAYS(\''.$currentyr.'-12-05\') - TO_DAYS(`e`.`DateHired`)) / 365) as InYears, IFNULL((SELECT SUM(AbsencesPerMonth) FROM `attend_62absences` WHERE IDNo=e.IDNo),0) AS Absences, 
 IFNULL((SELECT SUM(LatesPerMonth) FROM `attend_62latescount` WHERE IDNo=e.IDNo),0) AS Lates, IFNULL((SELECT SUM(UndertimeCount) FROM `attend_62undertime` WHERE IDNo=e.IDNo),0) AS Undertime, (SELECT COUNT(IDNo) FROM attend_2attendance WHERE LeaveNo NOT IN (12,13,15) AND IDNo=e.IDNo) AS AttendDays, 0 AS `Attend%`, 1.0 AS BranchClassRate, 
@@ -141,7 +141,7 @@ $sortfield=(isset($_POST['sortfield'])?' ORDER BY '.$_POST['sortfield']:'');
 
 
 $sql='SELECT c.*,FORMAT(Total13th,0) AS Calc_13th,FORMAT(CalcPerfBonus,0) AS Calcd_Bonus,ROUND(CalcPerfBonus+Total13th,0) AS TOTAL_VALUE,FORMAT(CalcPerfBonus+Total13th,2) AS TOTAL FROM calbonus c
-JOIN  `1employees` e ON e.IDNo=c.IDNo JOIN `attend_30currentpositions` p ON e.IDNo=p.IDNo ORDER BY c.JLID DESC,Position ASC,Branch, Nickname ASC '; //.$sortfield
+JOIN  `1employees` e ON e.IDNo=c.IDNo JOIN `attend_30currentpositions` p ON e.IDNo=p.IDNo ORDER BY c.JobLevelID DESC,Position ASC,Branch, Nickname ASC '; //.$sortfield
 $coltototal='TOTAL_VALUE'; //$showgrandtotal=true;
 $sqltotal='SELECT SUM(CalcPerfBonus) AS `TotalPerfBonus`, SUM(Total13th) AS `Total13th` FROM calbonus '; 
 $stmttotal=$link->query($sqltotal);

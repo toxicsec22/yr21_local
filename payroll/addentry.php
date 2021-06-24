@@ -19,7 +19,7 @@ include_once('../switchboard/contents.php');
 				
 		echo '</div><br/>';
 		}
-			$sql='select r.TxnId AS TxnID,r.IDNo,CONCAT(e.Nickname," ",e.SurName) AS Name,Branch,`DateofChange`, `BasicRate`, `DeMinimisRate`, `TaxShield`, `SSS-EE`, `Philhealth-EE`, `WTax`, r.`Remarks`, `DailyORMonthly`,CONCAT(e1.Nickname," ",e1.SurName) AS EncodedBy,r.TimeStamp,CONCAT(e2.Nickname," ",e2.SurName) AS ApprovedBy,r.ApprovalTS from payroll_22rates r JOIN attend_30latestpositionsinclresigned lpir ON r.IDNo=lpir.IDNo LEFT JOIN attend_0positions p ON lpir.PositionID=p.PositionID JOIN attend_1defaultbranchassign dba ON r.IDNo=dba.IDNo JOIN 1branches b ON dba.DefaultBranchAssignNo=b.BranchNo LEFT JOIN 1employees e ON r.IDNo=e.IDNo LEFT JOIN 1employees e1 ON r.EncodedByNo=e1.IDNo LEFT JOIN 1employees e2 ON r.ApprovedByNo=e2.IDNo ';
+			$sql='select r.TxnId AS TxnID,r.IDNo,CONCAT(e.Nickname," ",e.SurName) AS Name,Branch,`DateofChange`, `BasicRate`, `DeMinimisRate`, `TaxShield`, `SSS-EE`, `Philhealth-EE`, `WTax`, r.`Remarks`, `DailyORMonthly`,CONCAT(e1.Nickname," ",e1.SurName) AS EncodedBy,r.TimeStamp,CONCAT(e2.Nickname," ",e2.SurName) AS ApprovedBy,r.ApprovalTS from payroll_22rates r JOIN attend_30latestpositionsinclresigned lpir ON r.IDNo=lpir.IDNo LEFT JOIN attend_1positions p ON lpir.PositionID=p.PositionID JOIN attend_1defaultbranchassign dba ON r.IDNo=dba.IDNo JOIN 1branches b ON dba.DefaultBranchAssignNo=b.BranchNo LEFT JOIN 1employees e ON r.IDNo=e.IDNo LEFT JOIN 1employees e1 ON r.EncodedByNo=e1.IDNo LEFT JOIN 1employees e2 ON r.ApprovedByNo=e2.IDNo ';
 		}
      switch ($whichqry){
         case 'Rates':
@@ -51,7 +51,7 @@ include_once('../switchboard/contents.php');
 			$maxmsg='';
 			//check if max
 		if($monthly==1){  //monthly condition only
-			$sqlmax='SELECT TRUNCATE(MinRate*(1+PercentMintoMed/100)*(1+PercentMedtoMax/100),2) AS MAXIMUM FROM attend_1joblevel jl JOIN attend_0jobclass jc ON jc.JobClassNo=jl.JobClassNo JOIN attend_0positions p ON jl.JobLevelNo=p.JobLevelNo AND p.PositionID=(SELECT NewPositionID FROM attend_2changeofpositions WHERE IDNo='.$idno.' ORDER BY DateofChange LIMIT 1)';
+			$sqlmax='SELECT TRUNCATE(MinRate*(1+PercentMintoMed/100)*(1+PercentMedtoMax/100),2) AS MAXIMUM FROM attend_0joblevels jl JOIN attend_0jobclass jc ON jc.JobClassNo=jl.JobClassNo JOIN attend_1positions p ON jl.JobLevelID=p.JobLevelID AND p.PositionID=(SELECT NewPositionID FROM attend_2changeofpositions WHERE IDNo='.$idno.' ORDER BY DateofChange LIMIT 1)';
 			
 			$stmtmax=$link->query($sqlmax); $rowmax=$stmtmax->fetch();
 			

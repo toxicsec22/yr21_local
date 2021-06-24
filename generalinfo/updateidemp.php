@@ -31,7 +31,7 @@ switch ($which)
 		if (allowedToOpen(64987,'1rtc')) { //all
 			$deptcondition='';
 		} else { //dept
-			$deptcondition=' AND (deptid IN (SELECT deptid FROM attend_0positions WHERE PositionID='.$_SESSION['&pos'].' UNION SELECT deptid FROM 1departments WHERE deptheadpositionid='.$_SESSION['&pos'].') '.$withstores.')';
+			$deptcondition=' AND (deptid IN (SELECT deptid FROM attend_1positions WHERE PositionID='.$_SESSION['&pos'].' UNION SELECT deptid FROM 1departments WHERE deptheadpositionid='.$_SESSION['&pos'].') '.$withstores.')';
 		}
 		
 		$title='Uniform and Giveaway Shirt Sizes';

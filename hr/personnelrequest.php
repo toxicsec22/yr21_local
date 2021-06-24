@@ -25,7 +25,7 @@ switch ($which){
         </form>
         <?php
         echo comboBox($link,'SELECT * FROM `acctg_1budgetentities` ORDER BY Entity;','EntityID','Entity','entities');
-        echo comboBox($link,'SELECT * FROM attend_0positions ORDER BY Position;','PositionID','Position','positions');
+        echo comboBox($link,'SELECT * FROM attend_1positions ORDER BY Position;','PositionID','Position','positions');
        
 		$condc=(!allowedToOpen(64901,'1rtc')?' WHERE cp.`deptheadpositionid`=(SELECT cp2.deptheadpositionid FROM attend_30currentpositions cp2 WHERE IDNo='.$_SESSION['(ak0)'].') AND ':' WHERE ');
 		
@@ -53,7 +53,7 @@ switch ($which){
 		WHEN RequestStat=2 THEN "Pre Employment"
 		WHEN RequestStat=3 THEN "Deployed"
 		ELSE "Backed Out"
-		END) AS RequestStat,DATE(pr.`TimeStamp`) AS RequestedOn,PersonHired AS Applicant,p.Position, TargetDate, CONCAT(e.Nickname," ",e.SurName) as RequestedBy, pr.TimeStamp as RequestTS FROM hr_2personnelrequest pr JOIN attend_0positions p ON p.PositionID=pr.PositionID LEFT JOIN `1employees` e ON e.IDNo=pr.EncodedByNo JOIN `acctg_1budgetentities` be ON be.EntityID=pr.EntityID 
+		END) AS RequestStat,DATE(pr.`TimeStamp`) AS RequestedOn,PersonHired AS Applicant,p.Position, TargetDate, CONCAT(e.Nickname," ",e.SurName) as RequestedBy, pr.TimeStamp as RequestTS FROM hr_2personnelrequest pr JOIN attend_1positions p ON p.PositionID=pr.PositionID LEFT JOIN `1employees` e ON e.IDNo=pr.EncodedByNo JOIN `acctg_1budgetentities` be ON be.EntityID=pr.EntityID 
 LEFT JOIN attend_30currentpositions cp ON e.IDNo=cp.IDNo JOIN checkifexists cie ON pr.TxnID=cie.TxnID
 '.$condc.' '; */
         $sqlmain='SELECT pr.*,JobDesc,Entity,(CASE
@@ -67,7 +67,7 @@ LEFT JOIN attend_30currentpositions cp ON e.IDNo=cp.IDNo JOIN checkifexists cie 
 		
 		DATEDIFF(IF(RequestStat=3,StartingDate,CURDATE()),DATE(pr.`TimeStamp`)) As AgeOfReqInDays,
 		
-		DATE(pr.`TimeStamp`) AS RequestedOn,PersonHired AS Applicant,p.Position, TargetDate, CONCAT(e.Nickname," ",e.SurName) as RequestedBy, pr.TimeStamp as RequestTS FROM hr_2personnelrequest pr JOIN attend_0positions p ON p.PositionID=pr.PositionID LEFT JOIN `1employees` e ON e.IDNo=pr.EncodedByNo JOIN `acctg_1budgetentities` be ON be.EntityID=pr.EntityID 
+		DATE(pr.`TimeStamp`) AS RequestedOn,PersonHired AS Applicant,p.Position, TargetDate, CONCAT(e.Nickname," ",e.SurName) as RequestedBy, pr.TimeStamp as RequestTS FROM hr_2personnelrequest pr JOIN attend_1positions p ON p.PositionID=pr.PositionID LEFT JOIN `1employees` e ON e.IDNo=pr.EncodedByNo JOIN `acctg_1budgetentities` be ON be.EntityID=pr.EntityID 
 LEFT JOIN attend_30currentpositions cp ON e.IDNo=cp.IDNo JOIN checkifexists cie ON pr.TxnID=cie.TxnID
 '.$condc.' ';
 		
@@ -121,8 +121,8 @@ LEFT JOIN attend_30currentpositions cp ON e.IDNo=cp.IDNo JOIN checkifexists cie 
 		$sql=$sqlmain.' RequestStat=0 '.$defaultview.' ORDER BY Entity, Position';
 		
 		
-		// $sqlcheckmax='SELECT DATEDIFF(CURDATE(),DATE(pr.`TimeStamp`)) As AgeOfReqInDays FROM hr_2personnelrequest pr JOIN attend_0positions p ON p.PositionID=pr.PositionID JOIN 1employees e ON pr.EncodedByNo=e.EncodedByNo WHERE RequestStat=0 '.$defaultview.' ORDER BY AgeOfReqInDays DESC LIMIT 1';
-		$sqlcheckmax='SELECT DATEDIFF(CURDATE(),DATE(pr.`TimeStamp`)) As AgeOfReqInDays FROM hr_2personnelrequest pr JOIN attend_0positions p ON p.PositionID=pr.PositionID LEFT JOIN `1employees` e ON e.IDNo=pr.EncodedByNo JOIN `acctg_1budgetentities` be ON be.EntityID=pr.EntityID 
+		// $sqlcheckmax='SELECT DATEDIFF(CURDATE(),DATE(pr.`TimeStamp`)) As AgeOfReqInDays FROM hr_2personnelrequest pr JOIN attend_1positions p ON p.PositionID=pr.PositionID JOIN 1employees e ON pr.EncodedByNo=e.EncodedByNo WHERE RequestStat=0 '.$defaultview.' ORDER BY AgeOfReqInDays DESC LIMIT 1';
+		$sqlcheckmax='SELECT DATEDIFF(CURDATE(),DATE(pr.`TimeStamp`)) As AgeOfReqInDays FROM hr_2personnelrequest pr JOIN attend_1positions p ON p.PositionID=pr.PositionID LEFT JOIN `1employees` e ON e.IDNo=pr.EncodedByNo JOIN `acctg_1budgetentities` be ON be.EntityID=pr.EntityID 
 LEFT JOIN attend_30currentpositions cp ON e.IDNo=cp.IDNo JOIN checkifexists cie ON pr.TxnID=cie.TxnID
 '.$condc.' RequestStat=0 '.$defaultview.' ORDER BY AgeOfReqInDays DESC LIMIT 1';
 
@@ -198,7 +198,7 @@ LEFT JOIN attend_30currentpositions cp ON e.IDNo=cp.IDNo JOIN checkifexists cie 
         require_once $path.'/acrossyrs/logincodes/confirmtoken.php';
         include_once $path.'/acrossyrs/commonfunctions/listoptions.php';
         $entity=comboBoxValue($link,'`acctg_1budgetentities`','Entity',addslashes($_POST['Entity']),'EntityID');
-        $position=comboBoxValue($link,'attend_0positions','Position',addslashes($_POST['Position']),'PositionID');
+        $position=comboBoxValue($link,'attend_1positions','Position',addslashes($_POST['Position']),'PositionID');
         $columnstoadd=array('Remarks','TargetDate'); $sql='';
         foreach ($columnstoadd as $field) {$sql=$sql.' `' . $field. '`=\''.addslashes($_POST[$field]).'\', '; }
         $sql='INSERT INTO `hr_2personnelrequest` SET EncodedByNo='.$_SESSION['(ak0)'].', '.$sql.' EntityID='.$entity.', PositionID='.$position.', TimeStamp=Now()';

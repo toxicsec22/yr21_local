@@ -36,7 +36,7 @@ $sql='SELECT mt.*, CONCAT(e1.FirstName, " ", e1.Surname) AS FullName, Branch AS 
 	       JOIN `1employees` e ON e.IDNo=mt.EncodedByNo
 	       LEFT JOIN `1employees` e1 ON e1.IDNo=mt.IDNo
                LEFT JOIN `attend_30currentpositions` cp ON cp.BranchNo=mt.AssignedBranchNo AND cp.IDNo=mt.IDNo
-	       LEFT JOIN `attend_0positions` p ON p.PositionID=mt.PositionID ';
+	       LEFT JOIN `attend_1positions` p ON p.PositionID=mt.PositionID ';
 
 switch ($which){
    case 'List':
@@ -133,11 +133,11 @@ switch ($which){
    case 'Letter':       
        $title=''; $txnid=intval($_GET['TxnID']);
        $sql='SELECT mt.*, e1.Nickname, CONCAT(e1.FirstName, " ", e1.Surname) AS FullName, p.Position, CONCAT(e.FirstName, " ", e.Surname) AS EncodedBy, cp.Position AS EncodedbyPosition, CONCAT(e2.FirstName, " ", e2.Surname) AS DeptHead, p2.Position AS DeptHeadPosition 
-FROM hr_4tardy mt JOIN `1employees` e1 ON e1.IDNo=mt.IDNo LEFT JOIN attend_0positions p ON p.PositionID=mt.PositionID
+FROM hr_4tardy mt JOIN `1employees` e1 ON e1.IDNo=mt.IDNo LEFT JOIN attend_1positions p ON p.PositionID=mt.PositionID
  JOIN `1employees` e ON e.IDNo=mt.EncodedByNo JOIN `attend_30currentpositions` cp on cp.IDNo=mt.EncodedByNo 
  JOIN `1departments` d ON d.deptid=p.deptid
  JOIN `attend_30currentpositions` cp2 ON cp2.PositionID=d.deptheadpositionid
- JOIN `1employees` e2 ON e2.IDNo=cp2.IDNo LEFT JOIN attend_0positions p2 ON p2.PositionID=cp2.PositionID
+ JOIN `1employees` e2 ON e2.IDNo=cp2.IDNo LEFT JOIN attend_1positions p2 ON p2.PositionID=cp2.PositionID
  WHERE Posted=1 AND TxnID='.$txnid; 
        $stmt=$link->query($sql); $res=$stmt->fetch();
        //if($_SESSION['(ak0)']==1002) {echo $sql;}
@@ -173,7 +173,7 @@ receipt of this letter why no disciplinary action must be imposed on you
 for the violation of the Company\'s Code of Conduct on attendance.  Your
 tardiness for the month of <b><u>'.date('F',strtotime(''.$currentyr.'-'.$res['MonthTardy'].'-01')).'</u></b> are detailed below:';
 
-$sql='select a.DateToday,LEFT(a.TimeIn,5) AS TimeIn,CONCAT(Shift,":00") AS Sched,round(((time_to_sec(`a`.`TimeIn`) - time_to_sec(CONCAT(Shift,":00"))) / 60),0) AS `TotalMinutesLate` from ((`1employees` `e` join `attend_2attendance` `a` on(`e`.`IDNo` = `a`.`IDNo`)) join `attend_30currentpositions` `p` on(`e`.`IDNo` = `p`.`IDNo`)) where hour(`a`.`TimeIn`) <> 12 and hour(`a`.`TimeIn`) + minute(`a`.`TimeIn`) / 60 > if(`p`.`JLID` >= 6,8.5,8) and `e`.`Resigned` = 0 and `p`.`JLID` < 6 and `e`.`IDNo` not in (1010,1014) AND a.IDNo='.$res['IDNo'].' AND MONTH(`DateToday`)='.$res['MonthTardy'].' order by `e`.`Nickname`,`e`.`SurName`,month(`a`.`DateToday`);';
+$sql='select a.DateToday,LEFT(a.TimeIn,5) AS TimeIn,CONCAT(Shift,":00") AS Sched,round(((time_to_sec(`a`.`TimeIn`) - time_to_sec(CONCAT(Shift,":00"))) / 60),0) AS `TotalMinutesLate` from ((`1employees` `e` join `attend_2attendance` `a` on(`e`.`IDNo` = `a`.`IDNo`)) join `attend_30currentpositions` `p` on(`e`.`IDNo` = `p`.`IDNo`)) where hour(`a`.`TimeIn`) <> 12 and hour(`a`.`TimeIn`) + minute(`a`.`TimeIn`) / 60 > if(`p`.`JobLevelID` >= 6,8.5,8) and `e`.`Resigned` = 0 and `p`.`JobLevelID` < 6 and `e`.`IDNo` not in (1010,1014) AND a.IDNo='.$res['IDNo'].' AND MONTH(`DateToday`)='.$res['MonthTardy'].' order by `e`.`Nickname`,`e`.`SurName`,month(`a`.`DateToday`);';
 $stmt=$link->query($sql); $restable=$stmt->fetchAll();
 		
 		$letter.='<br><br><table width="100%" border="1px solid black" style="border-collapse:collapse;text-align:center;"><tr><th>DATE</th><th>SCHEDULE</th><th>ACTUAL TIME</th><th>NO. OF MINS. LATE</th></tr>';

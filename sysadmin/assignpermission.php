@@ -80,7 +80,7 @@ if (in_array($which,array('ViewSwitchboard','AddPermissionToPage', 'AddNewProgra
 }
 
 if (in_array($which,array('AddPermissionToPage', 'AddNewProgramCommand'))){
-  	$sql0='CREATE TEMPORARY TABLE groupdept AS SELECT p.deptid, d.Department, p.JobLevelNo, JLID, p.Position, p.PositionID FROM attend_0positions p JOIN `1departments` d ON d.deptid=p.deptid JOIN `attend_1joblevel` jl ON jl.JobLevelNo=p.JobLevelNo ORDER BY JobClassNo DESC,jl.JobLevelNo DESC;';
+  	$sql0='CREATE TEMPORARY TABLE groupdept AS SELECT p.deptid, d.Department, p.JobLevelID, JobLevelID, p.Position, p.PositionID FROM attend_1positions p JOIN `1departments` d ON d.deptid=p.deptid JOIN `attend_0joblevels` jl ON jl.JobLevelID=p.JobLevelID ORDER BY JobClassNo DESC,jl.JobLevelID DESC;';
   	
 	$stmt=$link->query($sql0);
 	$sql0='SELECT DISTINCTROW deptid AS DeptID, Department FROM groupdept;';
@@ -507,7 +507,7 @@ switch ($which)
 			echo '<div style="float:left;">';    
 			foreach($row0 as $pos){
             echo '<h4>'.$pos['Department'].'</h4>';
-            $sql1='SELECT Position, PositionID FROM groupdept WHERE DeptID='.$pos['DeptID'].' GROUP BY PositionID ORDER BY JLID DESC';
+            $sql1='SELECT Position, PositionID FROM groupdept WHERE DeptID='.$pos['DeptID'].' GROUP BY PositionID ORDER BY JobLevelID DESC';
 			
             $stmt1=$link->query($sql1); $row1=$stmt1->fetchAll();
             $deptlist='<table>';
@@ -534,7 +534,7 @@ switch ($which)
 				$sql ="SELECT AllowedPos,IFNULL(AllowedPerID,0) AS AllowedPerID FROM permissions_2allprocesses WHERE ProcessID=".$ProcessID.";";
 				$stmt=$link->query($sql); $rowh=$stmt->fetch();
 				
-				$sql ="SELECT PositionID,Position FROM attend_0positions p JOIN attend_1joblevel jl ON jl.JobLevelNo=p.JobLevelNo WHERE PositionID IN (".$rowh['AllowedPos'].") ORDER BY deptid,JLID DESC";
+				$sql ="SELECT PositionID,Position FROM attend_1positions p JOIN attend_0joblevels jl ON jl.JobLevelID=p.JobLevelID WHERE PositionID IN (".$rowh['AllowedPos'].") ORDER BY deptid,JobLevelID DESC";
                                 
 				$stmt=$link->query($sql); $row=$stmt->fetchAll();
 				foreach($row AS $res){
@@ -583,7 +583,7 @@ switch ($which)
 	case 'ViewSwitchboard':
 	if (allowedToOpen(3000,'1rtc')){
 			echo '<title>View Switchboard</title>';
-			echo comboBox($link,'SELECT PositionID, Position FROM attend_0positions ORDER BY Position','Position','PositionID','positionlist');
+			echo comboBox($link,'SELECT PositionID, Position FROM attend_1positions ORDER BY Position','Position','PositionID','positionlist');
 			
 			$pagesearch = $_GET['PagePreview'];
 			echo '<form action="#" method="POST">';
@@ -636,7 +636,7 @@ switch ($which)
 
 		<div id="wrapper">
 		<?php
-		echo '<h3>'.$name.'<br/>'.comboBoxValue($link,'attend_0positions','PositionID',$_POST['PositionToView'],'Position') .'</h3><br/>';
+		echo '<h3>'.$name.'<br/>'.comboBoxValue($link,'attend_1positions','PositionID',$_POST['PositionToView'],'Position') .'</h3><br/>';
 		if (isset($withdashboard) AND $withdashboard==1){
 			include_once('../graphs/dashboardgraphs.php');
 		}
@@ -894,7 +894,7 @@ echo '<br>';
 		$title='Access Per Position'.$addtitle;
 			echo '<title>'.$title.'</title>';
 			
-			echo comboBox($link,'SELECT PositionID, Position FROM attend_0positions ORDER BY Position','Position','PositionID','positionlist');
+			echo comboBox($link,'SELECT PositionID, Position FROM attend_1positions ORDER BY Position','Position','PositionID','positionlist');
 			
 			
 			if(!isset($_GET['Request'])){
@@ -912,13 +912,13 @@ echo '<br>';
 					$sqlreq='SELECT ProcessIDs FROM approvals_systempermission WHERE ForPositionID='.$_POST['PositionToView'].'';
 					$stmtreq=$link->query($sqlreq); $req=$stmtreq->fetch();
 				}
-				echo '<h3>'.comboBoxValue($link,'attend_0positions','PositionID',$_POST['PositionToView'],'Position') .'</h3><br/>';
+				echo '<h3>'.comboBoxValue($link,'attend_1positions','PositionID',$_POST['PositionToView'],'Position') .'</h3><br/>';
 				
 				$sql='SELECT AllowedPerID,ProcessID,ProcessTitle, ProcessAddress, OnSwitch FROM permissions_2allprocesses WHERE (AllowedPerID IS NOT NULL AND AllowedPerID<>"");';
 				$stmt=$link->query($sql); $row=$stmt->fetchAll();
 				
 				echo '<h4>AllowedPos</h4>';
-				$sql0='SELECT PositionID FROM attend_0positions WHERE deptid=(SELECT deptid FROM attend_0positions WHERE PositionID='.$_POST['PositionToView'].');';
+				$sql0='SELECT PositionID FROM attend_1positions WHERE deptid=(SELECT deptid FROM attend_1positions WHERE PositionID='.$_POST['PositionToView'].');';
 				$stmt0=$link->query($sql0); $row0=$stmt0->fetchAll();
 				$addlc='';
 				foreach ($row0 AS $field){
@@ -1053,7 +1053,7 @@ echo '<br>';
 			echo '<form action="assignpermission.php?w=OpenSystemTonight" method="post"><table>';
 			
 		
-                        $sql0='SELECT IDNo, FullName FROM attend_30currentpositions WHERE DeptHeadPositionID='.$_SESSION['&pos'].' ORDER BY JLID DESC, FullName;';
+                        $sql0='SELECT IDNo, FullName FROM attend_30currentpositions WHERE DeptHeadPositionID='.$_SESSION['&pos'].' ORDER BY JobLevelID DESC, FullName;';
 				$stmt0=$link->query($sql0); $row0=$stmt0->fetchAll();
 				
 			
@@ -1113,7 +1113,7 @@ echo '<br>';
 		echo '<div style="color:green;background-color:white;text-align:center;">Successfully Copied (Year '.$_GET['Year'].'). Pls check to confirm.</div>';
 	}
 	echo '<h3>'.$title.'</h3>';
-	echo comboBox($link,'SELECT PositionID, Position FROM attend_0positions ORDER BY Position','Position','PositionID','positionlist');
+	echo comboBox($link,'SELECT PositionID, Position FROM attend_1positions ORDER BY Position','Position','PositionID','positionlist');
 	
 	$oplist=''; $startyr=2015;
 	while($startyr<$currentyr){

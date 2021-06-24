@@ -12,7 +12,7 @@ switch($otherlist){
         $listcaption='Account';
         break;
     case 'collectorlist':	
-        $listsql='Select a.IDNo, concat(e.FirstName,\' \', e.Surname) as FullName, p.Position from `attend_2attendance` a join `1employees` as e on e.IDNo=a.IDNo join attend_30currentpositions p on p.IDNo=a.IDNo  where (((a.DateToday=\''.date('Y-m-d').'\' and a.BranchNo='.$_SESSION['bnum'].') or p.PositionID in(1,11,12,32,37,81)) and (e.Resigned=0 and p.PositionID<>0)) group by a.IDNo order by p.JLID desc, e.FirstName asc';
+        $listsql='Select a.IDNo, concat(e.FirstName,\' \', e.Surname) as FullName, p.Position from `attend_2attendance` a join `1employees` as e on e.IDNo=a.IDNo join attend_30currentpositions p on p.IDNo=a.IDNo  where (((a.DateToday=\''.date('Y-m-d').'\' and a.BranchNo='.$_SESSION['bnum'].') or p.PositionID in(1,11,12,32,37,81)) and (e.Resigned=0 and p.PositionID<>0)) group by a.IDNo order by p.JobLevelID desc, e.FirstName asc';
         $listvalue='IDNo';
         $listlabel='FullName';
         $listcaption='Collector';

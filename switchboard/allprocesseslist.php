@@ -54,7 +54,7 @@ echo '<h3>System Modules & Processes</h3><br>';
 $switch='<ul class="level1">';
 
 if(!isset($_POST['btnRequest'])){ 
-$sql11 ="SELECT PositionID, Position FROM attend_0positions ORDER BY Position;";
+$sql11 ="SELECT PositionID, Position FROM attend_1positions ORDER BY Position;";
 $stmt11=$link->query($sql11); 
 $positionlist = 'Position: <select name="ForPositionID">';
 while($row11 = $stmt11->fetch()) {
@@ -122,7 +122,7 @@ case 'ShowRequest':
 		goto here;
 	}
 	here:
-	$sql='select sp.*,ForPositionID AS TxnID,Position AS ForPosition,NickName As RequestedBy FROM approvals_systempermission sp JOIN 1employees id ON sp.RequestedByNo=id.IDNo JOIN attend_0positions p ON sp.ForPositionID=p.PositionID '.$reqcondi.' ORDER BY Position';
+	$sql='select sp.*,ForPositionID AS TxnID,Position AS ForPosition,NickName As RequestedBy FROM approvals_systempermission sp JOIN 1employees id ON sp.RequestedByNo=id.IDNo JOIN attend_1positions p ON sp.ForPositionID=p.PositionID '.$reqcondi.' ORDER BY Position';
 	$columnnames=array('ForPosition', 'RequestedBy', 'Timestamp');
    
     $title='List of Requests';

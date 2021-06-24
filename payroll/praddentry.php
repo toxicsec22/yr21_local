@@ -72,7 +72,7 @@
             if (!allowedToOpen(6281,'1rtc')) { echo 'No permission'; exit; }
             
             $sql0='UPDATE `1employees` e JOIN `'.$lastyr.'_1rtc`.`attend_61silbal` a ON e.IDNo=a.IDNo 
-        JOIN `attend_30currentpositions` cp ON e.IDNo=cp.IDNo JOIN attend_0positions p ON p.PositionID=cp.PositionID 
+        JOIN `attend_30currentpositions` cp ON e.IDNo=cp.IDNo JOIN attend_1positions p ON p.PositionID=cp.PositionID 
         JOIN `attend_howlongwithus` h ON e.IDNo=h.IDNo 
         SET e.SLBalDecCutoff=IFNULL(IF(a.SLBal>5,5,a.SLBal),0), e.PaidSLBenefit=0, e.VLfromPosition=IF(InYears>1,p.VLfromPosition,0), 
         e.VLfromTenure=IF(InYears>1,TRUNCATE(InYears,0)-1,0);'; 

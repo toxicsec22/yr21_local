@@ -9,7 +9,7 @@ if(isset($_SESSION['(ak0)'])){
 		$res0=$stmt0->fetch();
 		$cond=' AND (p.BranchNo IN ('.$res0['BranchNo'].'))';
 	} else if (allowedToOpen(6110,'1rtc')){ //assistants
-           $stmt0=$link->query('SELECT deptid FROM attend_0positions WHERE PositionID='.$_SESSION['&pos']);
+           $stmt0=$link->query('SELECT deptid FROM attend_1positions WHERE PositionID='.$_SESSION['&pos']);
            $res0=$stmt0->fetch();
            $cond=' AND p.deptid IN ('.$res0['deptid'].')'; }
 	else { //LatestSupervisorIDNo

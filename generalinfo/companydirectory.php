@@ -111,7 +111,7 @@ specificdept:
     if ($deptid>=800){
         $sql0='SELECT d.tel AS Telephone, d.address AS Address FROM `1departments` d WHERE d.deptid='.($deptid-800);
         $stmt0=$link->query($sql0); $res0=$stmt0->fetch();        
-        $sql1='CREATE TEMPORARY TABLE deptemployees AS SELECT LatestSupervisorIDNo,e.IDNo, cp.PositionID, Position, IF(JobLevelNo LIKE \'%2\', JLID+0.5, JLID) AS Rank, CONCAT(Nickname, " ",SurName) AS Name, IF(ISNULL(Email) OR (Email LIKE ""),"",CONCAT("<br>",Email)) AS Email, IF(ISNULL(LocalNo) OR (LocalNo LIKE ""),"",CONCAT("<br>Office Local No. ",LocalNo)) AS `LocalNo`, IF(ISNULL(mobilenumbers) OR (mobilenumbers LIKE ""),"",CONCAT("<br>",REPLACE(mobilenumbers,";","<BR>"))) AS Mobile, IF(ISNULL(WorkAssign) OR (WorkAssign LIKE ""),"",CONCAT("<br>",REPLACE(WorkAssign,";","<BR>"))) AS WorkAssign,deptheadpositionid, deptid FROM `attend_30currentpositions` cp JOIN `1employees` e ON e.IDNo=cp.IDNo LEFT JOIN `1_gamit`.`1rtcusers` pu ON e.IDNo=pu.IDNo WHERE  (cp.deptid='.($deptid-800).') OR (cp.PositionID=(SELECT deptheadpositionid FROM `1departments` WHERE deptid='.($deptid-800).'))';
+        $sql1='CREATE TEMPORARY TABLE deptemployees AS SELECT LatestSupervisorIDNo,e.IDNo, cp.PositionID, Position, IF(JobLevelID LIKE \'%2\', JobLevelID+0.5, JobLevelID) AS Rank, CONCAT(Nickname, " ",SurName) AS Name, IF(ISNULL(Email) OR (Email LIKE ""),"",CONCAT("<br>",Email)) AS Email, IF(ISNULL(LocalNo) OR (LocalNo LIKE ""),"",CONCAT("<br>Office Local No. ",LocalNo)) AS `LocalNo`, IF(ISNULL(mobilenumbers) OR (mobilenumbers LIKE ""),"",CONCAT("<br>",REPLACE(mobilenumbers,";","<BR>"))) AS Mobile, IF(ISNULL(WorkAssign) OR (WorkAssign LIKE ""),"",CONCAT("<br>",REPLACE(WorkAssign,";","<BR>"))) AS WorkAssign,deptheadpositionid, deptid FROM `attend_30currentpositions` cp JOIN `1employees` e ON e.IDNo=cp.IDNo LEFT JOIN `1_gamit`.`1rtcusers` pu ON e.IDNo=pu.IDNo WHERE  (cp.deptid='.($deptid-800).') OR (cp.PositionID=(SELECT deptheadpositionid FROM `1departments` WHERE deptid='.($deptid-800).'))';
 		// echo $sql1; exit();
         $stmt1=$link->prepare($sql1); $stmt1->execute();
 if(!isset($_GET['ReportsTo'])){		
@@ -135,7 +135,7 @@ if(!isset($_GET['ReportsTo'])){
     } else {
         $sql0='SELECT CONCAT(IF(ISNULL(Landline),"",CONCAT(Landline,"<BR>")),IF(ISNULL(Mobile),"",CONCAT(Mobile,"<BR><br>")),IFNULL(Email,"")) AS Telephone, RegisteredAddress AS Address FROM `1branches` WHERE BranchNo='.$deptid;
         $stmt0=$link->query($sql0); $res0=$stmt0->fetch();
-        $sql1='CREATE TEMPORARY TABLE deptemployees AS SELECT e.IDNo, Position, pu.ProgCookie, IF(JobLevelNo LIKE \'%2\', JLID+0.5, JLID) AS Rank, CONCAT(Nickname, " ",SurName) AS Name, Email, LocalNo, mobilenumbers AS Mobile FROM `attend_30currentpositions` cp JOIN `1employees` e ON e.IDNo=cp.IDNo LEFT JOIN `1_gamit`.`1rtcusers` pu ON e.IDNo=pu.IDNo WHERE cp.BranchNo='.$deptid;
+        $sql1='CREATE TEMPORARY TABLE deptemployees AS SELECT e.IDNo, Position, pu.ProgCookie, IF(JobLevelID LIKE \'%2\', JobLevelID+0.5, JobLevelID) AS Rank, CONCAT(Nickname, " ",SurName) AS Name, Email, LocalNo, mobilenumbers AS Mobile FROM `attend_30currentpositions` cp JOIN `1employees` e ON e.IDNo=cp.IDNo LEFT JOIN `1_gamit`.`1rtcusers` pu ON e.IDNo=pu.IDNo WHERE cp.BranchNo='.$deptid;
         $stmt1=$link->prepare($sql1); $stmt1->execute();
 if(!isset($_GET['ReportsTo'])){		
         $sql2='SELECT Rank FROM `deptemployees` GROUP BY Rank ORDER BY Rank DESC';
@@ -188,7 +188,7 @@ if(isset($_GET['ReportsTo'])){
   }
 ////BRANCH
   else{
-	   $sql1='CREATE TEMPORARY TABLE deptemployees1 AS SELECT cp.BranchNo,LatestSupervisorIDNo,e.IDNo, Position, pu.ProgCookie,  JLID as Rank, CONCAT(Nickname, " ",SurName) AS Name, Email, LocalNo, mobilenumbers AS Mobile FROM `attend_30currentpositions` cp JOIN `1employees` e ON e.IDNo=cp.IDNo LEFT JOIN `1_gamit`.`1rtcusers` pu ON e.IDNo=pu.IDNo WHERE cp.BranchNo='.$deptid.' or cp.IDNo=(select LatestSupervisorIDNo from attend_30currentpositions where BranchNo='.$deptid.' Order By Rank Desc limit 1) ';
+	   $sql1='CREATE TEMPORARY TABLE deptemployees1 AS SELECT cp.BranchNo,LatestSupervisorIDNo,e.IDNo, Position, pu.ProgCookie,  JobLevelID as Rank, CONCAT(Nickname, " ",SurName) AS Name, Email, LocalNo, mobilenumbers AS Mobile FROM `attend_30currentpositions` cp JOIN `1employees` e ON e.IDNo=cp.IDNo LEFT JOIN `1_gamit`.`1rtcusers` pu ON e.IDNo=pu.IDNo WHERE cp.BranchNo='.$deptid.' or cp.IDNo=(select LatestSupervisorIDNo from attend_30currentpositions where BranchNo='.$deptid.' Order By Rank Desc limit 1) ';
 	   $stmt1=$link->prepare($sql1); $stmt1->execute();
 $sqlb='select Pseudobranch from 1branches where BranchNo='.$deptid.'';
 $stmtb=$link->query($sqlb); $resultb=$stmtb->fetch();

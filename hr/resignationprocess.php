@@ -62,7 +62,7 @@ if (in_array($which,array('print','lookup'))){
 	from hr_2resignationprocess rp left join 1employees e on e.IDNo=rp.IDNo left join 
     attend_30latestpositionsinclresigned lpir ON rp.IDNo=lpir.IDNo LEFT JOIN 
     attend_1defaultbranchassign dba ON rp.IDNo=dba.IDNo 
-    left join attend_0positions p on p.PositionID=lpir.PositionID left join 1branches b on b.BranchNo=dba.DefaultBranchAssignNo left join 1departments d on d.deptid=p.deptid left join 1companies c on e.RcompanyNo=c.CompanyNo
+    left join attend_1positions p on p.PositionID=lpir.PositionID left join 1branches b on b.BranchNo=dba.DefaultBranchAssignNo left join 1departments d on d.deptid=p.deptid left join 1companies c on e.RcompanyNo=c.CompanyNo
 	
 	left join 1employees ehr on ehr.IDNo=rp.EncByHR
 	left join 1employees eadmin on eadmin.IDNo=rp.EncByADMIN
@@ -75,7 +75,7 @@ if (in_array($which,array('print','lookup'))){
 	left join 1employees fd on fd.IDNo=rp.EncByFD
 	where rp.TxnID='.$txnid.' GROUP BY rp.TxnID ';
 	
-	// from hr_2resignationprocess rp left join 1employees e on e.IDNo=rp.IDNo left join (select max(DateofChange),NewPositionID,AssignedBranchNo,IDNo from attend_2changeofpositions Group By IDNo) cp on cp.IDNo=e.IDNo left join attend_0positions p on p.PositionID=cp.NewPositionID left join 1branches b on b.BranchNo=cp.AssignedBranchNo left join 1departments d on d.deptid=p.deptid left join 1companies c on e.RcompanyNo=c.CompanyNo
+	// from hr_2resignationprocess rp left join 1employees e on e.IDNo=rp.IDNo left join (select max(DateofChange),NewPositionID,AssignedBranchNo,IDNo from attend_2changeofpositions Group By IDNo) cp on cp.IDNo=e.IDNo left join attend_1positions p on p.PositionID=cp.NewPositionID left join 1branches b on b.BranchNo=cp.AssignedBranchNo left join 1departments d on d.deptid=p.deptid left join 1companies c on e.RcompanyNo=c.CompanyNo
 	// echo $sql; exit();
 	$stmt=$link->query($sql);
 	$result=$stmt->fetch();
@@ -237,7 +237,7 @@ switch ($which){
 			$listcondition='';			
 		}
 		
-		$sql='Select TxnID,Date as EffectivityDate,IF(FinalDecision<>0,"",(DATEDIFF(CURDATE(),`Date`))) As AgeOfClearanceInDays,e1.Nickname as Nickname,Concat(e1.FirstName,\' \',e1.SurName) as FullName,(SELECT IF(PseudoBranch=1,dept,Branch) FROM attend_1defaultbranchassign dba JOIN attend_30latestpositionsinclresigned lpir ON dba.IDNo=lpir.IDNo JOIN 1branches b ON DefaultBranchAssignNo=b.BranchNo JOIN attend_0positions p ON lpir.PositionID=p.PositionID JOIN 1departments d ON p.deptid=d.deptid WHERE lpir.IDNo=e1.IDNo) AS `Dept/Branch`,Remarks,Concat (e.NickName,\' \',e.SurName) as EncodedBy,rp.TimeStamp from hr_2resignationprocess rp join 1employees e on e.IDNo=rp.EncodedByNo join 1employees e1 on e1.IDNo=rp.IDNo '.$conditionf.' '.$listcondition.' ORDER BY `Date` DESC';
+		$sql='Select TxnID,Date as EffectivityDate,IF(FinalDecision<>0,"",(DATEDIFF(CURDATE(),`Date`))) As AgeOfClearanceInDays,e1.Nickname as Nickname,Concat(e1.FirstName,\' \',e1.SurName) as FullName,(SELECT IF(PseudoBranch=1,dept,Branch) FROM attend_1defaultbranchassign dba JOIN attend_30latestpositionsinclresigned lpir ON dba.IDNo=lpir.IDNo JOIN 1branches b ON DefaultBranchAssignNo=b.BranchNo JOIN attend_1positions p ON lpir.PositionID=p.PositionID JOIN 1departments d ON p.deptid=d.deptid WHERE lpir.IDNo=e1.IDNo) AS `Dept/Branch`,Remarks,Concat (e.NickName,\' \',e.SurName) as EncodedBy,rp.TimeStamp from hr_2resignationprocess rp join 1employees e on e.IDNo=rp.EncodedByNo join 1employees e1 on e1.IDNo=rp.IDNo '.$conditionf.' '.$listcondition.' ORDER BY `Date` DESC';
 		// echo $sql; exit();
 		$txnidname='TxnID';
 		$columnnames=array('EffectivityDate','Nickname','FullName','Dept/Branch','Remarks','AgeOfClearanceInDays');

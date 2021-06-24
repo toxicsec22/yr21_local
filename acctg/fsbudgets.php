@@ -76,7 +76,7 @@ $quartercomputationne='(((MinRate*(1+PercentMintoMed/100)*(1+PercentMedtoMax/100
 $union='UNION All select dam.deptid,\'\' as AccountID,\'\' as Account,\'\' as Details,\'\' as monthlybasic,
 '.$quartercomputation.' as Q1, '.$quartercomputation.' as Q2,
 '.$quartercomputation.' as Q3, '.$quartercomputation.' as Q4
-from '.$lastyr.'_1rtc.payroll_21dailyandmonthly dam left join attend_0positions p on p.PositionID=dam.PositionID left join 1branches b on b.BranchNo=dam.BranchNo where dam.deptid=\''.$_REQUEST['department'].'\' Group by if(dam.deptid=10,dam.BranchNo,"") ';
+from '.$lastyr.'_1rtc.payroll_21dailyandmonthly dam left join attend_1positions p on p.PositionID=dam.PositionID left join 1branches b on b.BranchNo=dam.BranchNo where dam.deptid=\''.$_REQUEST['department'].'\' Group by if(dam.deptid=10,dam.BranchNo,"") ';
 
 $sqlee='Create temporary table EmployeeExpenses select bp.deptid, bp.AccountID, \'Employee\' as Account,bp.Details,(MinRate*(1+PercentMintoMed/100)*(1+PercentMedtoMax/100)) as `monthlybasic`,
 
@@ -109,7 +109,7 @@ $sqlee='Create temporary table EmployeeExpenses select bp.deptid, bp.AccountID, 
 		,"")) as Q4
 
 
-		from budget_2budgetplanning bp join acctg_1chartofaccounts ca on ca.AccountID=bp.AccountID  join attend_0positions p on p.PositionID=SUBSTRING_INDEX(bp.Details,\'-\',\'1\') join attend_1joblevel jl on jl.JobLevelNo=p.JobLevelNo  where bp.deptid=\''.$_REQUEST['department'].'\' and bp.AccountID=\'965\'
+		from budget_2budgetplanning bp join acctg_1chartofaccounts ca on ca.AccountID=bp.AccountID  join attend_1positions p on p.PositionID=SUBSTRING_INDEX(bp.Details,\'-\',\'1\') join attend_0joblevels jl on jl.JobLevelID=p.JobLevelID  where bp.deptid=\''.$_REQUEST['department'].'\' and bp.AccountID=\'965\'
 
 		'.$union.'
 		';

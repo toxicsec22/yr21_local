@@ -10,7 +10,7 @@ include_once $path.'/acrossyrs/commonfunctions/listoptions.php';
 $which=(!isset($_GET['which'])?'Active':$_GET['which']);
 
 if (in_array($which,array('Active','EditSpecifics'))){
-   echo comboBox($link,'SELECT * FROM attend_0positions ORDER BY Position;','PositionID','Position','positions');
+   echo comboBox($link,'SELECT * FROM attend_1positions ORDER BY Position;','PositionID','Position','positions');
    $columnnameslist=array('Date', 'FirstName', 'MiddleName', 'SurName', 'Position', 'MobileNo', 'Email', 'DateofInterview', 'Status','ReferredBy','Hired?','EncodedBy','TimeStamp');
 }
       
@@ -38,7 +38,7 @@ switch ($which){
       $columnnames=$columnnameslist;
         $sortfield=(isset($_POST['sortfield'])?$_POST['sortfield']:' a.Date, a.SurName'); $columnsub=$columnnames;
         $sql='SELECT a.*, Position, e.Nickname as EncodedBy, a.TimeStamp, IF(a.Hired=0,"",IF(a.Hired=1,"Hired","Rejected")) AS `Hired?` FROM hr_2applicants a
-        JOIN attend_0positions p ON p.PositionID=a.PositionID        
+        JOIN attend_1positions p ON p.PositionID=a.PositionID        
         JOIN `1employees` e ON e.IDNo=a.EncodedByNo '.((isset($_GET['show']) AND $_GET['show']==1)?'':' WHERE HIDE=0').'
         ORDER BY '.$sortfield.(isset($_POST['sortarrange'])?' '.$_POST['sortarrange']:' ASC'); 
         
@@ -52,7 +52,7 @@ switch ($which){
     case 'Add':
         require_once $path.'/acrossyrs/logincodes/confirmtoken.php';
         include_once $path.'/acrossyrs/commonfunctions/listoptions.php';
-        $position=comboBoxValue($link,'attend_0positions','Position',addslashes($_POST['Position']),'PositionID');
+        $position=comboBoxValue($link,'attend_1positions','Position',addslashes($_POST['Position']),'PositionID');
         $columnstoadd=array('Date', 'FirstName', 'MiddleName', 'SurName', 'MobileNo', 'Email', 'DateofInterview', 'Status','ReferredBy'); $sql='';
         foreach ($columnstoadd as $field) {$sql=$sql.' `' . $field. '`=\''.addslashes($_POST[$field]).'\', '; }
         $sql='INSERT INTO `hr_2applicants` SET EncodedByNo='.$_SESSION['(ak0)'].', '.$sql.' PositionID='.$position.', TimeStamp=Now()';
@@ -70,7 +70,7 @@ switch ($which){
 	 $txnid=intval($_GET['TxnID']); 
          $columnstoedit=array('Date', 'FirstName', 'MiddleName', 'SurName', 'Position', 'MobileNo', 'Email', 'DateofInterview', 'Status','ReferredBy','Hired');;
 	 $sql='SELECT a.*, Position, e.Nickname as EncodedBy, a.TimeStamp, IF(a.Hired=0,"",IF(a.Hired=1,"Hired","Rejected")) AS `Hired?` FROM hr_2applicants a
-        JOIN attend_0positions p ON p.PositionID=a.PositionID        
+        JOIN attend_1positions p ON p.PositionID=a.PositionID        
         JOIN `1employees` e ON e.IDNo=a.EncodedByNo 
         WHERE TxnID='.$txnid;
 	 $columnnames=$columnnameslist;
@@ -80,7 +80,7 @@ switch ($which){
          break;
     case 'Edit':
         require_once $path.'/acrossyrs/logincodes/confirmtoken.php';
-        $position=comboBoxValue($link,'attend_0positions','Position',addslashes($_POST['Position']),'PositionID');
+        $position=comboBoxValue($link,'attend_1positions','Position',addslashes($_POST['Position']),'PositionID');
         $columnstoadd=array('Date', 'FirstName', 'MiddleName', 'SurName', 'MobileNo', 'Email', 'DateofInterview', 'Status','ReferredBy','Hired'); $sql='';
         foreach ($columnstoadd as $field) {$sql=$sql.' `' . $field. '`=\''.addslashes($_REQUEST[$field]).'\', '; }
         $sql='UPDATE `hr_2applicants` SET EncodedByNo='.$_SESSION['(ak0)'].', '.$sql.' PositionID='.$position.', TimeStamp=Now() WHERE TxnID='.$_GET['TxnID']; 

@@ -17,7 +17,7 @@ switch ($which){
        $sql0='SELECT IDNo, CONCAT(FullName," - ", Branch) AS Name FROM `attend_30currentpositions` ';
        echo comboBox($link, $sql0, 'Name', 'IDNo', 'emplist');
 	   
-       $sql0='Select e.IDNo,Concat(e1.NickName," ",e1.SurName," - ",(SELECT IF(PseudoBranch=1,dept,Branch) FROM attend_1defaultbranchassign dba JOIN attend_30latestpositionsinclresigned lpir ON dba.IDNo=lpir.IDNo JOIN 1branches b ON DefaultBranchAssignNo=b.BranchNo JOIN attend_0positions p ON lpir.PositionID=p.PositionID JOIN 1departments d ON p.deptid=d.deptid WHERE lpir.IDNo=e1.IDNo)) as Name from 1employees e  join 1employees e1 on e1.IDNo=e.IDNo WHERE e.Resigned=1;';
+       $sql0='Select e.IDNo,Concat(e1.NickName," ",e1.SurName," - ",(SELECT IF(PseudoBranch=1,dept,Branch) FROM attend_1defaultbranchassign dba JOIN attend_30latestpositionsinclresigned lpir ON dba.IDNo=lpir.IDNo JOIN 1branches b ON DefaultBranchAssignNo=b.BranchNo JOIN attend_1positions p ON lpir.PositionID=p.PositionID JOIN 1departments d ON p.deptid=d.deptid WHERE lpir.IDNo=e1.IDNo)) as Name from 1employees e  join 1employees e1 on e1.IDNo=e.IDNo WHERE e.Resigned=1;';
        echo comboBox($link, $sql0, 'Name', 'IDNo', 'empresigned');
        echo '<h3>'.$title.'</h3><br>'; $title='';
        ?><div>
@@ -48,7 +48,7 @@ switch ($which){
     $subtitle='<br><br>Personnel Action';
     $sql='SELECT pa.*, e.Nickname, CONCAT(e.FirstName," ",e.SurName) AS FullName, Position, CONCAT(Department, " - ", Branch) AS `Department/Branch`, ActionDesc AS PersonnelAction, department AS Department, e2.Nickname AS EncodedBy FROM `hr_2personnelaction` pa JOIN `hr_0personnelaction` po ON po.ActionID=pa.ActionID 
 JOIN `1departments` d ON d.deptid=pa.deptID JOIN `1branches` b ON b.BranchNo=pa.BranchNo
-JOIN attend_0positions p ON p.PositionID=pa.PositionID
+JOIN attend_1positions p ON p.PositionID=pa.PositionID
 JOIN `1employees` e ON e.IDNo=pa.IDNo JOIN `1employees` e2 ON e2.IDNo=pa.EncodedByNo 
         WHERE  pa.IDNo='.$idno.' ORDER BY DateServed DESC';
 
@@ -67,7 +67,7 @@ include('meritdemeritsummary.php');
 	       LEFT JOIN `1employees` e2 ON e2.IDNo=pf.SupervisorIDNo
 	       JOIN `1branches` b ON b.BranchNo=pf.CurrentBranchNo
 	       JOIN `1companies` c ON c.CompanyNo=e1.RCompanyNo
-	       LEFT JOIN `attend_0positions` p ON p.PositionID=pf.CurrentPositionID
+	       LEFT JOIN `attend_1positions` p ON p.PositionID=pf.CurrentPositionID
         WHERE  pf.IDNo='.$idno.' ORDER BY EvalDueDate DESC';
 
 $columnnames=array('CurrentBranch','CurrentPosition','EvalAfterDays','EvalDueDate','SelfEval','SelfRemarks','Supervisor','SupervisorEval','SuperRemarks','Emp_Response','EmpRemarks','HRRemarks','HREncodedBy','HR_Status');
@@ -104,7 +104,7 @@ LEFT JOIN `1employees` e2 ON e2.IDNo=ie.EditOrDelByNo JOIN `1companies` c ON c.C
      $subtitle='<br><br>Trainings/Seminars'; $color1='e6f7ff';
      $sql='SELECT StartDate,EndDate,TrainingTitle,Trainor,TrainorTitle,Venue,IF(Completed=1,"Yes","No") AS `Completed?`,Comments, Position
 	FROM `hr_2traintrack` ts JOIN `hr_2trainsched` tm ON tm.TxnID=ts.TxnID JOIN `hr_1trainings` t ON t.TrainingID=tm.TrainingID
-	 JOIN attend_0positions p ON p.PositionID=ts.PositionID WHERE IDNo='.$idno.' ORDER BY StartDate DESC';
+	 JOIN attend_1positions p ON p.PositionID=ts.PositionID WHERE IDNo='.$idno.' ORDER BY StartDate DESC';
         $columnnames=array('StartDate','EndDate','TrainingTitle','Trainor','TrainorTitle','Venue','Completed?','Comments','Position');
      $showsubtitlealways=true; include('../backendphp/layout/displayastablenosort.php');
               

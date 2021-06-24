@@ -48,7 +48,7 @@ JOIN `1employees` e ON r.`EncodedByNo`=e.IDNo
 
     (SELECT TRUNCATE(SalaryStructureDaily(IF((EffectiveMinWage*'.$multiplier.')>=(SELECT NCRRate FROM NCRRate),(SELECT NCRRate FROM NCRRate),(EffectiveMinWage*'.$multiplier.')),JobClassNo,'.$increaserate.','.$steprate.',5),2) FROM storesrate WHERE IDNo=r.IDNo)
     
-    ,(SELECT TRUNCATE(MinRate*(1+PercentMintoMed/100)*(1+PercentMedtoMax/100),2) FROM attend_1joblevel jl JOIN attend_0jobclass jc ON jc.JobClassNo=jl.JobClassNo JOIN attend_0positions p ON jl.JobLevelNo=p.JobLevelNo AND p.PositionID=(SELECT NewPositionID FROM attend_2changeofpositions WHERE IDNo=r.IDNo ORDER BY DateofChange LIMIT 1))) AS MaxRate,
+    ,(SELECT TRUNCATE(MinRate*(1+PercentMintoMed/100)*(1+PercentMedtoMax/100),2) FROM attend_0joblevels jl JOIN attend_0jobclass jc ON jc.JobClassNo=jl.JobClassNo JOIN attend_1positions p ON jl.JobLevelID=p.JobLevelID AND p.PositionID=(SELECT NewPositionID FROM attend_2changeofpositions WHERE IDNo=r.IDNo ORDER BY DateofChange LIMIT 1))) AS MaxRate,
         CONCAT(
           IF(((SELECT MaxRate)<Basic) AND DailyORMonthly=1,"<font color=\"red\">",""),
           FORMAT(Basic,2), IF(((SELECT MaxRate)<Basic) AND DailyORMonthly=1,"</font>","")

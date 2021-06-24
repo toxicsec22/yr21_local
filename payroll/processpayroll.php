@@ -25,7 +25,7 @@ if (!isset($_POST['submitIDNoforrecalc'])) {
 
 $sql='SELECT lr.IDNo, Nickname, SurName, p.Position, IF(`LatestDorM`=0,"Daily","Monthly") AS RecordedRate, IF(`PreferredRateType`=0, "Daily","Monthly") AS PreferredForPosition FROM payroll_20latestrates lr JOIN `1employees` e ON e.IDNo=lr.IDNo 
 JOIN `attend_30currentpositions` cp ON cp.IDNo=lr.IDNo
-JOIN attend_0positions p ON p.PositionID=cp.PositionID WHERE e.`Resigned`=0 AND `LatestDorM`<>`PreferredRateType` AND lr.IDNo NOT IN (1525,1526);';
+JOIN attend_1positions p ON p.PositionID=cp.PositionID WHERE e.`Resigned`=0 AND `LatestDorM`<>`PreferredRateType` AND lr.IDNo NOT IN (1525,1526);';
 $columnnames=array('IDNo','Nickname', 'SurName','Position','RecordedRate','PreferredForPosition');
 $subtitle='Recorded Rate Type Different from Preferred for Position';
 include('../backendphp/layout/displayastableonlynoheaders.php');

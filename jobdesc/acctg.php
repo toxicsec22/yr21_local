@@ -2,7 +2,7 @@
 <?php
 
  $title='';
-$sql1='SELECT IDNo, FullName, department AS Department FROM `attend_30currentpositions` WHERE IDNo in (SELECT IDNo FROM `hr_2jobdesc` WHERE deptid IN (20,50)) ORDER BY JLID;';
+$sql1='SELECT IDNo, FullName, department AS Department FROM `attend_30currentpositions` WHERE IDNo in (SELECT IDNo FROM `hr_2jobdesc` WHERE deptid IN (20,50)) ORDER BY JobLevelID;';
     $sql2='SELECT OrderByNo AS `No.`, JobDesc AS `Job Description` FROM hr_2jobdesc jd  ';
 
     $groupby='IDNo';

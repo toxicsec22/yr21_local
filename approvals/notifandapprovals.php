@@ -529,7 +529,7 @@ if ((allowedToOpen(220,'1rtc'))){
 			goto here;
 		}
 		here:
-        $sqlsp = 'select sp.*,ForPositionID AS TxnID,Position AS ForPosition,NickName As RequestedBy FROM approvals_systempermission sp JOIN 1_gamit.0idinfo id ON sp.RequestedByNo=id.IDNo JOIN attend_0positions p ON sp.ForPositionID=p.PositionID '.$reqcondi.' ORDER BY Position ASC';
+        $sqlsp = 'select sp.*,ForPositionID AS TxnID,Position AS ForPosition,NickName As RequestedBy FROM approvals_systempermission sp JOIN 1_gamit.0idinfo id ON sp.RequestedByNo=id.IDNo JOIN attend_1positions p ON sp.ForPositionID=p.PositionID '.$reqcondi.' ORDER BY Position ASC';
         $stmtsp=$link->query($sqlsp); $datatoshowsp=$stmtsp->fetchAll(); $sp=0;
 
         if ($stmtsp->rowCount()>0){

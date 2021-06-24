@@ -11,7 +11,7 @@ switch ($which){
     case 'SendForApproval':
         $sql='SELECT pr.*, Entity, Position, TargetDate, e.Nickname as RequestedBy, pr.TimeStamp as RequestTS, e1.Nickname as ApprovedBy, pr.ApproveTS
         FROM hr_2personnelrequest pr
-        JOIN attend_0positions p ON p.PositionID=pr.PositionID        
+        JOIN attend_1positions p ON p.PositionID=pr.PositionID        
         JOIN `1employees` e ON e.IDNo=pr.EncodedByNo
         LEFT JOIN `1employees` e1 ON e1.IDNo=pr.ApprovedByNo
         JOIN `acctg_1budgetentities` be ON be.EntityID=pr.EntityID
@@ -48,7 +48,7 @@ switch ($which){
 	 // rtciconpass()
         $sql='SELECT pr.*, Entity, Position, TargetDate, e.Nickname as RequestedBy, pr.TimeStamp as RequestTS, e1.Nickname as ApprovedBy, pr.ApproveTS, IF(Approved=1,"Approved","Denied") AS `Approved?`
         FROM hr_2personnelrequest pr
-        JOIN attend_0positions p ON p.PositionID=pr.PositionID        
+        JOIN attend_1positions p ON p.PositionID=pr.PositionID        
         JOIN `1employees` e ON e.IDNo=pr.EncodedByNo
         LEFT JOIN `1employees` e1 ON e1.IDNo=pr.ApprovedByNo
         JOIN `acctg_1budgetentities` be ON be.EntityID=pr.EntityID

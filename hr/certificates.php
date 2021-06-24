@@ -96,7 +96,7 @@ $sql='SELECT StartDate,EndDate,TrainingTitle,Venue, CONCAT(e.FirstName, " ",LEFT
 JOIN `hr_2trainsched` tm ON tm.TxnID=ts.TxnID JOIN `hr_1trainings` t ON t.TrainingID=tm.TrainingID
 JOIN `1employees` e ON e.IDNo=ts.IDNo
    LEFT JOIN `1employees` e1 ON e1.IDNo=tm.LeadIDNo
-	       LEFT JOIN `attend_0positions` p ON p.PositionID=tm.LeadPositionID
+	       LEFT JOIN `attend_1positions` p ON p.PositionID=tm.LeadPositionID
 WHERE Completed=1 AND tm.TxnID='.$_GET['TxnID']; 
 
 }

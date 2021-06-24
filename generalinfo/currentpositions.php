@@ -57,9 +57,9 @@ foreach ($liststoshow as $list){
 renderlist($list);    
 }
 $title='';
-$sortfield=(!isset($_POST['sortfield'])?'JLID ':$_POST['sortfield']);
-$sql='SELECT `JobLevelNo`, `PositionID`,`Position`,`cp`.`IDNo`,`FullName`,`Branch`,`DateofChange`,CONCAT(id.Nickname," ",id.Surname) AS `Supervisor`, `Remarks` FROM attend_30currentpositions cp LEFT JOIN 1_gamit.0idinfo id ON cp.LatestSupervisorIDNo=id.IDNo ORDER BY '.$sortfield.(isset($_POST['sortarrange'])?' '.$_POST['sortarrange']:' ASC ');
-$columnnames=array('JobLevelNo','PositionID','Position','IDNo','FullName','Branch','Supervisor','DateofChange', 'Remarks'); $columnsub=$columnnames;
+$sortfield=(!isset($_POST['sortfield'])?'JobLevelID ':$_POST['sortfield']);
+$sql='SELECT `JobLevelID`, `PositionID`,`Position`,`cp`.`IDNo`,`FullName`,`Branch`,`DateofChange`,CONCAT(id.Nickname," ",id.Surname) AS `Supervisor`, `Remarks` FROM attend_30currentpositions cp LEFT JOIN 1_gamit.0idinfo id ON cp.LatestSupervisorIDNo=id.IDNo ORDER BY '.$sortfield.(isset($_POST['sortarrange'])?' '.$_POST['sortarrange']:' ASC ');
+$columnnames=array('JobLevelID','PositionID','Position','IDNo','FullName','Branch','Supervisor','DateofChange', 'Remarks'); $columnsub=$columnnames;
 $showbranches=false; 
 
      include('../backendphp/layout/displayastable.php');
@@ -93,7 +93,7 @@ if(isset($_GET['superonly']) AND $_GET['superonly']==1){
 		$position=getValue($link,'attend_30currentpositions','IDNo',$_POST['IDNo'],'PositionID');
 		$branch=getValue($link,'attend_30currentpositions','IDNo',$_POST['IDNo'],'BranchNo');
 	} else {
-		$position=getValue($link,'attend_0positions','Position',$_POST['newposition'],'PositionID');
+		$position=getValue($link,'attend_1positions','Position',$_POST['newposition'],'PositionID');
         $branch=getValue($link,'1branches','Branch',$_POST['newbranch'],'BranchNo');
 	}
 

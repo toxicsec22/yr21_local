@@ -125,7 +125,7 @@ echo '</div></div>';
 			ELSE 
 				IF(Score>=115,200,150)
 		END) AS RatePerUnit,IF(NoOfDays>=NoOfSaleDays,"100",TRUNCATE((((SELECT TRUNCATE(IFNULL(SUM(Qty*UnitPrice),0),2) FROM invty_2sale sm JOIN invty_2salesub ss ON sm.TxnID=ss.TxnID WHERE BranchNo=his.BranchNo AND MONTH(`Date`)=his.MonthNo AND `Date` IN (SELECT DateToday FROM attend_2attendance WHERE IDNo=his.IDNo AND BranchNo=his.BranchNo AND LeaveNo IN (11,15)))/(SELECT TRUNCATE(IFNULL(SUM(Qty*UnitPrice),0),2) FROM invty_2sale sm JOIN invty_2salesub ss ON sm.TxnID=ss.TxnID WHERE BranchNo=his.BranchNo AND MONTH(`Date`)=his.MonthNo))*100),2))
-         AS PercentSale FROM hr_2incentivesub his JOIN 1branches b ON his.BranchNo=b.BranchNo JOIN acctg_6targetscores ts ON `his`.BranchNo=`ts`.BranchNo AND `his`.MonthNo=ts.MonthNo JOIN 1employees e ON `his`.IDNo=e.IDNo JOIN attend_0positions p ON his.PositionID=p.PositionID JOIN attend_1joblevel jl ON jl.JobLevelNo=p.JobLevelNo WHERE his.MonthNo='.$txndate.' ORDER BY Branch,JLID DESC,FullName';
+         AS PercentSale FROM hr_2incentivesub his JOIN 1branches b ON his.BranchNo=b.BranchNo JOIN acctg_6targetscores ts ON `his`.BranchNo=`ts`.BranchNo AND `his`.MonthNo=ts.MonthNo JOIN 1employees e ON `his`.IDNo=e.IDNo JOIN attend_1positions p ON his.PositionID=p.PositionID JOIN attend_0joblevels jl ON jl.JobLevelID=p.JobLevelID WHERE his.MonthNo='.$txndate.' ORDER BY Branch,JobLevelID DESC,FullName';
         // echo $sql;
 	
 	$stmt=$link->query($sql); $result=$stmt->fetchAll();
@@ -141,7 +141,7 @@ SELECT e.IDNo,cop.AssignedBranchNo,cop.NewPositionID,DateofChange FROM attend_2c
         `e`.`IDNo`,AssignedBranchNo,NewPositionID,DateofChange AS DateofEffectivity
     FROM
     
-        `attend_0positions` `p`
+        `attend_1positions` `p`
         JOIN `attend_2changeofpositions` `cp` ON (`p`.`PositionID` = `cp`.`NewPositionID`)
         JOIN `1employees` e ON e.IDNo=cp.IDNo
     WHERE

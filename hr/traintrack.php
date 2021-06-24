@@ -34,13 +34,13 @@ if (isset($_GET['TxnID'])){
 	       JOIN `1employees` e ON e.IDNo=m.EncodedByNo 
 	       JOIN `hr_1trainings` t ON t.TrainingID=m.TrainingID 
                LEFT JOIN `1employees` e1 ON e1.IDNo=m.LeadIDNo
-               LEFT JOIN `attend_0positions` p ON p.PositionID=m.LeadPositionID
+               LEFT JOIN `attend_1positions` p ON p.PositionID=m.LeadPositionID
                 WHERE m.TxnID='.$txnid;
    $sqlsub='Select s.*, CONCAT(e1.FirstName, " ", e1.Surname) AS Trainee, Position, e.Nickname AS EncodedBy, IF(s.Completed=1,"Yes","No") AS `Completed?`
 	       FROM `hr_2trainsched` m JOIN `hr_2traintrack` s ON m.TxnID=s.TxnID 
 	       JOIN `1employees` e ON e.IDNo=s.EncodedByNo
 	       JOIN `1employees` e1 ON e1.IDNo=s.IDNo
-	       JOIN `attend_0positions` p ON p.PositionID=s.PositionID
+	       JOIN `attend_1positions` p ON p.PositionID=s.PositionID
 	       WHERE m.TxnID='.$txnid;
 }
 
@@ -72,13 +72,13 @@ switch ($which){
       $sql='SELECT m.*, count(sub.TxnID) AS Attendees, TrainingTitle, CONCAT(FirstName, " ", Surname) AS TrainingLead, Position AS TrainingLeadPosition  FROM hr_2trainsched m 
 		JOIN hr_2traintrack sub on m.TxnID=sub.TxnID JOIN `hr_1trainings` t ON t.TrainingID=m.TrainingID
                  LEFT JOIN `1employees` e ON e.IDNo=m.LeadIDNo
-                    LEFT JOIN `attend_0positions` p ON p.PositionID=m.LeadPositionID
+                    LEFT JOIN `attend_1positions` p ON p.PositionID=m.LeadPositionID
         WHERE (Month(m.StartDate)='.$month.' OR Month(m.EndDate)='.$month.') GROUP BY TxnID 
 	UNION  SELECT m.*, 0 as Attendees, TrainingTitle, CONCAT(FirstName, " ", Surname) AS TrainingLead, Position AS TrainingLeadPosition
 	FROM hr_2trainsched m left JOIN hr_2traintrack sub on m.TxnID=sub.TxnID
 	JOIN `hr_1trainings` t ON t.TrainingID=m.TrainingID 
         LEFT JOIN `1employees` e ON e.IDNo=m.LeadIDNo
-                    LEFT JOIN `attend_0positions` p ON p.PositionID=m.LeadPositionID
+                    LEFT JOIN `attend_1positions` p ON p.PositionID=m.LeadPositionID
         WHERE (Month(m.StartDate)='.$month.' OR Month(m.EndDate)='.$month.') AND sub.TxnID IS NULL	
 	';   
         $editprocess='traintrack.php?which=Training&TxnID='; $editprocesslabel='Lookup'; $txnidname='TxnID';
@@ -209,7 +209,7 @@ switch ($which){
         $idno=comboBoxValue($link,'`1employees`','CONCAT(FirstName, " ", Surname)',addslashes($_POST['Trainee']),'IDNo');
         $sql='SELECT StartDate,EndDate,TrainingTitle,Trainor,TrainorTitle,Venue,IF(Completed=1,"Yes","No") AS `Completed?`,Comments, Position
 	FROM `hr_2traintrack` ts JOIN `hr_2trainsched` tm ON tm.TxnID=ts.TxnID JOIN `hr_1trainings` t ON t.TrainingID=tm.TrainingID
-	 JOIN attend_0positions p ON p.PositionID=ts.PositionID WHERE IDNo='.$idno;
+	 JOIN attend_1positions p ON p.PositionID=ts.PositionID WHERE IDNo='.$idno;
         $columnnames=array('StartDate','EndDate','TrainingTitle','Trainor','TrainorTitle','Venue','Completed?','Comments','Position');
         include('../backendphp/layout/displayastable.php');  
 	noform:

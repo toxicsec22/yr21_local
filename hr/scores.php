@@ -930,7 +930,7 @@ switch ($which)
           IFNULL(round(SUM(CASE MONTH(DateOfIncident) WHEN  9 THEN WeightinPoints END), 2),0) AS September,
           IFNULL(round(SUM(CASE MONTH(DateOfIncident) WHEN 10 THEN WeightinPoints END), 2),0) AS October,
           IFNULL(round(SUM(CASE MONTH(DateOfIncident) WHEN 11 THEN WeightinPoints END), 2),0) AS November,
-          IFNULL(round(SUM(CASE MONTH(DateOfIncident) WHEN 12 THEN WeightinPoints END), 2),0) AS December FROM hr_72scores s JOIN hr_71scorestmt ss ON s.SSID=ss.SSID JOIN attend_30currentpositions cp ON s.ReporteeNo=cp.IDNo JOIN hr_70points p ON ss.PointID=p.PointID WHERE ('.$_SESSION['(ak0)'].' in ('.$incondi.')) AND stmtcat='.$_POST['StmtCat'].' AND DecisionStatus='.($_POST['StmtCat']==0?1:3).' GROUP BY ReporteeNo ORDER BY Department,JLID DESC;';
+          IFNULL(round(SUM(CASE MONTH(DateOfIncident) WHEN 12 THEN WeightinPoints END), 2),0) AS December FROM hr_72scores s JOIN hr_71scorestmt ss ON s.SSID=ss.SSID JOIN attend_30currentpositions cp ON s.ReporteeNo=cp.IDNo JOIN hr_70points p ON ss.PointID=p.PointID WHERE ('.$_SESSION['(ak0)'].' in ('.$incondi.')) AND stmtcat='.$_POST['StmtCat'].' AND DecisionStatus='.($_POST['StmtCat']==0?1:3).' GROUP BY ReporteeNo ORDER BY Department,JobLevelID DESC;';
 		// echo $sql;
 		$title=''; $formdesc=''; $txnidname='TxnID';
 		$columnnameslist=array('Branch', 'Employee', 'Department', 'Position', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December');
@@ -969,12 +969,12 @@ switch ($which)
 		echo '<br><h3><font color="green">Merits</font></h3>';
 		$title='';
 		$editprocess=$lookupprocess.'&StmtCat=1&IDNo='; $editprocesslabel='Lookup';
-		$sql = $sql0 . ' AND DecisionStatus=3 AND stmtcat=1 GROUP BY ReporteeNo ORDER BY Department,JLID DESC;';
+		$sql = $sql0 . ' AND DecisionStatus=3 AND stmtcat=1 GROUP BY ReporteeNo ORDER BY Department,JobLevelID DESC;';
 		include('../backendphp/layout/displayastablenosort.php');
 		
 		echo '<br><br><h3><font color="blue">Demerits</font></h3>';
 		$editprocess=$lookupprocess.'&StmtCat=0&IDNo='; $editprocesslabel='Lookup';
-		$sql = $sql0 . ' AND DecisionStatus=1 AND stmtcat=0 GROUP BY ReporteeNo ORDER BY Department,JLID DESC;'; //echo $sql;
+		$sql = $sql0 . ' AND DecisionStatus=1 AND stmtcat=0 GROUP BY ReporteeNo ORDER BY Department,JobLevelID DESC;'; //echo $sql;
 		include('../backendphp/layout/displayastablenosort.php');
 			
 	}
@@ -1010,7 +1010,7 @@ switch ($which)
 		
 		$title='Scores';
 		$subtitle = ' <font color="blue">Demerit</font>';
-		$sql = $sql0.' AND stmtcat=0 AND DecisionStatus=1 GROUP BY ReporteeNo'.(($_POST['deptid']=='All')?',ss.deptid':'').' ORDER BY Department,JLID DESC;';
+		$sql = $sql0.' AND stmtcat=0 AND DecisionStatus=1 GROUP BY ReporteeNo'.(($_POST['deptid']=='All')?',ss.deptid':'').' ORDER BY Department,JobLevelID DESC;';
 		
 		$lookupaddr = 'scores.php?w=LookupScore&MonthNo='.$_POST['MonthNo'].'&StmtCat=';
 		// echo $sql;
@@ -1022,7 +1022,7 @@ switch ($which)
 		echo '</div><div style="margin-left:50%">';
 		$editprocess=$lookupaddr.'1&IDNo='; $editprocesslabel='Lookup';
 		$subtitle = '<font color="green">Merit</font>';
-		$sql = $sql0.' AND stmtcat=1 AND DecisionStatus=3 GROUP BY ReporteeNo'.(($_POST['deptid']=='All')?',ss.deptid':'').' ORDER BY Department,JLID DESC;';
+		$sql = $sql0.' AND stmtcat=1 AND DecisionStatus=3 GROUP BY ReporteeNo'.(($_POST['deptid']=='All')?',ss.deptid':'').' ORDER BY Department,JobLevelID DESC;';
 		
 		include('../backendphp/layout/displayastablenosort.php');
 		echo '</div>';
@@ -1060,7 +1060,7 @@ switch ($which)
 	if (!allowedToOpen(65071,'1rtc')) { echo 'No permission'; exit; }
 	$title = 'Not Counted Reports';
 	
-		$sql='SELECT s.*, FullName AS Employee, cp.department AS Department,d.department AS ReportingDepartment, Branch, Position, TRUNCATE(SUM(WeightinPoints),2) AS Points FROM hr_72scores s JOIN hr_71scorestmt ss ON s.SSID=ss.SSID JOIN attend_30currentpositions cp ON s.ReporteeNo=cp.IDNo JOIN hr_70points p ON ss.PointID=p.PointID JOIN 1departments d ON ss.deptid=d.deptid WHERE (DecisionStatus=2 OR ReporteeHeadStatus=4) '.(allowedToOpen(65072,'1rtc')?'':'AND ss.deptid='.$rowdept['deptid']).' ORDER BY Branch,Department,JLID DESC';
+		$sql='SELECT s.*, FullName AS Employee, cp.department AS Department,d.department AS ReportingDepartment, Branch, Position, TRUNCATE(SUM(WeightinPoints),2) AS Points FROM hr_72scores s JOIN hr_71scorestmt ss ON s.SSID=ss.SSID JOIN attend_30currentpositions cp ON s.ReporteeNo=cp.IDNo JOIN hr_70points p ON ss.PointID=p.PointID JOIN 1departments d ON ss.deptid=d.deptid WHERE (DecisionStatus=2 OR ReporteeHeadStatus=4) '.(allowedToOpen(65072,'1rtc')?'':'AND ss.deptid='.$rowdept['deptid']).' ORDER BY Branch,Department,JobLevelID DESC';
 		// echo $sql;
 		$formdesc=''; $txnidname='TxnID';
 		

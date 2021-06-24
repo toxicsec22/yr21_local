@@ -232,7 +232,7 @@ if (in_array($whichqry,array('summary_for_payroll','my_attendance'))){
     break;
     case 'InPositionList':
             include_once $path.'/acrossyrs/commonfunctions/listoptions.php';
-            $title='Employee List From ' .comboBoxValue($link, 'attend_0positions', 'PositionID', $_GET['PositionID'], 'Position');
+            $title='Employee List From ' .comboBoxValue($link, 'attend_1positions', 'PositionID', $_GET['PositionID'], 'Position');
             $sql='SELECT IDNo, FullName FROM attend_30currentpositions WHERE PositionID='.intval($_GET['PositionID']);
             $columnnames=array('IDNo','FullName'); 
             $width='30%'; 
@@ -300,7 +300,7 @@ if (in_array($whichqry,array('summary_for_payroll','my_attendance'))){
 			echo '<br><br><H3>In Positions</H3>';
 			$editprocess='tocheckattendance.php?qry=InPositionList&PositionID=';
             $editprocesslabel='Lookup';
-           $sql='SELECT PositionID AS TxnID,Position, COUNT(*) AS EmployeeCount FROM `attend_30currentpositions` GROUP BY PositionID ORDER BY EmployeeCount DESC, JLID;';  
+           $sql='SELECT PositionID AS TxnID,Position, COUNT(*) AS EmployeeCount FROM `attend_30currentpositions` GROUP BY PositionID ORDER BY EmployeeCount DESC, JobLevelID;';  
            $columnnames=array('Position', 'EmployeeCount');
            include('../backendphp/layout/displayastable.php');
    break;

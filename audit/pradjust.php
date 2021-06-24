@@ -129,7 +129,7 @@ case 'ChargeSales':
 	
 	
 	//To get branch head
-	$sql='Select IDNo from `attend_30currentpositions` where BranchNo=\''.$branchno.'\' and PositionID in (50,53,32,33,37,81) order by JLID desc limit 1';
+	$sql='Select IDNo from `attend_30currentpositions` where BranchNo=\''.$branchno.'\' and PositionID in (50,53,32,33,37,81) order by JobLevelID desc limit 1';
 	$stmt=$link->query($sql);
 	$result=$stmt->fetch();
 	$clientno=$result['IDNo'];

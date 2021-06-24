@@ -23,7 +23,7 @@ switch ($w){
         if (!allowedToOpen(6717,'1rtc')){  echo 'No permission'; exit;}
         if($title=='Reported Resigned'){
                         $label="Back to Reported Resigned";
-			$sql='SELECT e.*,ResignReason,DateResigned,CONCAT(e.Nickname,"-",e.FirstName," ",e.Surname) AS `Nickname-FullName`, c.Company, p.Position, IF(p.deptid NOT IN (2,10),d.Department,Branch) AS Branch FROM `1employees` e LEFT JOIN `1companies` c on e.RCompanyNo=c.CompanyNo JOIN `1_gamit`.`0idinfo` i ON i.IDNo=e.IDNo JOIN `attend_30latestpositionsinclresigned` cp ON cp.IDNo=e.IDNo JOIN `attend_0positions` `p` ON ((`p`.`PositionID` = `cp`.`PositionID`)) 
+			$sql='SELECT e.*,ResignReason,DateResigned,CONCAT(e.Nickname,"-",e.FirstName," ",e.Surname) AS `Nickname-FullName`, c.Company, p.Position, IF(p.deptid NOT IN (2,10),d.Department,Branch) AS Branch FROM `1employees` e LEFT JOIN `1companies` c on e.RCompanyNo=c.CompanyNo JOIN `1_gamit`.`0idinfo` i ON i.IDNo=e.IDNo JOIN `attend_30latestpositionsinclresigned` cp ON cp.IDNo=e.IDNo JOIN `attend_1positions` `p` ON ((`p`.`PositionID` = `cp`.`PositionID`)) 
 JOIN 1departments d ON d.deptid=p.deptid JOIN attend_1defaultbranchassign dba ON e.IDNo=dba.IDNo JOIN 1branches b ON b.BranchNo=dba.DefaultBranchAssignNo WHERE e.Resigned=1 AND GovtReport=2 ORDER BY RDateHired DESC';
 			 array_push($columnnames,'DateResigned','ResignReason');
 			 $case='Reset';

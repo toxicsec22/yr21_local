@@ -174,8 +174,8 @@ if(in_array($which, array('EditMeasurables','ScorecardList','Traction','ToDo','I
 	
 		echo comboBox($link,'select e.*,CONCAT(Nickname,\' \',SurName) as Fullname from 1employees e JOIN attend_30currentpositions cp ON e.IDNo=cp.IDNo WHERE PositionID IN ('.$resultpid['AllowedPos'].') OR e.IDNo IN ('.$mancomlistidno.')','Fullname','IDNo','employees1');
 	} else {
-		$depid='(SELECT deptid FROM attend_0positions WHERE PositionID='.$_SESSION['&pos'].')';
-		$supid='(SELECT supervisorpositionid FROM attend_0positions WHERE PositionID='.$_SESSION['&pos'].')';
+		$depid='(SELECT deptid FROM attend_1positions WHERE PositionID='.$_SESSION['&pos'].')';
+		$supid='(SELECT supervisorpositionid FROM attend_1positions WHERE PositionID='.$_SESSION['&pos'].')';
 		echo comboBox($link,'select e.*,CONCAT(Nickname,\' \',SurName) as Fullname from 1employees e JOIN attend_30currentpositions cp ON e.IDNo=cp.IDNo WHERE deptheadpositionid='.$_SESSION['&pos'].' OR PositionID='.$supid.' OR deptid='.$depid.' OR e.IDNo='.$_SESSION['(ak0)'].'','IDNo','Fullname','employees');
 	// echo 'select e.*,CONCAT(Nickname,\' \',SurName) as Fullname from 1employees e JOIN attend_30currentpositions cp ON e.IDNo=cp.IDNo WHERE deptheadpositionid='.$_SESSION['&pos'].' OR deptid='.$depid.' OR e.IDNo='.$_SESSION['(ak0)'].'';
 		echo comboBox($link,'select e.*,CONCAT(Nickname,\' \',SurName) as Fullname from 1employees e JOIN attend_30currentpositions cp ON e.IDNo=cp.IDNo WHERE deptheadpositionid='.$_SESSION['&pos'].' OR PositionID='.$supid.' OR deptid='.$depid.' OR e.IDNo='.$_SESSION['(ak0)'].'','Fullname','IDNo','employees1');

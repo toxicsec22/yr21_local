@@ -60,7 +60,7 @@ switch ($calledfrom){
 			ELSE "Resigned"
 		END)
 
-			AS EmploymentStatus,IF(Gender=0,"F","M") AS Gender, c.Company, IF(i.DateResigned=\'0000-00-00\' OR ISNULL(i.DateResigned),"", i.DateResigned) AS DateResigned, WithHMO, i.TIN, i.SSSNo, i.PagIbigNo, i.PHICNo, cp.Position, Branch FROM `1employees` e LEFT JOIN `1companies` c on e.RCompanyNo=c.CompanyNo JOIN `1_gamit`.`0idinfo` i ON i.IDNo=e.IDNo JOIN `attend_30currentpositions` cp ON cp.IDNo=e.IDNo JOIN `attend_0positions` `p` ON ((`p`.`PositionID` = `cp`.`PositionID`)) ORDER BY '.$sortfield.(isset($_POST['sortarrange'])?' '.$_POST['sortarrange']:' ASC');
+			AS EmploymentStatus,IF(Gender=0,"F","M") AS Gender, c.Company, IF(i.DateResigned=\'0000-00-00\' OR ISNULL(i.DateResigned),"", i.DateResigned) AS DateResigned, WithHMO, i.TIN, i.SSSNo, i.PagIbigNo, i.PHICNo, cp.Position, Branch FROM `1employees` e LEFT JOIN `1companies` c on e.RCompanyNo=c.CompanyNo JOIN `1_gamit`.`0idinfo` i ON i.IDNo=e.IDNo JOIN `attend_30currentpositions` cp ON cp.IDNo=e.IDNo JOIN `attend_1positions` `p` ON ((`p`.`PositionID` = `cp`.`PositionID`)) ORDER BY '.$sortfield.(isset($_POST['sortarrange'])?' '.$_POST['sortarrange']:' ASC');
 
         if (allowedToOpen(array(6711,67111,6714),'1rtc')){
 			$show=!isset($_POST['show'])?'Show Current':$_POST['show'];
@@ -112,7 +112,7 @@ switch ($calledfrom){
         LEFT JOIN `1companies` c on e.RCompanyNo=c.CompanyNo
         JOIN `1_gamit`.`0idinfo` i ON i.IDNo=e.IDNo
         JOIN `attend_30latestpositionsinclresigned` r ON e.IDNo=r.IDNo
-        JOIN `attend_0positions` p ON p.PositionID=r.PositionID
+        JOIN `attend_1positions` p ON p.PositionID=r.PositionID
         LEFT JOIN `attend_1defaultbranchassign` dba ON e.IDNo=dba.IDNo
         JOIN `1branches` b ON b.BranchNo=dba.DefaultBranchAssignNo
         WHERE e.Resigned<>0
@@ -213,19 +213,19 @@ switch ($calledfrom){
         include_once('../generalinfo/lists.inc');
 
 		if (!allowedToOpen(6702,'1rtc')){
-			$sql='SELECT deptid,JLID FROM attend_30currentpositions WHERE IDNo='.$_SESSION['(ak0)'].'';
+			$sql='SELECT deptid,JobLevelID FROM attend_30currentpositions WHERE IDNo='.$_SESSION['(ak0)'].'';
 			$stmt=$link->query($sql); $resinfo=$stmt->fetch();
 
-			$acondi=' WHERE p.deptid='.$resinfo['deptid'].' AND cp.JLID<="'.$resinfo['JLID'].'"';
+			$acondi=' WHERE p.deptid='.$resinfo['deptid'].' AND cp.JobLevelID<="'.$resinfo['JobLevelID'].'"';
 			$bcondi=' WHERE p.deptid='.$resinfo['deptid'].'';
 		} else {
 			$acondi='';
 			$bcondi='';
 		}
 
-		echo comboBox($link,'SELECT FullName, IDNo FROM `attend_30currentpositions` cp JOIN attend_0positions p ON cp.PositionID=p.PositionID  '.$acondi.' ORDER BY FullName;','IDNo','FullName','namelist');
+		echo comboBox($link,'SELECT FullName, IDNo FROM `attend_30currentpositions` cp JOIN attend_1positions p ON cp.PositionID=p.PositionID  '.$acondi.' ORDER BY FullName;','IDNo','FullName','namelist');
 
-		echo comboBox($link,'SELECT PositionID, Position FROM attend_0positions p '.$bcondi.' ORDER BY Position ASC;','PositionID','Position','positions');
+		echo comboBox($link,'SELECT PositionID, Position FROM attend_1positions p '.$bcondi.' ORDER BY Position ASC;','PositionID','Position','positions');
 
 
         ?><br><br>
@@ -269,7 +269,7 @@ switch ($calledfrom){
     if(allowedToOpen(6743,'1rtc')){
         $posid=comboBoxValue($link,'attend_30currentpositions','FullName',addslashes($_POST['FullName']),'PositionID');
     } else{
-      $posid=comboBoxValue($link,'attend_0positions','Position',addslashes($_POST['Position']),'PositionID');}
+      $posid=comboBoxValue($link,'attend_1positions','Position',addslashes($_POST['Position']),'PositionID');}
 		$idno=comboBoxValue($link,'attend_30currentpositions','FullName',addslashes($_POST['FullName']),'IDNo');
 
 
@@ -302,7 +302,7 @@ switch ($calledfrom){
 }
    $formdesc.='<br><b><a href=employeeinfo.php?calledfrom=7>Change Assignment</a></b><i>';
 
-            $sql='select DateofChange,cbg.BranchNo,Branch,cbg.PositionID,`Position`,cbg.IDNo,concat(e.Nickname," ",e.Surname) AS FullName,concat(e2.Nickname," ",e2.Surname) AS EncodedBy,cbg.Remarks,cbg.EncodedByNo,cbg.TimeStamp FROM attend_2changebranchgroup cbg LEFT JOIN 1branches b ON cbg.BranchNo=b.BranchNo LEFT JOIN 1employees e ON cbg.IDNo=e.IDNo LEFT JOIN attend_0positions p ON cbg.PositionID=p.PositionID LEFT JOIN 1employees e2 ON cbg.EncodedByNo=e2.IDNo ORDER BY `TimeStamp` DESC;';
+            $sql='select DateofChange,cbg.BranchNo,Branch,cbg.PositionID,`Position`,cbg.IDNo,concat(e.Nickname," ",e.Surname) AS FullName,concat(e2.Nickname," ",e2.Surname) AS EncodedBy,cbg.Remarks,cbg.EncodedByNo,cbg.TimeStamp FROM attend_2changebranchgroup cbg LEFT JOIN 1branches b ON cbg.BranchNo=b.BranchNo LEFT JOIN 1employees e ON cbg.IDNo=e.IDNo LEFT JOIN attend_1positions p ON cbg.PositionID=p.PositionID LEFT JOIN 1employees e2 ON cbg.EncodedByNo=e2.IDNo ORDER BY `TimeStamp` DESC;';
         include('../backendphp/layout/displayastable.php');
 
 

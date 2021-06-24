@@ -53,7 +53,7 @@ if (!allowedToOpen(64821,'1rtcinfo')) {
 	$positionin=" AND PositionID IN (".$respos1to2['AllowedPos'].",".$respos3to5['AllowedPos'].",".$respos6['AllowedPos'].")";
 	
 	//rank 1-2
-	$sqlrank1to2='SELECT `Position` FROM attend_0positions p WHERE PositionID IN ('.$respos1to2['AllowedPos'].')'.$positionin.' ORDER BY Position;';
+	$sqlrank1to2='SELECT `Position` FROM attend_1positions p WHERE PositionID IN ('.$respos1to2['AllowedPos'].')'.$positionin.' ORDER BY Position;';
     $stmt1to2=$link->query($sqlrank1to2);
 	$result1to2=$stmt1to2->fetchAll();
 	$div1to2='';
@@ -61,7 +61,7 @@ if (!allowedToOpen(64821,'1rtcinfo')) {
 		$div1to2.='<li>'.$res1to2['Position'].'</li>';
 	}
 	//rank 3-5
-	$sqlrank3='SELECT `Position` FROM attend_0positions p WHERE PositionID IN ('.$respos3to5['AllowedPos'].',140,9)'.$positionin.' ORDER BY Position;';
+	$sqlrank3='SELECT `Position` FROM attend_1positions p WHERE PositionID IN ('.$respos3to5['AllowedPos'].',140,9)'.$positionin.' ORDER BY Position;';
     $stmt3=$link->query($sqlrank3);
 	$result3=$stmt3->fetchAll();
 	$div3='';
@@ -69,7 +69,7 @@ if (!allowedToOpen(64821,'1rtcinfo')) {
 		$div3.='<li>'.$res3['Position'].'</li>';
 	}
 	//rank 6
-	$sqlrank4to6='SELECT `Position` FROM attend_0positions p WHERE PositionID IN ('.$respos6['AllowedPos'].')'.$positionin.' ORDER BY Position;';
+	$sqlrank4to6='SELECT `Position` FROM attend_1positions p WHERE PositionID IN ('.$respos6['AllowedPos'].')'.$positionin.' ORDER BY Position;';
     $stmt4to6=$link->query($sqlrank4to6);
 	$result4to6=$stmt4to6->fetchAll();
 	$div4to6='';

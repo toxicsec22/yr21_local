@@ -19,7 +19,7 @@ $sqlfull='SELECT mt.*, CONCAT(e1.FirstName, " ", e1.Surname) AS FullName, e1.Nic
 	       JOIN `1employees` e ON e.IDNo=mt.EncodedByNo
 	       LEFT JOIN `1employees` e1 ON e1.IDNo=mt.IDNo
                LEFT JOIN `attend_30currentpositions` cp ON cp.BranchNo=mt.AssignedBranchNo AND cp.IDNo=mt.IDNo
-	       LEFT JOIN `attend_0positions` p ON p.PositionID=mt.PositionID LEFT JOIN hr_4offenseresult rs ON mt.TxnID=rs.TxnID '
+	       LEFT JOIN `attend_1positions` p ON p.PositionID=mt.PositionID LEFT JOIN hr_4offenseresult rs ON mt.TxnID=rs.TxnID '
         . ' LEFT JOIN `hr_0offenseresult` ofr ON ofr.ResultID=mt.ResultID ';
 
 if (in_array($which,array('LookupResult','Letter'))){

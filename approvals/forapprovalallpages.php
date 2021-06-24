@@ -176,7 +176,7 @@ if (allowedToOpen(210,'1rtc')){
 		$cond=' AND (p.BranchNo IN ('.$res0['BranchNo'].'))';
 		// $cond=$cond2.' AND p.PositionID IN (32,37,81)) OR lr.IDNo IN (SELECT IDNo FROM attend_30currentpositions WHERE LatestSupervisorIDNo='.$_SESSION['(ak0)'].' AND SupervisorApproved=0)';
 	} else if (allowedToOpen(6110,'1rtc')){ //assistants
-           $stmt0=$link->query('SELECT deptid FROM attend_0positions WHERE PositionID='.$_SESSION['&pos']);
+           $stmt0=$link->query('SELECT deptid FROM attend_1positions WHERE PositionID='.$_SESSION['&pos']);
            $res0=$stmt0->fetch();
            $cond=' AND p.deptid IN ('.$res0['deptid'].')'; }
 	else { //LatestSupervisorIDNo
