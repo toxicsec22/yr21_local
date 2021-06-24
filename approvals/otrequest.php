@@ -163,6 +163,33 @@ switch ($which){
     case 'Submit':
 	if (!allowedToOpen(6212,'1rtc')){ echo 'No Permission'; exit(); }
 		
+
+	if($_POST['OTType']=='PostShift' OR $_POST['OTType']=='PreShift'){
+
+		$sqlotc='SELECT Shift FROM attend_2attendance WHERE IDNo='.$_POST['IDNo'].' AND DateToday="'.$_POST['DateToday'].'"';  
+		$stmtotc=$link->query($sqlotc); $resotc=$stmtotc->fetch();
+
+		if($_POST['OTType']=='PostShift'){
+			$allowedottime=''.($resotc['Shift']+9).':01';
+			if($_POST['EndOfOT']>=$allowedottime){
+				goto allowed;
+			} else {
+				echo 'Should be PM not AM!'; exit;
+			}
+		} else {
+			$allowedottime=''.str_pad(($resotc['Shift']+0),2,0,STR_PAD_LEFT).':00';
+			if($_POST['EndOfOT']<$allowedottime){
+				goto allowed;
+			} else {
+				echo 'Must be less than shift. '.$allowedottime.''; exit;
+			}
+		}
+
+		allowed:
+	}
+	
+
+
 		if(''.$_POST['DateToday'].''<''.date('Y-m-d').''){ echo 'Date should be Date Today or Future Date.'; exit();}
 		if(''.date("H:i").''>'18:00'){ echo 'Can request until 18:00 [06:00 PM]'; exit(); }
         require_once $path.'/acrossyrs/logincodes/confirmtoken.php';
