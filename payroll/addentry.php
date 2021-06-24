@@ -51,7 +51,7 @@ include_once('../switchboard/contents.php');
 			$maxmsg='';
 			//check if max
 		if($monthly==1){  //monthly condition only
-			$sqlmax='SELECT TRUNCATE(MinRate*(1+PercentMintoMed/100)*(1+PercentMedtoMax/100),2) AS MAXIMUM FROM attend_0joblevels jl JOIN attend_0jobclass jc ON jc.JobLevelID=jl.JobLevelID JOIN attend_1positions p ON jl.JobLevelID=p.JobLevelID AND p.PositionID=(SELECT NewPositionID FROM attend_2changeofpositions WHERE IDNo='.$idno.' ORDER BY DateofChange LIMIT 1)';
+			$sqlmax='SELECT TRUNCATE(MinRate*(1+PercentMintoMed/100)*(1+PercentMedtoMax/100),2) AS MAXIMUM FROM attend_0joblevels jl  JOIN attend_1positions p ON jl.JobLevelID=p.JobLevelID AND p.PositionID=(SELECT NewPositionID FROM attend_2changeofpositions WHERE IDNo='.$idno.' ORDER BY DateofChange LIMIT 1)';
 			
 			$stmtmax=$link->query($sqlmax); $rowmax=$stmtmax->fetch();
 			
