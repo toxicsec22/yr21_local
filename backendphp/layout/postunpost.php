@@ -134,14 +134,21 @@ $txnidname='TxnID';
         case 'invty_2transfer':
         case 'invty_2sale':
             if (!allowedToOpen(array(401,40101,40102,314),'1rtc')){ goto nopermission; }
-
-            $sqla='SELECT '.$date.',`BranchNo` FROM '.$_POST['Table'].' WHERE TxnID='.intval($_POST['TxnID']);
+            if($_POST['Table']=='invty_2transfer'){
+                $tobranhnocol=',ToBranchNo';
+                $wheretobranchno=1;
+            } else {
+                $tobranhnocol='';
+                $wheretobranchno=0;
+            }
+            $sqla='SELECT '.$date.',`BranchNo`'.$tobranhnocol.' FROM '.$_POST['Table'].' WHERE TxnID='.intval($_POST['TxnID']);
+           
             $stmta=$link->query($sqla); $resulta=$stmta->fetch();
 
             if(allowedToOpen(40101,'1rtc')){ //handled branches of operations manager
                 
                 if($resulta[$date]==date('Y-m-d') OR (date('Y-m-d')==date('Y-m-d', strtotime("+1 day", strtotime($resulta[$date]))) AND date('H:i')<='12:00')){
-                    $sqlcheckopsmanager='SELECT BranchNo FROM attend_1branchgroups WHERE BranchNo='.$resulta['BranchNo'].' AND OpsManager='.$_SESSION['(ak0)'].'';
+                    $sqlcheckopsmanager='SELECT BranchNo FROM attend_1branchgroups WHERE (BranchNo='.$resulta['BranchNo'].''.($wheretobranchno==1?' OR BranchNo='.$resulta['ToBranchNo'].'':'').') AND OpsManager='.$_SESSION['(ak0)'].'';
                     $stmtcheckopsmanager=$link->query($sqlcheckopsmanager);
                     if($stmtcheckopsmanager->rowCount()>0){
                         //allowed
@@ -152,7 +159,8 @@ $txnidname='TxnID';
                     goto nopermission; 
                 }
             } elseif(allowedToOpen(314,'1rtc')){ //invty planners
-                $sqlcheckplanner='SELECT BranchNo FROM attend_1branchgroups WHERE BranchNo='.$resulta['BranchNo'].' AND InventoryPlanner='.$_SESSION['(ak0)'].'';
+                $sqlcheckplanner='SELECT BranchNo FROM attend_1branchgroups WHERE (BranchNo='.$resulta['BranchNo'].''.($wheretobranchno==1?' OR BranchNo='.$resulta['ToBranchNo'].'':'').') AND InventoryPlanner='.$_SESSION['(ak0)'].'';
+                
                 $stmtcheckplanner=$link->query($sqlcheckplanner);
                 if($stmtcheckplanner->rowCount()>0){
                     //allowed
