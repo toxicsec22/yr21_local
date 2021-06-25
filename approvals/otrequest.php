@@ -70,7 +70,8 @@ switch ($which){
 			$withbranchestable=' OR b.Pseudobranch=0';
 		}
 		
-		$formdesc='</i><br><div><div style="float:left;"><form method="POST" action="#">MonthNo: <input type="text" size="5" name="MonthNo" value="'.$txndate.'"> <input type="submit" value="Lookup"></form></div><div style="margin-left:25%"><form method="POST" action="#">PayrollID: <input type="text" size="5" name="PayrollID" list="payperiods" value="'.$_POST['payrollid'].'"> <input type="submit" value="Lookup"></form></div></div><br><b>'.$addlformdesc.'</b><i>';
+		$formdesc='</i><br><div><div style="float:left;"><form method="POST" action="#">MonthNo: <input type="text" size="5" name="MonthNo" value="'.$txndate.'"> <input type="submit" value="Lookup"></form></div></div><br><b>'.$addlformdesc.'</b><i>';
+		// $formdesc='</i><br><div><div style="float:left;"><form method="POST" action="#">MonthNo: <input type="text" size="5" name="MonthNo" value="'.$txndate.'"> <input type="submit" value="Lookup"></form></div><div style="margin-left:25%"><form method="POST" action="#">PayrollID: <input type="text" size="5" name="PayrollID" list="payperiods" value="'.$_POST['payrollid'].'"> <input type="submit" value="Lookup"></form></div></div><br><b>'.$addlformdesc.'</b><i>';
 		if (allowedToOpen(6212,'1rtc')){
 		echo comboBox($link,'SELECT FullName,IDNo FROM `attend_30currentpositions` WHERE deptid = (SELECT deptid FROM attend_30currentpositions WHERE IDNo='.$_SESSION['(ak0)'].') '.$withbranchesselect.' ORDER BY FullName;','FullName','IDNo','employees');
 		 echo '<br><h3>'.$title.'</h3>';
@@ -106,20 +107,13 @@ switch ($which){
 			$showprocesslabel=','.$maincon.' AS showeditprocess,'.$maincon.' AS showaddlprocess';
 		}
 		
-        $sqlmain1='SELECT OTType,ot.TxnID,Position,ApprovedTS,PayrollID,CONCAT(e.Nickname," ",e.SurName) AS FullName,CONCAT(e3.Nickname," ",e3.SurName) AS ApprovedBy,CONCAT(e3.Nickname," ",e3.SurName) AS DeniedBy,ApprovedTS AS DeniedTS,CONCAT(e2.Nickname," ",e2.SurName) AS RequestedBy,RequestedTS, Branch, ot.DateToday AS DateOfOT,(CASE WHEN a.LeaveNo=15 THEN IF(ad.TypeOfDayNo IN (2,3),CONCAT(LeaveName," & ",TypeofDayName),LeaveName)
-		WHEN a.LeaveNo IN (12,13) THEN LeaveName
-		ELSE "" END) AS TypeofDay, EndOfOT, Reason ';
-		$sqlmain2=' FROM approvals_5ot ot
-		LEFT JOIN attend_0ottype t ON t.OTTypeNo=ot.OTTypeNo
-		JOIN attend_2attendancedates ad ON ot.DateToday=ad.DateToday 
-		JOIN attend_2attendance a ON a.IDNo=ot.IDNo AND a.DateToday=ot.DateToday
-		JOIN attend_0leavetype lt ON lt.LeaveNo=a.LeaveNo
-		JOIN attend_0typeofday td ON td.TypeofDayNo=ad.`TypeOfDayNo`
-		JOIN `1employees` e ON ot.IDNo=e.IDNo JOIN attend_1defaultbranchassign dba ON ot.IDNo=dba.IDNo JOIN 1branches b ON dba.DefaultBranchAssignNo=b.BranchNo JOIN 1employees e2 ON ot.RequestedByNo=e2.IDNo LEFT JOIN 1employees e3 ON ot.ApprovedByNo=e3.IDNo JOIN attend_30latestpositionsinclresigned lpir ON ot.IDNo=lpir.IDNo JOIN attend_1positions p ON lpir.PositionID=p.PositionID WHERE ';
+        $sqlmain1='SELECT OTType,ot.TxnID,Position,ApprovedTS,CONCAT(e.Nickname," ",e.SurName) AS FullName,CONCAT(e3.Nickname," ",e3.SurName) AS ApprovedBy,CONCAT(e3.Nickname," ",e3.SurName) AS DeniedBy,ApprovedTS AS DeniedTS,CONCAT(e2.Nickname," ",e2.SurName) AS RequestedBy,RequestedTS, Branch, ot.DateToday AS DateOfOT, EndOfOT, Reason ';
+		$sqlmain2=' FROM approvals_5ot ot JOIN `1employees` e ON ot.IDNo=e.IDNo JOIN attend_0ottype ott ON ot.OTTypeNo=ott.OTTypeNo JOIN attend_1defaultbranchassign dba ON ot.IDNo=dba.IDNo JOIN 1branches b ON dba.DefaultBranchAssignNo=b.BranchNo JOIN 1employees e2 ON ot.RequestedByNo=e2.IDNo LEFT JOIN 1employees e3 ON ot.ApprovedByNo=e3.IDNo JOIN attend_30latestpositionsinclresigned lpir ON ot.IDNo=lpir.IDNo JOIN attend_1positions p ON lpir.PositionID=p.PositionID WHERE ';
 		$sqlmain=$sqlmain1.$showprocesslabel.$sqlmain2.$addlcondi.' '.$morp.' AND ';
 		
         $title='Pending OT Request'; 
-		$columnnames=array('FullName','Position','Branch','OTType','DateOfOT','TypeofDay','PayrollID','EndOfOT','Reason','RequestedBy','RequestedTS');
+		$columnnames=array('FullName','Position','Branch','OTType','DateOfOT','EndOfOT','Reason','RequestedBy','RequestedTS');
+		// $columnnames=array('FullName','Position','Branch','OTType','DateOfOT','TypeofDay','PayrollID','EndOfOT','Reason','RequestedBy','RequestedTS');
 		if (allowedToOpen(6212,'1rtc')){
 			$delprocess='otrequest.php?w=DeleteRequest&TxnID=';
 		}
@@ -129,6 +123,7 @@ switch ($which){
 		}
 		$sql=$sqlmain.'Approved=0';
 		// echo $sql;
+		// echo $sql.'<br><br>';
         include('../backendphp/layout/displayastable.php');
 		
 		unset($formdesc,$editprocess,$addlprocess,$delprocess);
@@ -142,19 +137,25 @@ switch ($which){
 		JOIN `1employees` e ON ot.IDNo=e.IDNo JOIN attend_1defaultbranchassign dba ON ot.IDNo=dba.IDNo JOIN 1branches b ON dba.DefaultBranchAssignNo=b.BranchNo JOIN 1employees e2 ON ot.RequestedByNo=e2.IDNo LEFT JOIN 1employees e3 ON ot.ApprovedByNo=e3.IDNo JOIN attend_2attendancedates ad ON ot.DateToday=ad.DateToday JOIN attend_30latestpositionsinclresigned lpir ON ot.IDNo=lpir.IDNo JOIN attend_1positions p ON lpir.PositionID=p.PositionID WHERE '.$addlcondi.' '.$morp.' AND ';*/
 		$sqlmain=$sqlmain1.$showprocesslabel.$sqlmain2.$addlcondi.' '.$morp.' AND ';
         $sql=$sqlmain.'Approved=1';
+		// echo $sql.'<br><br>';
         $title='Approved OT Request'; 
-		$columnnames=array('FullName','Position','Branch','OTType','DateOfOT','TypeofDay','EndOfOT','Reason','RequestedBy','RequestedTS','ApprovedBy','ApprovedTS');
+		$columnnames=array('FullName','Position','Branch','OTType','DateOfOT','EndOfOT','Reason','RequestedBy','RequestedTS','ApprovedBy','ApprovedTS');
+		// $columnnames=array('FullName','Position','Branch','OTType','DateOfOT','TypeofDay','EndOfOT','Reason','RequestedBy','RequestedTS','ApprovedBy','ApprovedTS');
         include('../backendphp/layout/displayastable.php');
 		
 		$sql=$sqlmain.'Approved=2';
+		// echo $sql.'<br><br>';
         $title='Denied OT Request'; 
-		$columnnames=array('FullName','Position','Branch','OTType','DateOfOT','TypeofDay','EndOfOT','Reason','RequestedBy','RequestedTS','DeniedBy','DeniedTS');
+		$columnnames=array('FullName','Position','Branch','OTType','DateOfOT','EndOfOT','Reason','RequestedBy','RequestedTS','DeniedBy','DeniedTS');
+		// $columnnames=array('FullName','Position','Branch','OTType','DateOfOT','TypeofDay','EndOfOT','Reason','RequestedBy','RequestedTS','DeniedBy','DeniedTS');
         include('../backendphp/layout/displayastable.php');
 		
 		unset($editprocess);
 		$sql=str_replace($showprocesslabel,'',$sqlmain).'Approved=3';
+		// echo $sql.'<br><br>';
         $title='"No Response" OT Request'; 
-		$columnnames=array('FullName','Position','Branch','OTType','DateOfOT','TypeofDay','EndOfOT','Reason','RequestedBy','RequestedTS');
+		$columnnames=array('FullName','Position','Branch','OTType','DateOfOT','EndOfOT','Reason','RequestedBy','RequestedTS');
+		// $columnnames=array('FullName','Position','Branch','OTType','DateOfOT','TypeofDay','EndOfOT','Reason','RequestedBy','RequestedTS');
         include('../backendphp/layout/displayastable.php');
 		
     break;
