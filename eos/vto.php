@@ -1039,7 +1039,7 @@ case 'Traction':
 	echo '<h2>'.$subtitle.'</h2>';
 	echo '</br><div style="background-color:white;"><b>ENCODING: </b><br></br>';
 	echo '<form method="post" action="vto.php?w=EncodeProcessQtr&IsRock=1" autocomplete="off">
-		<b>Quarter:</b> <input type="text" name="Quarter" list="vtoqs" size="1" required>
+		<b>Quarter:</b> <input type="text" name="Quarter" list="vtoqs" size="3" required>
 		<b>Rocks:</b> <input type="text" name="Rocks" size="40">
 		<b>Who:</b> <input type="text" name="Fullname" list="employees" value="'.$defaultwho.'">
 		<input type="hidden" name="action_token" value="'.($_SESSION['action_token']).'">
