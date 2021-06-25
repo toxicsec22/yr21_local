@@ -80,7 +80,7 @@ if (in_array($which,array('ViewSwitchboard','AddPermissionToPage', 'AddNewProgra
 }
 
 if (in_array($which,array('AddPermissionToPage', 'AddNewProgramCommand'))){
-  	$sql0='CREATE TEMPORARY TABLE groupdept AS SELECT p.deptid, d.Department, p.JobLevelID, JobLevelID, p.Position, p.PositionID FROM attend_1positions p JOIN `1departments` d ON d.deptid=p.deptid JOIN `attend_0joblevels` jl ON jl.JobLevelID=p.JobLevelID ORDER BY JobLevelID DESC,jl.JobLevelID DESC;';
+  	$sql0='CREATE TEMPORARY TABLE groupdept AS SELECT p.deptid, d.Department, p.JobLevelID, p.Position, p.PositionID FROM attend_1positions p JOIN `1departments` d ON d.deptid=p.deptid  ORDER BY p.JobLevelID DESC;';
   	
 	$stmt=$link->query($sql0);
 	$sql0='SELECT DISTINCTROW deptid AS DeptID, Department FROM groupdept;';
@@ -534,7 +534,7 @@ switch ($which)
 				$sql ="SELECT AllowedPos,IFNULL(AllowedPerID,0) AS AllowedPerID FROM permissions_2allprocesses WHERE ProcessID=".$ProcessID.";";
 				$stmt=$link->query($sql); $rowh=$stmt->fetch();
 				
-				$sql ="SELECT PositionID,Position FROM attend_1positions p JOIN attend_0joblevels jl ON jl.JobLevelID=p.JobLevelID WHERE PositionID IN (".$rowh['AllowedPos'].") ORDER BY deptid,JobLevelID DESC";
+				$sql ="SELECT PositionID,Position FROM attend_1positions p WHERE PositionID IN (".$rowh['AllowedPos'].") ORDER BY deptid,p.JobLevelID DESC";
                                 
 				$stmt=$link->query($sql); $row=$stmt->fetchAll();
 				foreach($row AS $res){
