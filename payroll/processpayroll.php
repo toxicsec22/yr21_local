@@ -148,9 +148,9 @@ $stmt=$link->prepare($sql); $stmt->execute();
 
 $sql='UPDATE `payroll_25payroll'.$temp.'` p JOIN payroll_20fromattendance a ON p.IDNo=a.IDNo AND p.PayrollID=a.PayrollID
 SET 
-RegDayBasic=ROUND(IF(DorSM=0,BasicRate*RegDaysPresent,(IF(a.IDNo IN ('.$newmonthlyemp.'), (BasicRate/13.04)*(RegDaysPresent+RWSDays+SpecDays+PaidLegalDays),BasicRate))),2),
-RegDayDeM=ROUND(IF(DorSM=0,DeMRate*RegDaysPresent,(IF(a.IDNo IN ('.$newmonthlyemp.'), (DeMRate/13.04)*(RegDaysPresent+RWSDays+SpecDays+PaidLegalDays),DeMRate))),2),
-RegDayTaxSh=ROUND(IF(DorSM=0,TaxShRate*RegDaysPresent,(IF(a.IDNo IN ('.$newmonthlyemp.'), (TaxShRate/13.04)*(RegDaysPresent+RWSDays+SpecDays+PaidLegalDays),TaxShRate))),2),
+RegDayBasic=ROUND(IF(DorSM=0,BasicRate*RegDaysPresent,(IF(a.IDNo IN ('.$newmonthlyemp.'), (BasicRate/13.04)*(RegDaysPresent+RWSDays+LWPDays+SpecDays+PaidLegalDays),BasicRate))),2),
+RegDayDeM=ROUND(IF(DorSM=0,DeMRate*RegDaysPresent,(IF(a.IDNo IN ('.$newmonthlyemp.'), (DeMRate/13.04)*(RegDaysPresent+RWSDays+LWPDays+SpecDays+PaidLegalDays),DeMRate))),2),
+RegDayTaxSh=ROUND(IF(DorSM=0,TaxShRate*RegDaysPresent,(IF(a.IDNo IN ('.$newmonthlyemp.'), (TaxShRate/13.04)*(RegDaysPresent+RWSDays+LWPDays+SpecDays+PaidLegalDays),TaxShRate))),2),
 VLBasic=ROUND((IF(DorSM=0,BasicRate,0)*VLDays),2),
 VLDeM=ROUND((IF(DorSM=0,DeMRate,0)*VLDays),2),
 VLTaxSh=ROUND((IF(DorSM=0,TaxShRate,0)*VLDays),2),
