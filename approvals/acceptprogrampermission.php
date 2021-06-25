@@ -29,6 +29,9 @@ $stmt=$link->query($sql); $res=$stmt->fetch();
 $progcookie=$res['ProgCookie'];
 
 if ($stmt->rowCount()>0){
+
+    setcookie('_comkey',"",time()-600,"/");
+    setcookie('_comkey2',"",time()-600,"/");
     
     
 	if (in_array($res['Day'],array(0,2,3))){ //regular approval
