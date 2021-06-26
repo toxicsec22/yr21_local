@@ -95,35 +95,18 @@ foreach ($resultgroup as $group){
     
     $switch=$switch.'</ul></li>';
 }
-
-echo (isset($home) and $home)?$switch:$switch.'<li><a href="/logout.php">Logout</a></li>';
+if (isset($home) and $home){
+        include_once $path.'/'.$url_folder.'/generalinfo/closedbranchesandattendanceerrors.php';
+        echo $switch.'<li><a href="/logout.php">Logout</a></li>';
+} else {
+echo $switch;
+echo '<br><br>';
+include_once  $path.'/'.$url_folder.'/backendphp/layout/showchoosebranch.php';
+}
 ?>
 </ul> <!-- end div navmenu -->
 </div> <!-- end div wrapper -->
-<?php
-if (isset($home) and $home){
-        include_once $path.'/'.$url_folder.'/generalinfo/closedbranchesandattendanceerrors.php';
-} else {
-echo '<br><br>';
-include_once  $path.'/'.$url_folder.'/backendphp/layout/showchoosebranch.php';
-echo '<div style="float: left;  display:block;"><br><br>';
 
-if (isset($_SESSION['&pos'])){
-	
-		
-		$url = $_SERVER['REQUEST_URI']; 
-		if((strpos($url,'eos') !== false) or (strpos($url,'acrossyrs') !== false)){
-
-		}else{
-                   
-                  //  include_once $path.'/'.$url_folder.'/approvals/forapprovalallpages.php';
-		}
-		
-	}
-echo '</div><br>';//."\n";
-}
-
-?>
 <br class="clearFloat" />
 <div id="footer">
 <p>Copyright &copy; <?php echo $currentyr; ?> - 1Rotary Trading Corporation</p>
