@@ -15,7 +15,7 @@
     $datatoshowclosed=$stmt->fetchAll(PDO::FETCH_ASSOC);    
     $count=0;
    if ($stmt->rowCount()>0){
-       include_once('../backendphp/layout/blink.php');
+       include_once($path.'/'.$url_folder.'/backendphp/layout/blink.php');
     $msg='<div id="blink" style="float:left; ">Branches that are not yet open today:  ';
     foreach($datatoshowclosed as $rows){
         $count++;
@@ -28,13 +28,13 @@
    }
     
 // to show attendance errors per person
-include_once '../attendance/attendsql/missingtimeinout.php';
+include_once $path.'/'.$url_folder.'/attendance/attendsql/missingtimeinout.php';
 $sqlnotimeout='SELECT `IDNo`, DATE_FORMAT(`DateToday`,"%Y-%m-%d") AS `MISSING_ATTENDANCE` FROM attend_41missingtimeinout 
     WHERE `IDNo`='.$_SESSION['(ak0)'].' AND `DateToday`<=CURDATE() ';
 
 $stmt2=$link->query($sqlnotimeout); $missingtimeout=$stmt2->fetchAll(PDO::FETCH_ASSOC);
 if ($stmt2->rowCount()>0){
-    include_once('../backendphp/layout/blink.php');
+    include_once($path.'/'.$url_folder.'/backendphp/layout/blink.php');
     $msg2='<div id="blink" style="float:left; font-weight:bold; font-size:large;"><br><b>ATTENDANCE ERRORS: (Please inform your department\'s person-in-charge asap.)</b><br><table><th>IDNo</th><th>On Dates</th><tr>';
     foreach($missingtimeout as $rows){
         $msg2=$msg2.'<td>'.$rows['IDNo'].'</td><td>'.$rows['MISSING_ATTENDANCE'].'</td></tr><tr>';
