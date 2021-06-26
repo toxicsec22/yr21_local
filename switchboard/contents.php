@@ -95,12 +95,14 @@ foreach ($resultgroup as $group){
     
     $switch=$switch.'</ul></li>';
 }
+
 echo (isset($home) and $home)?$switch:$switch.'<li><a href="/logout.php">Logout</a></li>';
 ?>
 </ul> <!-- end div navmenu -->
 </div> <!-- end div wrapper -->
 <?php
 if (isset($home) and $home){
+        include_once $path.'/'.$url_folder.'/generalinfo/closedbranchesandattendanceerrors.php';
 } else {
 echo '<br><br>';
 include_once  $path.'/'.$url_folder.'/backendphp/layout/showchoosebranch.php';
@@ -113,7 +115,7 @@ if (isset($_SESSION['&pos'])){
 		if((strpos($url,'eos') !== false) or (strpos($url,'acrossyrs') !== false)){
 
 		}else{
-                    include_once $path.'/'.$url_folder.'/generalinfo/closedbranchesandattendanceerrors.php';
+                   
                   //  include_once $path.'/'.$url_folder.'/approvals/forapprovalallpages.php';
 		}
 		
