@@ -16,7 +16,7 @@ $editprocess='employeeinfo.php?edit='.$_GET['calledfrom'].($_GET['calledfrom']==
 $calledfrom=$_REQUEST['calledfrom'];
 }
 
-if (in_array($calledfrom,array(6,61,7,71,8,81,9,91,62))){
+if (in_array($calledfrom,array(6,61,7,71,8,81,9,91,62,77,777))){
 		include_once $path.'/acrossyrs/commonfunctions/listoptions.php';
 }
 if (in_array($calledfrom,array(0,1))){
@@ -250,7 +250,7 @@ switch ($calledfrom){
 
         }
         $title='STL/CredAnalyst/InvtyPlanner/Ops Assignments';
-        $formdesc='</i><br/><b><a href=employeeinfo.php?calledfrom=6>Assignment History</a></b><i><br><br><br>';
+        $formdesc='</i><br/><b><a href=employeeinfo.php?calledfrom=77>Change Assignment (Multiple)</a> &nbsp; &nbsp; &nbsp; <a href=employeeinfo.php?calledfrom=6>Assignment History</a></b><i><br><br><br>';
         $columnnames=array('DateofChange','BranchNo','Branch','InventoryPlanner','TLFullName','SAMName','OpsSpecialist','OpsManager','CreditAnalyst');//'AssignedAR',
         $columnsub=$columnnames;
 					$sql='SELECT bg.DateofChange, b.BranchNo, Branch, concat(e.Nickname," ",e.Surname) as TLFullName, concat(e3.Nickname," ",e3.Surname) as CreditAnalyst, SAM, concat(e4.Nickname," ",e4.Surname) as SAMName, concat(e5.Nickname," ",e5.Surname) AS OpsSpecialist,concat(e6.Nickname," ",e6.Surname) AS OpsManager,concat(e7.Nickname," ",e7.Surname) AS InventoryPlanner FROM attend_1branchgroups bg LEFT join `1employees` e on bg.TeamLeader=e.IDNo  LEFT join `1employees` e3 on bg.CNC=e3.IDNo LEFT join `1employees` e4 on bg.SAM=e4.IDNo  left join `1employees` e5 on bg.OpsSpecialist=e5.IDNo left join `1employees` e6 on bg.OpsManager=e6.IDNo left join `1employees` e7 on bg.InventoryPlanner=e7.IDNo join `1branches` b on b.BranchNo=bg.BranchNo  where b.Active=1;';
@@ -259,6 +259,117 @@ switch ($calledfrom){
       } else { echo 'No permission'; exit;}
         goto endofform;
     break;
+
+
+    case '77':
+
+        $txnid='TxnID';
+        unset($editprocess,$txnidname);
+        if (allowedToOpen(674,'1rtc')){
+            if (allowedToOpen(array(6741,6743),'1rtc')){
+        include_once('../generalinfo/lists.inc');
+
+		if (!allowedToOpen(6702,'1rtc')){
+			$sql='SELECT deptid,JobLevelID FROM attend_30currentpositions WHERE IDNo='.$_SESSION['(ak0)'].'';
+			$stmt=$link->query($sql); $resinfo=$stmt->fetch();
+
+			$acondi=' WHERE p.deptid='.$resinfo['deptid'].' AND cp.JobLevelID<="'.$resinfo['JobLevelID'].'"';
+			$bcondi=' WHERE p.deptid='.$resinfo['deptid'].'';
+		} else {
+			$acondi='';
+			$bcondi='';
+		}
+
+		echo comboBox($link,'SELECT FullName, IDNo FROM `attend_30currentpositions` cp JOIN attend_1positions p ON cp.PositionID=p.PositionID  '.$acondi.' ORDER BY FullName;','IDNo','FullName','namelist');
+
+		echo comboBox($link,'SELECT PositionID, Position FROM attend_1positions p '.$bcondi.' ORDER BY Position ASC;','PositionID','Position','positions');
+
+
+        ?><title>Change Branch Assignments (Multiple)</title><br><br>
+
+<br><b><a href=employeeinfo.php?calledfrom=7>Change Assignment</a> &nbsp; &nbsp; <a href=employeeinfo.php?calledfrom=6>Assignment History</a></b><br><br>
+
+        <form method='post' action='employeeinfo.php?calledfrom=777'>
+        Change Assignment:  &nbsp &nbsp Date of Change<input type='date' size="6" name='DateofChange' value='<?php echo date('Y-m-d');?>'>
+        
+          <?php
+          if(!allowedToOpen(6743,'1rtc')){
+          ?>
+    		  &nbsp &nbsp Position <input type='text' size="10" name='Position' list='positions' autocomplete=off>
+          <?php
+          }
+          ?>
+    		  &nbsp &nbsp IDNo <input type='text' size="10" name='FullName' list='namelist' autocomplete=off>
+          &nbsp &nbsp Remarks <input type='text' name='Remarks' autocomplete=off>
+          <input type="hidden" name="action_token" value="<?php echo html_escape($_SESSION['action_token']) ?>"> &nbsp &nbsp
+			    <input type='submit' size=10 name='submit' value='Enter' OnClick='return confirm("Are you SURE?");'>&nbsp &nbsp &nbsp
+          
+        <?php
+
+        echo '<tr><td>';
+        echo '<div style="float:left;">'; 
+        
+        $sql0='SELECT CompanyNo, Company FROM 1companies WHERE CompanyNo<=6;';
+        $stmt0=$link->query($sql0); $row0=$stmt0->fetchAll();
+
+
+        echo '<br><h3>Handled Branches</h3><table><tr>';
+        foreach($row0 as $area){
+                $sql1='SELECT Branch, BranchNo FROM 1branches bb WHERE CompanyNo='.$area['CompanyNo'].' AND Active<>0 AND BranchNo>=0 ORDER BY CompanyNo,Branch ';
+                $stmt1=$link->query($sql1); $row1=$stmt1->fetchAll();
+                
+                if($stmt1->rowCount()>0){
+                    echo '<td valign="top">';
+                echo '<h4>'.$area['Company'].'</h4>';
+                
+                    $companylist='<table>';
+                
+                foreach($row1 as $row2){
+                    
+                        $companylist.='<tr><td><input type="checkbox" name="allowed[]"  value="'.$row2['BranchNo'].'"
+                        /><td>'.$row2['Branch'].' ('.$row2['BranchNo'].')</td>';
+                    
+                }  
+                 echo $companylist.'</table></td>';
+            }
+            
+           
+        }
+        echo '</tr></table></form>';
+
+        }
+       
+      } else { echo 'No permission'; exit;}
+        goto endofform;
+
+    break;
+
+    case '777':
+        // print_r($_POST);
+
+        if (allowedToOpen(array(6743,6741),'1rtc')) {
+
+            if(allowedToOpen(6743,'1rtc')){
+                $posid=comboBoxValue($link,'attend_30currentpositions','FullName',addslashes($_POST['FullName']),'PositionID');
+            } else{
+              $posid=comboBoxValue($link,'attend_1positions','Position',addslashes($_POST['Position']),'PositionID');}
+                $idno=comboBoxValue($link,'attend_30currentpositions','FullName',addslashes($_POST['FullName']),'IDNo');
+
+    
+
+            if (isset($_POST['allowed'])){
+                foreach($_POST['allowed'] as $selected){
+                    $sql='INSERT INTO `attend_2changebranchgroup` (`DateofChange`,`BranchNo`,IDNo,PositionID,Remarks,`EncodedByNo`, `TimeStamp`)
+                    VALUES ("'.$_POST['DateofChange'].'",'.$selected.','.$idno.','.$posid.',"'.addslashes($_POST['Remarks']).'",'.$_SESSION['(ak0)'].',NOW());';
+                    // echo $sql.'<br><br>';
+                    $stmt=$link->prepare($sql); $stmt->execute();
+                }
+            }
+
+                header("Location:employeeinfo.php?calledfrom=7");
+            }
+
+        break;
 
 	 //removed stl fixed assignment
      //Not used anymore
@@ -300,7 +411,7 @@ switch ($calledfrom){
         <input type='submit' name='btnDelete' value='Delete' OnClick='return confirm(\"Really delete this?\");' size='10'>
    </form><br>";
 }
-   $formdesc.='<br><b><a href=employeeinfo.php?calledfrom=7>Change Assignment</a></b><i>';
+   $formdesc.='<br><b><a href=employeeinfo.php?calledfrom=7>Change Assignment</a> &nbsp; &nbsp; <a href=employeeinfo.php?calledfrom=77>Change Assignment (Multiple)</a></b><i>';
 
             $sql='select DateofChange,cbg.BranchNo,Branch,cbg.PositionID,`Position`,cbg.IDNo,concat(e.Nickname," ",e.Surname) AS FullName,concat(e2.Nickname," ",e2.Surname) AS EncodedBy,cbg.Remarks,cbg.EncodedByNo,cbg.TimeStamp FROM attend_2changebranchgroup cbg LEFT JOIN 1branches b ON cbg.BranchNo=b.BranchNo LEFT JOIN 1employees e ON cbg.IDNo=e.IDNo LEFT JOIN attend_1positions p ON cbg.PositionID=p.PositionID LEFT JOIN 1employees e2 ON cbg.EncodedByNo=e2.IDNo ORDER BY `TimeStamp` DESC;';
         include('../backendphp/layout/displayastable.php');
