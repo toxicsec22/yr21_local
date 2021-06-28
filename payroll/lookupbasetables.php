@@ -386,7 +386,7 @@ case 'StructureDailyPaid':
                     ')<br><h5>Branches: '.$region['Branches'].'</h5>';
                 $startrate=($regionalrate*$multiplier)>=$ncrrate?$ncrrate:$regionalrate*$multiplier;
 
-                $sql='SELECT jl.JobLevelID, JobLevel, GROUP_CONCAT(Position) AS Positions,
+                $sql='SELECT jl.JobLevelID, JobLevel, GROUP_CONCAT(DISTINCT `Position` ORDER BY `Position` SEPARATOR "<br>" ) AS Positions,
                 TRUNCATE(SalaryStructureDaily('.$startrate.',jl.JobLevelID,'.$increaserate.',1,1),2) AS `Hiring Rate`, 
                 TRUNCATE(SalaryStructureDaily('.$startrate.',jl.JobLevelID,'.$increaserate.','.$steprate.',1),2) AS `Performer 1 yr (2 to 4 years)`, 
 
