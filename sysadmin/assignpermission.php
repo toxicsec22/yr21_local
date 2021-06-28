@@ -928,7 +928,7 @@ echo '<br>';
 				
 				
 				
-				$sql='SELECT ProcessID, IF(FIND_IN_SET('.$_POST['PositionToView'].',AllowedPos),1,0) AS Ok,AllowedPos, ProcessTitle, ProcessAddress, OnSwitch FROM permissions_2allprocesses WHERE '.$addlc.' UNION SELECT ProcessID,1,"",ProcessTitle,ProcessAddress,OnSwitch FROM permissions_2allprocesses WHERE FIND_IN_SET(ProcessID,(SELECT ProcessIDs FROM approvals_systempermission WHERE ForPositionID='.$_GET['ForPositionID'].')) ORDER BY ProcessAddress;';
+				$sql='SELECT ProcessID, IF(FIND_IN_SET('.$_POST['PositionToView'].',AllowedPos),1,0) AS Ok,AllowedPos, ProcessTitle, ProcessAddress, OnSwitch FROM permissions_2allprocesses WHERE '.$addlc.' UNION SELECT ProcessID,1,"",ProcessTitle,ProcessAddress,OnSwitch FROM permissions_2allprocesses WHERE FIND_IN_SET(ProcessID,(SELECT ProcessIDs FROM approvals_systempermission WHERE ForPositionID='.$_POST['PositionToView'].')) ORDER BY ProcessAddress;';
 
 				// $sql='SELECT ProcessID, IF(FIND_IN_SET('.$_POST['PositionToView'].',AllowedPos),1,0) AS Ok,AllowedPos, ProcessTitle, ProcessAddress, OnSwitch FROM permissions_2allprocesses WHERE '.$addlc.' ORDER BY ProcessAddress;';
 				$stmt=$link->query($sql); $row1=$stmt->fetchAll();
