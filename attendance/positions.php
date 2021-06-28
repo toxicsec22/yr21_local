@@ -256,6 +256,7 @@ if (allowedToOpen(6702,'1rtc')) { $delprocess='positions.php?w=Delete&PositionID
 // set first field only if the first field should also be added/edited
 $firstfield='PositionID';
 //set a first field so commas will work 
+$encodedbyno=true;
 $sqlinsert='INSERT INTO `'.$table.'` SET ';   
 $sqlupdate='UPDATE `'.$table.'` SET ';
 	
