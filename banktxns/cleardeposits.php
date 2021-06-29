@@ -7,6 +7,7 @@ $show=!isset($_REQUEST['show'])?1:$_REQUEST['show'];
 include_once $path.'/acrossyrs/commonfunctions/listoptions.php';
 if (!isset($_REQUEST['bankname'])){ $bank=!isset($_GET['bank'])?'':$_GET['bank'];} 
 else { $bank=comboBoxValue($link,'acctg_1chartofaccounts','ShortAcctID',addslashes($_REQUEST['bankname']),'AccountID'); }
+if(allowedToOpen(5432,'1rtc')) { ?>
 ?>
 <form method="post" action="cleardeposits.php<?php echo '?bank='.$bank; ?>" style="display:inline">
 	<input type="text" name="bankname" list="banks" size=20 autocomplete="off" required="true">
@@ -18,7 +19,9 @@ else { $bank=comboBoxValue($link,'acctg_1chartofaccounts','ShortAcctID',addslash
 <input type=hidden name="show" value=1>
 <input type="submit" name="submit" value="Show All">
 </form>
-<?php if(allowedToOpen(62512,'1rtc')) { ?>
+<?php
+}
+if(allowedToOpen(62512,'1rtc')) { ?>
 <form method="post" action="cleardeposits.php" style="display:inline">
 <input type=hidden name="show" value=2>
 <input type="submit" name="submit" value="Show Non-Banks">
