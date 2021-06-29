@@ -44,15 +44,22 @@ JOIN `1employees` e ON r.`EncodedByNo`=e.IDNo
       $increaserate=1.1; $steprate=1.1;
 
       
-    $sql='SELECT TxnId,r.IDNo,DateofChange,Remarks,FullName,Position,Branch,DorM,IF(DailyORMonthly=0,
+      //minwage
+      $sqls='SELECT MAX(DateEffective),TotalMinWage,TimeStamp from `1_gamit`.`payroll_4wageorders` where MinWageAreaID=\'1\' ';
+      $stmts=$link->query($sqls); $results=$stmts->fetch();
+      $minwage=$results['TotalMinWage']; $daysofmonth=26.08; 
+
+
+      $sql='SELECT TxnId,r.IDNo,DateofChange,Remarks,FullName,Position,Branch,DorM,IF(DailyORMonthly=0,
 
     (SELECT TRUNCATE(SalaryStructureDaily(IF((EffectiveMinWage*'.$multiplier.')>=(SELECT NCRRate FROM NCRRate),(SELECT NCRRate FROM NCRRate),(EffectiveMinWage*'.$multiplier.')),JobLevelID,'.$increaserate.','.$steprate.',5),2) FROM storesrate WHERE IDNo=r.IDNo)
     
-    ,(SELECT TRUNCATE(MinRate*(1+PercentMintoMed/100)*(1+PercentMedtoMax/100),2) FROM attend_0joblevels jl JOIN attend_1positions p ON jl.JobLevelID=p.JobLevelID AND p.PositionID=(SELECT NewPositionID FROM attend_2changeofpositions WHERE IDNo=r.IDNo ORDER BY DateofChange LIMIT 1))) AS MaxRate,
+    , (SELECT TRUNCATE(ROUND('.$minwage.'*'.$daysofmonth.'*PercentIncMinimum*REPLACE(RegStep,0,1)*REPLACE(`Step1`,0,1)*REPLACE(`Step2`,0,1)*REPLACE(`Step3`,0,1)*REPLACE(`Step4`,0,1)*REPLACE(`Maximum`,0,1),0),2) 
+from `attend_0joblevels` jl left join payroll_0salarystructure ss on ss.JobLevelID=jl.JobLevelID JOIN attend_1positions p ON jl.JobLevelID=p.JobLevelID WHERE p.PositionID=(SELECT NewPositionID FROM attend_2changeofpositions WHERE IDNo=r.IDNo ORDER BY DateofChange LIMIT 1))) AS MaxRate,
         CONCAT(
           IF(((SELECT MaxRate)<Basic) AND DailyORMonthly=1,"<font color=\"red\">",""),
           FORMAT(Basic,2), IF(((SELECT MaxRate)<Basic) AND DailyORMonthly=1,"</font>","")
-          ,IF(DailyORMonthly=1,IF((SELECT MaxRate)<Basic,CONCAT(" > ",(SELECT MaxRate)),""),"")) AS Basic, FORMAT(DeMinimis,2) AS DeMinimis, FORMAT(CalcSSS,2) AS CalcSSS, FORMAT(CalcPHIC,2) AS CalcPHIC, FORMAT(`PagIbig-EE`,2) AS `PagIbig-EE`,FORMAT(WTax,2) AS WTax,IF(DailyORMonthly=1,"",CONCAT(
+          ,IF(DailyORMonthly=1,IF((SELECT MaxRate)<Basic,CONCAT(" > ",FORMAT((SELECT MaxRate),2)),""),"")) AS Basic, FORMAT(DeMinimis,2) AS DeMinimis, FORMAT(CalcSSS,2) AS CalcSSS, FORMAT(CalcPHIC,2) AS CalcPHIC, FORMAT(`PagIbig-EE`,2) AS `PagIbig-EE`,FORMAT(WTax,2) AS WTax,IF(DailyORMonthly=1,"",CONCAT(
             IF(((SELECT MaxRate)<BasicRate) AND DailyORMonthly=0,"<font color=\"red\">",""), 
             BasicRate,IF(((SELECT MaxRate)<BasicRate) AND DailyORMonthly=0,"</font>","")
             ,IF((SELECT MaxRate)<BasicRate,CONCAT(" > ",(SELECT MaxRate)),""))) AS DailyRate,
@@ -61,6 +68,26 @@ TxnId AS TxnID, EncodedBy,'.((allowedToOpen(7913,'1rtc'))?1:"
 IF(DailyORMonthly=1,IF((SELECT MaxRate)<Basic,0,1),IF((SELECT MaxRate)<BasicRate,0,1))
 ").' AS showeditprocess 
 FROM payroll_ratesforapproval r JOIN `1employees` e ON e.IDNo=r.IDNo ';
+
+
+
+//     $sql='SELECT TxnId,r.IDNo,DateofChange,Remarks,FullName,Position,Branch,DorM,IF(DailyORMonthly=0,
+
+//     (SELECT TRUNCATE(SalaryStructureDaily(IF((EffectiveMinWage*'.$multiplier.')>=(SELECT NCRRate FROM NCRRate),(SELECT NCRRate FROM NCRRate),(EffectiveMinWage*'.$multiplier.')),JobLevelID,'.$increaserate.','.$steprate.',5),2) FROM storesrate WHERE IDNo=r.IDNo)
+    
+//     ,(SELECT TRUNCATE(MinRate*(1+PercentMintoMed/100)*(1+PercentMedtoMax/100),2) FROM attend_0joblevels jl JOIN attend_1positions p ON jl.JobLevelID=p.JobLevelID WHERE p.PositionID=(SELECT NewPositionID FROM attend_2changeofpositions WHERE IDNo=r.IDNo ORDER BY DateofChange LIMIT 1))) AS MaxRate,
+//         CONCAT(
+//           IF(((SELECT MaxRate)<Basic) AND DailyORMonthly=1,"<font color=\"red\">",""),
+//           FORMAT(Basic,2), IF(((SELECT MaxRate)<Basic) AND DailyORMonthly=1,"</font>","")
+//           ,IF(DailyORMonthly=1,IF((SELECT MaxRate)<Basic,CONCAT(" > ",(SELECT MaxRate)),""),"")) AS Basic, FORMAT(DeMinimis,2) AS DeMinimis, FORMAT(CalcSSS,2) AS CalcSSS, FORMAT(CalcPHIC,2) AS CalcPHIC, FORMAT(`PagIbig-EE`,2) AS `PagIbig-EE`,FORMAT(WTax,2) AS WTax,IF(DailyORMonthly=1,"",CONCAT(
+//             IF(((SELECT MaxRate)<BasicRate) AND DailyORMonthly=0,"<font color=\"red\">",""), 
+//             BasicRate,IF(((SELECT MaxRate)<BasicRate) AND DailyORMonthly=0,"</font>","")
+//             ,IF((SELECT MaxRate)<BasicRate,CONCAT(" > ",(SELECT MaxRate)),""))) AS DailyRate,
+// FORMAT(Basic+DeMinimis+Allowance,2) AS TotalMonthly, FORMAT(TaxDue(((Basic-CalcSSS-CalcPHIC-100)*12))/12,2) AS CalcTax, 
+// TxnId AS TxnID, EncodedBy,'.((allowedToOpen(7913,'1rtc'))?1:"
+// IF(DailyORMonthly=1,IF((SELECT MaxRate)<Basic,0,1),IF((SELECT MaxRate)<BasicRate,0,1))
+// ").' AS showeditprocess 
+// FROM payroll_ratesforapproval r JOIN `1employees` e ON e.IDNo=r.IDNo ';
 
     // echo $sql; 
 
