@@ -22,7 +22,7 @@ if (in_array($which,array('RequestOT','Submit','OTPerPersonPerPayrollID','TotalO
 	$listsql='SELECT PayrollID, concat(PayrollID, " : ", FromDate, " - ", ToDate) as PayPeriod FROM payroll_1paydates;';
 	$_POST['payrollid']=(isset($_POST['payrollid'])?$_POST['payrollid']:((date('m')*2)+(date('d')<15?-1:0)));
     echo comboBox($link,$listsql,'PayPeriod','PayrollID','payperiods');
-	echo comboBox($link,'SELECT OTType, OTTypeNo FROM attend_0ottype','OTTypeNo','OTType','ottypes');
+	// echo comboBox($link,'SELECT OTType, OTTypeNo FROM attend_0ottype','OTTypeNo','OTType','ottypes');
 }
 
 switch ($which){
@@ -70,8 +70,8 @@ switch ($which){
 			$withbranchestable=' OR b.Pseudobranch=0';
 		}
 		
-		$formdesc='</i><br><div><div style="float:left;"><form method="POST" action="#">MonthNo: <input type="text" size="5" name="MonthNo" value="'.$txndate.'"> <input type="submit" value="Lookup"></form></div></div><br><b>'.$addlformdesc.'</b><i>';
-		// $formdesc='</i><br><div><div style="float:left;"><form method="POST" action="#">MonthNo: <input type="text" size="5" name="MonthNo" value="'.$txndate.'"> <input type="submit" value="Lookup"></form></div><div style="margin-left:25%"><form method="POST" action="#">PayrollID: <input type="text" size="5" name="PayrollID" list="payperiods" value="'.$_POST['payrollid'].'"> <input type="submit" value="Lookup"></form></div></div><br><b>'.$addlformdesc.'</b><i>';
+		$formdesc='</i><br><div><div><form method="POST" action="#">MonthNo: <input type="text" size="5" name="MonthNo" value="'.$txndate.'"> <input type="submit" value="Lookup"></form></div></div>';
+		// $formdesc='<br><b>'.$addlformdesc.'</b><i></i><br><div><div style="float:left;"><form method="POST" action="#">MonthNo: <input type="text" size="5" name="MonthNo" value="'.$txndate.'"> <input type="submit" value="Lookup"></form></div><div style="margin-left:25%"><form method="POST" action="#">PayrollID: <input type="text" size="5" name="PayrollID" list="payperiods" value="'.$_POST['payrollid'].'"> <input type="submit" value="Lookup"></form></div></div><br><b>'.$addlformdesc.'</b><i>';
 		if (allowedToOpen(6212,'1rtc')){
 		echo comboBox($link,'SELECT FullName,IDNo FROM `attend_30currentpositions` WHERE deptid = (SELECT deptid FROM attend_30currentpositions WHERE IDNo='.$_SESSION['(ak0)'].') '.$withbranchesselect.' ORDER BY FullName;','FullName','IDNo','employees');
 		 echo '<br><h3>'.$title.'</h3>';
@@ -79,8 +79,30 @@ switch ($which){
         <form method='post' action='otrequest.php?w=Submit'>
             Date Today/Future Date <input type='date' name='DateToday' value='<?php echo date('Y-m-d'); ?>'>&nbsp &nbsp &nbsp
             IDNo <input type='text' name='IDNo' value='' list='employees' size=7>&nbsp &nbsp &nbsp
-			Type Of Overtime: <input type='text' name='OTType' list="ottypes" size=9 required> &nbsp &nbsp &nbsp
-            <b>StartOfOT</b> <sup>(PreShift)</sup> / <b>EndOfOT</b> <sup>(PostShift)</sup> <input type='time' name='EndOfOT' value='19:00'> &nbsp &nbsp &nbsp<br>
+
+			<?php 
+				$stmtottype=$link->query('SELECT OTType, OTTypeNo FROM attend_0ottype WHERE OTTypeNo<>0;'); $resottypes=$stmtottype->fetchAll();	
+				$ottypeselect='';
+				foreach($resottypes AS $resottype){
+					$ottypeselect.='<option value="'.$resottype['OTTypeNo'].'">'.$resottype['OTType'].'</option>';
+				}
+			?>
+			<!-- Type Of Overtime: <input type='text' name='OTType' list="ottypes" size=9 required> -->
+			Type Of Overtime:
+			<select id='OTType' name="OTTypeNo" required>
+				<option value="">-- Select OT Type --</option>
+				<?php echo $ottypeselect;?>
+			</select>
+			<span style='display:none;' id='StartOfOT' name="StartOfOT">&nbsp &nbsp &nbsp <font color="blue"><b>StartOfOT:</b></font>
+			&nbsp; <input type='time' name='StartOfOT'  value='08:00' size='20' />
+			</span>
+			<span style='display:none;' id='EndOfOT' name="EndOfOT">&nbsp &nbsp &nbsp <font color="green"><b>EndOfOT:</b></font> 
+			&nbsp; <input type='time' name='EndOfOT'  value='19:00' size='20' />
+			</span>
+			 
+            <!-- <b>StartOfOT</b> <sup>(PreShift)</sup> / <b>EndOfOT</b> <sup>(PostShift)</sup> <input type='time' name='EndOfOT' value='19:00'> &nbsp &nbsp &nbsp<br> -->
+			<?php ?>
+			<br>
             Reason <input type='text' name='Reason' size=50> &nbsp &nbsp &nbsp
             <input type="hidden" name="action_token" value="<?php echo html_escape($_SESSION['action_token']); ?>" />
             <input type='submit' name='Submit' value='Submit'>
@@ -107,12 +129,12 @@ switch ($which){
 			$showprocesslabel=','.$maincon.' AS showeditprocess,'.$maincon.' AS showaddlprocess';
 		}
 		
-        $sqlmain1='SELECT OTType,ot.TxnID,Position,ApprovedTS,CONCAT(e.Nickname," ",e.SurName) AS FullName,CONCAT(e3.Nickname," ",e3.SurName) AS ApprovedBy,CONCAT(e3.Nickname," ",e3.SurName) AS DeniedBy,ApprovedTS AS DeniedTS,CONCAT(e2.Nickname," ",e2.SurName) AS RequestedBy,RequestedTS, Branch, ot.DateToday AS DateOfOT, EndOfOT, Reason ';
+        $sqlmain1='SELECT OTType,ot.TxnID,Position,ApprovedTS,CONCAT(e.Nickname," ",e.SurName) AS FullName,CONCAT(e3.Nickname," ",e3.SurName) AS ApprovedBy,CONCAT(e3.Nickname," ",e3.SurName) AS DeniedBy,ApprovedTS AS DeniedTS,CONCAT(e2.Nickname," ",e2.SurName) AS RequestedBy,RequestedTS, Branch, ot.DateToday AS DateOfOT, StartOfOT,EndOfOT, Reason ';
 		$sqlmain2=' FROM approvals_5ot ot JOIN `1employees` e ON ot.IDNo=e.IDNo JOIN attend_0ottype ott ON ot.OTTypeNo=ott.OTTypeNo JOIN attend_1defaultbranchassign dba ON ot.IDNo=dba.IDNo JOIN 1branches b ON dba.DefaultBranchAssignNo=b.BranchNo JOIN 1employees e2 ON ot.RequestedByNo=e2.IDNo LEFT JOIN 1employees e3 ON ot.ApprovedByNo=e3.IDNo JOIN attend_30latestpositionsinclresigned lpir ON ot.IDNo=lpir.IDNo JOIN attend_1positions p ON lpir.PositionID=p.PositionID WHERE ';
 		$sqlmain=$sqlmain1.$showprocesslabel.$sqlmain2.$addlcondi.' '.$morp.' AND ';
 		
         $title='Pending OT Request'; 
-		$columnnames=array('FullName','Position','Branch','OTType','DateOfOT','EndOfOT','Reason','RequestedBy','RequestedTS');
+		$columnnames=array('FullName','Position','Branch','OTType','DateOfOT','StartOfOT','EndOfOT','Reason','RequestedBy','RequestedTS');
 		// $columnnames=array('FullName','Position','Branch','OTType','DateOfOT','TypeofDay','PayrollID','EndOfOT','Reason','RequestedBy','RequestedTS');
 		if (allowedToOpen(6212,'1rtc')){
 			$delprocess='otrequest.php?w=DeleteRequest&TxnID=';
@@ -139,7 +161,7 @@ switch ($which){
         $sql=$sqlmain.'Approved=1';
 		// echo $sql.'<br><br>';
         $title='Approved OT Request'; 
-		$columnnames=array('FullName','Position','Branch','OTType','DateOfOT','EndOfOT','Reason','RequestedBy','RequestedTS','ApprovedBy','ApprovedTS');
+		$columnnames=array('FullName','Position','Branch','OTType','DateOfOT','StartOfOT','EndOfOT','Reason','RequestedBy','RequestedTS','ApprovedBy','ApprovedTS');
 		// $columnnames=array('FullName','Position','Branch','OTType','DateOfOT','TypeofDay','EndOfOT','Reason','RequestedBy','RequestedTS','ApprovedBy','ApprovedTS');
         include('../backendphp/layout/displayastable.php');
 		
@@ -165,12 +187,13 @@ switch ($which){
 	if (!allowedToOpen(6212,'1rtc')){ echo 'No Permission'; exit(); }
 		
 
-	if($_POST['OTType']=='PostShift' OR $_POST['OTType']=='PreShift'){
+	// if($_POST['OTTypeNo']=='11' OR $_POST['OTTypeNo']=='12' OR $_POST['OTTypeNo']=='13'){
 
+		if(in_array($_POST['OTTypeNo'],array(11,12))){
 		$sqlotc='SELECT Shift FROM attend_2attendance WHERE IDNo='.$_POST['IDNo'].' AND DateToday="'.$_POST['DateToday'].'"';  
 		$stmtotc=$link->query($sqlotc); $resotc=$stmtotc->fetch();
 
-		if($_POST['OTType']=='PostShift'){
+		if($_POST['OTTypeNo']=='12'){
 			$allowedottime=''.($resotc['Shift']+9).':01';
 			if($_POST['EndOfOT']>=$allowedottime){
 				goto allowed;
@@ -179,7 +202,7 @@ switch ($which){
 			}
 		} else {
 			$allowedottime=''.str_pad(($resotc['Shift']+0),2,0,STR_PAD_LEFT).':00';
-			if($_POST['EndOfOT']<$allowedottime){
+			if($_POST['StartOfOT']<$allowedottime){
 				goto allowed;
 			} else {
 				echo 'Must be less than shift. '.$allowedottime.''; exit;
@@ -194,19 +217,23 @@ switch ($which){
 		if(''.$_POST['DateToday'].''<''.date('Y-m-d').''){ echo 'Date should be Date Today or Future Date.'; exit();}
 		if(''.date("H:i").''>'18:00'){ echo 'Can request until 18:00 [06:00 PM]'; exit(); }
         require_once $path.'/acrossyrs/logincodes/confirmtoken.php';
-		$ottypeno=comboBoxValue($link,'`attend_0ottype`','OTType',addslashes($_POST['OTType']),'OTTypeNo');
-        $columnstoadd=array('IDNo','DateToday','EndOfOT','Reason'); $sql='';
+		// $ottypeno=comboBoxValue($link,'`attend_0ottype`','OTType',addslashes($_POST['OTType']),'OTTypeNo');
+        $columnstoadd=array('IDNo','OTTypeNo','DateToday','Reason'); 
+		
+		if($_POST['OTTypeNo']==11){
+			array_push($columnstoadd,'StartOfOT');
+		} else if($_POST['OTTypeNo']==12 OR $_POST['OTTypeNo']==13){
+			array_push($columnstoadd,'EndOfOT');
+		} else if($_POST['OTTypeNo']==23 OR $_POST['OTTypeNo']==24){
+			array_push($columnstoadd,'StartOfOT','EndOfOT');
+		}
+
+		$sql='';
         foreach ($columnstoadd as $field) {$sql=$sql.' `' . $field. '`=\''.addslashes($_POST[$field]).'\', '; }
 		
-		if($_POST['OTType']=='Regular'){
-			$OTType=0;
-		}elseif($_POST['OTType']=='RDOT Regular Hrs'){
-			$OTType=2;
-		}else{
-			$OTType=1;
-		}
-		// echo $OTType; exit();
-        $sql='INSERT INTO `approvals_5ot` SET RequestedByNo='.$_SESSION['(ak0)'].','.$sql.' RequestedTS=NOW(),OTTypeNo=\''.$ottypeno.'\'';
+		
+        $sql='INSERT INTO `approvals_5ot` SET RequestedByNo='.$_SESSION['(ak0)'].','.$sql.' RequestedTS=NOW()';
+		// echo $sql; exit();
 		$stmt=$link->prepare($sql); $stmt->execute();
         header('Location:otrequest.php?w=RequestOT');
     break;
@@ -394,4 +421,27 @@ $formdesc='<br>Notes: <br>&nbsp; &nbsp; &nbsp; WH Supervisor can override time o
 }
  $link=null; $stmt=null; 
 ?>
-</body></html>
+</body>
+<script>
+$(document).ready(function(){
+    $('#OTType').on('change', function() {
+      if ( this.value == '11')
+      {
+        $("#StartOfOT").show();
+        $("#EndOfOT").hide();
+      } else if(this.value == '12' || this.value == '13'){
+       	$("#StartOfOT").hide();
+        $("#EndOfOT").show();
+      }  else if(this.value == '23' || this.value == '24'){
+       	$("#StartOfOT").show();
+        $("#EndOfOT").show();
+      } else
+      {
+        $("#StartOfOT").hide();
+        $("#EndOfOT").hide();
+      }
+    });
+});
+</script>
+
+</html>
