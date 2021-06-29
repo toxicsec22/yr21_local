@@ -8,6 +8,7 @@ $addallow=5401;
 $editallow=5401;
 $delallow=20005;
 $unpost=407;
+$treasury=5432;
 $co='1rtc';
   
 if (!allowedToOpen($lookupallow,'1rtc')) { echo 'No permission'; exit;} 
@@ -48,7 +49,9 @@ if (in_array($w,array('Add','EditMain'))){
         include('../backendphp/functions/checkeditablemainacctg.php');
 
 	$columnstoadd=array('Date','DueDate','CVNo','CheckNo','DateofCheck','Payee','Remarks');
-        $acctid=comboBoxValue($link,'`acctg_1chartofaccounts`','ShortAcctID',addslashes($_POST['CreditAccount']),'AccountID');
+        if(allowedToOpen($treasury,'1rtc')){
+                $acctid=comboBoxValue($link,'`banktxns_1maintaining`','ShortAcctID',addslashes($_POST['CreditAccount']),'AccountID');
+        } else { $acctid=comboBoxValueWithSql ($linklist,'SELECT ca.AccountID FROM `acctg_1chartofaccounts` ca LEFT JOIN `banktxns_1maintaining` ba ON ca.AccountID=ba.AccountID WHERE ba.AccountID IS NULL AND ca.ShortAcctID LIKE "'.addslashes($_POST['CreditAccount']).'" LIMIT 1;','AccountID');}
         $payeeno=comboBoxValue($link,'`1suppliers`','SupplierName',addslashes($_POST['Payee']),'SupplierNo');
         $paytype=comboBoxValue($link,'`acctg_0paymentmodes`','PaymentMode',addslashes($_POST['PaymentMode']),'PaymentModeID');
 	$sql='';
@@ -73,7 +76,12 @@ if (in_array($w,array('AddSub','EditSub'))){
 }
 
 if (in_array($w,array($form,$form.'MainEdit','Edit'.$form.'Sub'))){
-        echo comboBox($link,'SELECT AccountID, ShortAcctID FROM `acctg_1chartofaccounts` ORDER BY ShortAcctID;','AccountID','ShortAcctID','accounts');
+        if(allowedToOpen($treasury,'1rtc')){
+                echo comboBox($link,'SELECT AccountID, ShortAcctID FROM `banktxns_1maintaining` ORDER BY ShortAcctID;','AccountID','ShortAcctID','accounts');
+        } else {
+                echo comboBox($link,'SELECT ca.AccountID, ca.ShortAcctID FROM `acctg_1chartofaccounts` ca LEFT JOIN `banktxns_1maintaining` ba ON ca.AccountID=ba.AccountID WHERE ba.AccountID IS NULL ORDER BY ca.ShortAcctID','AccountID','ShortAcctID','accounts'); 
+        }
+        
         echo comboBox($link,'SELECT PaymentModeID,PaymentMode FROM `acctg_0paymentmodes` ORDER BY PaymentModeID;','PaymentModeID','PaymentMode','pmlist');
         echo comboBox($link,'SELECT BranchNo, Branch FROM `1branches` ORDER BY Branch','BranchNo','Branch','branches');
         echo comboBox($link,'SELECT EntityID, Entity FROM `acctg_1budgetentities` ORDER BY Entity','EntityID','Entity','entities');
@@ -198,15 +206,20 @@ switch ($w){
             
             
             $editprocessmainlabel='Edit'; $editprocessmain='formcv.php?w='.$form.'MainEdit&edit=2&'.$txnidname.'='.$txnid;
-            $delprocessmain='..\backendphp\functions\delrecords.php?TxnID='.$txnid.'&action_token='.$_SESSION['action_token'].'&w='.$table.'&l=acctg';
+
             
             $sortfield=(isset($_POST['sortfield'])?$_POST['sortfield']:'s.TimeStamp'); 
             $sqlsub.=' ORDER BY '.$sortfield.(isset($_POST['sortarrange'])?' '.$_POST['sortarrange']:' ASC');
             
-            $sqlsum='SELECT Posted,PayeeNo,CheckNo,sum('.$coltototal.') as Total, SUM(CASE WHEN Forex<>1 THEN 1 ELSE 0 END) AS CountForex, SUM(Amount*Forex) AS PHPTotal FROM  `'.$subtable.'` s JOIN `'.$table.'` m ON m.CVNo=s.CVNo WHERE m.CVNo='.$txnid;
+            $sqlsum='SELECT Posted,PayeeNo,CheckNo,CreditAccountID,sum('.$coltototal.') as Total, SUM(CASE WHEN Forex<>1 THEN 1 ELSE 0 END) AS CountForex, SUM(Amount*Forex) AS PHPTotal FROM  `'.$subtable.'` s JOIN `'.$table.'` m ON m.CVNo=s.CVNo WHERE m.CVNo='.$txnid;
             $stmt=$link->query($sqlsum); $result=$stmt->fetch();
             $editsub=$result['Posted']==0?true:false;
             $suppno=$result['PayeeNo'];
+
+            if(allowedToOpen($treasury,'1rtc') or in_array($result['CreditAccountID'],$accountsforacctg)){
+                $delprocessmain='..\backendphp\functions\delrecords.php?TxnID='.$txnid.'&action_token='.$_SESSION['action_token'].'&w='.$table.'&l=acctg';
+            }    
+
             $addlinfo='Total:  '.number_format($result['Total'],2).str_repeat('&nbsp',10);
             if ($result['CountForex']<>0) { $addlinfo.='PHP Total:  '.number_format($result['PHPTotal'],2).str_repeat('&nbsp',10);}
             $addlinfo.='<a href="formcv.php?w=AddMain">Add '. $w.'</a>'.'<br><br>';
