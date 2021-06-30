@@ -13,6 +13,9 @@ echo ' <a id=\'link\' href="../sysadmin/assignpermission.php?w=OpenSystemTonight
 if (allowedToOpen(3003,'1rtc')) {
 	echo ' <a id=\'link\' href="../sysadmin/accesspercompany.php">Give Access Per Company</a>';
 }
+
+echo ' <a id=\'link\' href="../sysadmin/assignpermission.php?w=AccessPerPositionRemove">Access Per Position (REMOVE)</a> ';
+		
 echo '<br><br>';
 switch ($which)
 {

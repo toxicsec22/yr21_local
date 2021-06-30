@@ -39,6 +39,7 @@ echo '<div>';
 		echo '<a id=\'link\' target="_blank" href="assignpermission.php?w=ViewSwitchboard&PagePreview=1">View Switchboard By Position</a> ';
 		echo '<a id=\'link\' target="_blank" href="assignpermission.php?w=ViewSwitchboard&PagePreview=2">View Switchboard By IDNo</a> ';
 		echo '&nbsp; &nbsp; &nbsp;<a id=\'link\' href="assignpermission.php?w=AccessPerPosition">Access Per Position (ADD)</a> ';
+		
 		echo '<a id=\'link\' href="assignpermission.php?w=AccessPerPositionRemove">Access Per Position (REMOVE)</a> ';
 		echo '<a id=\'link\' href="assignpermission.php?w=PrevYrsPermission">Prev Yrs Permission</a> <br><br>';
 		echo '<a id=\'link\' href="assignpermission.php?w=DataProtection">Data Protection</a> ';
@@ -877,7 +878,7 @@ echo '<br>';
 
 	case 'AccessPerPosition':
 	case 'AccessPerPositionRemove':
-	if (allowedToOpen(array(3000,220),'1rtc')){
+	if (allowedToOpen(array(3000,220,100),'1rtc')){
 		if($_GET['w']=='AccessPerPosition'){
 			$addtitle=' (ADD)';
 			$disabledadd='disabled';
@@ -894,13 +895,13 @@ echo '<br>';
 		$title='Access Per Position'.$addtitle;
 			echo '<title>'.$title.'</title>';
 			
-			echo comboBox($link,'SELECT PositionID, Position FROM attend_1positions ORDER BY Position','Position','PositionID','positionlist');
+			echo comboBox($link,'SELECT PositionID, Position FROM attend_1positions '.(allowedToOpen(3000,'1rtc')?'':'WHERE PositionID IN (SELECT DISTINCT(PositionID) FROM attend_30currentpositions WHERE deptheadpositionid='.$_SESSION['&pos'].')').' ORDER BY Position','Position','PositionID','positionlist');
 			
 			
 			if(!isset($_GET['Request'])){
 				echo '<h3>'.$title.'</h3>';
 				echo '<form action="#" method="POST">';
-				echo 'Position: <input type="text" name="PositionToView" list="positionlist"> ';
+				echo 'PositionID: <input type="text" name="PositionToView" list="positionlist"> ';
 				echo '<input type="submit" name="ViewAccess" value="View Access"/></form><br/><br/>';
 			} else {
 				echo '<h3>Requested Access</h3>';
@@ -949,7 +950,7 @@ echo '<br>';
 							$pid.=$row2['ProcessID'].",";
 					}  
 				}
-				echo $accesslist.'</table><input type="hidden" name="PosID" value="'.$_POST['PositionToView'].'"><input type="hidden" value="'.$_SESSION['action_token'].'" name="action_token">'.(allowedToOpen(3000,'1rtc')?'<input type="submit" value="'.$buttonval.' Access">':'').'</form>';
+				echo $accesslist.'</table><input type="hidden" name="PosID" value="'.$_POST['PositionToView'].'"><input type="hidden" value="'.$_SESSION['action_token'].'" name="action_token">'.(allowedToOpen(array(3000,100),'1rtc')?'<input type="submit" value="'.$buttonval.' Access" OnClick="return confirm(\'Are you SURE?\');">':'').'</form>';
 				echo '<br>'.(allowedToOpen(3000,'1rtc')?'<form action="assignpermission.php?w=Decline" method="POST"><input type="hidden" name="PosID" value="'.$_GET['ForPositionID'].'"><input style="color:red;" type="submit" value="Decline Request" OnClick="return confirm(\'Really delete this?\');"></form>':'');
 				
 			}
@@ -997,8 +998,16 @@ echo '<br>';
 	
 	case 'AssignAccessPerPositionRemove':
 	
-	if(!allowedToOpen(3000,'1rtc')){ echo 'No Permission'; exit(); }
+	if(!allowedToOpen(array(3000,100),'1rtc')){ echo 'No Permission'; exit(); }
 		require_once $path.'/acrossyrs/logincodes/confirmtoken.php';
+
+
+		$sqlp='SELECT IF(deptheadpositionid='.$_SESSION['&pos'].',1,0) AS allowedtoupdate FROM attend_30currentpositions WHERE PositionID='.$_POST['PosID'].' GROUP BY PositionID;';
+		$stmtp=$link->query($sqlp); $rowp=$stmtp->fetch();
+		if($rowp['allowedtoupdate']==0){
+			echo 'not allowed to update the position.'; exit();
+		}
+
 			$processidtoremove='';
 			foreach ($_REQUEST['allowedaccess'] AS $allowedprocessid){
 				
