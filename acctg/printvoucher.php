@@ -255,7 +255,7 @@ $result=$stmt->fetchAll();
 foreach ($result as $mainrow){
 
       $main='<div align="right"><img src="http://'.$_SERVER['HTTP_HOST'].'/favicon.ico" width="22px" height="22px"><font size="5"><b>1RTC</b></font></div><table width="90%" >
-      <tr><td>Date:  '.$mainrow['Date'].'</td><td>JV No:  <a href="javascript:window.print()">'.$mainrow['JVNo'].'</a></td><td>Remarks: '.$mainrow['Remarks'].'</td></tr>
+      <tr><td>Date:  '.$mainrow['JVDate'].'</td><td>JV No:  <a href="javascript:window.print()">'.$mainrow['JVNo'].'</a></td><td>Remarks: '.$mainrow['Remarks'].'</td></tr>
 </table>';
       
 
