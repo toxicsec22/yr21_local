@@ -271,7 +271,7 @@ switch ($which){
                 foreach($_POST['allowed'] as $selected){
                     $sql='INSERT INTO `acctg_1begbal` (`AccountID`,`BegBalance`,`BranchNo`, `EncodedByNo`, `TimeStamp`)
                     SELECT '.$_GET['AccountID'].',0,'.$selected.','.$_SESSION['(ak0)'].',Now() FROM `1branches` b 
-                    WHERE BranchNo NOT IN (SELECT BranchNo FROM `acctg_1begbal` WHERE AccountID='.$_GET['AccountID'].' AND BranchNo='.$selected.') AND b.BranchNo='.$selected.' AND b.BranchNo NOT IN (95,999) AND b.Active=1;';
+                    WHERE BranchNo NOT IN (SELECT BranchNo FROM `acctg_1begbal` WHERE AccountID='.$_GET['AccountID'].' AND BranchNo='.$selected.') AND b.BranchNo='.$selected.' AND b.Active=1;';
 
                     $stmt=$link->prepare($sql); $stmt->execute();
                 }
