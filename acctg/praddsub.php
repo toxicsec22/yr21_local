@@ -379,8 +379,10 @@ case 'DepEncashAdd':
 	$pk='TxnID'; $table='acctg_2depositmain'; 
 	include_once('../backendphp/functions/checkeditablesub.php'); 
 	$typeidsql='';
-	$details=(empty($_POST['EncashDetails']))?(($_POST['TypeID']=='Gas')?'KR: '.$_POST['KMperReading'].' Inv: ' .$_POST['InvoiceNo']:$_POST['EncashDetails']):$_POST['EncashDetails'];
-	
+	// $details=(empty($_POST['EncashDetails']))?(($_POST['TypeID']=='Gas')?'KR: '.$_POST['KMperReading'].' Inv: ' .$_POST['InvoiceNo']:$_POST['EncashDetails']):$_POST['EncashDetails'];
+
+	$details=(($_POST['TypeID']=='Gas')?'KR: '.$_POST['KMperReading'].' Inv: ' .$_POST['InvoiceNo'].' - '.$_POST['EncashDetails']:$_POST['EncashDetails']);
+	// echo $details; exit();
 	$amt=$_POST['Amount'];
 	
 	$acctid=(empty($_POST['DebitAccount']) or !isset($_POST['DebitAccount']))?100:(getNumber('Account',($_POST['DebitAccount']))); 

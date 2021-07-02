@@ -216,10 +216,11 @@ genericList('SELECT * FROM acctg_1branchpreapprovedbudgetlist order by BudgetDes
 
 echo '<script>
         function show(){
+            var encashdetailsinput = document.getElementById("encashdetailsid");
             var option = document.getElementById("category").value;
             if(option == "Gas")
                   {
-                        document.getElementById("gas").style.display="none";
+                        encashdetailsinput.setAttribute("placeholder","Sales invoice");
                         document.getElementById("gasinputs").style.display="block";
                         document.getElementById("gasinputs1").style.display="block";
                   } else {
@@ -227,6 +228,22 @@ echo '<script>
 					  document.getElementById("gasinputs").style.display="none";
                                           document.getElementById("gasinputs1").style.display="none";
 				  }
+
+                  if(option == "Courier for Documents"){
+                            encashdetailsinput.setAttribute("placeholder","Where it was sent from and what was sent");
+                    } else if(option == "Disinfection Supplies"){
+                        encashdetailsinput.setAttribute("placeholder","what supplies/items were bought");
+                    } else if(option == "Electric Bill" || option == "Water Bill"){
+                        encashdetailsinput.setAttribute("placeholder","billing period and due date");
+                    } else if(option == "Fare (person only)"){
+                        encashdetailsinput.setAttribute("placeholder","Fare used for? (deposit, courier, etc.)");
+                    } else if(option == "Boarding House"){
+                        encashdetailsinput.setAttribute("placeholder","month to be applied to");
+                    } else if(option == "Ice"){
+                        encashdetailsinput.setAttribute("placeholder","date of expense");
+                    } else if(option == "Supplies"){
+                        encashdetailsinput.setAttribute("placeholder","what supplies/items were bought");
+                    }
         }
     </script>';
 
@@ -240,7 +257,7 @@ $addencash='<form method=post style="display: inline" action="praddsub.php?w=Dep
 Budgetted Expense Type <input type="text" list="budgetlist" id="category" name="TypeID" onchange="show()"/>
                                 &nbsp &nbsp
 FromBudgetOf <input type=text name="FromBudgetOf"  size=5 list="entities" value="'.$_SESSION['@brn'].'" '.(allowedToOpen(5994,'1rtc')?'':'readonly').'> &nbsp &nbsp
-<div id="gas" style="display:inline;">Encash Details <input type=text name="EncashDetails" size=10 ></div>&nbsp &nbsp</br>
+<div id="gas" style="display:inline;">Encash Details <b style="color:red"> * </b> <input type=text id="encashdetailsid" name="EncashDetails" size=20 required autocomplete=off></div>&nbsp &nbsp</br>
 TIN (numbers only)<input type=text name="TIN" size=10>
 &nbsp &nbsp Approval No<input type=text name="ApprovalNo" size=11 placeholder="Blank if budgetted">'.$addencash.'&nbsp &nbsp
 Amount <input type=text name="Amount" size=5>&nbsp &nbsp
