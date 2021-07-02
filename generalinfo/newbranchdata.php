@@ -15,10 +15,20 @@ $title='Add Required Data for New Branch';
 
 
 echo comboBox($link,'SELECT BranchNo, Branch FROM `1branches`','Branch','BranchNo','branches');
-echo comboBox($link,'SELECT FullName, IDNo FROM `attend_30currentpositions` WHERE PositionID IN (31,35,36) ORDER BY FullName;','FullName','IDNo','stl');
-echo comboBox($link,'SELECT FullName, IDNo FROM `attend_30currentpositions` WHERE PositionID IN (31,61) ORDER BY FullName;','FullName','IDNo','sam');
-echo comboBox($link,'SELECT FullName, IDNo FROM `attend_30currentpositions` WHERE PositionID IN (153,154) ORDER BY FullName;','FullName','IDNo','cso');
-echo comboBox($link,'SELECT FullName, IDNo FROM `attend_30currentpositions` WHERE PositionID IN (71) ORDER BY FullName;','FullName','IDNo','ops');
+
+// echo comboBox($link,'SELECT FullName, IDNo FROM `attend_30currentpositions` WHERE PositionID IN (31,35,36) ORDER BY FullName;','FullName','IDNo','stl');
+// echo comboBox($link,'SELECT FullName, IDNo FROM `attend_30currentpositions` WHERE PositionID IN (31,61) ORDER BY FullName;','FullName','IDNo','sam');
+// echo comboBox($link,'SELECT FullName, IDNo FROM `attend_30currentpositions` WHERE PositionID IN (153,154) ORDER BY FullName;','FullName','IDNo','cso');
+// echo comboBox($link,'SELECT FullName, IDNo FROM `attend_30currentpositions` WHERE PositionID IN (71) ORDER BY FullName;','FullName','IDNo','ops');
+$sqls='SELECT IDNo FROM attend_30latestpositionsinclresigned lpir JOIN attend_1positions p ON lpir.PositionID=p.PositionID WHERE Resigned=0 AND deptid=';
+
+$sqlorderby=' ORDER BY lpir.JobLevelID DESC LIMIT 1';
+
+$sqldefault='SELECT ('.$sqls.'11'.$sqlorderby.') AS STLSAM, ('.$sqls.'60'.$sqlorderby.') AS CSO, ('.$sqls.'70'.$sqlorderby.') AS OPS;';
+// echo $sqldefault;
+$stmtdefault=$link->query($sqldefault); $resdefault=$stmtdefault->fetch();
+
+
 echo comboBox($link,'SELECT Branch, BranchNo FROM `1branches` WHERE Active=1;','BranchNo','Branch','branchlist');
 
 ?>
@@ -41,11 +51,11 @@ echo comboBox($link,'SELECT Branch, BranchNo FROM `1branches` WHERE Active=1;','
         </form><br/><br/>
     <form method='post' action='newbranchdata.php'>
         For Branch <input type='text' name='BranchNo' list='branches' size=5 value='<?php echo $branchno;?>'> &nbsp; &nbsp; <?php echo strtoupper($branch); ?>
-        Credit Analyst: <input type='text' name='CSO' size=5 list='cso'> &nbsp; &nbsp; 
-<!--        Acctg: <input type='text' name='Acctg' size=5 > &nbsp; &nbsp;-->
-        STL: <input type='text' name='STL' size=5 list='stl'> &nbsp; &nbsp;
-        SAM: <input type='text' name='SAM' size=5 list='sam'> &nbsp; &nbsp;
-        Ops Specialist: <input type='text' name='Ops' size=5 list='ops'> &nbsp; &nbsp;
+        Credit Analyst: <input type='text' name='CSO' size=5 value="<?php echo $resdefault['CSO'];?>"> &nbsp; &nbsp;
+        STL: <input type='text' name='STL' size=5 value="<?php echo $resdefault['STLSAM'];?>"> &nbsp; &nbsp;
+        Fields Specialist <input type='text' name='Ops' size=5 value="<?php echo $resdefault['OPS'];?>"> &nbsp; &nbsp;
+        Branch Coordinator <input type='text' name='OpsBC' size=5 value="<?php echo $resdefault['OPS'];?>"> &nbsp; &nbsp;
+        Branch Support <input type='text' name='OpsBS' size=5 value="<?php echo $resdefault['OPS'];?>"> &nbsp; &nbsp;
         Remarks: <input type='text' name='Remarks' size=10 > &nbsp; &nbsp; 
         <input type='submit' value='Add Default Assignments' name='w'><br/><br/>
         </form>
@@ -92,17 +102,31 @@ switch ($which){
         include('../backendphp/layout/displayastablenosort.php');
         break;
     case 'Add Default Assignments':
-		$insertarray=array('CSO','STL','SAM','Ops');
+		$insertarray=array('CSO','STL','Ops','OpsBC','OpsBS');
 		
 		
 		foreach($insertarray AS $insert){
-			$sqlinsert='INSERT INTO `attend_2changebranchgroup` SET DateofChange=CURDATE(),BranchNo='.$branchno.',EncodedByNo='.$_SESSION['(ak0)'].',`TimeStamp`=Now(),PositionID=(SELECT PositionID FROM attend_30currentpositions WHERE IDNo='.$_POST[$insert].'),'
+            if($insert=='CSO'){
+                $positionid=153;
+            } else if ($insert=='STL') {
+                $positionid=31;
+            } else if($insert=='Ops') {
+                $positionid=71;
+            } else if($insert=='OpsBC') {
+                $positionid=77;
+            } else {
+                $positionid=76;
+            }
+
+			$sqlinsert='INSERT INTO `attend_2changebranchgroup` SET DateofChange=CURDATE(),BranchNo='.$branchno.',EncodedByNo='.$_SESSION['(ak0)'].',`TimeStamp`=Now(),PositionID='.$positionid.','
             . '`IDNo`='.$_POST[$insert].', `Remarks`=\''.$_POST['Remarks'].'\'';
+
 			$link->query($sqlinsert); if($_SESSION['(ak0)']==1002) { echo $sqlinsert;}
 		}
+
 		
-        $sql='SELECT bg.*,CONCAT(e.Nickname," ",e.SurName) AS CNC,CONCAT(e2.Nickname," ",e2.SurName) AS TeamLeader,CONCAT(e3.Nickname," ",e3.SurName) AS SAM,CONCAT(e4.Nickname," ",e4.SurName) AS OpsSpecialist FROM `attend_1branchgroups` bg LEFT JOIN 1employees e ON bg.CNC=e.IDNo LEFT JOIN 1employees e2 ON bg.TeamLeader=e2.IDNo LEFT JOIN 1employees e3 ON bg.SAM=e3.IDNo LEFT JOIN 1employees e4 ON bg.OpsSpecialist=e4.IDNo WHERE BranchNo='.$branchno;
-        $columnnames=array('DateofChange', 'BranchNo', 'CNC', 'TeamLeader', 'SAM', 'OpsSpecialist');
+        $sql='SELECT bg.*,CONCAT(e.Nickname," ",e.SurName) AS CNC,CONCAT(e2.Nickname," ",e2.SurName) AS TeamLeader,CONCAT(e3.Nickname," ",e3.SurName) AS SAM,CONCAT(e4.Nickname," ",e4.SurName) AS FieldSpecialist,CONCAT(e5.Nickname," ",e5.SurName) AS BranchCoordinator,CONCAT(e6.Nickname," ",e6.SurName) AS BranchSupport FROM `attend_1branchgroups` bg LEFT JOIN 1employees e ON bg.CNC=e.IDNo LEFT JOIN 1employees e2 ON bg.TeamLeader=e2.IDNo LEFT JOIN 1employees e3 ON bg.SAM=e3.IDNo LEFT JOIN 1employees e4 ON bg.FieldSpecialist=e4.IDNo LEFT JOIN 1employees e5 ON bg.BranchCoordinator=e5.IDNo LEFT JOIN 1employees e6 ON bg.BranchSupport=e6.IDNo WHERE BranchNo='.$branchno;
+        $columnnames=array('DateofChange', 'BranchNo', 'CNC', 'TeamLeader', 'SAM', 'FieldSpecialist','BranchCoordinator','BranchSupport');
         include('../backendphp/layout/displayastablenosort.php');
         break;
     case 'Update _comkey - ALL Branches':
