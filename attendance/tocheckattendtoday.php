@@ -34,8 +34,8 @@ switch ($which){
 		if (allowedToOpen(8285,'1rtc')){ $addlcondi = ' OR 1=1'; goto esc;}//GenAdmin/AdminAssistant
 		if (allowedToOpen(8289,'1rtc')){ $addlcondi = ' OR Pseudobranch=0'; goto esc;}//OpsHead
 		if (allowedToOpen(8286,'1rtc')){ 
-                    $addlcondi = ' OR va.BranchNo IN (SELECT BranchNo FROM attend_1branchgroups WHERE OpsSpecialist='.$_SESSION['(ak0)'].')'; 
-                    goto esc;}//OpsSpecialist
+                    $addlcondi = ' OR va.BranchNo IN (SELECT BranchNo FROM attend_1branchgroups WHERE BranchCoordinator='.$_SESSION['(ak0)'].')'; 
+                    goto esc;}//BranchCoordinator
 		if (allowedToOpen(8287,'1rtc')){ $addlcondi = ' OR va.BranchNo='.$_SESSION['bnum']; goto esc;}//BranchHead and OIC
 			
 		esc:

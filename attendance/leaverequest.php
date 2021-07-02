@@ -94,7 +94,7 @@ switch ($which){
         if (allowedToOpen(6202,'1rtc')) { $condition=''; } 
         elseif (allowedToOpen(214,'1rtc')) { $condition=' AND p.deptheadpositionid='.$_SESSION['&pos']; }
 		else if (allowedToOpen(2133,'1rtc'))  {
-			$stmt0=$link->query('SELECT GROUP_CONCAT(BranchNo) AS BranchNo FROM attend_1branchgroups WHERE OpsSpecialist='.$_SESSION['(ak0)'].'');
+			$stmt0=$link->query('SELECT GROUP_CONCAT(BranchNo) AS BranchNo FROM attend_1branchgroups WHERE BranchCoordinator='.$_SESSION['(ak0)'].'');
 			$res0=$stmt0->fetch();
 			$condition=' AND (p.BranchNo IN ('.$res0['BranchNo'].'))';
 		}
@@ -172,7 +172,7 @@ switch ($which){
 		if (allowedToOpen(2131,'1rtc')) { $condition=''; } 
         elseif (allowedToOpen(214,'1rtc')) { $condition=' WHERE deptheadpositionid='.$_SESSION['&pos']; }
 		else if (allowedToOpen(2133,'1rtc'))  {
-			$stmt0=$link->query('SELECT GROUP_CONCAT(BranchNo) AS BranchNo FROM attend_1branchgroups WHERE OpsSpecialist='.$_SESSION['(ak0)'].'');
+			$stmt0=$link->query('SELECT GROUP_CONCAT(BranchNo) AS BranchNo FROM attend_1branchgroups WHERE BranchCoordinator='.$_SESSION['(ak0)'].'');
 			$res0=$stmt0->fetch();
 			$condition=' WHERE (BranchNo IN ('.$res0['BranchNo'].'))';
 		}

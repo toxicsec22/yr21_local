@@ -137,7 +137,7 @@ if(allowedToOpen(686,'1rtc')){
         
 
         $sql='UPDATE hr_82perfevalmain pf JOIN attend_30currentpositions cp ON pf.IDNo=cp.IDNo SET 
-        SIDNo=(IF((cp.deptid<>10),(SELECT cp3.LatestSupervisorIDNo FROM `attend_30currentpositions` cp3 WHERE cp3.IDNo=pf.IDNo),(SELECT OpsSpecialist FROM attend_30currentpositions cp4 JOIN attend_1branchgroups bg ON cp4.BranchNo=bg.BranchNo WHERE cp4.IDNo=pf.IDNo))),
+        SIDNo=(IF((cp.deptid<>10),(SELECT cp3.LatestSupervisorIDNo FROM `attend_30currentpositions` cp3 WHERE cp3.IDNo=pf.IDNo),(SELECT BranchCoordinator FROM attend_30currentpositions cp4 JOIN attend_1branchgroups bg ON cp4.BranchNo=bg.BranchNo WHERE cp4.IDNo=pf.IDNo))),
         DIDNo=(SELECT cp2.IDNo FROM `attend_30currentpositions` cp2 WHERE cp2.PositionID=(SELECT cp2.PositionID FROM `attend_30currentpositions` cp2 
         WHERE cp2.PositionID=(SELECT IF((cp1.deptheadpositionid=cp1.PositionID),cp1.supervisorpositionid,cp1.deptheadpositionid) FROM `attend_30currentpositions` cp1 WHERE cp1.IDNo=pf.IDNo))) WHERE pf.TxnID='.$res0['TxnID'].';';
           
@@ -158,10 +158,7 @@ $stmt=$link->query($sqlpopultatedtoday); $res=$stmt->fetchAll();
           $stmt=$link->prepare($sql); $stmt->execute();  
     }
 
-// //sub
-// $sql='INSERT IGNORE INTO hr_82perfevalmonthlymain (IDNo,MonthNo,SIDNo,EncodedByNo,TimeStamp) SELECT cp.IDNo,'.date('m',strtotime($_POST['EvalDueDate'])).',(IF((cp.deptid<>10),(SELECT cp3.LatestSupervisorIDNo FROM `attend_30currentpositions` cp3 WHERE cp3.IDNo=cp.IDNo),(SELECT OpsSpecialist FROM attend_30currentpositions cp4 JOIN attend_1branchgroups bg ON cp4.BranchNo=bg.BranchNo WHERE cp4.IDNo=cp.IDNo))),0,NOW() from attend_30currentpositions cp JOIN hr_82perfevalmain pem ON cp.IDNo=pem.IDNo WHERE pem.TxnID='.$res0['TxnID'].'';
-// // echo $sql.'<br>';
-//         $stmt=$link->prepare($sql); $stmt->execute();
+
           
   
       $sqlpopultatedtoday='SELECT pem.TxnID,
@@ -381,7 +378,7 @@ $stmt=$link->query($sqlpopultatedtoday); $res=$stmt->fetchAll();
     require_once $path.'/acrossyrs/logincodes/confirmtoken.php';
       $sql='INSERT INTO `hr_82perfevalmain` 
           (`IDNo`,`CurrentPositionID`,`CurrentBranchNo`,`SIDNo`,`DIDNo`,`EvalDueDate`, `EvalSchedID`,`HREncodedByNo`,`HRTimestamp`)  
-          SELECT e.`IDNo`, `PositionID`, `DefaultBranchAssignNo`, (IF((p.deptid<>10),(SELECT cp3.LatestSupervisorIDNo FROM `attend_30currentpositions` cp3 WHERE cp3.IDNo=p.IDNo),(SELECT OpsSpecialist FROM attend_30currentpositions cp4 JOIN attend_1branchgroups bg ON cp4.BranchNo=bg.BranchNo WHERE cp4.IDNo=p.IDNo))) AS SIDNo, 
+          SELECT e.`IDNo`, `PositionID`, `DefaultBranchAssignNo`, (IF((p.deptid<>10),(SELECT cp3.LatestSupervisorIDNo FROM `attend_30currentpositions` cp3 WHERE cp3.IDNo=p.IDNo),(SELECT BranchCoordinator FROM attend_30currentpositions cp4 JOIN attend_1branchgroups bg ON cp4.BranchNo=bg.BranchNo WHERE cp4.IDNo=p.IDNo))) AS SIDNo, 
           (SELECT IF(a.IDNo=e.IDNo,a.LatestSupervisorIDNo,a.IDNo) FROM `attend_30currentpositions` a 
           WHERE a.positionid=(SELECT `deptheadpositionid` FROM `attend_30currentpositions` b WHERE b.IDNo=e.IDNo)) AS `DIDNo`,
           \''.$currentyr.'-'.$month.'-27\' AS `EvalDueDate`, '.$evalsched.' AS `EvalSchedID`, 

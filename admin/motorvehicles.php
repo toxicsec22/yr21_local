@@ -1283,11 +1283,11 @@ switch ($which)
 		if (allowedToOpen(8290,'1rtc')) { //Gen Admin Only
 			$addcon = ''; goto repskip;
 		}
-		if (allowedToOpen(82862,'1rtc')) { //branch see branch OpsSpecialist
+		if (allowedToOpen(82862,'1rtc')) { //branch see branch FieldSpecialist
 			$addcon = ' AND rr.RequestedByNo IN (SELECT IDNo FROM attend_30currentpositions WHERE supervisorpositionid='.$_SESSION['&pos'].')'; goto repskip;
 		}
-		if (allowedToOpen(8286,'1rtc')) { //branch see branch OpsSpecialist
-			$addcon = ' AND  (rr.RequestedByNo='.$_SESSION['(ak0)'].' OR rr.BranchNo IN (SELECT BranchNo FROM attend_1branchgroups WHERE OpsSpecialist='.$_SESSION['(ak0)'].' OR OpsManager='.$_SESSION['(ak0)'].'))'; goto repskip;
+		if (allowedToOpen(8286,'1rtc')) { //branch see branch FieldSpecialist
+			$addcon = ' AND  (rr.RequestedByNo='.$_SESSION['(ak0)'].' OR rr.BranchNo IN (SELECT BranchNo FROM attend_1branchgroups WHERE '.$_SESSION['(ak0)'].' IN (FieldSpecialist,BranchSupport,BranchCoordinator) OR OpsManager='.$_SESSION['(ak0)'].'))'; goto repskip;
 		}
 		
 		repskip:

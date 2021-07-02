@@ -966,7 +966,11 @@ DATE_ADD(`Date`, INTERVAL Duration Month)>\''.$currentyr.'-12-31\';';
         select bg.DateofChange,bg.BranchNo,IDNo,PositionID,Remarks,'.$_SESSION['(ak0)'].',NOW() from `' . $currentyr . '_1rtc`.`attend_1branchgroups` bg JOIN `' . $currentyr . '_1rtc`.attend_30currentpositions cp ON bg.SAM=cp.IDNo
         UNION
         select bg.DateofChange,bg.BranchNo,IDNo,PositionID,Remarks,'.$_SESSION['(ak0)'].',NOW() from `' . $currentyr . '_1rtc`.`attend_1branchgroups` bg JOIN `' . $currentyr . '_1rtc`.attend_30currentpositions cp ON bg.CNC=cp.IDNo UNION
-        select bg.DateofChange,bg.BranchNo,IDNo,PositionID,Remarks,'.$_SESSION['(ak0)'].',NOW() from `' . $currentyr . '_1rtc`.`attend_1branchgroups` bg JOIN `' . $currentyr . '_1rtc`.attend_30currentpositions cp ON bg.OpsSpecialist=cp.IDNo;';
+        select bg.DateofChange,bg.BranchNo,IDNo,PositionID,Remarks,'.$_SESSION['(ak0)'].',NOW() from `' . $currentyr . '_1rtc`.`attend_1branchgroups` bg JOIN `' . $currentyr . '_1rtc`.attend_30currentpositions cp ON bg.FieldSpecialist=cp.IDNo
+        UNION
+        select bg.DateofChange,bg.BranchNo,IDNo,PositionID,Remarks,'.$_SESSION['(ak0)'].',NOW() from `' . $currentyr . '_1rtc`.`attend_1branchgroups` bg JOIN `' . $currentyr . '_1rtc`.attend_30currentpositions cp ON bg.BranchCoordinator=cp.IDNo
+        UNION
+        select bg.DateofChange,bg.BranchNo,IDNo,PositionID,Remarks,'.$_SESSION['(ak0)'].',NOW() from `' . $currentyr . '_1rtc`.`attend_1branchgroups` bg JOIN `' . $currentyr . '_1rtc`.attend_30currentpositions cp ON bg.BranchSupport=cp.IDNo;';
 
 
         $stmt=$link->prepare($sql); $stmt->execute();

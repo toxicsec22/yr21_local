@@ -169,7 +169,7 @@ if (allowedToOpen(210,'1rtc')){
 		$cond=' AND LatestSupervisorIDNo IN (1001,1002) ';
 	}
 	else if (allowedToOpen(2133,'1rtc'))  { //Stores Branch Heads
-		$stmt0=$link->query('SELECT IFNULL(GROUP_CONCAT(BranchNo),0) AS BranchNo FROM attend_1branchgroups WHERE OpsSpecialist='.$_SESSION['(ak0)'].'');
+		$stmt0=$link->query('SELECT IFNULL(GROUP_CONCAT(BranchNo),0) AS BranchNo FROM attend_1branchgroups WHERE BranchCoordinator='.$_SESSION['(ak0)'].'');
 		$res0=$stmt0->fetch();
 		// $cond2=' AND p.BranchNo IN ('.$res0['BranchNo'].')';
 		// $cond=$cond2.' AND p.PositionID IN (32,37,81)';

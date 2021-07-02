@@ -43,7 +43,7 @@ if(in_array($whichqry,array('SetRestday','addremarks','RemarksOfHR','RemarksOfDe
 if(in_array($whichqry,array('SetRestday','RemarksOfHR'))){
 
 	if (allowedToOpen(2133,'1rtc')){
-		$deptincondition=' AND BranchNo IN (SELECT BranchNo FROM attend_1branchgroups WHERE OpsSpecialist='.$_SESSION['(ak0)'].')';
+		$deptincondition=' AND BranchNo IN (SELECT BranchNo FROM attend_1branchgroups WHERE BranchCoordinator='.$_SESSION['(ak0)'].')';
 	} else {
 		$deptincondition='';
 	}
@@ -383,7 +383,7 @@ include_once('../backendphp/layout/clickontabletoedithead.php');
 							   $resdeptin=$stmtdeptin->fetch();
 							   $deptincondition='OR deptid IN ('.(($resdeptin['deptid']==70)?'70,10':$resdeptin['deptid']).')';
 					} elseif (allowedToOpen(2133,'1rtc')){
-						$deptincondition='OR BranchNo IN (SELECT BranchNo FROM attend_1branchgroups WHERE OpsSpecialist='.$_SESSION['(ak0)'].')';
+						$deptincondition='OR BranchNo IN (SELECT BranchNo FROM attend_1branchgroups WHERE BranchCoordinator='.$_SESSION['(ak0)'].')';
 					} else {
 						$deptincondition='';
 					}
@@ -679,7 +679,7 @@ case 'SetShiftByDept':
 	echo '<div style="margin-left:25%">';
 	echo '<h3>'.$title.'</h3><br>';
 	
-	$sqllist='SELECT BranchNo,Branch FROM 1branches WHERE Active=1 AND BranchNo>0 AND PseudoBranch=0 AND BranchNo IN (SELECT BranchNo FROM attend_1branchgroups WHERE OpsSpecialist='.$_SESSION['(ak0)'].')';
+	$sqllist='SELECT BranchNo,Branch FROM 1branches WHERE Active=1 AND BranchNo>0 AND PseudoBranch=0 AND BranchNo IN (SELECT BranchNo FROM attend_1branchgroups WHERE BranchCoordinator='.$_SESSION['(ak0)'].')';
 
 	echo comboBox($link,$sqllist,'BranchNo','Branch','branches');
    echo '<form action=""><input type="hidden" name="w" value="SetShiftsPerBranch"> Date <b>FROM</b>: <input type="date" name="DateFrom" value="'.(isset($_GET['DateFrom'])?$_GET['DateFrom']:date('Y-m-d',strtotime('tomorrow'))).'"> Date <b>TO</b>: <input type="date" name="DateTo" value="'.(isset($_GET['DateTo'])?$_GET['DateTo']:date('Y-m-d',strtotime('tomorrow'))).'"></span> Branch: <input type="text" name="Branch" list="branches" size="10" value="'.(isset($_GET['Branch'])?$_GET['Branch']:'').'"> <input type="submit" name="btnLookup" value="Lookup"></form>';

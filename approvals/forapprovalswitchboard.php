@@ -693,7 +693,7 @@ if (allowedToOpen(6302,'1rtc')) {
 //Printed Invoices
 if ((allowedToOpen(78833,'1rtc')) OR (allowedToOpen(78834,'1rtc'))){
 	if (allowedToOpen(78833,'1rtc')){
-			$viewcon = 'IssuedTo IN (SELECT BranchNo FROM attend_1branchgroups WHERE OpsSpecialist='.$_SESSION['(ak0)'].')';
+			$viewcon = 'IssuedTo IN (SELECT BranchNo FROM attend_1branchgroups WHERE '.$_SESSION['(ak0)'].' IN (FieldSpecialist,BranchSupport) )';
 	} else {
 		$viewcon = '1=1 ';
 	}

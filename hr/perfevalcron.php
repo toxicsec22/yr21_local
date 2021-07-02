@@ -25,7 +25,7 @@
     
 //update main
       $sql='UPDATE hr_82perfevalmain pf JOIN attend_30currentpositions cp ON pf.IDNo=cp.IDNo SET 
-      SIDNo=(IF((cp.deptid<>10),(SELECT cp3.LatestSupervisorIDNo FROM `attend_30currentpositions` cp3 WHERE cp3.IDNo=pf.IDNo),(SELECT OpsSpecialist FROM attend_30currentpositions cp4 JOIN attend_1branchgroups bg ON cp4.BranchNo=bg.BranchNo WHERE cp4.IDNo=pf.IDNo))),
+      SIDNo=(IF((cp.deptid<>10),(SELECT cp3.LatestSupervisorIDNo FROM `attend_30currentpositions` cp3 WHERE cp3.IDNo=pf.IDNo),(SELECT BranchCoordinator FROM attend_30currentpositions cp4 JOIN attend_1branchgroups bg ON cp4.BranchNo=bg.BranchNo WHERE cp4.IDNo=pf.IDNo))),
       DIDNo=(SELECT cp2.IDNo FROM `attend_30currentpositions` cp2 WHERE cp2.PositionID=(SELECT cp2.PositionID FROM `attend_30currentpositions` cp2 
       WHERE cp2.PositionID=(SELECT IF((cp1.deptheadpositionid=cp1.PositionID),cp1.supervisorpositionid,cp1.deptheadpositionid) FROM `attend_30currentpositions` cp1 WHERE cp1.IDNo=pf.IDNo))) WHERE DATE(`HRTimestamp`)=CURDATE();';
         
@@ -45,9 +45,7 @@
         }
 
 
-        // $sql='INSERT IGNORE INTO hr_82perfevalmonthlymain (IDNo,MonthNo,SIDNo,EncodedByNo,TimeStamp) SELECT cp.IDNo,'.date('m').',(IF((cp.deptid<>10),(SELECT cp3.LatestSupervisorIDNo FROM `attend_30currentpositions` cp3 WHERE cp3.IDNo=cp.IDNo),(SELECT OpsSpecialist FROM attend_30currentpositions cp4 JOIN attend_1branchgroups bg ON cp4.BranchNo=bg.BranchNo WHERE cp4.IDNo=cp.IDNo))),0,NOW() from attend_30currentpositions cp JOIN hr_82perfevalmain pem ON cp.IDNo=pem.IDNo WHERE MONTH(EvalDueDate)='.$month.'';
-        // $stmt=$link->prepare($sql); $stmt->execute();
-          
+       
   
       $sqlpopultatedtoday='SELECT pem.TxnID,
       
