@@ -166,9 +166,9 @@ if (in_array($whichqry,array('summary_for_payroll','my_attendance'))){
 	   case 'PerCompanyList':
             include_once $path.'/acrossyrs/commonfunctions/listoptions.php';
             $title='Employee List From '.companyandbranchValue($link,'1companies','CompanyNo', $_GET['RCompanyNo'],'Company') . ' Company';
-            $sql='SELECT e.IDNo, CONCAT(e.FirstName, " ", e.MiddleName, " ", e.SurName) AS EmployeeName, BranchorDept FROM 1employees e
+            $sql='SELECT e.IDNo,MobileNo, CONCAT(e.FirstName, " ", e.MiddleName, " ", e.SurName) AS EmployeeName,e.DateHired, BranchorDept FROM 1employees e JOIN 1_gamit.0idinfo id ON e.IDNo=id.IDNo
             JOIN 1companies c ON e.RCompanyNo = c.CompanyNo JOIN attend_30currentpositions cp ON e.IDNo=cp.IDNo WHERE e.RCompanyNo= '.intval($_GET['RCompanyNo']).' AND Resigned=0 AND DirectOrAgency=0 ORDER BY BranchorDept';
-            $columnnames=array('IDNo','EmployeeName','BranchorDept'); 
+            $columnnames=array('IDNo','EmployeeName','BranchorDept','DateHired','MobileNo'); 
             //$width='40%'; 
             ?>
             <div width='100%'><div width='50%'  style='float: left; margin-left: 3%'>
