@@ -229,7 +229,7 @@ include '../backendphp/layout/displayastablenosort.php';
                 border: 2px solid grey;
                 padding: 25px;
                 margin: 25px;">This serves as our guide. Note that all figures are based on current NCR daily rate of '.$minwage.' and '.$daysofmonth.' days per month. TimeStamp: '.$results['TimeStamp'].'
-                '.(($_SESSION['(ak0)']=1002)?'<br><br>DataClosedBy:'.$resulta['DataClosedBy'].'
+                '.(($_SESSION['(ak0)']==1002)?'<br><br>DataClosedBy:'.$resulta['DataClosedBy'].'
                 <form style="display:inline;" method="post" action="lookupbasetables.php?w=DataClosedBy">
                     <input type="submit" name="Update" value="Update DataClosedBy?" OnClick="return confirm(\'Are you sure you want to update?\');">
                 </form>':'').'</div><i>';
