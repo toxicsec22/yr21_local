@@ -75,16 +75,21 @@ if(allowedToOpen(array(1500,1603),'1rtc')){
 	}
 }
 
+$sqlqtr='SELECT QtrThemeMancom, QtrTheme FROM eos_2vtoqtrmain WHERE VTOQtrId=(IF(YEAR(CURDATE())='.$currentyr.',QUARTER(CURDATE()),4));';
+$stmt=$link->query($sqlqtr); $resqtr=$stmt->fetch();
+
+
+
 if (allowedToOpen(1603,'1rtc') AND (!isset($_SESSION['deptonly']))) {
-	$dep='ManCom';
+	$dep='ManCom: &nbsp; '.$resqtr['QtrThemeMancom'];
 	$mancomordeptcondi=' ManComOrdept=-1 AND ';	
 	$color1='green';
 	$l10day='monday';
 	$l10dayval='1';
+	
 } else {
 	
-	$dep=comboBoxValue($link, '1departments', 'deptid', $_SESSION['deptonly'], 'dept');
-	
+	$dep=comboBoxValue($link, '1departments', 'deptid', $_SESSION['deptonly'], 'dept').':  &nbsp; '.$resqtr['QtrTheme'];;
 	
 	if(isset($_SESSION['deptonly']) AND in_array($_SESSION['deptonly'], $deptwith3rdlayer) AND (!allowedToOpen(1603,'1rtc')) AND in_array($_SESSION['&pos'], array(36,61))){
 		$idnov=$_SESSION['(ak0)'];
@@ -263,7 +268,7 @@ if(in_array($which, array('Traction','Rocks','RockSummary','Issues','ToDo','Scor
 if(in_array($which, array('Traction'))){
 				
 				 
-            $sql='SELECT VTOQtrId,QtrFutureDate, QtrRevenue, QtrProfit, QtrMeasurables FROM eos_2vtoqtrmain WHERE VTOQtrId='.$qtr;
+            $sql='SELECT VTOQtrId,QtrFutureDate, QtrRevenue, QtrProfit, QtrMeasurables, QtrThemeMancom, QtrTheme FROM eos_2vtoqtrmain WHERE VTOQtrId='.$qtr;
             $stmt=$link->query($sql); $result=$stmt->fetch();
 }
 if(in_array($which, array('MtgUpdate','WeeklyUpdates','WeeklyMeeting','OnOffTrackProcess','DoneNotDone','ResolveNotResolve','WeeklyMeetingIssues','UpdateScore','MeetingStatus'))){
@@ -407,11 +412,6 @@ echo $visionlink;
 
 
 ?>
-
-
-
-
-
  
 <?php
 
@@ -1014,10 +1014,17 @@ case 'Traction':
 	$sqlm='select * from eos_2vtoqtrmain';
 	$stmtm=$link->query($sqlm); $resultm=$stmtm->fetchAll();
 	echo '<h3>Update Quarter Information</h3></br><table id="table">';
-	echo'<tr><th>QtrFutureDate</th><th>QtrRevenue</th><th>QtrProfit</th><th>QtrMeasurables</th><th>Update?</th></tr>';
+	echo'<tr><th>QtrFutureDate</th><th>QtrRevenue</th><th>QtrProfit</th><th>QtrMeasurables</th><th>QtrThemeMancom</th><th>QtrTheme</th><th>Update?</th></tr>';
 	foreach($resultm as $resm){
 		echo'<form method="post" action="vto.php?w=UpdateProcessQtr&VTOQtrId='.$resm['VTOQtrId'].'">
-		<tr><td><input type="text" name="QtrFutureDate" value="'.$resm['QtrFutureDate'].'"></td><td><input type="text" name="QtrRevenue" value="'.$resm['QtrRevenue'].'"></td><td><input type="text" name="QtrProfit" value="'.$resm['QtrProfit'].'"></td><td><input type="text" name="QtrMeasurables" value="'.$resm['QtrMeasurables'].'"></td><td><input type="hidden" name="action_token" value="'.($_SESSION['action_token']).'"><input type="submit" name="submit" value="Update?"></td></tr>
+		<tr><td><input type="text" name="QtrFutureDate" value="'.$resm['QtrFutureDate'].'"></td>
+		<td><input type="text" name="QtrRevenue" value="'.$resm['QtrRevenue'].'"></td>
+		<td><input type="text" name="QtrProfit" value="'.$resm['QtrProfit'].'"></td>
+		<td><input type="text" name="QtrMeasurables" value="'.$resm['QtrMeasurables'].'"></td>
+		<td><input type="text" name="QtrThemeMancom" value="'.$resm['QtrThemeMancom'].'"></td>
+		<td><input type="text" name="QtrTheme" value="'.$resm['QtrTheme'].'"></td>
+		<td><input type="hidden" name="action_token" value="'.($_SESSION['action_token']).'">
+		<input type="submit" name="submit" value="Update?"></td></tr>
 		</form>';
 	}
 
@@ -2033,7 +2040,7 @@ $stmt0=$link->prepare($sql0);$stmt0->execute();
 	
 	case'UpdateProcessQtr':
 	require_once $path.'/acrossyrs/logincodes/confirmtoken.php';
-		$sql='Update eos_2vtoqtrmain set QtrFutureDate=\''.$_POST['QtrFutureDate'].'\',QtrRevenue=\''.$_POST['QtrRevenue'].'\',QtrProfit=\''.$_POST['QtrProfit'].'\',QtrMeasurables=\''.$_POST['QtrMeasurables'].'\' where VTOQtrId=\''.$_GET['VTOQtrId'].'\' ';
+		$sql='Update eos_2vtoqtrmain set QtrFutureDate=\''.$_POST['QtrFutureDate'].'\',QtrRevenue=\''.$_POST['QtrRevenue'].'\',QtrProfit=\''.$_POST['QtrProfit'].'\',QtrMeasurables=\''.$_POST['QtrMeasurables'].'\',QtrThemeMancom=\''.$_POST['QtrThemeMancom'].'\',QtrTheme=\''.$_POST['QtrTheme'].'\' where VTOQtrId=\''.$_GET['VTOQtrId'].'\' ';
 		$stmt=$link->prepare($sql); $stmt->execute();
 		header("Location:vto.php?w=Encode");
 	break;
