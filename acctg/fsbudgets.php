@@ -59,26 +59,26 @@ echo comboBox($link,'SELECT  department, deptid, deptheadpositionid FROM `1depar
 if (in_array($which,array('LookupExpenses','lists'))){
 	// employee
 if(isset($_REQUEST['department'])){
-// $sqls='select max(DateEffective),TotalMinWage,TimeStamp from `1_gamit`.`payroll_4wageorders` where MinWageAreaID=\'1\' ';
-// $stmts=$link->query($sqls); $results=$stmts->fetch();
-// $minwage=$results['TotalMinWage']; $daysofmonth=26.08;
+$sqls='select max(DateEffective),TotalMinWage,TimeStamp from `1_gamit`.`payroll_4wageorders` where MinWageAreaID=\'1\' ';
+$stmts=$link->query($sqls); $results=$stmts->fetch();
+$minwage=$results['TotalMinWage']; $daysofmonth=26.08;
 
 $plan=3600;
 $onetimeexpenses='30700';
 
 $quartercomputation='(((sum(TotalMonthly)+sum(`SSS-EE`)+sum(`Philhealth-EE`)+sum(`PagIbig-EE`))*3)+(('.$plan.'*count(IDNo))/4)+(sum(TotalMonthly)/4)+((sum(BasicDaily)*5)/4)+(sum(TotalMonthly)/4))';
 
-$quarterhiredcomputation='(((MinRate*(1+PercentMintoMed/100)*(1+PercentMedtoMax/100))+(select Employer from '.$lastyr.'_1rtc.payroll_0ssstable where (MinRate*(1+PercentMintoMed/100)*(1+PercentMedtoMax/100)) BETWEEN RangeMin AND RangeMax)+(SELECT if(`monthlybasic`<=MinBasic,MinPremium,if(`monthlybasic` < MaxBasic,(`monthlybasic`*PremiumRate/100),MaxPremium))/2 FROM '.$lastyr.'_1rtc.payroll_0phicrate WHERE ApplicableYear='.$currentyr.')+\'100\')*3+('.$plan.'/4)+'.$onetimeexpenses.'+((MinRate*(1+PercentMintoMed/100)*(1+PercentMedtoMax/100))/4))
-+(((MinRate*(1+PercentMintoMed/100)*(1+PercentMedtoMax/100))/26.08)*5)/4+((MinRate*(1+PercentMintoMed/100)*(1+PercentMedtoMax/100))/4)';
+$quarterhiredcomputation='(((PercentIncMinimum*'.$minwage.'*'.$daysofmonth.')+(select (SSER+MPFER) from payroll_0ssstable where (PercentIncMinimum*'.$minwage.'*'.$daysofmonth.') BETWEEN RangeMin AND RangeMax)+(SELECT if(`monthlybasic`<=MinBasic,MinPremium,if(`monthlybasic` < MaxBasic,(`monthlybasic`*PremiumRate/100),MaxPremium))/2 FROM payroll_0phicrate WHERE ApplicableYear='.$currentyr.')+\'100\')*3+('.$plan.'/4)+'.$onetimeexpenses.'+((PercentIncMinimum*'.$minwage.'*'.$daysofmonth.')/4))
++((PercentIncMinimum*'.$minwage.')*5)/4+((PercentIncMinimum*'.$minwage.'*'.$daysofmonth.')/4)';
 
-$quartercomputationne='(((MinRate*(1+PercentMintoMed/100)*(1+PercentMedtoMax/100))+(select Employer from '.$lastyr.'_1rtc.payroll_0ssstable where (MinRate*(1+PercentMintoMed/100)*(1+PercentMedtoMax/100)) BETWEEN RangeMin AND RangeMax)+(SELECT if(`monthlybasic`<=MinBasic,MinPremium,if(`monthlybasic` < MaxBasic,(`monthlybasic`*PremiumRate/100),MaxPremium))/2 FROM '.$lastyr.'_1rtc.payroll_0phicrate WHERE ApplicableYear='.$currentyr.')+\'100\')*3+('.$plan.'/4)+((MinRate*(1+PercentMintoMed/100)*(1+PercentMedtoMax/100))/4))+(((MinRate*(1+PercentMintoMed/100)*(1+PercentMedtoMax/100))/26.08)*5)/4+((MinRate*(1+PercentMintoMed/100)*(1+PercentMedtoMax/100))/4)';
+$quartercomputationne='(((PercentIncMinimum*'.$minwage.'*'.$daysofmonth.')+(select (SSER+MPFER) from payroll_0ssstable where (PercentIncMinimum*'.$minwage.'*'.$daysofmonth.') BETWEEN RangeMin AND RangeMax)+(SELECT if(`monthlybasic`<=MinBasic,MinPremium,if(`monthlybasic` < MaxBasic,(`monthlybasic`*PremiumRate/100),MaxPremium))/2 FROM payroll_0phicrate WHERE ApplicableYear='.$currentyr.')+\'100\')*3+('.$plan.'/4)+((PercentIncMinimum*'.$minwage.'*'.$daysofmonth.')/4))+((PercentIncMinimum*'.$minwage.')*5)/4+((PercentIncMinimum*'.$minwage.'*'.$daysofmonth.')/4)';
 
 $union='UNION All select dam.deptid,\'\' as AccountID,\'\' as Account,\'\' as Details,\'\' as monthlybasic,
-'.$quartercomputation.' as Q1, '.$quartercomputation.' as Q2,
+'.$quartercomputation.' as Q1, '.$quartercomputation.' as Q2, 
 '.$quartercomputation.' as Q3, '.$quartercomputation.' as Q4
-from '.$lastyr.'_1rtc.payroll_21dailyandmonthly dam left join attend_1positions p on p.PositionID=dam.PositionID left join 1branches b on b.BranchNo=dam.BranchNo where dam.deptid=\''.$_REQUEST['department'].'\' Group by if(dam.deptid=10,dam.BranchNo,"") ';
+from payroll_21dailyandmonthly dam left join attend_1positions p on p.PositionID=dam.PositionID left join 1branches b on b.BranchNo=dam.BranchNo where dam.deptid=\''.$_REQUEST['department'].'\' Group by if(dam.deptid=10,dam.BranchNo,"") ';
 
-$sqlee='Create temporary table EmployeeExpenses select bp.deptid, bp.AccountID, \'Employee\' as Account,bp.Details,(MinRate*(1+PercentMintoMed/100)*(1+PercentMedtoMax/100)) as `monthlybasic`,
+$sqlee='Create temporary table EmployeeExpenses select bp.deptid, bp.AccountID, \'Employee\' as Account,bp.Details,(PercentIncMinimum*'.$minwage.'*'.$daysofmonth.') as `monthlybasic`,
 
 		if(substring(Details,LOCATE(\'-\', Details)+1,100)=1,
 		'.$quarterhiredcomputation.'
