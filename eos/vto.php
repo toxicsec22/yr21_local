@@ -42,6 +42,7 @@ if(allowedToOpen(array(1500,1603),'1rtc')){
 	foreach($ress AS $resm){
 		$md.='<form style="float:left;margin-right:3px;" action="vto.php?w=SwitchDept&go2='.$which.'" method="POST"><input type="hidden" value="'.$resm['deptid'].'" name="deptid"><input style="width:90px;" type="submit" value="'.$resm['dept'].'" name="btnSubmitm"></form> ';
 	}
+	$md.='<a style="background-color:#e7e7e7;padding:2px;border:1px solid blue;color:#000;text-decoration: none;" href="interdeptmeeting.php">Interdepartment Meeting</a>';
 	$md2='';
 	
 	
@@ -393,7 +394,9 @@ $tractionlink='<a id="link" href="vto.php?w=Traction"><font style="font-size:8.5
 <a id="link" href="vto.php?w=WeeklyMeetingIssues'.(isset($_GET['IDNo'])?'&IDNo='.$_GET['IDNo'].'':'').'">Meeting - ISSUES</a>
 <a id="link" href="vto.php?w=ToDoSummary">To Do Summary</a> 
 <a id="link" href="vto.php?w=RockSummary">Rock Summary</a>
-&nbsp; &nbsp; &nbsp; &nbsp;<a id="link" target="_blank" href="wishlists.php"><b>Wishlist</b></a></br></br>';
+&nbsp; &nbsp; &nbsp; &nbsp;<a id="link" target="_blank" href="wishlists.php"><b>Wishlist</b></a>';
+
+$tractionlink.='</br></br>';
 
 if(in_array($which, array('Traction','Rocks','RockSummary','Issues','ToDo','ScorecardList','WeeklyMeeting','WeeklyUpdates','ToDoSummary','WeeklyMeetingIssues','EditQtr','EditMeasurables'))){	
 
@@ -1487,10 +1490,12 @@ $stmt=$link->query($sql); $result=$stmt->fetchAll();
 	
 	echo '<br><b>Rocks</b>';
 	echo '<table border="1px solid black" style="border-collapse:collapse;background-color:white;">';
-	echo '<tr><th>Rock</th><th>Status</th><th colspan=3></th></tr>';
+	echo '<tr><th>Rock</th><th colspan=2>Status</th><th colspan=1></th></tr>';
 		foreach($result as $ress){
+			// $otlink='vto.php?w=OnOffTrackProcess&VTOQtrSubId='.$ress['VTOQtrSubId'].'&action_token='.$_SESSION['action_token'];
+			// echo'<tr><td style="padding:3px;">'.$ress['RockOrIssues'].'</td><td style="padding:3px;">'.(($weekno==$ress['WeekNo'] AND $ress['Status']==1)?'On-Track':(($weekno==$ress['WeekNo'] AND $ress['Status']==0)?'Off-Track':(($weekno==$ress['WeekNo'] AND $ress['Status']==2)?'Done':''))).'</td><td style="padding:3px;"><a href="'.$otlink.'&Track=1">On-Track</a></td><td style="padding:3px;"><a href="'.$otlink.'&Track=0">Off-Track</a></td></td><td style="padding:3px;"><a href="'.$otlink.'&Track=2">Done</a></td></tr>';
 			$otlink='vto.php?w=OnOffTrackProcess&VTOQtrSubId='.$ress['VTOQtrSubId'].'&action_token='.$_SESSION['action_token'];
-			echo'<tr><td style="padding:3px;">'.$ress['RockOrIssues'].'</td><td style="padding:3px;">'.(($weekno==$ress['WeekNo'] AND $ress['Status']==1)?'On-Track':(($weekno==$ress['WeekNo'] AND $ress['Status']==0)?'Off-Track':(($weekno==$ress['WeekNo'] AND $ress['Status']==2)?'Done':''))).'</td><td style="padding:3px;"><a href="'.$otlink.'&Track=1">On-Track</a></td><td style="padding:3px;"><a href="'.$otlink.'&Track=0">Off-Track</a></td></td><td style="padding:3px;"><a href="'.$otlink.'&Track=2">Done</a></td></tr>';
+			echo'<tr><td style="padding:3px;">'.$ress['RockOrIssues'].'</td><td style="padding:3px;">'.(($weekno==$ress['WeekNo'] AND $ress['Status']==1)?'On-Track':(($weekno==$ress['WeekNo'] AND $ress['Status']==0)?'Off-Track':(($weekno==$ress['WeekNo'] AND $ress['Status']==2)?'Done':''))).'</td><td style="padding:3px;">'.$ress['RemarksOrResolution'].'</td><td style="padding:3px;"><form action="'.$otlink.'" method="POST" autocomplete="off"><input type="text" size="20" name="Remarks" value="'.$ress['RemarksOrResolution'].'" maxlength="20"> <input type="submit" name="btnOnTrack" value="On-Track" style="color:green;"> <input type="submit" name="btnOffTrack" value="Off-Track" style="color:red;"> <input type="submit" name="btnRockDone" value="Done" style="color:blue;"></form></td></tr>';
 		}
 	echo'</table>';
 	
@@ -1548,14 +1553,26 @@ if($_POST['submit']=='Submit'){
 	
 	
 	case 'OnOffTrackProcess':
-	
+	// print_r($_POST);
+	if(isset($_POST['btnOnTrack'])){
+		$trackstat=1;
+	}
+	else if($_POST['btnOffTrack']){
+		$trackstat=0;
+	}
+	else {
+		$trackstat=2;
+	}
+
+	// echo '<br><br>'.$trackstat; exit();
+
 	require_once $path.'/acrossyrs/logincodes/confirmtoken.php';
-	$sql='UPDATE eos_2vtoqtrsub set RIStatPerWeek=(CASE 
-	WHEN RIGHT(RIStatPerWeek,4)="'.$weekno.'-1" THEN REPLACE(RIStatPerWeek,"'.$weekno.'-1","'.$weekno.'-'.$_GET['Track'].'") 
-	WHEN RIGHT(RIStatPerWeek,4)="'.$weekno.'-0" THEN REPLACE(RIStatPerWeek,"'.$weekno.'-0","'.$weekno.'-'.$_GET['Track'].'")
-	WHEN RIGHT(RIStatPerWeek,4)="'.$weekno.'-2" THEN REPLACE(RIStatPerWeek,"'.$weekno.'-2","'.$weekno.'-'.$_GET['Track'].'")
-	WHEN RIGHT(RIStatPerWeek,4)=0 THEN "'.$weekno.'-'.$_GET['Track'].'"
-    ELSE IFNULL(CONCAT(RIStatPerWeek,",'.$weekno.'-'.$_GET['Track'].'"),"'.$weekno.'-'.$_GET['Track'].'")
+	$sql='UPDATE eos_2vtoqtrsub set RemarksOrResolution="'.addslashes($_POST['Remarks']).'",RIStatPerWeek=(CASE 
+	WHEN RIGHT(RIStatPerWeek,4)="'.$weekno.'-1" THEN REPLACE(RIStatPerWeek,"'.$weekno.'-1","'.$weekno.'-'.$trackstat.'") 
+	WHEN RIGHT(RIStatPerWeek,4)="'.$weekno.'-0" THEN REPLACE(RIStatPerWeek,"'.$weekno.'-0","'.$weekno.'-'.$trackstat.'")
+	WHEN RIGHT(RIStatPerWeek,4)="'.$weekno.'-2" THEN REPLACE(RIStatPerWeek,"'.$weekno.'-2","'.$weekno.'-'.$trackstat.'")
+	WHEN RIGHT(RIStatPerWeek,4)=0 THEN "'.$weekno.'-'.$trackstat.'"
+    ELSE IFNULL(CONCAT(RIStatPerWeek,",'.$weekno.'-'.$trackstat.'"),"'.$weekno.'-'.$trackstat.'")
 END),EncodedByNo='.$_SESSION['(ak0)'].',TimeStamp=NOW() WHERE VTOQtrSubId='.$_GET['VTOQtrSubId'];
 	
 	
@@ -1916,10 +1933,10 @@ $stmt0=$link->prepare($sql0);$stmt0->execute();
 	
 	echo '<br><b>Rocks</b>';
 	echo '<table border="1px solid black" style="border-collapse:collapse;background-color:white;">';
-	echo '<tr><th>Rock</th><th>Status</th><th>Who</th></tr>';
+	echo '<tr><th>Rock</th><th colspan=2>Status</th><th>Who</th></tr>';
 	
 		foreach($result as $ress){
-			echo'<tr style="'.(($weekno==$ress['WeekNo'] AND ($ress['Status']==1 OR $ress['Status']==2))?'':(($weekno==$ress['WeekNo'] AND $ress['Status']==0)?'font-weight:bold;':'font-weight:bold;')).'"><td style="padding:5px;">'.$ress['RockOrIssues'].'</td><td style="padding:5px;'.(($weekno==$ress['WeekNo'] AND $ress['Status']==0)?'color:red;':'').'">'.(($weekno==$ress['WeekNo'] AND $ress['Status']==1)?'On-Track':(($weekno==$ress['WeekNo'] AND $ress['Status']==0)?'Off-Track':(($weekno==$ress['WeekNo'] AND $ress['Status']==2)?'Done':''))).'</td><td style="padding:5px;">'.$ress['Who?'].'</td></tr>';
+			echo'<tr style="'.(($weekno==$ress['WeekNo'] AND ($ress['Status']==1 OR $ress['Status']==2))?'':(($weekno==$ress['WeekNo'] AND $ress['Status']==0)?'font-weight:bold;':'font-weight:bold;')).'"><td style="padding:5px;">'.$ress['RockOrIssues'].'</td><td style="padding:5px;'.(($weekno==$ress['WeekNo'] AND $ress['Status']==0)?'color:red;':'').'">'.(($weekno==$ress['WeekNo'] AND $ress['Status']==1)?'On-Track':(($weekno==$ress['WeekNo'] AND $ress['Status']==0)?'Off-Track':(($weekno==$ress['WeekNo'] AND $ress['Status']==2)?'Done':''))).'</td><td style="padding:5px;">'.$ress['RemarksOrResolution'].'</td><td style="padding:5px;">'.$ress['Who?'].'</td></tr>';
 		}
 	echo'</table>';
 	
