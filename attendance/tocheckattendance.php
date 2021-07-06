@@ -166,9 +166,21 @@ if (in_array($whichqry,array('summary_for_payroll','my_attendance'))){
 	   case 'PerCompanyList':
             include_once $path.'/acrossyrs/commonfunctions/listoptions.php';
             $title='Employee List From '.companyandbranchValue($link,'1companies','CompanyNo', $_GET['RCompanyNo'],'Company') . ' Company';
-            $sql='SELECT e.IDNo,MobileNo, CONCAT(e.FirstName, " ", e.MiddleName, " ", e.SurName) AS EmployeeName,e.DateHired, BranchorDept FROM 1employees e JOIN 1_gamit.0idinfo id ON e.IDNo=id.IDNo
-            JOIN 1companies c ON e.RCompanyNo = c.CompanyNo JOIN attend_30currentpositions cp ON e.IDNo=cp.IDNo WHERE e.RCompanyNo= '.intval($_GET['RCompanyNo']).' AND Resigned=0 AND DirectOrAgency=0 ORDER BY BranchorDept';
-            $columnnames=array('IDNo','EmployeeName','BranchorDept','DateHired','MobileNo'); 
+            // $sql='SELECT e.IDNo,MobileNo, CONCAT(e.FirstName, " ", e.MiddleName, " ", e.SurName) AS EmployeeName,e.DateHired, BranchorDept,id.SSSNo,id.PHICNo,id.PagIbigNo,id.TIN FROM 1employees e JOIN 1_gamit.0idinfo id ON e.IDNo=id.IDNo
+            // JOIN 1companies c ON e.RCompanyNo = c.CompanyNo JOIN attend_30currentpositions cp ON e.IDNo=cp.IDNo WHERE e.RCompanyNo= '.intval($_GET['RCompanyNo']).' AND Resigned=0 AND DirectOrAgency=0 ORDER BY BranchorDept';
+            // $columnnames=array('IDNo','EmployeeName','BranchorDept','DateHired','MobileNo','SSSNo','PHICNo','PagIbigNo','TIN'); 
+            if (allowedToOpen(62411,'1rtc')){ 
+                $columnnames=array('IDNo','EmpName','BranchorDept','Position','DateHired','MobileNo','SSSNo','PHICNo','PagIbigNo','TIN','MonthlyBasic'); 
+                $orderby=' ORDER BY e.SurName,e.FirstName,e.MiddleName';
+            } else {
+                $columnnames=array('IDNo','EmployeeName','BranchorDept'); 
+                $orderby=' ORDER BY BranchorDept';
+            }
+
+            $sql='SELECT e.IDNo,Position,MobileNo,CONCAT(e.SurName,", ",e.FirstName," ",e.MiddleName) AS EmpName, CONCAT(e.FirstName, " ", e.MiddleName, " ", e.SurName) AS EmployeeName,e.DateHired, BranchorDept,id.SSSNo,id.PHICNo,id.PagIbigNo,id.TIN,FORMAT(BasicMonthly,2) AS MonthlyBasic FROM 1employees e JOIN 1_gamit.0idinfo id ON e.IDNo=id.IDNo
+            JOIN 1companies c ON e.RCompanyNo = c.CompanyNo JOIN attend_30currentpositions cp ON e.IDNo=cp.IDNo JOIN payroll_21dailyandmonthly dm ON id.IDNo=dm.IDNo WHERE e.RCompanyNo= '.intval($_GET['RCompanyNo']).' AND Resigned=0 AND e.DirectOrAgency=0 '.$orderby;
+
+            
             //$width='40%'; 
             ?>
             <div width='100%'><div width='50%'  style='float: left; margin-left: 3%'>
