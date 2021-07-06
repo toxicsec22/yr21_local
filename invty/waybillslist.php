@@ -82,7 +82,7 @@ $(document).ready(function(){
 			 $addlsql='';
 			 if (allowedToOpen(20613,'1rtc')) {
 				 //handled branch
-				 $stmt0=$link->query('SELECT GROUP_CONCAT(BranchNo) AS BranchNo FROM attend_1branchgroups WHERE '.$_SESSION['(ak0)'].' IN (FieldSpecialist,BranchCoordinator)');
+				 $stmt0=$link->query('SELECT GROUP_CONCAT(BranchNo) AS BranchNo FROM attend_1branchgroups WHERE '.$_SESSION['(ak0)'].' IN (BranchCoordinator)');
 					$res0=$stmt0->fetch();
 				$addlsql=' AND (fib.BranchNo IN ('.$res0['BranchNo'].'))';
 			 } else if(allowedToOpen(20614,'1rtc')){

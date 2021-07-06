@@ -66,7 +66,7 @@ echo '<h4><b>'.comboBoxValue($link,'`0area`','AreaNo',$areano,'Area').'</b></h4>
 if (allowedToOpen(6362,'1rtc')){
     $deptincondition=' deptid=10';
 } else {
-    $deptincondition=' cp.BranchNo IN (SELECT BranchNo FROM attend_1branchgroups WHERE BranchCoordinator='.$_SESSION['(ak0)'].')';
+    $deptincondition=' cp.BranchNo IN (SELECT BranchNo FROM attend_1branchgroups WHERE '.$_SESSION['(ak0)'].' IN (FieldSpecialist,BranchSupport,BranchCoordinator))';
 }
 
 $sql1='SELECT IDNo, CONCAT(cp.FullName," - ",cp.Branch) AS FullNameBranch FROM attend_30currentpositions cp JOIN 1branches b ON cp.BranchNo=b.BranchNo WHERE '.$deptincondition.' AND AreaNo='.$areano.' ORDER BY cp.Branch';

@@ -222,7 +222,7 @@ echo '<title>'.$title.'</title>';
 				
 				$specsql=''; $whtosql='';
 				if (allowedToOpen(58226,'1rtc')) {
-					$sqlf='select GROUP_CONCAT(BranchNo) AS HandledBranches from attend_1branchgroups WHERE '.$_SESSION['(ak0)'].' IN (FieldSpecialist,BranchSupport,BranchCoordinator);';
+					$sqlf='select GROUP_CONCAT(BranchNo) AS HandledBranches from attend_1branchgroups WHERE BranchSupport='.$_SESSION['(ak0)'].';';
 					$stmtf=$link->query($sqlf); $resf=$stmtf->fetch();
 					
 					$specsql=' AND b.BranchNo IN ('.$resf['HandledBranches'].')';
