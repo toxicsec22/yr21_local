@@ -51,7 +51,14 @@ include_once('../switchboard/contents.php');
 			$maxmsg='';
 			//check if max
 		if($monthly==1){  //monthly condition only
-			$sqlmax='SELECT TRUNCATE(MinRate*(1+PercentMintoMed/100)*(1+PercentMedtoMax/100),2) AS MAXIMUM FROM attend_0joblevels jl  JOIN attend_1positions p ON jl.JobLevelID=p.JobLevelID AND p.PositionID=(SELECT NewPositionID FROM attend_2changeofpositions WHERE IDNo='.$idno.' ORDER BY DateofChange LIMIT 1)';
+
+		//minwage
+			$sqls='SELECT MAX(DateEffective),TotalMinWage,TimeStamp from `1_gamit`.`payroll_4wageorders` where MinWageAreaID=\'1\' ';
+			$stmts=$link->query($sqls); $results=$stmts->fetch();
+			$minwage=$results['TotalMinWage']; $daysofmonth=26.08; 
+
+			$sqlmax='SELECT TRUNCATE(ROUND('.$minwage.'*'.$daysofmonth.'*PercentIncMinimum*REPLACE(RegStep,0,1)*REPLACE(`Step1`,0,1)*REPLACE(`Step2`,0,1)*REPLACE(`Step3`,0,1)*REPLACE(`Step4`,0,1)*REPLACE(`Maximum`,0,1),0),2) AS MAXIMUM  
+			 from `attend_0joblevels` jl left join payroll_0salarystructure ss on ss.JobLevelID=jl.JobLevelID JOIN attend_1positions p ON jl.JobLevelID=p.JobLevelID WHERE p.PositionID=(SELECT NewPositionID FROM attend_2changeofpositions WHERE IDNo='.$idno.' ORDER BY DateofChange LIMIT 1)';
 			
 			$stmtmax=$link->query($sqlmax); $rowmax=$stmtmax->fetch();
 			
