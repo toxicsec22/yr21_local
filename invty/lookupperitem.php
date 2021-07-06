@@ -123,16 +123,19 @@ if ((isset($_POST['Category'])) OR (isset($_SESSION['CatNo']))){
 		echo'<center><b>Updated Successfully</b></center>';
 	}
    	
-		 $sql='SELECT lmp.*,ItemDesc, lc.UnitCost FROM `invty_5latestminprice` lmp JOIN invty_1items i ON lmp.ItemCode=i.ItemCode LEFT JOIN invty_52latestcost lc ON i.ItemCode=lc.ItemCode JOIN invty_1category c ON i.CatNo=c.CatNo WHERE i.CatNo='.$catno.';';
-                 $columnnames=array('ItemCode','ItemDesc','UnitCost','PriceLevel1','PriceLevel2','PriceLevel3','PriceLevel4','PriceLevel5');
-                 
+		 $sql='SELECT lmp.*,ItemDesc, lc.UnitCost,date_format(`lmp`.`Date`,\'%Y-%m-%d\') as `DateofPrice` FROM `invty_5latestminprice` lmp JOIN invty_1items i ON lmp.ItemCode=i.ItemCode LEFT JOIN invty_52latestcost lc ON i.ItemCode=lc.ItemCode JOIN invty_1category c ON i.CatNo=c.CatNo WHERE i.CatNo='.$catno.';';
+                 $columnnames=array('ItemCode','ItemDesc','UnitCost','PriceLevel1','PriceLevel2','PriceLevel3','PriceLevel4','PriceLevel5','DateofPrice');
+               //   echo $sql;
                  $txnidname='ItemCode';
                  if (allowedToOpen(array(7491),'1rtc')){ 
                      $columnstoedit=array('PriceLevel1','PriceLevel2','PriceLevel3','PriceLevel4','PriceLevel5');
                         $editprocess='lookupperitem.php?w=AddPriceLevel&ItemCode='; $editprocesslabel='Edit';
                      include('../backendphp/layout/displayastableeditcells.php'); 
                      
-                 } else { include('../backendphp/layout/displayastablenosort.php');}
+                 } else {  
+                    $colwithcond='DateofPrice'; $tblcondition=''.$currentyr.'-01-02'; $condtype='date'; $colorneg='red'; 
+                   include('invlayout/displayastableinv.php');
+                  }
 // echo $sql;
 	} elseif (allowedToOpen(array(7492,7493),'1rtc')) { // sales office
       $sql='SELECT date_format(`Date`,\'%Y-%m-%d\') as `DateofPrice`, `PriceLevel1`, `PriceLevel2`, `PriceLevel3`, `PriceLevel4`, `PriceLevel5`, lmp.ItemCode, i.ItemDesc as Description, i.Unit FROM `invty_5latestminprice` lmp join `invty_1items` i on i.ItemCode=lmp.ItemCode WHERE i.CatNo='.$catno. ' order by `ItemCode`';
