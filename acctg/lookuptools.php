@@ -385,11 +385,12 @@ case 'NewBranchSales':
     $title='New Branch Sales in the Past 3 Years';
     $formdesc='Moved branches are counted with the original branch.<br><br>';
     
-    $sql0='CREATE TEMPORARY TABLE `branchnumbers` AS SELECT b.BranchNo, IF(b.BranchNo IN (SELECT `MovedBranch` FROM `'.$currentyr.'_1rtc`.`1branches`),(SELECT BranchNo FROM `'.$currentyr.'_1rtc`.`1branches` WHERE MovedBranch=b.BranchNo),b.BranchNo) AS BranchNum,
-YEAR(IF(`MovedBranch`=-1,`Anniversary`,(SELECT `Anniversary` FROM `'.$currentyr.'_1rtc`.`1branches` WHERE BranchNo=b.MovedBranch))) AS BranchAnnivYr FROM `'.$currentyr.'_1rtc`.`1branches` b '.(allowedToOpen(5721,'1rtc')? ' JOIN `attend_1branchgroups` bg ON b.BranchNo=bg.BranchNo WHERE bg.SAM='.$_SESSION['(ak0)']:' WHERE b.BranchNo<>999 ');
+    $sql0='CREATE TEMPORARY TABLE `branchnumbers` AS SELECT b.BranchNo, IF(b.BranchNo IN (SELECT `MovedBranch` FROM `1branches`),(SELECT BranchNo FROM `1branches` WHERE MovedBranch=b.BranchNo AND BranchNo=b.BranchNo),b.BranchNo) AS BranchNum,
+YEAR(IF(`MovedBranch`=-1,`Anniversary`,(SELECT `Anniversary` FROM `1branches` WHERE BranchNo=b.MovedBranch))) AS BranchAnnivYr FROM `1branches` b '.(allowedToOpen(5721,'1rtc')? ' JOIN `attend_1branchgroups` bg ON b.BranchNo=bg.BranchNo WHERE bg.SAM='.$_SESSION['(ak0)']:' WHERE b.BranchNo<>999 ');
+// echo $sql0.'<br><br>';
     $stmt0=$link->prepare($sql0); $stmt0->execute();
     
-    $sql0='CREATE TEMPORARY TABLE `newbranchsales` AS SELECT b.BranchNo, BranchNum,`BranchAnnivYr`,"'.$currentyr.'" AS `ForYear`, SUM(Amount) AS `YrTotal`, SUM(CASE WHEN `BranchAnnivYr`<='.$last3yrs.' THEN Amount END) AS ExistingBranches, SUM(CASE WHEN `BranchAnnivYr`='.$last2yrs.' THEN Amount END) AS `'.$last2yrs.'NewBranches`, SUM(CASE WHEN `BranchAnnivYr`='.$lastyr.' THEN Amount END) AS `'.$lastyr.'NewBranches`, SUM(CASE WHEN `BranchAnnivYr`='.$currentyr.' THEN Amount END) AS `'.$currentyr.'NewBranches` FROM `'.$currentyr.'_1rtc`.`acctg_61unisalereturn` s JOIN `branchnumbers` b ON b.`BranchNo`=s.`BranchNo` GROUP BY b.BranchNo ;';
+    $sql0='CREATE TEMPORARY TABLE `newbranchsales` AS SELECT b.BranchNo, BranchNum,`BranchAnnivYr`,"'.$currentyr.'" AS `ForYear`, SUM(Amount) AS `YrTotal`, SUM(CASE WHEN `BranchAnnivYr`<='.$last3yrs.' THEN Amount END) AS ExistingBranches, SUM(CASE WHEN `BranchAnnivYr`='.$last2yrs.' THEN Amount END) AS `'.$last2yrs.'NewBranches`, SUM(CASE WHEN `BranchAnnivYr`='.$lastyr.' THEN Amount END) AS `'.$lastyr.'NewBranches`, SUM(CASE WHEN `BranchAnnivYr`='.$currentyr.' THEN Amount END) AS `'.$currentyr.'NewBranches` FROM `acctg_61unisalereturn` s JOIN `branchnumbers` b ON b.`BranchNo`=s.`BranchNo` GROUP BY b.BranchNo ;';
     $stmt0=$link->prepare($sql0); $stmt0->execute();
 
     $sql0='INSERT INTO `newbranchsales` SELECT b.BranchNo,BranchNum,`BranchAnnivYr`,"'.$lastyr.'" AS `ForYear`, SUM(Amount) AS `YrTotal`, SUM(CASE WHEN `BranchAnnivYr`<='.$last3yrs.' THEN Amount END) AS ExistingBranches, SUM(CASE WHEN `BranchAnnivYr`='.$last2yrs.' THEN Amount END) AS `'.$last2yrs.'NewBranches`, SUM(CASE WHEN `BranchAnnivYr`='.$lastyr.' THEN Amount END) AS `'.$lastyr.'NewBranches`, SUM(CASE WHEN `BranchAnnivYr`='.$currentyr.' THEN Amount END) AS `'.$currentyr.'NewBranches` FROM `'.$lastyr.'_1rtc`.`acctg_61unisalereturn` s JOIN `branchnumbers` b ON b.`BranchNo`=s.`BranchNo` GROUP BY b.BranchNo ;';
@@ -410,7 +411,7 @@ YEAR(IF(`MovedBranch`=-1,`Anniversary`,(SELECT `Anniversary` FROM `'.$currentyr.
             . 'FORMAT(SUM(CASE WHEN ForYear='.$lastyr.' THEN YrTotal END),0) AS `'.$lastyr.'`, '
             . 'FORMAT(SUM(CASE WHEN ForYear='.$last2yrs.' THEN YrTotal END),0) AS `'.$last2yrs.'`'
             . ' FROM `newbranchsales` n '
-            . ' JOIN `'.$currentyr.'_1rtc`.`1branches` b ON b.BranchNo=n.BranchNum WHERE BranchAnnivYr>='.$last2yrs.' GROUP BY BranchNum ORDER BY `BranchAnnivYr` DESC, `Branch`;'; 
+            . ' JOIN `1branches` b ON b.BranchNo=n.BranchNum WHERE BranchAnnivYr>='.$last2yrs.' GROUP BY BranchNum ORDER BY `BranchAnnivYr` DESC, `Branch`;'; 
     $columnnames=array('Branch',$currentyr,$lastyr,$last2yrs);
     unset($hidecount); $subtitle='<br><br><h4>3-yr Sales of New Branches</h4>';
     echo '<div style="width:130%;"><div style="float:left; display: inline;"';
@@ -419,7 +420,7 @@ YEAR(IF(`MovedBranch`=-1,`Anniversary`,(SELECT `Anniversary` FROM `'.$currentyr.
     echo '<div style="display:inline; margin-left: 50px;"';
     $sql='SELECT Branch, CONCAT(FORMAT((SUM(CASE WHEN ForYear='.$currentyr.' THEN YrTotal END)-SUM(CASE WHEN ForYear='.$lastyr.' THEN YrTotal END))/SUM(CASE WHEN ForYear='.$lastyr.' THEN YrTotal END)*100,2),"%") AS `'.$currentyr.'`, CONCAT(FORMAT((SUM(CASE WHEN ForYear='.$lastyr.' THEN YrTotal END)-SUM(CASE WHEN ForYear='.$last2yrs.' THEN YrTotal END))/SUM(CASE WHEN ForYear='.$last2yrs.' THEN YrTotal END)*100,2),"%") AS `'.$lastyr.'`'
             . ' FROM `newbranchsales` n '
-            . ' JOIN `'.$currentyr.'_1rtc`.`1branches` b ON b.BranchNo=n.BranchNum WHERE BranchAnnivYr>='.$last2yrs.' GROUP BY BranchNum ORDER BY `BranchAnnivYr` DESC, `Branch`;'; 
+            . ' JOIN `1branches` b ON b.BranchNo=n.BranchNum WHERE BranchAnnivYr>='.$last2yrs.' GROUP BY BranchNum ORDER BY `BranchAnnivYr` DESC, `Branch`;'; 
     $columnnames=array('Branch',$currentyr,$lastyr); $color1='cce6ff'; $subtitle='<br><br><br>';
     include('../backendphp/layout/displayastableonlynoheaders.php');
     echo '</div>'; //right
@@ -430,30 +431,30 @@ case 'SalesHistory':
     if (!allowedToOpen(576,'1rtc')) {   echo 'No permission'; exit;} 
     $title='Sales History';
     
-    $sql0='CREATE TEMPORARY TABLE `branchnumbers` AS SELECT b.BranchNo, IF(b.BranchNo IN (SELECT `MovedBranch` FROM `'.$currentyr.'_1rtc`.`1branches` WHERE b.BranchNo>0),(SELECT BranchNo FROM `'.$currentyr.'_1rtc`.`1branches` WHERE MovedBranch=b.BranchNo),b.BranchNo) AS BranchNum,
-YEAR(IF(`MovedBranch`=-1,`Anniversary`,(SELECT `Anniversary` FROM `'.$currentyr.'_1rtc`.`1branches` WHERE BranchNo=b.MovedBranch))) AS BranchAnnivYr, ProvincialBranch FROM `'.$currentyr.'_1rtc`.`1branches` b '.(allowedToOpen(5761,'1rtc')? ' JOIN `attend_1branchgroups` bg ON b.BranchNo=bg.BranchNo WHERE bg.SAM='.$_SESSION['(ak0)']:' WHERE b.BranchNo<>999 AND b.BranchNo>=0');
+    $sql0='CREATE TEMPORARY TABLE `branchnumbers` AS SELECT b.BranchNo, IF(b.BranchNo IN (SELECT `MovedBranch` FROM `1branches` WHERE b.BranchNo>0),(SELECT BranchNo FROM `1branches` WHERE MovedBranch=b.BranchNo),b.BranchNo) AS BranchNum,
+YEAR(IF(`MovedBranch`=-1,`Anniversary`,(SELECT `Anniversary` FROM `1branches` WHERE BranchNo=b.MovedBranch))) AS BranchAnnivYr, ProvincialBranch FROM `1branches` b '.(allowedToOpen(5761,'1rtc')? ' JOIN `attend_1branchgroups` bg ON b.BranchNo=bg.BranchNo WHERE bg.SAM='.$_SESSION['(ak0)']:' WHERE b.BranchNo<>999 AND b.BranchNo>=0');
 
 // echo $sql0;
     $stmt0=$link->prepare($sql0); $stmt0->execute();
     
-    $sql0='CREATE TEMPORARY TABLE `PriceIncrease` AS SELECT lcurr.ItemCode, IFNULL((lcurr.PriceLevel3-llast.PriceLevel3),0) AS MPDiff, IFNULL((lcurr.PriceLevel4-llast.PriceLevel4),0) AS PMPDiff FROM `'.$currentyr.'_1rtc`.`invty_5latestminprice` `lcurr` JOIN `'.$lastyr.'_1rtc`.`invty_5latestminprice` `llast` ON lcurr.ItemCode=llast.ItemCode;';
+    $sql0='CREATE TEMPORARY TABLE `PriceIncrease` AS SELECT lcurr.ItemCode, IFNULL((lcurr.PriceLevel3-llast.PriceLevel3),0) AS MPDiff, IFNULL((lcurr.PriceLevel4-llast.PriceLevel4),0) AS PMPDiff FROM `invty_5latestminprice` `lcurr` JOIN `'.$lastyr.'_1rtc`.`invty_5latestminprice` `llast` ON lcurr.ItemCode=llast.ItemCode;';
     $stmt0=$link->prepare($sql0); $stmt0->execute(); // echo $sql0;
     
     $condition=' ';
     $sql0='CREATE TEMPORARY TABLE `SalesHistory` AS
 SELECT  b.BranchNo,b.BranchNum, (SELECT TRUNCATE(SUM(s.Qty*s.UnitPrice),0) FROM `'.$last2yrs.'_1rtc`.`invty_2sale` m JOIN `'.$last2yrs.'_1rtc`.`invty_2salesub` s ON m.`TxnID`=s.`TxnID` WHERE txntype IN (1,2,5,10) AND (ClientNo NOT BETWEEN 1000 AND 9999) AND (ClientNo NOT BETWEEN 15001 AND 15005) AND BranchNo=b.BranchNo) AS `'.$last2yrs.'`, 
 (SELECT TRUNCATE(SUM(s.Qty*s.UnitPrice),0) FROM `'.$lastyr.'_1rtc`.`invty_2sale` m JOIN `'.$lastyr.'_1rtc`.`invty_2salesub` s ON m.`TxnID`=s.`TxnID` WHERE txntype IN (1,2,5,10) AND (ClientNo NOT BETWEEN 1000 AND 9999) AND (ClientNo NOT BETWEEN 15001 AND 15005) AND BranchNo=b.BranchNo) AS `'.$lastyr.'`,
-(SELECT TRUNCATE(SUM(s.Qty*s.UnitPrice),0) FROM `'.$currentyr.'_1rtc`.`invty_2sale` m JOIN `'.$currentyr.'_1rtc`.`invty_2salesub` s ON m.`TxnID`=s.`TxnID` WHERE txntype IN (1,2,5,10) AND (ClientNo NOT BETWEEN 1000 AND 9999) AND (ClientNo NOT BETWEEN 15001 AND 15005) AND BranchNo=b.BranchNo) AS `'.$currentyr.'`, 0 AS `PriceDriver`, 0 AS `VolumeDriver`  
+(SELECT TRUNCATE(SUM(s.Qty*s.UnitPrice),0) FROM `invty_2sale` m JOIN `invty_2salesub` s ON m.`TxnID`=s.`TxnID` WHERE txntype IN (1,2,5,10) AND (ClientNo NOT BETWEEN 1000 AND 9999) AND (ClientNo NOT BETWEEN 15001 AND 15005) AND BranchNo=b.BranchNo) AS `'.$currentyr.'`, 0 AS `PriceDriver`, 0 AS `VolumeDriver`  
 FROM `branchnumbers` b ;'; // echo $sql0;
     $stmt0=$link->prepare($sql0); $stmt0->execute();
     
-    $sql0='UPDATE `SalesHistory` p SET `PriceDriver`=(SELECT TRUNCATE(SUM(Qty*(PMPDiff)),0) FROM `PriceIncrease` pi JOIN `'.$currentyr.'_1rtc`.`invty_2salesub` s ON pi.ItemCode=s.ItemCode JOIN `'.$currentyr.'_1rtc`.`invty_2sale` m ON m.`TxnID`=s.`TxnID`  
+    $sql0='UPDATE `SalesHistory` p SET `PriceDriver`=(SELECT TRUNCATE(SUM(Qty*(PMPDiff)),0) FROM `PriceIncrease` pi JOIN `invty_2salesub` s ON pi.ItemCode=s.ItemCode JOIN `invty_2sale` m ON m.`TxnID`=s.`TxnID`  
 JOIN `branchnumbers` b ON b.BranchNo=m.BranchNo AND b.ProvincialBranch=1
 WHERE txntype IN (1,2,5,10) AND (ClientNo NOT BETWEEN 1000 AND 9999) AND (ClientNo NOT BETWEEN 15001 AND 15005) AND BranchAnnivYr<>'.$currentyr.' AND p.BranchNo=b.BranchNo);';
     // echo $sql0;
     $stmt0=$link->prepare($sql0); $stmt0->execute();
     
-    $sql0='UPDATE `SalesHistory` p SET `PriceDriver`=(SELECT TRUNCATE(SUM(Qty*(MPDiff)),0) FROM `PriceIncrease` pi JOIN `'.$currentyr.'_1rtc`.`invty_2salesub` s ON pi.ItemCode=s.ItemCode JOIN `'.$currentyr.'_1rtc`.`invty_2sale` m ON m.`TxnID`=s.`TxnID`  
+    $sql0='UPDATE `SalesHistory` p SET `PriceDriver`=(SELECT TRUNCATE(SUM(Qty*(MPDiff)),0) FROM `PriceIncrease` pi JOIN `invty_2salesub` s ON pi.ItemCode=s.ItemCode JOIN `invty_2sale` m ON m.`TxnID`=s.`TxnID`  
 JOIN `branchnumbers` b ON b.BranchNo=m.BranchNo AND b.ProvincialBranch=0
 WHERE txntype IN (1,2,5,10) AND (ClientNo NOT BETWEEN 1000 AND 9999) AND (ClientNo NOT BETWEEN 15001 AND 15005) AND BranchAnnivYr<>'.$currentyr.' AND p.BranchNo=b.BranchNo);';
     // echo $sql0;
@@ -462,7 +463,7 @@ WHERE txntype IN (1,2,5,10) AND (ClientNo NOT BETWEEN 1000 AND 9999) AND (Client
     $sql0='UPDATE `SalesHistory` SET `VolumeDriver`=`'.$currentyr.'`-`PriceDriver`;'; // echo $sql0;
     $stmt0=$link->prepare($sql0); $stmt0->execute();
     
-    $sql='SELECT `Branch`, FORMAT(SUM(`'.$last2yrs.'`),0) AS `'.$last2yrs.'`, FORMAT(SUM(`'.$lastyr.'`),0) AS `'.$lastyr.'`, FORMAT(SUM(`'.$currentyr.'`),0) AS `'.$currentyr.'`,FORMAT(SUM(`PriceDriver`),0) AS `PriceDriver`,FORMAT(SUM(`VolumeDriver`),0) AS `VolumeDriver` FROM `SalesHistory` s JOIN `'.$currentyr.'_1rtc`.`1branches` b ON b.BranchNo=s.BranchNum WHERE b.Pseudobranch<>1 GROUP BY `BranchNum` ORDER BY Branch'; //echo $sql;
+    $sql='SELECT `Branch`, FORMAT(SUM(`'.$last2yrs.'`),0) AS `'.$last2yrs.'`, FORMAT(SUM(`'.$lastyr.'`),0) AS `'.$lastyr.'`, FORMAT(SUM(`'.$currentyr.'`),0) AS `'.$currentyr.'`,FORMAT(SUM(`PriceDriver`),0) AS `PriceDriver`,FORMAT(SUM(`VolumeDriver`),0) AS `VolumeDriver` FROM `SalesHistory` s JOIN `1branches` b ON b.BranchNo=s.BranchNum WHERE b.Pseudobranch<>1 GROUP BY `BranchNum` ORDER BY Branch'; //echo $sql;
     $columnnames=array('Branch',$last2yrs,$lastyr,$currentyr,'PriceDriver','VolumeDriver'); $hidecount=true;
     include('../backendphp/layout/displayastable.php');
     $sql='SELECT "Totals" AS Branch, FORMAT(SUM(`'.$last2yrs.'`),0) AS `'.$last2yrs.'`, FORMAT(SUM(`'.$lastyr.'`),0) AS `'.$lastyr.'`, FORMAT(SUM(`'.$currentyr.'`),0) AS `'.$currentyr.'`,FORMAT(SUM(`PriceDriver`),0) AS `PriceDriver`,FORMAT(SUM(`VolumeDriver`),0) AS `VolumeDriver` FROM `SalesHistory` s ';
@@ -495,7 +496,7 @@ case 'RaiseClients':
     $stmt0=$link->prepare($sql0); $stmt0->execute();
     
     $sql0='UPDATE `SalesPerClient` sc SET `Yr'.$currentyr.'`=(SELECT ROUND(IFNULL(SUM(Qty*UnitPrice),0),0)
-        FROM `'.$currentyr.'_1rtc`.`invty_2sale` m JOIN `'.$currentyr.'_1rtc`.`invty_2salesub` s ON m.`TxnID`=s.`TxnID` 
+        FROM `invty_2sale` m JOIN `invty_2salesub` s ON m.`TxnID`=s.`TxnID` 
         WHERE m.Date BETWEEN \''.$fromdate.'\' AND \''.$todate.'\' AND `txntype` IN (1,2,5) AND m.ClientNo=sc.ClientNo)';  
     $stmt0=$link->prepare($sql0); $stmt0->execute();
     
@@ -536,7 +537,7 @@ case 'RecoverClients':
     $sql0='DROP TEMPORARY TABLE IF EXISTS `12month`;'; $stmt0=$link->prepare($sql0); $stmt0->execute();
 
     $sql0='CREATE TEMPORARY TABLE `12month` AS 
-SELECT MONTH(m.Date) AS SaleMonth, ClientNo, COUNT(m.TxnID) AS Frequency, SUM(Qty*UnitPrice) AS SaleAmt, CONCAT(MONTHNAME(m.Date)," ",'.$currentyr.') AS SaleDate  FROM `'.$currentyr.'_1rtc`.`invty_2sale` m JOIN `'.$currentyr.'_1rtc`.`invty_2salesub` s ON m.TxnID=s.TxnID WHERE MONTH(m.Date)<'.$checkmonth.' AND m.txntype IN (1,2) AND m.ClientNo NOT IN (10000,10001,10004,15001,15002,15003,15004,15005) '.$condition.' GROUP BY ClientNo HAVING SaleAmt>10000 
+SELECT MONTH(m.Date) AS SaleMonth, ClientNo, COUNT(m.TxnID) AS Frequency, SUM(Qty*UnitPrice) AS SaleAmt, CONCAT(MONTHNAME(m.Date)," ",'.$currentyr.') AS SaleDate  FROM `invty_2sale` m JOIN `invty_2salesub` s ON m.TxnID=s.TxnID WHERE MONTH(m.Date)<'.$checkmonth.' AND m.txntype IN (1,2) AND m.ClientNo NOT IN (10000,10001,10004,15001,15002,15003,15004,15005) '.$condition.' GROUP BY ClientNo HAVING SaleAmt>10000 
 UNION
 SELECT MONTH(m.Date) AS SaleMonth, ClientNo, COUNT(m.TxnID) AS Frequency, SUM(Qty*UnitPrice) AS SaleAmt, CONCAT(MONTHNAME(m.Date)," ",'.$lastyr.') AS SaleDate FROM `'.$lastyr.'_1rtc`.`invty_2sale` m JOIN `'.$lastyr.'_1rtc`.`invty_2salesub` s ON m.TxnID=s.TxnID WHERE MONTH(m.Date)>('.$currmonth.') AND m.txntype IN (1,2) AND m.ClientNo NOT IN (10000,10001,10004,15001,15002,15003,15004,15005) '.$condition.' GROUP BY ClientNo HAVING SaleAmt>10000 '; //if($_SESSION['(ak0)']==1002){echo $sql0;}
     $stmt0=$link->prepare($sql0); $stmt0->execute();
@@ -546,7 +547,7 @@ SELECT MONTH(m.Date) AS SaleMonth, ClientNo, COUNT(m.TxnID) AS Frequency, SUM(Qt
     $sql0='CREATE TEMPORARY TABLE `activebefore` AS 
 SELECT @t:=@t+1 AS TxnNo, ClientNo, SUM(Frequency) AS FrequencyInPast12Months, SaleDate AS LastSaleDate FROM `12month` JOIN (SELECT @t:=0) t GROUP BY ClientNo HAVING SUM(SaleAmt)>10000 AND SUM(Frequency)>2 AND MAX(TxnNo);'; $stmt0=$link->prepare($sql0); $stmt0->execute(); // if($_SESSION['(ak0)']==1002){echo $sql0;}
 
-    $sql='SELECT c.*, FrequencyInPast12Months, LastSaleDate FROM `'.$currentyr.'_1rtc`.`1clients` c JOIN `activebefore` ab ON c.ClientNo=ab.ClientNo WHERE ab.ClientNo NOT IN (SELECT ClientNo FROM `'.$currentyr.'_1rtc`.`invty_2sale` m WHERE m.ClientNo NOT IN (10000,10001,10004,15001,15002,15003,15004,15005) AND m.txntype IN (1,2) AND MONTH(m.Date)>='.$checkmonth.') AND c.Inactive=0 ORDER BY ClientName';
+    $sql='SELECT c.*, FrequencyInPast12Months, LastSaleDate FROM `1clients` c JOIN `activebefore` ab ON c.ClientNo=ab.ClientNo WHERE ab.ClientNo NOT IN (SELECT ClientNo FROM `invty_2sale` m WHERE m.ClientNo NOT IN (10000,10001,10004,15001,15002,15003,15004,15005) AND m.txntype IN (1,2) AND MONTH(m.Date)>='.$checkmonth.') AND c.Inactive=0 ORDER BY ClientName';
     
 
 $columnnames=array('ClientNo','ClientName','FrequencyInPast12Months','LastSaleDate');
