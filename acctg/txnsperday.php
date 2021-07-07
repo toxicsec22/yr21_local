@@ -18,9 +18,7 @@ $perday=$_REQUEST['perday'];
 $fieldname=($perday==0?'Month':'Date');
 
 //Converted the long tertiary line to this if else statements, just for readability purposes.
-if($whichqry != "CVBudget")
-  $defaultdate = date('Y-m-d');
-else if(isset($_REQUEST['Date']))
+if(isset($_REQUEST['Date']))
   $defaultdate = $_REQUEST['Date'];
 else
   $defaultdate = date('Y-m-d', strtotime("next Friday"));
@@ -43,7 +41,6 @@ if (in_array($whichqry,array('Bounced','BouncedfromCR'))){ goto skipdates;}
                 <input type="hidden" name="perday" value="1">
                 <input type="submit" name="lookup" value="Lookup Per Day">        
 </form> &nbsp; &nbsp; &nbsp;
-<?php if ($whichqry=='CVBudget'){ goto skipmonthandadd;} ?>
 
 <form method="post" style="display:inline"
       action="<?php echo 'txnsperday.php?perday=0&w='.$whichqry.'&Date='.(!isset($_REQUEST['Month'])?$defaultdate:$_REQUEST['Month']); ?>" enctype="multipart/form-data">
@@ -174,25 +171,6 @@ $editprocesslabel='Lookup';
 echo '<h4>Bounced From CR Last Year</h4>';
 include('../backendphp/layout/displayastableonlynoheaders.php');
     break;    
-
-case 'CVBudget':
-if (!allowedToOpen(601,'1rtc')) { echo 'No permission'; exit;}
-$title='';
-$skipmainswitch=true;
-$columnnames=array('Date','CVNo','DateofCheck','CheckNo','CreditAccountID','Bank','PayeeNo','Payee','Total','Remarks');
-$columnsub=$columnnames; $columnsub[]='TotalValue';
-$sortfield=(isset($_POST['sortfield'])?$_POST['sortfield']:'CVNo');
-$columnstoedit=array('DateofCheck','CheckNo','CreditAccountID','Remarks');
-$txndate=!isset($_GET['Date'])?'m.Date=\''.$defaultdate.'\'':'m.Date=\''.$_GET['Date'].'\'';
-$sql='select m.CVNo, m.Date, m.DateofCheck,m.CheckNo, CreditAccountID,ca.ShortAcctID as Bank, m.PayeeNo, m.Payee, m.Cleared, m.Posted, format(sum(s.Amount),2) as Total, ROUND(sum(s.Amount),2) as TotalValue, m.Remarks from acctg_2cvmain as m join acctg_1chartofaccounts ca on ca.AccountID=m.CreditAccountID join acctg_2cvsub s on m.CVNo=s.CVNo where '.$txndate .' and CheckNo<100 group by m.CVNo  Order By '.$sortfield;
-$txnidname='CVNo';
-$editprocess='preditsupplyside.php?w='.$whichqry.'&Date='.$defaultdate.'&TxnID=';
-$editprocesslabel='Change!'; $coltototal='TotalValue'; $showgrandtotal=true;
-$addlprocess='formcv.php?w=CV&TxnID=';$addlprocesslabel='Lookup';
-
-include_once('../backendphp/layout/displayastableeditcells.php');
-    break;   
-
     
 case 'Interbranch':
 case 'Txfr':
