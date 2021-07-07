@@ -497,10 +497,10 @@ switch ($which)
 			echo '<div style="float:left;">';
 			echo '<form action="assignpermission.php?w='.$path.'" method="post"><table>';
 			
-			echo '<tr><td>Processs ID:</td><td><input name="ProcessID" type="text" size="20" placeholder="" value="'.$ProcessID.'" required '.$viewonly.'/></td></tr>';
-			echo '<tr><td>Processs Title:</td><td><input name="ProcessTitle" type="text" size="50" placeholder="" value="'.$ProcessTitle.'" required '.$viewonly.'/></td></tr>';
-			echo '<tr><td>Processs Description:</td><td><input name="ProcessDesc" type="text" size="50" placeholder="" value="'.$ProcessDesc.'" required '.$viewonly.'/></td></tr>';
-			echo '<tr><td>Processs Address:</td><td><input name="ProcessAddress" type="text" size="50" placeholder="" value="'.$ProcessAddress.'" required '.$viewonly.'/></td></tr>';
+			echo '<tr><td>Process ID:</td><td><input name="ProcessID" type="text" size="20" placeholder="" value="'.$ProcessID.'" required '.$viewonly.'/></td></tr>';
+			echo '<tr><td>Process Title:</td><td><input name="ProcessTitle" type="text" size="50" placeholder="" value="'.$ProcessTitle.'" required '.$viewonly.'/></td></tr>';
+			echo '<tr><td>Process Description:</td><td><input name="ProcessDesc" type="text" size="50" placeholder="" value="'.$ProcessDesc.'" required '.$viewonly.'/></td></tr>';
+			echo '<tr><td>Process Address:</td><td><input name="ProcessAddress" type="text" size="50" placeholder="" value="'.$ProcessAddress.'" required '.$viewonly.'/></td></tr>';
 			echo '<tr><td>OnSwitch:</td><td><input name="OnSwitch" type="text" size="10" placeholder="" value="'.$OnSwitch.'" list="onswitchlist" required '.$viewonly.'/></td></tr>';
 			echo '<tr><td>OrderBy:</td><td><input name="OrderBy" type="number" size="10" placeholder="" value="'.$OrderBy.'" required '.$viewonly.'/></td></tr>';
 			echo '<tr><td valign="top">AllowedPos:</td><td>';
