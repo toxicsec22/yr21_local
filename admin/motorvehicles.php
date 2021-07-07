@@ -1287,7 +1287,7 @@ switch ($which)
 			$addcon = ' AND rr.RequestedByNo IN (SELECT IDNo FROM attend_30currentpositions WHERE supervisorpositionid='.$_SESSION['&pos'].')'; goto repskip;
 		}
 		if (allowedToOpen(8286,'1rtc')) { //branch see branch FieldSpecialist
-			$addcon = ' AND  (rr.RequestedByNo='.$_SESSION['(ak0)'].' OR rr.BranchNo IN (SELECT BranchNo FROM attend_1branchgroups WHERE '.$_SESSION['(ak0)'].' IN (BranchSupport) OR OpsManager='.$_SESSION['(ak0)'].'))'; goto repskip;
+			$addcon = ' AND  (rr.RequestedByNo='.$_SESSION['(ak0)'].' OR rr.BranchNo IN (SELECT BranchNo FROM attend_1branchgroups WHERE '.$_SESSION['(ak0)'].' IN (BranchSupport,FieldSpecialist) OR OpsManager='.$_SESSION['(ak0)'].'))'; goto repskip;
 		}
 		
 		repskip:
