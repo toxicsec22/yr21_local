@@ -2,8 +2,12 @@
 $path=$_SERVER['DOCUMENT_ROOT']; include_once $path.'/acrossyrs/logincodes/checkifloggedon.php';
 if (!allowedToOpen(6462,'1rtc')) { echo 'No permission'; exit();}
 
-$showbranches=false;
-
+$which=(!isset($_GET['w'])?'Spotcheck':$_GET['w']);
+if($which=='Spotcheck'){
+	$showbranches=true;
+} else {
+	$showbranches=false;
+}
 include_once('../switchboard/contents.php');
 include_once $path.'/acrossyrs/commonfunctions/listoptions.php';
 echo comboBox($link,'select CatNo, Category from invty_1category Order by Category','CatNo','Category','categorylist');
@@ -20,21 +24,23 @@ echo comboBox($link,'select CatNo, Category from invty_1category Order by Catego
 </script>	
 <?php
 	
-$which=(!isset($_GET['w'])?'Spotcheck':$_GET['w']);
+
 
 	switch ($which){
 		case'Spotcheck':
 		include_once('../backendphp/layout/showencodedbybutton.php');
 		echo'<title>Branch Spotcheck</title><h3>Branch Spotcheck</h3>';
 		
-		$sqlb='select BranchNo, Branch from 1branches where Active=1 and PseudoBranch=0';
-		$stmtb=$link->query($sqlb); $resultb=$stmtb->fetchAll();
-		$input='';
-		foreach($resultb as $resb){
-			$input.='<input type="checkbox" name="checkbox[]" value="'.$resb['BranchNo'].'">'.$resb['Branch'].'</br>';
-		}
+	
 		
 		if (allowedToOpen(6465,'1rtc')){
+			$sqlb='select BranchNo, Branch from 1branches where Active=1 and PseudoBranch=0 AND BranchNo IN (SELECT BranchNo FROM attend_1branchgroups WHERE FieldSpecialist='.$_SESSION['(ak0)'].')';
+			$stmtb=$link->query($sqlb); $resultb=$stmtb->fetchAll();
+			$input='';
+			foreach($resultb as $resb){
+				$input.='<input type="checkbox" name="checkbox[]" value="'.$resb['BranchNo'].'">'.$resb['Branch'].'</br>';
+			}
+
 			echo'</br><b>Encoding:</b><div style="padding:5px; background-color:1b3d6d; color:white; width:440px;">
 			<form method="post" action="branchspotcheck.php?w=AddCategory">
 				Date: <input type="Date" name="Date" value="'.date('Y-m-d').'">
@@ -49,14 +55,26 @@ $which=(!isset($_GET['w'])?'Spotcheck':$_GET['w']);
 		}
 	
 		$title='';
+
+		if(isset($_POST['btnPerBranch'])){
+			$monthno=$_POST['MonthNo'];
+			$branchcondi=' AND bs.BranchNo='.$_SESSION['bnum'];
+		} else if(isset($_POST['btnAllBranches'])){
+			$monthno=$_POST['MonthNo'];
+			$branchcondi='';
+		}else {
+			$monthno=date('m');
+		}
+
 if (allowedToOpen(array(6464,6465),'1rtc')){
 	$columnnames=array('Branch','Date','Category','Posted');
-	$othercon='';
+	$othercon='WHERE MONTH(`Date`)='.$monthno.' '.$branchcondi;
 }else{
 	$columnnames=array('Date','Category','Posted');
-	$othercon='where bs.BranchNo=\''.$_SESSION['bnum'].'\' and Posted=0';
+	$othercon=' WHERE MONTH(`Date`)='.$monthno.' AND bs.BranchNo=\''.$_SESSION['bnum'].'\' and Posted=0';
 }	
 		$sql='select  bs.Posted,bs.TxnID,bs.Date, Category,Concat(Nickname, \' \', SurName) as EncodedBy, bs.TimeStamp, Branch from audit_2branchspotcheck bs left join invty_1category c on c.CatNo=bs.CatNo left join 1employees e on e.IDNo=bs.EncodedByNo left join 1branches b on b.BranchNo=bs.BranchNo '.$othercon.'';
+		// echo $sql;
 		$txnidname='TxnID';
 		
 			if ($showenc==1) {
@@ -64,6 +82,9 @@ if (allowedToOpen(array(6464,6465),'1rtc')){
 			}
 		$editprocess='branchspotcheck.php?w=Lookup&TxnID=';
 		$editprocesslabel='Lookup';
+		
+		
+		$formdesc='</i><form action="#" method="POST">MonthNo: <input type="text" name="MonthNo" value="'.$monthno.'"> '.((allowedToOpen(array(6464,6465),'1rtc'))?'<input type="submit" name="btnPerBranch" value="Per Branch"> <input type="submit" name="btnAllBranches" value="All Branches">':'<input type="submit" name="btnPerBranch" value="Filter">').'</form><i>';
 		include('../backendphp/layout/displayastablenosort.php');
 			
 		break;
