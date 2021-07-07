@@ -222,7 +222,7 @@ switch ($w){
             $editprocesssublabel='Edit'; $editprocesssub='formfuturecv.php?w=Edit'.$form.'Sub&'.$txnidname.'='.$txnid.'&TxnSubId=';
             
             $delprocesssub='..\backendphp\functions\delrecordssub.php?TxnID='.$txnid.'&w='.$subtable.'&l=acctg'.'&TxnSubId=';
-            $postedprocess='printvoucher.php?w=FutureCV&FromVch='.$txnid.'&ToVch='.$txnid.'">Print CV</a>&nbsp; &nbsp;<a href="printvoucher.php?w=Check&CheckNo='.$result['CheckNo'].'&CVNo='.$txnid.'"';
+            $postedprocess='printvoucher.php?w=FutureCV&FromVch='.$txnid.'&ToVch='.$txnid.'">Print CV</a>&nbsp; &nbsp;<a href="printvoucher.php?w=FutureCheck&CheckNo='.$result['CheckNo'].'&CVNo='.$txnid.'"';
             $postedprocesslabel='Print Check (mm-dd-yyyy)';
         
             include('../backendphp/layout/mainandsubform.php');
