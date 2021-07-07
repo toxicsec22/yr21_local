@@ -38,9 +38,9 @@ if (isset($_POST['btnShowSwitch'])){
 	else {
 		$ownswitchcondi = '';
 	}
-if (basename($_SERVER['REQUEST_URI']) == "index.php"){
-        echo '<h3><a href="newsystem.php">Click me to try the NEW switchboard [ BETA VERSION ]</a></h3><br>';
-}
+// if (basename($_SERVER['REQUEST_URI']) == "index.php"){
+//         echo '<h3><a href="newsystem.php">Click me to try the NEW switchboard [ BETA VERSION ]</a></h3><br>';
+// }
 
 //if pos = -1 no menu
 $condition=' WHERE (`OnSwitch` > 0) AND ((FIND_IN_SET('.$_SESSION['&pos'].',`AllowedPos`)) '.($_SESSION['&pos']<>-1?'OR (FIND_IN_SET('.$_SESSION['(ak0)'].',`AllowedPerID`))':'').')';
