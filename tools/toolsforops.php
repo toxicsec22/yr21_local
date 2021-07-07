@@ -20,6 +20,10 @@ switch ($whichqry){
         $sortfield=(isset($_POST['sortfield'])?$_POST['sortfield']:' (AverageMonthlySales/EmployeeCount) '); $columnsub=$columnnames;
         goto classreport;
     case 'ShowClass':
+        if (allowedToOpen(730,'1rtc')) {   
+            include_once('../backendphp/layout/linkstyle.php');
+            echo '<br><a id="link" target="_blank" href="../invty/lookupgeninv.php?w=ClassPerQuarter">Class Per Quarter</a><br>';
+        }
         $title='Branch Classification'; 
         $columnnames=array('Branch','AverageDailyNoSundays','Average<br/>Monthly Sales', 'Age of Branch','CalculatedClass', 'ClassLastYr');
 		$columnnames1=array('Branch', 'AverageDailyNoSundaysValue','AverageMonthlySales', 'Age of Branch','CalculatedClass', 'ClassLastYr');
