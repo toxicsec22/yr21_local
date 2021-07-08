@@ -495,7 +495,7 @@ switch ($which)
 			
 			echo '<div>';
 			echo '<div style="float:left;">';
-			echo '<form action="assignpermission.php?w='.$path.'" method="post"><table>';
+			echo '<form action="assignpermission.php?w='.$path.'&action_token='.$_SESSION['action_token'].'" method="post"><table>';
 			
 			echo '<tr><td>Process ID:</td><td><input name="ProcessID" type="text" size="20" placeholder="" value="'.$ProcessID.'" required '.$viewonly.'/></td></tr>';
 			echo '<tr><td>Process Title:</td><td><input name="ProcessTitle" type="text" size="50" placeholder="" value="'.$ProcessTitle.'" required '.$viewonly.'/></td></tr>';
@@ -559,7 +559,7 @@ switch ($which)
 	
 	case 'AddNewMenuProcess':
 	if (allowedToOpen(3000,'1rtc')){
-
+		require_once $path.'/acrossyrs/logincodes/confirmtoken.php';
 		$sql='INSERT INTO `permissions_2allprocesses` (ProcessID,ProcessTitle,ProcessDesc,ProcessAddress,OnSwitch,AllowedPos,AllowedPerID,OrderBy) VALUES ("'.$_POST['ProcessID'].'","'.$_POST['ProcessTitle'].'","'.$_POST['ProcessDesc'].'","'.$_POST['ProcessAddress'].'","'.$_POST['OnSwitch'].'",'.(empty($trimlastcomma) ? 'DEFAULT':'"'.$trimlastcomma.'"').','.(empty($_POST['AllowedPerID']) ? 'DEFAULT':'"'.$_POST['AllowedPerID'].'"').',"'.$_POST['OrderBy'].'")';
 		// echo $sql; exit();
 		$stmt = $link->prepare($sql);
@@ -572,7 +572,7 @@ switch ($which)
 	
 	case 'UpdateMenuProcess':
 	if (allowedToOpen(3000,'1rtc')){
-	
+		require_once $path.'/acrossyrs/logincodes/confirmtoken.php';
 		$sql='UPDATE `permissions_2allprocesses` SET ProcessID="'.$_POST['ProcessID'].'",ProcessTitle="'.$_POST['ProcessTitle'].'", ProcessDesc="'.$_POST['ProcessDesc'].'", ProcessAddress="'.$_POST['ProcessAddress'].'", OnSwitch="'.$_POST['OnSwitch'].'", AllowedPos='.(empty($trimlastcomma) ? 'DEFAULT':'"'.$trimlastcomma.'"').', AllowedPerID='.(empty($_POST['AllowedPerID']) ? 'DEFAULT':'"'.$_POST['AllowedPerID'].'"').', OrderBy="'.$_POST['OrderBy'].'" WHERE ProcessID='.intval($_GET['ProcessID']);
 		
 		$stmt = $link->prepare($sql);
@@ -951,7 +951,7 @@ echo '<br>';
 					}  
 				}
 				echo $accesslist.'</table><input type="hidden" name="PosID" value="'.$_POST['PositionToView'].'"><input type="hidden" value="'.$_SESSION['action_token'].'" name="action_token">'.(allowedToOpen(array(3000,100),'1rtc')?'<input type="submit" value="'.$buttonval.' Access" OnClick="return confirm(\'Are you SURE?\');">':'').'</form>';
-				echo '<br>'.(allowedToOpen(3000,'1rtc')?'<form action="assignpermission.php?w=Decline" method="POST"><input type="hidden" name="PosID" value="'.$_GET['ForPositionID'].'"><input style="color:red;" type="submit" value="Decline Request" OnClick="return confirm(\'Really delete this?\');"></form>':'');
+				echo '<br>'.(allowedToOpen(3000,'1rtc')?'<form action="assignpermission.php?w=Decline&action_token='.$_SESSION['action_token'].'" method="POST"><input type="hidden" name="PosID" value="'.$_GET['ForPositionID'].'"><input style="color:red;" type="submit" value="Decline Request" OnClick="return confirm(\'Really delete this?\');"></form>':'');
 				
 			}
 	}
@@ -960,7 +960,7 @@ echo '<br>';
 	
 	case 'Decline':
 	if(!allowedToOpen(3000,'1rtc')){ echo 'No Permission'; exit(); }
-	
+	require_once $path.'/acrossyrs/logincodes/confirmtoken.php';
 	$sqldel='DELETE FROM approvals_systempermission WHERE ForPositionID='.$_POST['PosID'];
 	$stmtdel = $link->prepare($sqldel);
 	$stmtdel->execute();
@@ -1129,11 +1129,12 @@ echo '<br>';
 		$oplist.='&nbsp; &nbsp; &nbsp; <input type="checkbox" name="Yr'.$startyr.'" value="'.$startyr.'"> '.$startyr;
 		$startyr++;
 	}
-	echo '<form action="assignpermission.php?w=PrPrevYrsPermission" method="POST" autocomplete="off">Copy From <input type="text" name="PosFrom" list="positionlist" required> Copy To <input type="text" name="PosTo" list="positionlist" required> '.$oplist.' &nbsp; &nbsp; <input type="submit" value="Copy Permission" name="btnCopyPermission"></form>';
+	echo '<form action="assignpermission.php?w=PrPrevYrsPermission&action_token='.$_SESSION['action_token'].'" method="POST" autocomplete="off">Copy From <input type="text" name="PosFrom" list="positionlist" required> Copy To <input type="text" name="PosTo" list="positionlist" required> '.$oplist.' &nbsp; &nbsp; <input type="submit" value="Copy Permission" name="btnCopyPermission"></form>';
 	
 	break;
 	
 	case 'PrPrevYrsPermission':
+		require_once $path.'/acrossyrs/logincodes/confirmtoken.php';
 	$link=connect_db($currentyr.'_1rtc',1);
 	$copyfrom=$_POST['PosFrom'];
 	$copyto=$_POST['PosTo'];
