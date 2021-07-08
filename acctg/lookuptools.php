@@ -402,6 +402,7 @@ YEAR(IF(`MovedBranch`=-1,`Anniversary`,(SELECT `Anniversary` FROM `1branches` WH
     $sql='SELECT ForYear, FORMAT(SUM(YrTotal),0) AS YrTotal, FORMAT(SUM(ExistingBranches),0) AS ExistingBranches, FORMAT(SUM('.$last2yrs.'NewBranches),0) AS '.$last2yrs.'NewBranches, FORMAT(SUM('.$lastyr.'NewBranches),0) AS '.$lastyr.'NewBranches, FORMAT(SUM('.$currentyr.'NewBranches),0) AS '.$currentyr.'NewBranches FROM `newbranchsales` GROUP BY ForYear ORDER BY ForYear DESC;';
     $columnnames=array('ForYear','YrTotal',$currentyr.'NewBranches',$lastyr.'NewBranches',$last2yrs.'NewBranches','ExistingBranches');
     $hidecount=true;
+    $width="60%";
     include_once('../backendphp/layout/displayastable.php');
     
 //    $sql1='SELECT SUM(YrTotal) AS YrTotal FROM `newbranchsales` WHERE ForYear='.$currentyr; $stmt1=$link->query($sql1); $res1=$stmt1->fetch();
@@ -422,6 +423,7 @@ YEAR(IF(`MovedBranch`=-1,`Anniversary`,(SELECT `Anniversary` FROM `1branches` WH
             . ' FROM `newbranchsales` n '
             . ' JOIN `1branches` b ON b.BranchNo=n.BranchNum WHERE BranchAnnivYr>='.$last2yrs.' GROUP BY BranchNum ORDER BY `BranchAnnivYr` DESC, `Branch`;'; 
     $columnnames=array('Branch',$currentyr,$lastyr); $color1='cce6ff'; $subtitle='<br><br><br>';
+    $width="30%";
     include('../backendphp/layout/displayastableonlynoheaders.php');
     echo '</div>'; //right
     echo '</div>'; //wrap
