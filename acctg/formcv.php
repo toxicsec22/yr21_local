@@ -7,8 +7,9 @@ $lookupallow=598;
 $addallow=5401;
 $editallow=5401;
 $delallow=20005;
-$unpost=407;
 $treasury=5432;
+$unpost=(allowedToOpen($treasury,'1rtc'))?414:413;
+$assignbank=601;
 $co='1rtc';
   
 if (!allowedToOpen($lookupallow,'1rtc')) { echo 'No permission'; exit;} 
@@ -16,25 +17,27 @@ if (!allowedToOpen($lookupallow,'1rtc')) { echo 'No permission'; exit;}
 ?><br><div id="section" style="display: block;"><?php
 $file=basename($_SERVER['SCRIPT_FILENAME']);
 $w=(!isset($_GET['w'])?'List':$_GET['w']);
-$txnidname='CVNo'; $form='CV'; $postfield='Posted';
+$txnidname='CVNo'; $form='CV'; $postfield=(allowedToOpen($treasury,'1rtc'))?'Posted':'APVPosted';
 include_once $path.'/acrossyrs/commonfunctions/listoptions.php';
 
 $table='acctg_2cvmain'; $subtable='acctg_2cvsub'; 
 
 if (isset($_GET[$txnidname])){
    $txnid=intval($_GET[$txnidname]); 
-   $columnnamesmain=array('Date','CVNo','DueDate','DateofCheck','PaymentMode','CheckNo','CreditAccount','PayeeNo','Payee','Remarks','ReleaseDate','CheckReceivedBy','Posted','Cleared');
+   $columnnamesmain=array('Date','CVNo','DueDate','DateofCheck','PaymentMode','CheckNo','CreditAccount','PayeeNo','Payee','Remarks','ReleaseDate','CheckReceivedBy','APVPosted','Posted','Cleared');
    $columnsub=array('Particulars','Branch','FromBudgetOf','ForInvoiceNo','TIN','DebitAccount','Amount','Forex','PHPAmount');     
-   $sqlmain='Select m.*, ca.ShortAcctID as CreditAccount, CONCAT(e.Nickname," ",e.SurName) AS EncodedBy, CONCAT(e1.Nickname," ",e1.SurName) AS PostedBy, PaymentMode FROM `'.$table.'` m JOIN acctg_1chartofaccounts ca ON ca.AccountID=m.CreditAccountID
+   $sqlmain='Select m.*, ca.ShortAcctID as CreditAccount, CONCAT(e.Nickname," ",e.SurName) AS EncodedBy, CONCAT(e2.Nickname," ",e2.SurName) AS APVPostedBy, CONCAT(e1.Nickname," ",e1.SurName) AS PostedBy, PaymentMode FROM `'.$table.'` m JOIN acctg_1chartofaccounts ca ON ca.AccountID=m.CreditAccountID
                 LEFT JOIN acctg_0paymentmodes pm ON m.PaymentModeID=pm.PaymentModeID
-	        LEFT JOIN `1employees` e ON e.IDNo=m.EncodedByNo LEFT JOIN `1employees` e1 ON e1.IDNo=m.PostedByNo WHERE m.CVNo='.$txnid;
+	        LEFT JOIN `1employees` e ON e.IDNo=m.EncodedByNo LEFT JOIN `1employees` e1 ON e1.IDNo=m.PostedByNo 
+                LEFT JOIN `1employees` e2 ON e2.IDNo=m.APVPostedByNo 
+                WHERE m.CVNo='.$txnid;
    $sqlsub='Select s.*, (Amount*Forex) AS PHPVal, FORMAT(Amount*Forex,2) AS PHPAmount, b.Branch, ca.ShortAcctID as DebitAccount, e.Nickname as EncodedBy,Entity as FromBudgetOf from '.$subtable.' s join acctg_1chartofaccounts ca on ca.AccountID=s.DebitAccountID  LEFT JOIN `1employees` e ON e.IDNo=s.EncodedByNo LEFT JOIN `acctg_1budgetentities` be on be.EntityID=s.FromBudgetOf
                join `1branches` b on b.BranchNo=s.BranchNo join '.$table.' m on m.CVNo=s.CVNo
                WHERE m.CVNo='.$txnid.' ';
 }
 
 
-if (in_array($w,array($form,$form.'MainEdit','EditMain','AddSub','EditSub','CVSubAutoAdd'))){
+if (in_array($w,array($form,$form.'MainEdit','EditMain','AddSub','EditSub','CVSubAutoAdd','AssignBankProcess'))){
         include_once('../backendphp/functions/editok.php');
 }
 
@@ -50,8 +53,12 @@ if (in_array($w,array('Add','EditMain'))){
 
 	$columnstoadd=array('Date','DueDate','CVNo','CheckNo','DateofCheck','Payee','Remarks');
         if(allowedToOpen($treasury,'1rtc')){
+                if(addslashes($_POST['CreditAccount'])=='AP-Voucher') { 
+                        $acctid=403;
+                } else {
                 $acctid=comboBoxValue($link,'`banktxns_1maintaining`','ShortAcctID',addslashes($_POST['CreditAccount']),'AccountID');
-        } else { $acctid=comboBoxValueWithSql ($linklist,'SELECT ca.AccountID FROM `acctg_1chartofaccounts` ca LEFT JOIN `banktxns_1maintaining` ba ON ca.AccountID=ba.AccountID WHERE ba.AccountID IS NULL AND ca.ShortAcctID LIKE "'.addslashes($_POST['CreditAccount']).'" LIMIT 1;','AccountID');}
+                }
+        } else { $acctid=comboBoxValueWithSql ($link,'SELECT ca.AccountID FROM `acctg_1chartofaccounts` ca LEFT JOIN `banktxns_1maintaining` ba ON ca.AccountID=ba.AccountID WHERE ba.AccountID IS NULL AND ca.ShortAcctID LIKE "'.addslashes($_POST['CreditAccount']).'" ','AccountID');}
         $payeeno=comboBoxValue($link,'`1suppliers`','SupplierName',addslashes($_POST['Payee']),'SupplierNo');
         $paytype=comboBoxValue($link,'`acctg_0paymentmodes`','PaymentMode',addslashes($_POST['PaymentMode']),'PaymentModeID');
 	$sql='';
@@ -77,7 +84,7 @@ if (in_array($w,array('AddSub','EditSub'))){
 
 if (in_array($w,array($form,$form.'MainEdit','Edit'.$form.'Sub'))){
         if(allowedToOpen($treasury,'1rtc')){
-                echo comboBox($link,'SELECT AccountID, ShortAcctID FROM `banktxns_1maintaining` ORDER BY ShortAcctID;','AccountID','ShortAcctID','accounts');
+                echo comboBox($link,'SELECT AccountID, ShortAcctID FROM `banktxns_1maintaining` UNION SELECT AccountID, ShortAcctID FROM `acctg_1chartofaccounts` WHERE AccountID=403 ORDER BY ShortAcctID;','AccountID','ShortAcctID','accounts');
         } else {
                 echo comboBox($link,'SELECT ca.AccountID, ca.ShortAcctID FROM `acctg_1chartofaccounts` ca LEFT JOIN `banktxns_1maintaining` ba ON ca.AccountID=ba.AccountID WHERE ba.AccountID IS NULL ORDER BY ca.ShortAcctID','AccountID','ShortAcctID','accounts'); 
         }
@@ -211,14 +218,14 @@ switch ($w){
             $sortfield=(isset($_POST['sortfield'])?$_POST['sortfield']:'s.TimeStamp'); 
             $sqlsub.=' ORDER BY '.$sortfield.(isset($_POST['sortarrange'])?' '.$_POST['sortarrange']:' ASC');
             
-            $sqlsum='SELECT Posted,PayeeNo,CheckNo,CreditAccountID,sum('.$coltototal.') as Total, SUM(CASE WHEN Forex<>1 THEN 1 ELSE 0 END) AS CountForex, SUM(Amount*Forex) AS PHPTotal FROM  `'.$subtable.'` s JOIN `'.$table.'` m ON m.CVNo=s.CVNo WHERE m.CVNo='.$txnid;
+            $sqlsum='SELECT APVPosted,Posted,PayeeNo,CheckNo,CreditAccountID,sum('.$coltototal.') as Total, SUM(CASE WHEN Forex<>1 THEN 1 ELSE 0 END) AS CountForex, SUM(Amount*Forex) AS PHPTotal FROM  `'.$subtable.'` s JOIN `'.$table.'` m ON m.CVNo=s.CVNo WHERE m.CVNo='.$txnid;
             $stmt=$link->query($sqlsum); $result=$stmt->fetch();
             $editsub=$result['Posted']==0?true:false;
             $suppno=$result['PayeeNo'];
 
-            if(allowedToOpen($treasury,'1rtc') or in_array($result['CreditAccountID'],$accountsforacctg)){
+            
                 $delprocessmain='..\backendphp\functions\delrecords.php?TxnID='.$txnid.'&action_token='.$_SESSION['action_token'].'&w='.$table.'&l=acctg';
-            }    
+                
 
             $addlinfo='Total:  '.number_format($result['Total'],2).str_repeat('&nbsp',10);
             if ($result['CountForex']<>0) { $addlinfo.='PHP Total:  '.number_format($result['PHPTotal'],2).str_repeat('&nbsp',10);}
@@ -379,6 +386,52 @@ switch ($w){
                         header('Location:formcv.php?w='.$form.'&'.$txnidname.'='.$txnid);
                 break;
 
+    case 'AssignBank':
+                        if (!allowedToOpen($assignbank,'1rtc')) { echo 'No permission'; exit;}
+                        $title='AP Vouchers for Assignment';
+                        $skipmainswitch=true;
+                        $columnnames=array('Date','CVNo','DateofCheck','CheckNo','CreditAccountID','Bank','PayeeNo','Payee','Total','Remarks');
+                        $columnsub=$columnnames; $columnsub[]='TotalValue';
+                        $sortfield=(isset($_POST['sortfield'])?$_POST['sortfield']:'CVNo');
+                        $columnstoedit=array('DateofCheck','CheckNo','CreditAccountID');
+                        $sql='SELECT m.CVNo, m.Date, m.DateofCheck,m.CheckNo, CreditAccountID,ca.ShortAcctID AS Bank, m.PayeeNo, m.Payee, FORMAT(SUM(s.Amount),2) AS Total, ROUND(SUM(s.Amount),2) AS TotalValue, m.Remarks FROM acctg_2cvmain AS m JOIN acctg_1chartofaccounts ca ON ca.AccountID=m.CreditAccountID JOIN acctg_2cvsub s ON m.CVNo=s.CVNo WHERE m.APVPosted=1 AND (m.CreditAccountID=403 OR m.Posted=0) GROUP BY m.CVNo  ORDER BY '.$sortfield;
+                        $txnidname='CVNo';
+                        $editprocess='formcv.php?w=AssignBankProcess&CVNo=';
+                        $editprocesslabel='Change!'; $coltototal='TotalValue'; $showgrandtotal=true;
+                        $addlprocess='formcv.php?w=CV&CVNo=';$addlprocesslabel='Lookup';
+                        
+                        include_once('../backendphp/layout/displayastableeditcells.php');
+                            break;   
+         case 'AssignBankProcess':
+                                if (!allowedToOpen(601,'1rtc')) { echo 'No permission'; exit;}
+                                $txnid=intval($_GET['CVNo']);
+                                //to check if editable
+                                if (editOk('acctg_2cvmain',$txnid,$link,$whichqry)){
+                                $sqlupdate='UPDATE `acctg_2cvmain` SET ';
+                                $sql='';
+                                $columnstoedit=array('DateofCheck','CheckNo','CreditAccountID');
+                               
+                                foreach ($columnstoedit as $field) {
+                                        $sql=$sql.' `' . $field. '`=\''.$_POST[$field].'\', '; 
+                                }
+                                $sql=$sqlupdate.$sql.' EncodedByNo=\''.$_SESSION['(ak0)'].'\', PostedByNo=\''.$_SESSION['(ak0)'].'\',TimeStamp=Now() WHERE APVPosted=1 AND Posted=0 and CVNo='.$txnid; 
+                                echo $sql; exit();
+                                $stmt=$link->prepare($sql);
+                                $stmt->execute();
+                                } 
+                                header("Location:formcv.php?w=AssignBank");
+                                break;
+     case 'Budget':
+                                if (!allowedToOpen(601,'1rtc')) { echo 'No permission'; exit;}
+                                $txnid=intval($_GET['TxnID']);
+                                $sql='UPDATE `budgetforcalc` SET Budget='.$_POST['Budget'].', TS=Now() where AccountID='.$_REQUEST['AccountID'];
+                                //echo $sql; break;
+                                $stmt=$link->prepare($sql);
+                                $stmt->execute();
+                                
+                                header("Location:txnsperday.php?perday=1&w=CVBudget&Date=".$_GET['Date']);
+                                break;
+                        
 }
 $link=null; $linkacctg=null;
 ?>
