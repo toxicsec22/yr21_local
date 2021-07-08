@@ -170,7 +170,7 @@ Unit		varchar(10)	NOT NULL,
 GoodItem	double	NOT NULL,
 Defective	double	NOT NULL,
 EndInvToday	double	NOT NULL)
-SELECT BranchNo,a.ItemCode,i.CatNo,c.Category,i.ItemDesc as Description,i.Unit, SUM(CASE WHEN Defective<>1 THEN Qty END) as GoodItem, SUM(CASE WHEN Defective=1 THEN Qty END) as Defective,Sum(Qty) as EndInvToday FROM invty_20uniallposted as a join invty_1items i on i.ItemCode=a.ItemCode join `invty_1category` c on c.CatNo=i.CatNo where Date is not null and Date<=Now() and BranchNo='.$_SESSION['bnum'].' group by a.ItemCode, a.BranchNo' ;    
+SELECT BranchNo,a.ItemCode,i.CatNo,c.Category,i.ItemDesc as Description,i.Unit, SUM(CASE WHEN Defective<>1 AND Defective<>2 THEN Qty ELSE 0 END) as GoodItem, SUM(CASE WHEN Defective=1 OR Defective=2 THEN Qty ELSE 0 END) as Defective,Sum(Qty) as EndInvToday FROM invty_20uniallposted as a join invty_1items i on i.ItemCode=a.ItemCode join `invty_1category` c on c.CatNo=i.CatNo where Date is not null and Date<=Now() and BranchNo='.$_SESSION['bnum'].' group by a.ItemCode, a.BranchNo' ;    
 
     $stmt0=$link->prepare($sql0);
     $stmt0->execute();   
