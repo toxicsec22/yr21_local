@@ -11,6 +11,11 @@ if (isset($_POST['post'])){
     $sql='Update `'.$_POST['Table'].'` SET `'.$_POST['Posted'].'`='.$_POST['Post'].', `'.$_POST['Posted'].'ByNo`='.$_SESSION['(ak0)'].' WHERE `'.$txnidname.'`='.$_POST[$txnidname]; 
     $stmt=$link->prepare($sql); $stmt->execute();  
 
+    if($postfield=='APVPosted'){
+        $sql='UPDATE acctg_2cvmain SET Posted='.$_POST['Posted'].' WHERE CreditAccountID<>403 AND (CreditAccountID NOT IN (SELECT AccountID FROM banktxns_1maintaining);';
+        $stmt=$link->prepare($sql); $stmt->execute();
+    }
+
 header("Location:".$_SERVER['HTTP_REFERER']);
 }
 ?>

@@ -227,11 +227,12 @@ $txnidname='TxnID';
             if (!allowedToOpen(407,'1rtc')){ goto nopermission;}
             else {$datecondition=true;}
             break;
-        case 'acctg_2cvmain':      
-        case 'acctg_2depositmain':  
-            if (!allowedToOpen(407,'1rtc')){ goto nopermission;}
-            break;
         
+        case 'acctg_2depositmain':  
+            if (!allowedToOpen(412,'1rtc')){ goto nopermission;}
+            break;
+
+        case 'acctg_2cvmain':      
         case 'acctg_2collectsubbounced':
         case 'acctg_2salemain':
         case 'acctg_2txfrmain':
