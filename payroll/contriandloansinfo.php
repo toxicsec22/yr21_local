@@ -33,6 +33,7 @@ echo '<br>';
 $which=(!isset($_GET['w'])?'select':$_GET['w']);
 
 
+$sqlcompanies='SELECT CompanyNo,Company FROM 1companies WHERE CompanyNo<=6';
 
 switch ($which)
 {
@@ -40,9 +41,8 @@ switch ($which)
     case 'select':
         $title='Government Payment Details';
     echo '<title>'.$title.'</title>';
-    echo '<br><h3>'.$title.'</h3>';
+    // echo '<br><h3>'.$title.'</h3>';
 
-    $sqlcompanies='SELECT CompanyNo,Company FROM 1companies WHERE CompanyNo<=6';
 
     $stmt=$link->query($sqlcompanies); $results=$stmt->fetchAll();
 
@@ -56,7 +56,7 @@ switch ($which)
 
         foreach($results AS $result){
             $sqlfield.=' (SELECT COUNT(GPID) AS CountNoPayment FROM payroll_1govtpaymentsinfo WHERE RefNo IS NULL AND ApplicableMonth<='.date('m').' AND GAID='.$arrgpid.' AND CompanyNo='.$result['CompanyNo'].') AS `'.$result['Company'].'`,';
-            $sqlselectcomp.='IF('.$result['Company'].'=0,"",CONCAT("<font color=\"red\">",'.$result['Company'].'," Pending</font>")) AS '.$result['Company'].', ';
+            $sqlselectcomp.='IF('.$result['Company'].'=0,"<font color=\"green\">&#10004;</font>",CONCAT("<font color=\"red\">",'.$result['Company'].'," Pending</font>")) AS '.$result['Company'].', ';
             array_push($columnnames,$result['Company']);
 
         }
@@ -71,8 +71,8 @@ switch ($which)
 
     // echo $sql0.'<br><br>';
     $sql='SELECT GPName AS GovtAgency,'.$sqlselectcomp.'1 FROM govtpendingpayment';
-$title='';
-
+// $title='';
+$formdesc='As of Current Month';
 include '../backendphp/layout/displayastablenosort.php';
 
     break;
@@ -143,7 +143,7 @@ include '../backendphp/layout/displayastablenosort.php';
             }
         }
 
-        $sqlcompanies='SELECT CompanyNo,Company FROM 1companies WHERE CompanyNo<=6';
+        // $sqlcompanies='SELECT CompanyNo,Company FROM 1companies WHERE CompanyNo<=6';
 
         echo comboBox($link,$sqlcompanies,'CompanyNo','Company','companies');
         $req='<font color="red">*</font>';
