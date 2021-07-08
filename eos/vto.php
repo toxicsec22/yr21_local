@@ -9,12 +9,17 @@ include_once('../switchboard/contents.php');
 include_once $path.'/acrossyrs/commonfunctions/listoptions.php';
 $which=!isset($_GET['w'])?'Vision':$_GET['w'];
 $vto=!isset($_REQUEST['VTOID'])?1:$_REQUEST['VTOID'];
+
 //deptid
 	if(!isset($_SESSION['deptonly'])){
 			$iddept=-1;
-		}else{
+		} else if($_SESSION['deptonly']==-100){
+			$iddept=-100;
+		} else{
 			$iddept=$_SESSION['deptonly'];
 		}
+
+		// print_r($_SESSION);
 //
 if(in_array($which, array('Vision','Encode'))){
 	goto skipb;
@@ -25,7 +30,10 @@ if (allowedToOpen(1500,'1rtc')){
 else if (allowedToOpen(1603,'1rtc')){
 	$sqlsm='select deptid,dept from attend_30currentpositions WHERE IDNo='.$_SESSION['(ak0)'].' OR LatestSupervisorIDNo='.$_SESSION['(ak0)'].' OR deptheadpositionid='.$_SESSION['&pos'].' GROUP BY deptid ORDER BY dept;';
 	
-} else {
+} elseif(isset($_SESSION['divisionid'])){
+	$_SESSION['deptonly']=-100;
+}
+	else {
 	$_SESSION['deptonly']=comboBoxValue($link, 'attend_30currentpositions', 'IDNo', $_SESSION['(ak0)'], 'deptid');
 }
 
@@ -43,6 +51,11 @@ if(allowedToOpen(array(1500,1603),'1rtc')){
 		$md.='<form style="float:left;margin-right:3px;" action="vto.php?w=SwitchDept&go2='.$which.'" method="POST"><input type="hidden" value="'.$resm['deptid'].'" name="deptid"><input style="width:90px;" type="submit" value="'.$resm['dept'].'" name="btnSubmitm"></form> ';
 	}
 	$md.='<a style="background-color:#e7e7e7;padding:2px;border:1px solid blue;color:#000;text-decoration: none;" href="interdeptmeeting.php">Interdepartment Meeting</a>';
+
+
+
+
+
 	$md2='';
 	
 	
@@ -61,6 +74,9 @@ if(allowedToOpen(array(1500,1603),'1rtc')){
 		}
 	
 	}
+
+
+	
 	
 	
 	
@@ -74,8 +90,32 @@ if(allowedToOpen(array(1500,1603),'1rtc')){
 		echo '<h3>Per Team</h3>'.$md2.'<div style="clear: both; display: block; position: relative;height:10px;"></div>';
 	
 	}
+	
+	
+
+
+
+
 }
 
+$sqldiv='SELECT DID,DivisionDesc,LEFT(FullName,LOCATE(" -",FullName)-1) AS DivisionHead
+	 FROM `1divisions` dv JOIN attend_30currentpositions cp ON dv.DivisionHeadIDNo=cp.IDNo WHERE FIND_IN_SET('.$_SESSION['(ak0)'].',PositionIDsorIDNos) OR FIND_IN_SET('.$_SESSION['&pos'].',PositionIDsorIDNos) OR DivisionHeadIDNo='.$_SESSION['(ak0)'].' OR dv.EncodedByNo='.$_SESSION['(ak0)'].'';
+	//  echo $sqldiv; exit();
+	$stmtdiv=$link->query($sqldiv);
+	$md3='';
+	if($stmtdiv->rowCount()>0){
+		$md3.='<hr><h3>Divisions</h3>';
+		$resdivs=$stmtdiv->fetchAll();
+
+		foreach($resdivs AS $resdiv){
+			$md3.='<form style="float:left;margin-right:3px;" action="vto.php?w=SwitchDept&division=1&go2='.$which.'" method="POST"><input type="hidden" value="'.$resdiv['DID'].'" name="DID"><input style="width:210px;" type="submit" value="'.$resdiv['DivisionDesc'].' ('.$resdiv['DivisionHead'].')" name="btnSubmitm"></form> ';
+		}
+		
+	}
+
+	echo '<br>'.$md3.'<div style="clear: both; display: block; position: relative;height:10px;"></div>';
+
+	
 $sqlqtr='SELECT QtrThemeMancom, QtrTheme FROM eos_2vtoqtrmain WHERE VTOQtrId=(IF(YEAR(CURDATE())='.$currentyr.',QUARTER(CURDATE()),4));';
 $stmt=$link->query($sqlqtr); $resqtr=$stmt->fetch();
 
@@ -88,6 +128,32 @@ if (allowedToOpen(1603,'1rtc') AND (!isset($_SESSION['deptonly']))) {
 	$l10day='monday';
 	$l10dayval='1';
 	
+} elseif($_SESSION['deptonly']==-100) {
+	$dep=$_SESSION['divisionname'].':  &nbsp; '.$resqtr['QtrTheme'];
+	// print_r($_SESSION);
+	$sqldividno='SELECT IF(IsPosition=0,CONCAT((SELECT GROUP_CONCAT(IDNo) FROM attend_30currentpositions WHERE FIND_IN_SET(PositionID,PositionIDsorIDNos)),",",DivisionHeadIDNo),CONCAT(PositionIDsorIDNos,",",DivisionHeadIDNo)) AS IDNos FROM 1divisions WHERE DID='.$_SESSION['divisionid'];
+	$stmtdividno=$link->query($sqldividno); $resdividno=$stmtdividno->fetch();
+
+	// echo $sqldividno;
+	$mancomordeptcondi=' Who IN ('.$resdividno['IDNos'].') AND ManComOrdept<>-1 AND ';
+
+	$sqll10='SELECT (CASE 
+		WHEN L10mtgday=1 THEN "monday"
+		WHEN L10mtgday=2 THEN "tuesday"
+		WHEN L10mtgday=3 THEN "wednesday"
+		WHEN L10mtgday=4 THEN "thursday"
+		WHEN L10mtgday=5 THEN "friday"
+		WHEN L10mtgday=6 THEN "saturday"
+		ELSE "sunday"
+	END) AS dayofmeeting,L10mtgday FROM 1departments WHERE deptid='.(comboBoxValue($link, 'attend_30currentpositions', 'IDNo', $_SESSION['(ak0)'], 'deptid')).'';
+
+	$stmtl10=$link->query($sqll10); $resultl10=$stmtl10->fetch();
+
+
+		$l10day=$resultl10['dayofmeeting'];
+		$l10dayval=$resultl10['L10mtgday'];
+	
+
 } else {
 	
 	$dep=comboBoxValue($link, '1departments', 'deptid', $_SESSION['deptonly'], 'dept').':  &nbsp; '.$resqtr['QtrTheme'];;
@@ -100,28 +166,10 @@ if (allowedToOpen(1603,'1rtc') AND (!isset($_SESSION['deptonly']))) {
 		$idnov=$_GET['IDNo'];
 	}
 	
-	// $layer3condi='';
-	// $superv=',0';
-	
-	/* if($_SESSION['&pos']==36){
-		// $sqlsuper='SELECT DISTINCT(SAM) AS Supervisor FROM attend_1branchgroups WHERE TeamLeader='.$_SESSION['(ak0)'].' LIMIT 1';
-		$sqlsuper='SELECT LatestSupervisorIDNo AS Supervisor FROM attend_30currentpositions WHERE IDNo='.$_SESSION['(ak0)'].' LIMIT 1';
-		// echo $sqlsuper;
-		$stmtsuper=$link->query($sqlsuper);
-		$resultsuper=$stmtsuper->fetch();
-		
-		if($resultsuper['Supervisor']==''){
-			$superv=',0';
-		} else {
-			$superv=','.$resultsuper['Supervisor'];
-		}
-		
-	} */
 	
 	
 	$mancomordeptcondi=' '.(isset($idnov)?'Who IN (SELECT IDNo From attend_30currentpositions WHERE (IDNo='.intval($idnov).' OR LatestSupervisorIDNo='.intval($idnov).')) AND':'').' ManComOrdept='.$_SESSION['deptonly'].' AND ';
 	
-	// echo $mancomordeptcondi;
 	
 	$color1='blue';
 	
@@ -136,21 +184,18 @@ if (allowedToOpen(1603,'1rtc') AND (!isset($_SESSION['deptonly']))) {
 	END) AS dayofmeeting,L10mtgday FROM 1departments WHERE deptid='.$_SESSION['deptonly'].'';
 	$stmtl10=$link->query($sqll10); $resultl10=$stmtl10->fetch();
 	
-	//important! remove later
-	
-	/* if($resultl10['L10mtgday']==1){
-	$l10day='tuesday';
-	$l10dayval=2;
-	} else { */
+
 		$l10day=$resultl10['dayofmeeting'];
 		$l10dayval=$resultl10['L10mtgday'];
-	/* } */
+	
 	
 }
-if(allowedToOpen(array(1500,1603),'1rtc')){
+
+
+// if(allowedToOpen(array(1500,1603),'1rtc')){
 	
 	echo '<br><h1 align="center" style="background-color:white;padding:8px;border:1px solid green;"><font color="'.$color1.'">'.$dep.(isset($_GET['IDNo'])?' ('.comboBoxValue($link, 'attend_30currentpositions', 'IDNo', $_GET['IDNo'], 'FullName').')':'').'</font></h1><br>';
-}
+// }
  skipb:
  
 include_once '../backendphp/layout/linkstyle.php';
@@ -291,7 +336,7 @@ $lastweekno=$weekno-1;
 if(strlen($lastweekno)==1){
 	$lastweekno='0'.$lastweekno;
 }
-	$sqlchecker='select right(WeekNoAndStatus,1) AS Status,substring(WeekNoAndStatus,1,2) as WeekNo from eos_1mtgstatus where deptid='.$iddept.' and substring(WeekNoAndStatus,1,2)='.$lastweekno.'';
+	$sqlchecker='select right(WeekNoAndStatus,1) AS Status,substring(WeekNoAndStatus,1,2) as WeekNo from eos_1mtgstatus where '.($iddept<>-100?'deptid='.$iddept.'':'2=2').' and substring(WeekNoAndStatus,1,2)='.$lastweekno.'';
 	$stmtchecker=$link->query($sqlchecker); $resultchecker=$stmtchecker->fetch();
 	if($stmtchecker->rowCount()!=0){
 		$status=$resultchecker['Status'];
@@ -421,13 +466,24 @@ echo $visionlink;
 switch ($which){
 	case 'SwitchDept':
 	
-	// print_r($_POST); exit();
-	if($_POST['btnSubmitm']=='ManCom'){
-		unset($_SESSION['deptonly']);
+	if(isset($_GET['division'])){
+		$_SESSION['divisionid']=$_POST['DID'];
+		$_SESSION['divisionname']=$_POST['btnSubmitm'];
+		$_SESSION['deptonly']=-100; 
 	} else {
-		$_SESSION['deptonly']=$_POST['deptid'];
+		if(isset($_SESSION['divisionid'])){
+			unset($_SESSION['divisionid']);
+			unset($_SESSION['divisionname']);
+		}
+		
+		if($_POST['btnSubmitm']=='ManCom'){
+			unset($_SESSION['deptonly']);
+		} else {
+			$_SESSION['deptonly']=$_POST['deptid'];
+		}
 	}
-	
+	// print_r($_SESSION);
+	// exit();
 	header("Location:vto.php?w=".$_GET['go2'].(isset($_GET['IDNo'])?'&IDNo='.$_GET['IDNo'].'':'')."");
 	
 	break;
@@ -1403,7 +1459,7 @@ case 'Traction':
 		$mtgval=1;
 	}
 	// echo $_POST['MtgStatus']; exit();
-		$sqls='select substring(substring_index(WeekNoAndStatus,\',\',1),4,100) AS Status from eos_1mtgstatus where deptid='.$iddept.'';
+		$sqls='select substring(substring_index(WeekNoAndStatus,\',\',1),4,100) AS Status from eos_1mtgstatus where '.($iddept<>-100?'deptid='.$iddept.'':'2=2').'';
 		$stmts=$link->query($sqls); $results=$stmts->fetch();
 	if($stmts->rowCount()!=0){
 		$sqlu='update eos_1mtgstatus set EncodedByNo='.$_SESSION['(ak0)'].',`TimeStamp`=NOW(),WeekNoAndStatus=REPLACE(WeekNoAndStatus,substring_index(WeekNoAndStatus,\',\',1),"'.$lastweekno.'-'.$mtgval.'") where deptid='.$iddept.'';
@@ -1458,7 +1514,7 @@ case 'Traction':
 	
 	$sqlmain='select vqs.*,RIGHT(RIStatPerWeek,4) AS WhatWkNo,RIGHT((SELECT WhatWkNo),1) AS `Status`, LEFT((SELECT WhatWkNo),2) AS WeekNo,CONCAT(Nickname,\' \',SurName) as Fullname from eos_2vtoqtrsub vqs left join 1employees e on e.IDNo=vqs.Who WHERE '.$mancomordeptcondi.' Stat=0 AND Who='.$_SESSION['(ak0)'];
 	
-	
+	// echo $sqlmain;
 	//scorecard
 
 $sql='select *,substring(substring_index(WeekNoAndScores,\',\',1),4,100) AS Scores,substring(WeekNoAndScores,1,2) as WeekNo,if(CountedforEval=1,"Counted","NotCounted") as CountedforEval from eos_2scorecard where '.$mancomordeptcondi.' Who=\''.$_SESSION['(ak0)'].'\' and Status=0';
@@ -1853,7 +1909,7 @@ CountedforEval: <input type="text" name="CountedforEval" list="countednotcounted
 	
 	$sqlmain='select vqs.*,CONCAT(Nickname," ",SurName) AS `Who?`,RIGHT(RIStatPerWeek,4) AS `WhatWkNo`,RIGHT((SELECT WhatWkNo),1) AS `Status`, LEFT((SELECT WhatWkNo),2) AS WeekNo,CONCAT(Nickname,\' \',SurName) as Fullname from eos_2vtoqtrsub vqs left join 1employees e on e.IDNo=vqs.Who WHERE '.$mancomordeptcondi.' Stat=0 '.$rcondi;
 	
-	
+	// echo $sqlmain;
 
 	echo '<br><b>Scorecard</b>';
 $sql0='CREATE TEMPORARY TABLE weeksandscore (
