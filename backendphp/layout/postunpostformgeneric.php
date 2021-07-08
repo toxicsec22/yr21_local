@@ -12,8 +12,12 @@ if (isset($_POST['post'])){
     $stmt=$link->prepare($sql); $stmt->execute();  
 
     if($postfield=='APVPosted'){
-        $sql='UPDATE acctg_2cvmain SET Posted='.$_POST['Posted'].' WHERE CreditAccountID<>403 AND (CreditAccountID NOT IN (SELECT AccountID FROM banktxns_1maintaining);';
+        $sql='SELECT CVNo FROM acctg_2cvmain WHERE CreditAccountID<>403 AND (CreditAccountID NOT IN (SELECT AccountID FROM banktxns_1maintaining) AND `'.$txnidname.'`='.$_POST[$txnidname];
+        $stmt=$link->query($sql); $result=$stmt->fetch();
+        if($stmt->rowCount()==0) { goto skipupdate;}
+        $sql='UPDATE acctg_2cvmain SET Posted='.$_POST['Post'].' WHERE CreditAccountID<>403 AND (CreditAccountID NOT IN (SELECT AccountID FROM banktxns_1maintaining) AND `'.$txnidname.'`='.$_POST[$txnidname];  echo $sql;
         $stmt=$link->prepare($sql); $stmt->execute();
+        skipupdate:
     }
 
 header("Location:".$_SERVER['HTTP_REFERER']);
