@@ -24,35 +24,6 @@
 		$frombudgetof=companyandbranchValue($link, 'acctg_1budgetentities', 'Entity', $_POST['FromBudgetOf'], 'EntityID');}
 switch ($whichqry){
 	
-case 'CVBudget':
-	if (!allowedToOpen(601,'1rtc')) { echo 'No permission'; exit;}
-	$txnid=intval($_GET['CVNo']);
-	//to check if editable
-	if (editOk('acctg_2cvmain',$txnid,$link,$whichqry)){
-	$sqlupdate='UPDATE `acctg_2cvmain` SET ';
-        $sql='';
-        $columnstoedit=array('DateofCheck','CheckNo','CreditAccountID','Remarks');
-       
-	foreach ($columnstoedit as $field) {
-		$sql=$sql.' `' . $field. '`=\''.$_POST[$field].'\', '; 
-	}
-	$sql=$sqlupdate.$sql.' EncodedByNo=\''.$_SESSION['(ak0)'].'\', PostedByNo=\''.$_SESSION['(ak0)'].'\',TimeStamp=Now() where Posted=0 and TxnID='.$txnid; 
-	//echo $sql; break;
-        $stmt=$link->prepare($sql);
-	$stmt->execute();
-	} 
-	header("Location:txnsperday.php?perday=1&w=CVBudget&Date=".$_GET['Date']);
-        break;
-case 'Budget':
-	if (!allowedToOpen(601,'1rtc')) { echo 'No permission'; exit;}
-	$txnid=intval($_GET['TxnID']);
-	$sql='UPDATE `budgetforcalc` SET Budget='.$_POST['Budget'].', TS=Now() where AccountID='.$_REQUEST['AccountID'];
-	//echo $sql; break;
-        $stmt=$link->prepare($sql);
-	$stmt->execute();
-	
-	header("Location:txnsperday.php?perday=1&w=CVBudget&Date=".$_GET['Date']);
-        break;
 
  
         }
