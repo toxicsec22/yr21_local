@@ -61,7 +61,7 @@ if (in_array($which,array('AddReleaseDate','Unset','SetNonBank','SetBasedOnPayee
     elseif (substr($_GET['TxnID'],0,1)==2) { $table='acctg_4futurecvmain'; $field='CVNo'; } else { $table='acctg_2cvmain'; $field='CVNo'; }
     switch ($which){
         case 'SetNonBank':
-            $sql=' CreditAccountID NOT IN (SELECT AccountID FROM `banktxns_1maintaining`) ';
+            $sql=' CreditAccountID NOT IN (SELECT AccountID FROM `banktxns_1maintaining`) AND CreditAccountID<>403 ';
             break;
         case 'SetBasedOnPayee':
             $sql=' (Payee LIKE \''.$_POST['Payee'].'\') ';
