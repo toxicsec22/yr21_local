@@ -169,16 +169,16 @@ if (in_array($whichqry,array('summary_for_payroll','my_attendance'))){
             // $sql='SELECT e.IDNo,MobileNo, CONCAT(e.FirstName, " ", e.MiddleName, " ", e.SurName) AS EmployeeName,e.DateHired, BranchorDept,id.SSSNo,id.PHICNo,id.PagIbigNo,id.TIN FROM 1employees e JOIN 1_gamit.0idinfo id ON e.IDNo=id.IDNo
             // JOIN 1companies c ON e.RCompanyNo = c.CompanyNo JOIN attend_30currentpositions cp ON e.IDNo=cp.IDNo WHERE e.RCompanyNo= '.intval($_GET['RCompanyNo']).' AND Resigned=0 AND DirectOrAgency=0 ORDER BY BranchorDept';
             // $columnnames=array('IDNo','EmployeeName','BranchorDept','DateHired','MobileNo','SSSNo','PHICNo','PagIbigNo','TIN'); 
-            if (allowedToOpen(62411,'1rtc')){ 
-                $columnnames=array('IDNo','EmpName','BranchorDept','Position','DateHired','MobileNo','SSSNo','PHICNo','PagIbigNo','TIN','MonthlyBasic'); 
-                $orderby=' ORDER BY e.SurName,e.FirstName,e.MiddleName';
-            } else {
+            // if (allowedToOpen(62411,'1rtc')){ 
+            //     $columnnames=array('IDNo','EmpName','BranchorDept','Position','DateHired','MobileNo','SSSNo','PHICNo','PagIbigNo','TIN','MonthlyBasic'); 
+            //     $orderby=' ORDER BY e.SurName,e.FirstName,e.MiddleName';
+            // } else {
                 $columnnames=array('IDNo','EmployeeName','BranchorDept'); 
                 $orderby=' ORDER BY BranchorDept';
-            }
+            // }
 
-            $sql='SELECT e.IDNo,Position,MobileNo,CONCAT(e.SurName,", ",e.FirstName," ",e.MiddleName) AS EmpName, CONCAT(e.FirstName, " ", e.MiddleName, " ", e.SurName) AS EmployeeName,e.DateHired, BranchorDept,id.SSSNo,id.PHICNo,id.PagIbigNo,id.TIN,FORMAT(BasicMonthly,2) AS MonthlyBasic FROM 1employees e JOIN 1_gamit.0idinfo id ON e.IDNo=id.IDNo
-            JOIN 1companies c ON e.RCompanyNo = c.CompanyNo JOIN attend_30currentpositions cp ON e.IDNo=cp.IDNo JOIN payroll_21dailyandmonthly dm ON id.IDNo=dm.IDNo WHERE e.RCompanyNo= '.intval($_GET['RCompanyNo']).' AND Resigned=0 AND e.DirectOrAgency=0 '.$orderby;
+            $sql='SELECT e.IDNo, CONCAT(e.FirstName, " ", e.MiddleName, " ", e.SurName) AS EmployeeName, BranchorDept FROM 1employees e JOIN 1_gamit.0idinfo id ON e.IDNo=id.IDNo
+            JOIN 1companies c ON e.RCompanyNo = c.CompanyNo JOIN attend_30currentpositions cp ON e.IDNo=cp.IDNo WHERE e.RCompanyNo= '.intval($_GET['RCompanyNo']).' AND Resigned=0 AND e.DirectOrAgency=0 '.$orderby;
 
             
             //$width='40%'; 
@@ -202,6 +202,80 @@ if (in_array($whichqry,array('summary_for_payroll','my_attendance'))){
             </div></div>
             <?php
     break;
+
+//temporary only
+    case 'PerCompanyListResigned':
+        include_once $path.'/acrossyrs/commonfunctions/listoptions.php';
+        $title='SEPARATED Employee List '.(isset($_POST['btnLookup'])?'From '.companyandbranchValue($link,'1companies','CompanyNo', $_POST['CompanyNo'],'Company') . ' Company':'').'';
+
+            $columnnames=array('IDNo','EmployeeName','PHICNo','Birthdate','DirectHire','Gender','DateResigned','MonthlyBasic'); 
+            $orderby=' ORDER BY e.SurName,e.FirstName,e.MiddleName';
+       
+
+            $companylist='';
+            $sql='SELECT CompanyNo,Company FROM 1companies WHERE CompanyNo<=6';
+            $stmt=$link->query($sql);$rows=$stmt->fetchAll();
+            foreach($rows AS $row){
+                $companylist.='<option value="'.$row['CompanyNo'].'" '.((isset($_POST['CompanyNo']) AND $_POST['CompanyNo']==$row['CompanyNo'])?'selected':'').'>'.$row['Company'].'</option>';
+            }
+
+$title="SEPARATED Employees";
+echo '<title>'.$title.'</title>';
+echo '<br><br><h3>'.$title.'</h3>';
+            echo '<form action="#" method="POST">
+            Year: <select name="Yr">
+                <option value="2021" '.((isset($_POST['Yr']) AND $_POST['Yr']==2021)?'selected':'').'>2021</option>
+                <option value="2020" '.((isset($_POST['Yr']) AND $_POST['Yr']==2020)?'selected':'').'>2020</option>
+                <option value="2019" '.((isset($_POST['Yr']) AND $_POST['Yr']==2019)?'selected':'').'>2019</option>
+                <option value="2018" '.((isset($_POST['Yr']) AND $_POST['Yr']==2018)?'selected':'').'>2018</option>
+                <option value="2017" '.((isset($_POST['Yr']) AND $_POST['Yr']==2017)?'selected':'').'>2017</option>
+                <option value="2016" '.((isset($_POST['Yr']) AND $_POST['Yr']==2016)?'selected':'').'>2016</option>
+                <option value="2015" '.((isset($_POST['Yr']) AND $_POST['Yr']==2015)?'selected':'').'>2015</option>
+                <option value="2014" '.((isset($_POST['Yr']) AND $_POST['Yr']==2014)?'selected':'').'>2014</option>
+                <option value="2013" '.((isset($_POST['Yr']) AND $_POST['Yr']==2013)?'selected':'').'><=2013</option>
+            </select> Company: <select name="CompanyNo">'.$companylist.'</select><input type="submit" value="Lookup" name="btnLookup"></form>';
+
+// echo '<br><br><h3>'.$title.'</h3>';
+//             echo '<form action="#" method="POST">
+//             Year: <select name="Yr">
+//                 <option value="2021" '.((isset($_POST['Yr']) AND $_POST['Yr']==2021)?'selected':'').'>2021</option>
+//                 <option value="2020" '.((isset($_POST['Yr']) AND $_POST['Yr']==2020)?'selected':'').'>2020</option>
+//                 <option value="2019" '.((isset($_POST['Yr']) AND $_POST['Yr']==2019)?'selected':'').'>2019</option>
+//                 <option value="2018" '.((isset($_POST['Yr']) AND $_POST['Yr']==2018)?'selected':'').'>2018</option>
+//             </select> Company: <select name="CompanyNo">'.$companylist.'</select><input type="submit" value="Lookup" name="btnLookup"></form>';
+
+if(isset($_POST['btnLookup'])){
+        include_once $path.'/acrossyrs/commonfunctions/listoptions.php';
+
+        $tabledmr='payroll_21dailyandmonthlyofresigned';
+        if($_POST['Yr']==2017){
+            $sql0='
+            CREATE TEMPORARY TABLE `'.$_POST['Yr'].'_1rtc`.payroll_21dailyandmonthlyofresignedprev AS
+            select `e`.`IDNo` AS `IDNo`,if(`lr`.`LatestDorM` = 0,ifnull(`lr`.`LatestBasicRate` * 13,0),truncate(ifnull(`lr`.`LatestBasicRate`,0) * 2,2)) AS `BasicMonthly` from ((`'.$_POST['Yr'].'_1rtc`.`1employees` `e` join `'.$_POST['Yr'].'_1rtc`.`payroll_20latestrates` `lr` on(`e`.`IDNo` = `lr`.`IDNo`)) join `'.$_POST['Yr'].'_1rtc`.`gen_info_0idinfo` `i` on(`i`.`IDNo` = `lr`.`IDNo`)) where `e`.`Resigned` <> 0 group by `e`.`IDNo`;';
+            $stmt0=$link->prepare($sql0); $stmt0->execute();
+            // echo $sql0.'<br><br>';
+            $tabledmr='payroll_21dailyandmonthlyofresignedprev'; 
+        }
+        if($_POST['Yr']>=2014 AND $_POST['Yr']<2017){
+            $tabledmr='payroll_21DailyandMonthlyofResigned'; 
+        }
+        if($_POST['Yr']>=2014){
+            $sql='SELECT e.IDNo, CONCAT(e.SurName, ", ",e.FirstName, " ", e.MiddleName) AS EmployeeName,id.Birthdate,id.PHICNo,IF(e.DirectOrAgency<>0,"No","") AS DirectHire,IF(e.Gender=1,"M","F") AS Gender,DateResigned,FORMAT(BasicMonthly,2) AS MonthlyBasic FROM '.$_POST['Yr'].'_1rtc.1employees e JOIN 1_gamit.0idinfo id ON e.IDNo=id.IDNo
+            JOIN '.$_POST['Yr'].'_1rtc.1companies c ON e.RCompanyNo = c.CompanyNo JOIN '.$_POST['Yr'].'_1rtc.'.$tabledmr.' dmr ON id.IDNo=dmr.IDNo WHERE e.RCompanyNo= '.intval($_POST['CompanyNo']).' AND e.Resigned=1 '.$orderby;
+
+            $formdesc='</i><b>'.$_POST['Yr'].' '.comboBoxValue($link,'1companies','CompanyNo', $_POST['CompanyNo'],'Company').'</b><i>';
+        } else {
+            $sql='SELECT id.IDNo, CONCAT(id.SurName, ", ",id.FirstName, " ", id.MiddleName) AS EmployeeName,id.Birthdate,id.PHICNo,"" AS DirectHire,"" AS Gender,DateResigned,"" AS MonthlyBasic FROM 1_gamit.0idinfo id WHERE YEAR(DateResigned)<=2013 ORDER BY DateResigned DESC;';
+
+             $formdesc='</i><b>Resigned Employees <= 2013 (ALL Companies)</b><i>';
+        }
+        // echo $sql;
+        $title='';
+        include_once('../backendphp/layout/displayastablenosort.php');
+    }  
+
+
+break;
 
     case 'PerDeptList':
             include_once $path.'/acrossyrs/commonfunctions/listoptions.php';
