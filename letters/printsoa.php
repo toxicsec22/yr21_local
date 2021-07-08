@@ -7,7 +7,7 @@ $path=$_SERVER['DOCUMENT_ROOT']; include_once $path.'/acrossyrs/logincodes/check
 //if ($allow==0) { echo 'No permission'; exit;}
 //allowed:
 // end of check
-if (!allowedToOpen(array(586,587,588,589,590,591),'1rtc')) { echo 'No permission'; exit; } 
+if (!allowedToOpen(array(586,587,588,589,590,591),'1rtc')) { echo 'No permission'; exit; }
 include_once $path.'/acrossyrs/dbinit/userinit.php';
 $link=!isset($link)?connect_db($currentyr.'_1rtc',0):$link;
 
@@ -37,9 +37,9 @@ $whichqry=$_GET['w'];
 <title>Print SOA and Client Info</title>
 <style>
 
-body  
-{ 
-    /* this affects the margin on the content before sending to printer */ 
+body
+{
+    /* this affects the margin on the content before sending to printer */
     margin: 0px;
     font-size: 10pt;
     font-family: Arial, Helvetica, sans-serif;
@@ -55,7 +55,7 @@ padding: 3px;
     }
 <?php if($whichqry<>'CreditInformation' AND $whichqry<>'Araw1CreditInfo'){
 echo '
-@media print  
+@media print
 {
 table {
 border:1px solid black;
@@ -75,16 +75,16 @@ div { text-align:justify; }
 	}
 	#container{width:100%;}
 	 html, body {
-			height: 99%;    
+			height: 99%;
 }}'; } ?>
 img {
-  
+
 }
 </style>
 </head>
 <body>
 <?php
- 
+
 
 
 
@@ -106,7 +106,7 @@ if ($whichqry<>'SendToEmailPreview' and $whichqry<>'SOA' and $whichqry<>'RemindH
  <?php
 } // end not SOA and not RemindHoldCheck
 ?>
- <input type="submit" name="lookup" value="Lookup"></center> 
+ <input type="submit" name="lookup" value="Lookup"></center>
 <?php
 renderlist('allclients');renderlist('companies');
 	goto noform;
@@ -135,14 +135,14 @@ $companyno=$result['CompanyNo'];
 $company=$result['CompanyName'];
 }
 if ($whichqry=='SendToEmailPreview' OR $whichqry=='SOA'){
-   
+
 //for PDC section
 include('../acctg/ARfunctions.php');
 
 makepdcs($clientno,$link);
 
-// end of PDC temp table 
- 
+// end of PDC temp table
+
 $sql0='CREATE TEMPORARY TABLE Receivables (
 InvDate DATE NOT NULL,
 ClientNo SMALLINT NOT NULL,
@@ -186,15 +186,15 @@ $dataasof=$stmtasof->fetch();
 }
 skipvariables:
 switch ($whichqry){
-   
+
 CASE 'SOA':
- /*    if (!allowedToOpen(591,'1rtc')) { echo 'No permission'; exit; } 
+ /*    if (!allowedToOpen(591,'1rtc')) { echo 'No permission'; exit; }
 //for PDC section
 include('../acctg/ARfunctions.php');
 makepdcs($clientno,$link);
 
-// end of PDC temp table 
- 
+// end of PDC temp table
+
 $sql0='CREATE TEMPORARY TABLE Receivables (
 InvDate DATE NOT NULL,
 ClientNo SMALLINT NOT NULL,
@@ -253,8 +253,8 @@ if ($stmtpdc->rowCount()>0){
 } else {
    $pdctable='';
 }
-// end of PDC 
- 
+// end of PDC
+
     $sqlmain='SELECT ClientName, ContactPerson, TelNo1, TelNo2,concat("Terms: ",Terms," days") as Terms,concat("Credit Limit: ",format(CreditLimit,0)) as CreditLimit, Sum(InvBalance) as TotalDue FROM `Receivables` r where r.CompanyNo='.$company['CompanyNo'].' GROUP BY ClientName';
     $sqlsub='SELECT r.* FROM Receivables r  where r.CompanyNo='.$company['CompanyNo'];
 
@@ -295,7 +295,7 @@ $sub=$sub.'<tr>
 }
 $sub=$sub.'</table><center>------   NOTHING FOLLOWS  ------</center><br>';
 
-    
+
     $total='<div style="float:right">Total:  '.number_format($result['TotalDue'],2).str_repeat('&nbsp',7) .'</div><br>' ;
 //Verified by:&nbsp &nbsp  '. $controllername.'<br>
 $letter=$letter.$main.$sub.'<br>'.$total.$pdctable.'<br><br><footer>
@@ -309,12 +309,12 @@ Please note that unpaid overdue or over-the-limit accounts (whichever comes firs
 <br>System data as of '.$dataasof['DataAsOf'].'</font>
 </footer><br><br><br>';
  echo $letter;
-}   
-      break; 
-	  
-	  
+}
+      break;
+
+
 case 'SendToEmailPreview':
-    
+
 $letter=''; $cc='';
 foreach ($resultco as $company){
 $cc.=$company['Company'].",";
@@ -334,8 +334,8 @@ if ($stmtpdc->rowCount()>0){
 } else {
    $pdctable='';
 }
-// end of PDC 
- 
+// end of PDC
+
     $sqlmain='SELECT ClientName,EmailAddress, ContactPerson, TelNo1, TelNo2,concat("Terms: ",Terms," days") as Terms,concat("Credit Limit: ",format(CreditLimit,0)) as CreditLimit, Sum(InvBalance) as TotalDue FROM `Receivables` r where r.CompanyNo='.$company['CompanyNo'].' GROUP BY ClientName';
     $sqlsub='SELECT r.* FROM Receivables r  where r.CompanyNo='.$company['CompanyNo'];
 
@@ -366,18 +366,18 @@ $sub=$sub.'<tr>
 }
 $sub=$sub.'</table><br>';
 
-    
+
     $total='<div style="float:right">Total:  '.number_format($result['TotalDue'],2).'</div><br>' ;
 
 
 $letter.=$main.$sub.'<br>'.$total.$pdctable.'<br><hr>';
 
- 
- 
+
+
 // $letter.=$letter;
 
 
-} 
+}
 
 $letter.='<footer>
 
@@ -403,31 +403,31 @@ $cc=substr($cc, 0, -1);
 echo '<div style="background-color:orange;border:1px solid black;padding:5px;text-align:center;">';
  echo '<form action="emailsoa.php" method="POST">Receiver: '.$receiver.'<input type="hidden" name="Receiver" value="'.$receiver.'"><h3>Webmail Account:</h3> Sender: '.$res['Sender'].'<br> <input type="hidden" name="Sender" value="'.$res['Sender'].'"><input type="hidden" name="From" value="'.$cc.'"><textarea name="msg" style="display:none;">'.$letter.'</textarea>Password: <input type="password" name="Password"><input type="submit" value="Send"></form>';
 echo '</div>';
- 
+
       break;
-	  
-	  
-	  
-	  
+
+
+
+
 
 CASE 'CreditInfoNew':
 CASE 'CreditInfoExist':
 case 'CreditReject':
     if (!allowedToOpen(586,'1rtc')) { echo 'No permission'; exit; }
 
- 
- 
+
+
 $sqlmain='SELECT c.*,Company, CompanyName FROM `1clients` c JOIN gen_info_1branchesclientsjxn bcj ON c.ClientNo=bcj.ClientNo JOIN 1branches b ON bcj.branchNo=b.BranchNo JOIN 1companies cc ON b.CompanyNo=cc.CompanyNo where c.ClientNo='.$clientno.' LIMIT 1';
 
     $stmt=$link->query($sqlmain);
     $result=$stmt->fetch();
-    
-$company=$result['CompanyName'];	
+
+$company=$result['CompanyName'];
 
 $letter='<center><img src="../generalinfo/logo/'.$result['Company'].'.png"></br>';
 
-$letter=$letter. '<font style="font-size: 80%;">Credit & Collections Office: &nbsp; collections@1rotary.com.ph <br/>(02) 734 07679 •  '.$resultuser['MobileNo'].'</font><br><br><br>Credit Information<br><br></center>';	
-	
+$letter=$letter. '<font style="font-size: 80%;">Credit & Collections Office: &nbsp; collections@1rotary.com.ph <br/>(02) 734 07679 •  '.$resultuser['MobileNo'].'</font><br><br><br>Credit Information<br><br></center>';
+
 $letter=$letter.'<a href="javascript:window.print()">To:  '.$result['ClientName'].'</a>
 <div style="float:right">Date: '.date('F d, Y').'</div>
 <br><br><i>Attn: '.$result['ContactPerson'].'</i><br><br>'.$result['TelNo1'].'<br>'.$result['TelNo2'].'<br><br><hr>';
@@ -442,7 +442,7 @@ $main=$main.'<center><H4 style="border-style:solid; border-width: 1px;padding-to
     padding-right: 30px;
     padding-bottom: 10px;
     padding-left: 30px;
-    width:400px;">To ensure that ALL your payments are acknowledged, 
+    width:400px;">To ensure that ALL your payments are acknowledged,
 always ask for a COLLECTION RECEIPT whenever you pay.</H4></center>';
 
 $main=$main.'Terms and Conditions of this service:<br>'
@@ -472,7 +472,7 @@ $ack='<p style="display:inline; float:left;border-style:solid; border-width: 1px
     width:300px;">Acknowledged By:  _______________________<br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
     <font size="1">Signature above printed name</font><br><br><br>
     Conforme: _______________________<br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<font size="1">Signature above printed name</font></p>';
-    
+
 $vty='<p style="display:inline; float:right;">Very truly yours,<br><br><br><br>__________________<br>'.$user.'<br><font size="2">'.$userposition.'</font>';
 //<br><br><br><br>__________________<br>'.$controllername.'<br><font size="2">Controller</font>
 $letter=$letter.$main.'<br><footer>'.$ack.$vty. '
@@ -480,8 +480,8 @@ $letter=$letter.$main.'<br><footer>'.$ack.$vty. '
 </footer><br><br><br>';
  echo $letter;
  break;
- 
- 
+
+
 CASE 'Araw1CreditInfo':
     if (!allowedToOpen(586,'1rtc')) { echo 'No permission'; exit; }
 include_once($path.'/acrossyrs/commonfunctions/numtowords.php');
@@ -490,13 +490,13 @@ $sqlmain='SELECT c.*,Company, CompanyName FROM `1clients` c JOIN gen_info_1branc
 
     $stmt=$link->query($sqlmain);
     $result=$stmt->fetch();
-    
-$company=$result['CompanyName'];	
+
+$company=$result['CompanyName'];
 
 $letter='<center><img src="../generalinfo/logo/'.$result['Company'].'.png"></br>';
 
-$letter=$letter. '<font style="font-size: 80%;">Credit & Collections Office: &nbsp; collections@1rotary.com.ph <br/>(02) 734 07679 •  '.$resultuser['MobileNo'].'</font><br><br><br>Credit Information<br><br></center>';	
-	
+$letter=$letter. '<font style="font-size: 80%;">Credit & Collections Office: &nbsp; collections@1rotary.com.ph <br/>(02) 734 07679 •  '.$resultuser['MobileNo'].'</font><br><br><br>Credit Information<br><br></center>';
+
 $letter=$letter.'<a href="javascript:window.print()">To:  '.$result['ClientName'].'</a>
 <div style="float:right">Date: '.date('F d, Y').'</div>
 <br><br><i>Attn: '.$result['ContactPerson'].'</i><br><br>'.$result['TelNo1'].'<br>'.$result['TelNo2'].'<br><br><hr>';
@@ -523,15 +523,15 @@ $ack='<p style="display:inline; float:right;padding-top: 15px;
     padding-left: 10px;
     width:300px;">Conforme: '.str_repeat('&nbsp;',25).'Date:__/__/___<br><br>'.str_repeat('&nbsp;',7).'_______________________<br>'.str_repeat('&nbsp;',25).'Name:<br><br><br>
     '.str_repeat('&nbsp;',7).'_______________________<br>'.str_repeat('&nbsp;',23).'Witness#2</p>';
-    
+
 $vty='<p style="display:inline; float:left;">Very truly yours,<br><br><br>'.str_repeat('&nbsp;',18).'__________________<br>'.str_repeat('&nbsp;',31).'Name</br>'.str_repeat('&nbsp;',26).'Designation<br></br></br>'.str_repeat('&nbsp;',18).'__________________<br>'.str_repeat('&nbsp;',27).'Witness#1';
 $letter=$letter.$main.'<br><footer>'.$ack.$vty. '
 <br>
 </footer><br><br><br>';
  echo $letter;
- break; 
- 
- 
+ break;
+
+
  CASE 'CreditInformation':
     if (!allowedToOpen(586,'1rtc')) { echo 'No permission'; exit; }
 // echo '<style>@media print
@@ -542,21 +542,21 @@ $letter=$letter.$main.'<br><footer>'.$ack.$vty. '
 	// #container{width:100%;}
 
 	 // html, body {
-			// height: 99%;    
+			// height: 99%;
 // }}</style>';
- 
- 
+
+
 $sqlmain='SELECT c.*,Company, CompanyName FROM `1clients` c JOIN gen_info_1branchesclientsjxn bcj ON c.ClientNo=bcj.ClientNo JOIN 1branches b ON bcj.branchNo=b.BranchNo JOIN 1companies cc ON b.CompanyNo=cc.CompanyNo where c.ClientNo='.$clientno.' LIMIT 1';
 
     $stmt=$link->query($sqlmain);
     $result=$stmt->fetch();
-    
-$company=$result['CompanyName'];	
+
+$company=$result['CompanyName'];
 
 $letter='<center><img src="../generalinfo/logo/'.$result['Company'].'.png"></br>';
 
-$letter=$letter. '<font style="font-size: 80%;">Credit & Collections Office: &nbsp; collections@1rotary.com.ph <br/>(02) 734 07679 •  '.$resultuser['MobileNo'].'</font><br><br><br>Credit Information<br><br></center>';	
-	
+$letter=$letter. '<font style="font-size: 80%;">Credit & Collections Office: &nbsp; collections@1rotary.com.ph <br/>(02) 734 07679 •  '.$resultuser['MobileNo'].'</font><br><br><br>Credit Information<br><br></center>';
+
 $letter=$letter.'<a href="javascript:window.print()">To:  '.$result['ClientName'].'</a>
 <div style="float:right">Date: '.date('F d, Y').'</div>
 <br><br><i>Attn: '.$result['ContactPerson'].'</i><br><br>'.$result['TelNo1'].'<br>'.$result['TelNo2'].'<br><br><hr>';
@@ -570,8 +570,9 @@ $main.='<br><ol>'
 .'<li>Accounts must be settled within five days from due date. A collection receipt will be provided to ensure acknowledgment of payment. Client must always ask for receipt.</li>'
 .'<li>Payment by check will be deemed to have been made upon clearing.</li>'
 .'<li>No new credit purchase will be allowed in excess of the credit line.</li>'
-.'<li>After the fifth day, 2% interest will be charged for the outstanding unpaid amount, which shall continue every month thereafter.</li>'
+.'<li>After the fifth day, 0.5% interest will be charged for the outstanding unpaid amount, which shall continue every month thereafter.</li>'
 .'<li>In the event of a bounced check, the client must pay the equivalent amount in cash within five days from notice. Otherwise, his account will automatically return to COD status.</li>'
+.'<li>For every bounced check, 25% will be deducted from the client’s Credit limit. The fourth deduction will necessarily zero-out client’s credit limit.</li>'
 .'<li>If an account is not settled within three months from the due date, the client shall be in default and the company may
 take the necessary steps to ensure collection. In case of litigation, the venue shall be in the exclusive jurisdiction of
 the courts of the City of Taguig, to the exclusion of all other courts.</li>'
@@ -584,28 +585,28 @@ padding-right: 10px;
 padding-bottom: 10px;
 padding-left: 10px;
 width:300px;">Very truly yours,<br><br><br><br>______________________________<br><b>'.$user.'</b></br>'.$userposition.'</p>';
-  
+
 $vty='<p style="display:inline; float:right;">Conforme:<br><br><br><br>__________________<br>Date:</p>';
 $letter=$letter.$main.'<br><footer>'.$ack.$vty. '
 <br>
 </footer><br><br><br>';
  echo $letter;
- 
+
  break;
- 
- 
- 
+
+
+
  CASE 'CreditLineSecurityAgreements':
     if (!allowedToOpen(586,'1rtc')) { echo 'No permission'; exit; }
 // echo '<style></style>';
- 
- 
+
+
 $sqlmain='SELECT c.*,Company, CompanyName FROM `1clients` c JOIN gen_info_1branchesclientsjxn bcj ON c.ClientNo=bcj.ClientNo JOIN 1branches b ON bcj.branchNo=b.BranchNo JOIN 1companies cc ON b.CompanyNo=cc.CompanyNo where c.ClientNo='.$clientno.' LIMIT 1';
 
     $stmt=$link->query($sqlmain);
     $result=$stmt->fetch();
-    
-$company=$result['CompanyName'];	
+
+$company=$result['CompanyName'];
 
 
 echo '<center><a href="javascript:window.print()"><img src="../generalinfo/logo/'.$result['Company'].'.png"></a></br></center>';
@@ -615,25 +616,25 @@ echo '<br><br>';
 		<b><center>Co-maker Statement</center></b>
 
 		<br><p><blockquote>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;I, ________________________________, of legal age, with residence at _____________________ _______________________________________________, for valuable consideration, hereby agree to be the solidary co-maker under the foregoing credit line, whose contents I read and understood. I promise to pay '.$company.' the full amount in case of default upon demand.</blockquote></p>
-		
+
 		<br>
 		<br>
 		<center><div><div>________________________________<br><b>Signature</b></div><div style="margin-left:35%;" align="left">Date:<br>Contact no.:</div></div></center>
 		<br><br><br>
-		
+
 		<b><center>Security Agreement for Deposit Account</center></b><br>
-		
-		
+
+
 		<p><blockquote>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;I, ________________________________, of legal age, with address at _____________________ _______________________________________________, with due authority, (the ‘Grantor’) hereby executes this Security Agreement with '.$company.' on ___________________ upon the following terms:</blockquote></p><br>
 		<blockquote>
 		<ol>
-		
+
 		<li>The Grantor hereby creates a security interest over deposit account number _________________ under account name _________________________________________________________ (the ‘account’) with ____________________________________ to secure payment of the credit line with the Company.</li>
-		
+
 		<li>The Grantor grants special power of attorney (‘SPA’) to the Company to appropriate the collateral to settle the outstanding liability that has defaulted default under the credit line.</li>
-		
+
 		<li>The SPA shall be extinguished when the total principal obligation is paid in full, or when there is no default and the term of the credit line expires.</li>
-		
+
 		</ol>
 		</blockquote></div><br><br><br><br><br>';
 		/* $ack='<p style="display:inline; float:left;
@@ -642,21 +643,21 @@ echo '<br><br>';
 			padding-left: 10px;
 			width:300px;">______________________________<br>Name<br><b>Grantor</b></p>'; */
 		$ack='<center>______________________________<br>Name<br><b>Grantor</b><br><br><br>';
-			  
+
 			// $vty='<p style="display:inline; float:right;"><u>'.$user.', '.$userposition.'</u><br><b>'.$company.'</b></p>';
 			$vty='______________________________<br>'.$user.'<br>'.$userposition.'<br><b>'.$company.'</b></center>';
-		
+
 		echo '<div style="text-align:center;width:100%;align:center;">'.$ack.$vty.'</div><p>';
  break;
- 
- 
- 
+
+
+
 case 'RemindHoldCheck':
     if (!allowedToOpen(590,'1rtc')) { echo 'No permission'; exit; }
    include('../acctg/ARfunctions.php');
    makepdcs($clientno,$link);
    if (!isset($_POST['check1'])){
-      
+
    ?><form method="post" action="printsoa.php?w=RemindHoldCheck">
  Check/s To Include in the letter:<br>1.&nbsp<input type="text" name="check1" list="undeposited" size=30 autocomplete="off" required="true">
  <br>2.&nbsp<input type="text" name="check2" list="undeposited" size=30 autocomplete="off">
@@ -664,9 +665,9 @@ case 'RemindHoldCheck':
  <br>4.&nbsp<input type="text" name="check4" list="undeposited" size=30 autocomplete="off">
  <br>5.&nbsp<input type="text" name="check5" list="undeposited" size=30 autocomplete="off">
  <input type="hidden" name="clientno" value="<?php echo $clientno ?>" ><input type="hidden" name="<?php echo $fieldname;?>" value="<?php echo $_POST[$fieldname];?>" >
-  
-<datalist id="undeposited" style="height: 150px;width: 150px; overflow: auto"> 
-<?php  
+
+<datalist id="undeposited" style="height: 150px;width: 150px; overflow: auto">
+<?php
 		foreach ($link->query('Select PDCNo, concat(PDCNo, " dated ",DateofPDC,":  P", PDC) as Particulars from undeppdcs p ') as $row) {
                 ?>
                 <option value="<?php echo $row['PDCNo']; ?>" label="<?php echo $row['Particulars']; ?>"></option>
@@ -687,7 +688,7 @@ $resultco=$stmt->fetchAll();
 
 foreach ($resultco as $company){
 $letter='<center><img src="../generalinfo/logo/'.$company['Company'].'.png"></br>';
- 
+
 $letter=$letter. '<font style="font-size: 80%;">Credit & Collections Office: &nbsp; collections@1rotary.com.ph <br/>(02) 734 07679 •  '.$resultuser['MobileNo'].'</font><br><br><br>Final Notice<br><br></center>';
 $sqlmain='SELECT * FROM `1clients` c where ClientNo='.$clientno;
 
@@ -705,7 +706,7 @@ $result=$stmt->fetchAll();
 $checkcount=0;
 foreach ($result as $check){
    $checkcount=$checkcount+1;
-   $main=$main.'<center>'.$checkcount.'. '. $check['Particulars'].'</center><br>'; 
+   $main=$main.'<center>'.$checkcount.'. '. $check['Particulars'].'</center><br>';
 }
 $main=$main.'<br><br>Please settle your accounts on time to avoid any convenience caused by the temporary suspension of your credit line.';
 $main=$main.'<br><br>If payments have been made, kindly disregard this reminder.<br><br>Thank you very much.<br><br>';
@@ -721,7 +722,7 @@ $sqluser='Select concat(FirstName, \' \',Left(MiddleName,1), \'. \',SurName) as 
 $stmt=$link->query($sqluser);
 $result=$stmt->fetch();
 $creditofficer=$result['FullName'];
-    
+
 $vty='<p style="display:inline; float:right;">Very truly yours,<br><br><br><br>__________________<br>'.$creditofficer.'<br><font size="2">'.$result['Position'].'</font>';
 
 $letter=$letter.$main.'<br><footer>'.$ack.$vty. '
@@ -748,11 +749,11 @@ $letter=$letter.$main.'<br><footer>'.$vty. '
 <br>
 </footer><br><br><br>';
  echo $letter;
- break;   
+ break;
 }
 
 
-noform: 
+noform:
      $stmt=null;  $link=null;
     ?>
 </body>
