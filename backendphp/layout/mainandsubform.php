@@ -52,7 +52,7 @@ echo '<title>'.$title.'</title>';
 $stmt=$link->query($sqlmain); $result=$stmt->fetch();
 if (!isset($nopost)){
     $postvalue=($result[$postfield]==1?0:1); $main=$table; 
-    include('../backendphp/layout/postunpostformgeneric.php');
+    include('../backendphp/layout/postunpostform.php');
 }
 ?>
 <div id="wrap"><div id="main">
