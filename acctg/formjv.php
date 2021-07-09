@@ -15,7 +15,7 @@ if (!allowedToOpen($lookupallow,'1rtc')) { echo 'No permission'; exit;}
 ?><br><div id="section" style="display: block;"><?php
 $file=basename($_SERVER['SCRIPT_FILENAME']);
 $w=(!isset($_GET['w'])?'List':$_GET['w']);
-$txnidname='JVNo'; $form='JV'; $postfield='Posted';
+$txnidname='JVNo'; $form='JV'; $postfield='Posted'; $datefield='JVDate';
 include_once $path.'/acrossyrs/commonfunctions/listoptions.php';
 
 
