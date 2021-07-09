@@ -4,57 +4,22 @@ include_once $path.'/acrossyrs/dbinit/userinit.php';
 $link=!isset($link)?connect_db($currentyr.'_1rtc',0):$link;
 
  
-$post=$_REQUEST['Post'];
+$postvalue=$_REQUEST['Post'];
+$postfield=$_REQUEST['PostField'];
 $table=$_REQUEST['Table'];
 $txnid=intval($_REQUEST['TxnID']);
+$txnidname=$_REQUEST['TxnIDName'];
 $which=strstr($_REQUEST['Table'],'_',true);
 $txntype=$_REQUEST['txntype'];
-$txnidname='TxnID';
+$datefield=$_REQUEST['DateField'];
 
-
-/* COMMENTED OUT CONFIRMATION COMMANDS */
-    switch ($which) {
-       
-        case 'invty':
-            
-            break;
-        case 'acctg':
-            
-            break;
-        case 'audit':
-            
-            $txnidname='CountID';
-			
-            break;
-        case 'quote':
-            
-            break;
-        default:
-            break;
-    }
     
     switch($txntype){
-        case 4:
-        case 'Repack':
-        case 'Out': case 'Vacuum':
-            $date='DateOUT';
-            $postfield='Posted';
-            $confirmfield='Transfer';
-            break;
         case 7:
         case 'In':
-            $date='DateIN';
-            $postfield='PostedIn';
             $dateout='DateOUT';
-            $confirmfield='TransferIN';
             break;
-        case 'Assets': $txnidname='AssetID'; $date='DateAcquired'; $postfield='Posted'; break;
-        case 'Prepaid': $txnidname='PrepaidID'; $date='DatePaid'; $postfield='Posted'; break;
-        case 'countcash': $date='DateCounted'; $txnidname='CashCountID'; $postfield='Posted'; break;
-        case 'quote':  $txnidname='QuoteID'; $date='QuoteDate'; $postfield='Posted'; break;
-        case 'SpecCredits':  $txnidname='TxnID'; $date='DateofCredit'; $postfield='Posted'; break;
-        case 'BouncedfromCR': $date='DateBounced'; $postfield='Posted';  break;
-        case 'BouncedfromCRLast': $date='DateBounced'; $txnidname='UndepPDCId'; $postfield='Posted';  break;
+        
 		case 'Order':
 		
 		$sqlm='select Posted from invty_3order WHERE TxnID='.$txnid.';'; 
@@ -69,58 +34,46 @@ $txnidname='TxnID';
 				exit();
 			}
 		}
-		
-		
-		$date='Date';  $postfield='Posted';
+		  
 		break;
 		
-		case 'LoanType':
-		$date='LoanDate';  $postfield='Posted';
-		
-		break;
-		// print_r($_REQUEST); exit();
-        default:
-            $date='Date';  $postfield='Posted';
     }
 	
-	switch($table){
-		case'acctg_2cvmain':
-			$txnidname='CVNo';
-		break;
-		
-		case'acctg_4futurecvmain':
-			$txnidname='CVNo';
-		break;
-		
-		case'acctg_2jvmain':
-			$txnidname='JVNo';
-			$date='JVDate';
-		break;
-		
-	}
    
-    $sql='Select `'.$date.'`, '.(isset($dateout)?'`'.$dateout.'`,':'').' `'.$postfield.'` from `'.$table.'` where '.$txnidname.'='.$txnid;
+    $sql='Select `'.$datefield.'`, '.(isset($dateout)?'`'.$dateout.'`,':'').' `'.$postfield.'` from `'.$table.'` where '.$txnidname.'='.$txnid;
 
     if ($_SESSION['(ak0)']==1002) { echo 'Txntype: '.$txntype.'<br><br>'.$sql;  }
     $stmt=$link->query($sql); $result=$stmt->fetch();
     
-    if ($result[$postfield]==0 and $post<>0){ //POST
+//POST
+    if ($result[$postfield]==0 and $postvalue<>0){ 
         if ($_SESSION['(ak0)']==1002) { echo 'goes here POST';  }
         $sql='Update `'.$table.'` SET `'.$postfield.'`=1, `'.$postfield.'ByNo`='.$_SESSION['(ak0)'].' where '.$txnidname.'='.$txnid;
 		if($txntype=='LoanType'){
 			$stmt=$link->prepare($sql); $stmt->execute();
 			$sql='Update `'.$table.'` SET `'.$postfield.'TS`=NOW() where '.$txnidname.'='.$txnid;
 		}
-		// exit();
         if ($_SESSION['(ak0)']==1002) { echo 'Txntype: '.$txntype.'<br><br>'.$sql;  }
         $stmt=$link->prepare($sql);
         $stmt->execute();   
+
+    // additional for check vouchers
+    if (in_array($table,array('acctg_2cvmain', 'acctg_4futurecvmain'))){
+        if($postfield=='APVPosted'){
+            $sql='SELECT CVNo FROM acctg_2cvmain WHERE CreditAccountID<>403 AND (CreditAccountID NOT IN (SELECT AccountID FROM banktxns_1maintaining) AND `'.$txnidname.'`='.$txnid;
+            $stmt=$link->query($sql); $result=$stmt->fetch();
+            if($stmt->rowCount()==0) { goto nopermission;}
+            $sql='UPDATE acctg_2cvmain SET Posted=1 WHERE CreditAccountID<>403 AND (CreditAccountID NOT IN (SELECT AccountID FROM banktxns_1maintaining) AND `'.$txnidname.'`='.$txnid;  
+            $stmt=$link->prepare($sql); $stmt->execute();
+    }
+    }
+
     } else {
         //UNPOST 
         if ($_SESSION['(ak0)']==1002) { echo 'goes here ';  }
-        $closedate=($which<>'acctg')?$_SESSION['nb4']:$_SESSION['nb4A']; 
-        $datecondition=((($txntype==7 or $txntype=='In') and (is_null($result['DateIN']) or empty($result['DateIN'])))?($result[$dateout]>$closedate):(($result[$date])>($closedate))); // OR $result[$date]=='0000-00-00'
-        if ($_SESSION['(ak0)']==1002) {  echo $closedate; echo $result[$date].'<br>'.$datecondition;  }
+        $closedate=(allowedToOpen(250,'1rtc'))?$_SESSION['nb4A']:$_SESSION['nb4']; 
+        $datecondition=((($txntype==7 or $txntype=='In') and (is_null($result['DateIN']) or empty($result['DateIN'])))?($result[$dateout]>$closedate):(($result[$datefield])>($closedate))); 
+        if ($_SESSION['(ak0)']==1002) {  echo $closedate; echo $result[$datefield].'<br>'.$datecondition;  }
 		
         switch ($table) {
         case 'invty_3branchrequest':
@@ -141,13 +94,13 @@ $txnidname='TxnID';
                 $tobranhnocol='';
                 $wheretobranchno=0;
             }
-            $sqla='SELECT '.$date.',`BranchNo`'.$tobranhnocol.' FROM '.$_POST['Table'].' WHERE TxnID='.intval($_POST['TxnID']);
+            $sqla='SELECT '.$datefield.',`BranchNo`'.$tobranhnocol.' FROM '.$_POST['Table'].' WHERE TxnID='.intval($_POST['TxnID']);
            
             $stmta=$link->query($sqla); $resulta=$stmta->fetch();
 
             if(allowedToOpen(40101,'1rtc')){ //handled branches of operations manager
                 
-                if($resulta[$date]==date('Y-m-d') OR (date('Y-m-d')==date('Y-m-d', strtotime("+1 day", strtotime($resulta[$date]))) AND date('H:i')<='12:00')){
+                if($resulta[$datefield]==date('Y-m-d') OR (date('Y-m-d')==date('Y-m-d', strtotime("+1 day", strtotime($resulta[$datefield]))) AND date('H:i')<='12:00')){
                     $sqlcheckopsmanager='SELECT BranchNo FROM attend_1branchgroups WHERE (BranchNo='.$resulta['BranchNo'].''.($wheretobranchno==1?' OR BranchNo='.$resulta['ToBranchNo'].'':'').') AND OpsManager='.$_SESSION['(ak0)'].'';
                     $stmtcheckopsmanager=$link->query($sqlcheckopsmanager);
                     if($stmtcheckopsmanager->rowCount()>0){
@@ -201,7 +154,6 @@ $txnidname='TxnID';
         case 'audit_2countmain':
         case 'audit_2toolscountmain':
         case 'audit_2countcash':
-        case 'audit_3vacuum':
         case 'invty_4adjust':
             if (!allowedToOpen(404,'1rtc')){ goto nopermission; } 
             break;
@@ -217,22 +169,33 @@ $txnidname='TxnID';
             break;
         case 'acctg_1assets':
             if (!allowedToOpen(408,'1rtc')){ goto nopermission; }
-            $datecondition=true; $txnidname='AssetID';
+            $datecondition=true; 
             break;
         case 'acctg_2prepaid':
             if (!allowedToOpen(408,'1rtc')){ goto nopermission; }
-            $datecondition=true; $txnidname='PrepaidID';
-            break;
-        case 'acctg_4futurecvmain':
-            if (!allowedToOpen(407,'1rtc')){ goto nopermission;}
-            else {$datecondition=true;}
+            $datecondition=true; 
             break;
         
         case 'acctg_2depositmain':  
             if (!allowedToOpen(412,'1rtc')){ goto nopermission;}
             break;
 
-        case 'acctg_2cvmain':      
+        case 'acctg_4futurecvmain':   
+            $datecondition=true;
+        case 'acctg_2cvmain':   
+            if($postfield=='APVPosted'){
+                if (!allowedToOpen(413,'1rtc')){ goto nopermission;}
+                $sql='SELECT CVNo FROM acctg_2cvmain WHERE CreditAccountID<>403 AND (CreditAccountID NOT IN (SELECT AccountID FROM banktxns_1maintaining) AND `'.$txnidname.'`='.$txnid;
+                $stmt=$link->query($sql); $result=$stmt->fetch();
+                if($stmt->rowCount()==0) { goto nopermission;}
+                $sql='UPDATE acctg_2cvmain SET Posted='.$postvalue.' WHERE CreditAccountID<>403 AND (CreditAccountID NOT IN (SELECT AccountID FROM banktxns_1maintaining) AND `'.$txnidname.'`='.$txnid;  
+                $stmt=$link->prepare($sql); $stmt->execute();
+            } else {
+                if (!allowedToOpen(414,'1rtc')){ goto nopermission;}
+                $txnid=$txnid.' AND (CreditAccountID=403 OR (CreditAccountID  IN (SELECT AccountID FROM banktxns_1maintaining)))';
+            }
+                break;
+
         case 'acctg_2collectsubbounced':
         case 'acctg_2salemain':
         case 'acctg_2txfrmain':

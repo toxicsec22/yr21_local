@@ -103,7 +103,7 @@ WHERE a.PrepaidID='.$txnid;
      $txnsubid='AmortID'; 
     $withsub=true; $coltototal='Amount'; $runtotal=true;
     // info for posting:
-    $postvalue='1'; $table='acctg_2prepaid';  $txntype='Prepaid';
+    $postvalue='1'; $table='acctg_2prepaid';  $txnidname='PrepaidID'; $datefield='DatePaid'; 
     //to add records in sub
     $columnnames=array(
                     array('field'=>'AmortDate', 'type'=>'date','size'=>15,'required'=>true,'autofocus'=>true),

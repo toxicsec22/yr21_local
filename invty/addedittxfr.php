@@ -60,16 +60,16 @@ $showbranches=true;
     $reqno=$result['ForRequestNo']; $reqtxnid=$result['ReqTxnID'];
     if ($result['BranchNo']==$result['ToBranchNo']) {
         $txntype='Repack'; $editsubtable='TxfrSubEdit'; $editprocesslabel='Enter';
-        $postedfield='Posted';
+        $postedfield='Posted'; $datefield='DateOUT';
         $deloreditmain='<a href=..\backendphp\functions\delrecords.php?TxnID='.$txnid.'&action_token='.$_SESSION['action_token'].'&w=invty_2transfer&l=invty OnClick="return confirm(\'Really delete this?\');">Delete</a>';
         } elseif ($result['BranchNo']==$_SESSION['bnum']) {
         $txntype='Out'; $editsubtable='TxfrSubEdit'; $editprocesslabel='Enter';
-        $postedfield='Posted';
+        $postedfield='Posted'; $datefield='DateOUT';
         $deloreditmain='<a href=..\backendphp\functions\delrecords.php?TxnID='.$txnid.'&action_token='.$_SESSION['action_token'].'&w=invty_2transfer&l=invty OnClick="return confirm(\'Really delete this?\');">Delete</a>';
         
     } elseif ($result['ToBranchNo']==$_SESSION['bnum']) {
          $txntype='In';$editsubtable='TxfrSubAccept'; $editprocesslabel='Accept';
-         
+         $datefield='DateIN';
          $postedfield='PostedIn';
          $deloreditmain='';
          

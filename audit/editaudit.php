@@ -99,6 +99,7 @@ $liststoshow=array('');
     $action='praddaudit.php?w=CountInvSubAdd&CountID='.$txnid;
     // info for posting:
     $postvalue='1';
+    $txnidname='CountID';
     $table='audit_2countmain';
     $txntype='audit';
         break;

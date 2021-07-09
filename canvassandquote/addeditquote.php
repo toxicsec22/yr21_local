@@ -68,7 +68,7 @@ WHERE m.QuoteID='.$txnid.' Order By Description';
     $txnsubid='QuoteSubID'; $withsub=true;
     $liststoshow=array();
     // info for posting:
-    $postvalue='1'; $table='quotations_2quotemain'; $txntype='quote';
+    $postvalue='1'; $table='quotations_2quotemain'; $txnidname='QuoteID'; $datefield='QuoteDate';
  // $left='90%'; $leftmargin='91%'; $right='9%'; 
  include('../backendphp/layout/inputsubform.php');
    $link=null; $stmt=null;

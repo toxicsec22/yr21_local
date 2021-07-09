@@ -340,11 +340,13 @@ CASE 'BouncedfromCR':
 if (!allowedToOpen(593,'1rtc')) {   echo 'No permission'; exit;}
 if(isset($_GET['fromlast'])){
 	$whichqry='BouncedfromCRLast'; $fromlast='&fromlast=1';
+    $txnidname='UndepPDCId';
 	$tbname='acctg_3undepositedpdcfromlastperiodbounced';
 	$sql='SELECT sb.*,PDCNo AS CheckNo, PDCBank AS CheckBank, c.ClientName, AmountOfPDC AS Amount, e.Nickname AS EncodedBy, ca.ShortAcctID AS BankWhereBounced FROM acctg_3undepositedpdcfromlastperiod m JOIN acctg_3undepositedpdcfromlastperiodbounced sb ON m.UndepPDCId=sb.UndepPDCId JOIN `1clients` c ON c.ClientNo=m.ClientNo JOIN `1employees` e ON e.IDNo=sb.EncodedByNo JOIN acctg_1chartofaccounts ca ON ca.AccountID=sb.CreditAccountID WHERE m.UndepPDCId='.$txnid;
 	$upimg='FromLast';
 } else {
 	$whichqry='BouncedfromCR';
+    $txnidname='TxnID';
 // The sql for main may remain to be the basis for unpaid invoices	
 	$tbname='acctg_2collectsubbounced';
 	$sql='SELECT sb.*, m.CheckNo, m.CheckBank, c.ClientName, FORMAT(SUM(s.Amount)-(SELECT IFNULL(SUM(Amount),0) FROM `acctg_2collectsubdeduct` csd WHERE csd.TxnID=m.TxnID),2)  AS Amount, e.Nickname AS EncodedBy, ca.ShortAcctID AS BankWhereBounced FROM acctg_2collectmain m JOIN acctg_2collectsub s ON m.TxnID=s.TxnID JOIN acctg_2collectsubbounced sb ON m.TxnID=sb.TxnID
@@ -404,8 +406,8 @@ if (editOk($tbname,$txnid,$link,$whichqry) and allowedToOpen(593,'1rtc')){
 //	
     $columnnames=array(); $liststoshow=array();
     // info for posting:
-    $postvalue='1';
-    $table=$tbname; $txntype=$whichqry;
+    $postvalue='1'; $datefield='DateBounced';
+    $table=$tbname; 
 break;
         
 CASE 'Interbranch':

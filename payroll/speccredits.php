@@ -78,7 +78,7 @@ if (!isset($_GET['TxnID'])){ goto noform;} else {
 	$postvalue='1';
     $table='payroll_30othercreditsmain';
 	$txnid=$_GET['TxnID'];
-	$txntype='SpecCredits';
+	$datefield='DateofCredit';
 	$withsub=true;include('../backendphp/layout/inputsubform.php');
    
 }

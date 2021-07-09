@@ -65,14 +65,6 @@ switch ($whichqry){
     case 'CashCount':
      
       $title='Add/Edit Cash Count';
-   /*  $sqlmain='SELECT c.*, b.Branch, e.Nickname as AuditedBy FROM audit_2countcash c join `1branches` b on b.BranchNo=c.BranchNo
-left join `1employees` e on e.IDNo=c.EncodedByNo
-where  CashCountID='.$txnid;
-    
-    $stmt=$link->query($sqlmain);
-    $result=$stmt->fetch();
-    $datecounted=$result['DateCounted']; */
-	
     $main='';
     
     if (editOk('audit_2countcash',$txnid,$link,'countcash')){
@@ -140,8 +132,8 @@ $liststoshow=array('');
         
     $action='prcashtools.php?w=CountCashSubAdd&CashCountID='.$txnid;
     // info for posting:
-    $postvalue='1';
-    $table='audit_2countcash'; $txntype='countcash';
+    $postvalue='1'; $txnidname='CashCountID'; $datefield='DateCounted';
+    $table='audit_2countcash'; 
 	
 	
 	
@@ -223,7 +215,7 @@ $liststoshow=array('');
    $liststoshow=array('tools');
     $action='prcashtools.php?w=CountToolsSubAdd&CountID='.$txnid;
     // info for posting:
-    $postvalue='1';
+    $postvalue='1'; $txnidname='CountID';
     $table='audit_2toolscountmain';
     
         break;
