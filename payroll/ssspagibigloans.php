@@ -284,7 +284,7 @@ $divnewline='<div style="clear: both; display: block; position: relative;height:
  $txnsubid='TxnSubID'; 
  $withsub=true; $coltototal='DiffAmount'; $runtotal=true;
  // $withsub=true; $coltototal='Amount'; $runtotal=true;
-$post='1'; $table='payroll_31loansmain';   $txntype='LoanType';
+$postvalue='1'; $table='payroll_31loansmain';   $txntype='LoanType';
 
  // info for posting:
 //END Used

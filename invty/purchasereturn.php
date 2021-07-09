@@ -183,7 +183,7 @@ $txnid=intval($_REQUEST['TxnID']);
         
     $action='purchasereturn.php?w=PRaddsub&TxnID='.$txnid;
       
-	$post='1';
+	$postvalue='1';
     $table='invty_2pr';
 	$liststoshow=array();
 	$withsub=true;

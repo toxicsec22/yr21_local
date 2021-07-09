@@ -100,7 +100,7 @@ Where m.TxnID='.$txnid.' Group By m.AdjNo';
     $action='pradjust.php?w=AdjustSubAdd&TxnID='.$txnid.'&txntype=Adjust';
     $liststoshow=array('items');
     // info for posting:
-    $post='1';
+    $postvalue='1';
     $table='invty_4adjust';
     
         break;

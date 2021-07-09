@@ -253,7 +253,7 @@ where s.TxnID='.$txnid;
     $action='praddsale.php?w=SaleSub&TxnID='.$txnid.'&txntype='.$txntype;
     
     // info for posting:
-    $post='1';
+    $postvalue='1';
     $table='invty_2sale';
     
     

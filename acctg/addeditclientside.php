@@ -113,7 +113,7 @@ join acctg_1chartofaccounts ca1 on ca1.AccountID=s.CreditAccountID '
     $whichotherlist='acctg';
     $otherlist=array('accounts');
     // info for posting:
-    $post='1';
+    $postvalue='1';
     $table='acctg_2salemain';
     
         break;
@@ -328,7 +328,7 @@ $stmt=$link->query($sqlunpd);
     $whichotherlist='acctg';
     $otherlist=array('unpaidinvoices');
     // info for posting:
-    $post='1';
+    $postvalue='1';
     $table='acctg_2collectmain'; $txntype=30;
     
     include('acctglayout/inputsubformwithinvlist.php');
@@ -404,7 +404,7 @@ if (editOk($tbname,$txnid,$link,$whichqry) and allowedToOpen(593,'1rtc')){
 //	
     $columnnames=array(); $liststoshow=array();
     // info for posting:
-    $post='1';
+    $postvalue='1';
     $table=$tbname; $txntype=$whichqry;
 break;
         
@@ -514,7 +514,7 @@ Where m.TxnID='.$txnid;
     $action='praddsub.php?w=TxfrSubAdd&TxnID='.$txnid;
     $liststoshow=array();
     // info for posting:
-    $post='1';
+    $postvalue='1';
     $table='acctg_2txfrmain';
     
     //Removed. not used acctg_2txfrsubadj table

@@ -75,7 +75,7 @@ if (!isset($_GET['TxnID'])){ goto noform;} else {
 	 $columnstoedit=array();
 	 $editok=$editsub; $editprocesslabel='Edit';
 	 
-	$post='1';
+	$postvalue='1';
     $table='payroll_30othercreditsmain';
 	$txnid=$_GET['TxnID'];
 	$txntype='SpecCredits';

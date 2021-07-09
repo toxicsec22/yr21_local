@@ -179,7 +179,7 @@ $showbranches=true;
     $action='praddtxfr.php?w=TxfrSubAdd&ReqTxnID='.$reqtxnid.'&TxnID='.$txnid.'&txntype='.$txntype;
         
     // info for posting:
-    $post='1';
+    $postvalue='1';
     $table='invty_2transfer';
     
     
@@ -377,7 +377,7 @@ Where m.TxnID='.$txnid.' and ud.SendBal<>0 Group By ud.ReqTxnID';
     $action='praddtxfr.php?w=RequestSubAdd&TxnID='.$txnid.'&txntype=Request';
     $liststoshow=array();
     // info for posting:
-    $post='1';
+    $postvalue='1';
     $table='invty_3branchrequest';
     
     $editprocesslabel='Enter'; $width='120%';

@@ -170,7 +170,7 @@ include_once('../backendphp/layout/displayastable.php');
             $addsub='formjv.php?w=AddSub&'.$txnidname.'='.$txnid;
             
             // info for posting: $table has been defined
-            $post='1';
+            $postvalue='1';
               $fieldsinrow=4;
             $editprocesssublabel='Edit'; $editprocesssub='formjv.php?w=Edit'.$form.'Sub&'.$txnidname.'='.$txnid.'&TxnSubId=';
             

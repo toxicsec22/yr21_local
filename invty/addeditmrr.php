@@ -148,7 +148,7 @@ $liststoshow=array();*/
 
 
    info_for_posting:
-    $post='1';
+    $postvalue='1';
     $table='invty_2mrr';
     
 //        break;

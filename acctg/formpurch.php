@@ -200,7 +200,7 @@ switch ($w){
             $addsub='formpurch.php?w=AddSub&'.$txnidname.'='.$txnid;
             
             // info for posting: $table has been defined
-            $post='1';
+            $postvalue='1';
               $fieldsinrow=6;
             $editprocesssublabel='Edit'; $editprocesssub='formpurch.php?w=Edit'.$form.'Sub&'.$txnidname.'='.$txnid.'&TxnSubId=';
             

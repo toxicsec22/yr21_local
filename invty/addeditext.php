@@ -106,7 +106,7 @@ Where m.TxnID='.$txnid;
     $action='praddext.php?w=RequestSubAdd&TxnID='.$txnid.'&txntype=Request';
     $liststoshow=array();
     // info for posting:
-    $post='1';
+    $postvalue='1';
     $table='invty_3extrequest';
     
         break;
@@ -279,7 +279,7 @@ left join `1employees` as e on o.EncodedByNo=e.IDNo where TxnID='.$txnid;
 	
 
     // info for posting:
-    $post='1';
+    $postvalue='1';
 	
     $table='invty_3order';
     

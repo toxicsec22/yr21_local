@@ -103,7 +103,7 @@ WHERE a.AssetID='.$txnid;
      $txnsubid='DeprID'; 
     $withsub=true; $coltototal='Amount'; $runtotal=true;
     // info for posting:
-    $post='1'; $table='acctg_1assets';  $txntype='Assets';
+    $postvalue='1'; $table='acctg_1assets';  $txntype='Assets';
     //to add records in sub
     $columnnames=array(
                     array('field'=>'DeprDate', 'type'=>'date','size'=>15,'required'=>true,'autofocus'=>true),

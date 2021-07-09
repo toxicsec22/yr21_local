@@ -246,7 +246,7 @@ switch ($w){
             $addsub='formcv.php?w=AddSub&'.$txnidname.'='.$txnid;
             
             // info for posting: $table has been defined
-            $post='1';
+            $postvalue='1';
               $fieldsinrow=3;
             $editprocesssublabel='Edit'; $editprocesssub='formcv.php?w=Edit'.$form.'Sub&'.$txnidname.'='.$txnid.'&TxnSubId=';
             

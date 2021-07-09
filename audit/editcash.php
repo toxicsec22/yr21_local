@@ -140,7 +140,7 @@ $liststoshow=array('');
         
     $action='prcashtools.php?w=CountCashSubAdd&CashCountID='.$txnid;
     // info for posting:
-    $post='1';
+    $postvalue='1';
     $table='audit_2countcash'; $txntype='countcash';
 	
 	
@@ -223,7 +223,7 @@ $liststoshow=array('');
    $liststoshow=array('tools');
     $action='prcashtools.php?w=CountToolsSubAdd&CountID='.$txnid;
     // info for posting:
-    $post='1';
+    $postvalue='1';
     $table='audit_2toolscountmain';
     
         break;

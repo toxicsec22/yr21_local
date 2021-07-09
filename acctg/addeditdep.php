@@ -144,7 +144,7 @@ Where m.TxnID='.$txnid;
     $action='praddsub.php?w=DepSubAdd&TxnID='.$txnid;
     $liststoshow=array('branchnames');
     // info for posting:
-    $post='1';
+    $postvalue='1';
     $table='acctg_2depositmain';
     
 
