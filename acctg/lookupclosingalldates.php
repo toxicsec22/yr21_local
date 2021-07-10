@@ -471,17 +471,17 @@ $sql0='drop table if exists `acctg_dailyclose_endapar'.$_SESSION['(ak0)'].'`'; $
     
  */
 
-$subtitle='With MRR, No Recorded Purchase in Acctg after 3 Days';
+$subtitle='With MRR, No Recorded Purchase in Acctg after 5 Days';
 
 $sql='SELECT m.`Date`, m.MRRNo AS `MRRorPR`, m.SuppInvNo, m.TxnID, s.SupplierName FROM `invty_2mrr` m
         LEFT JOIN `acctg_2purchasemain` pm ON m.MRRNo=pm.MRRNo
         JOIN `1suppliers` AS s ON m.SupplierNo=s.SupplierNo 
-        WHERE (txntype=6) AND (pm.MRRNo IS NULL)
+        WHERE (txntype=6) AND (pm.MRRNo IS NULL)  AND DATEDIFF(CURDATE(),m.`Date`)>5
         UNION ALL
 SELECT m.`Date`, m.PRNo, m.PRNo, m.TxnID, s.SupplierName FROM `invty_2pr` m
         LEFT JOIN `acctg_2purchasemain` pm ON m.PRNo=pm.MRRNo
         JOIN `1suppliers` AS s ON m.SupplierNo=s.SupplierNo 
-        WHERE (txntype=8) AND (pm.MRRNo IS NULL);';
+        WHERE (txntype=8) AND (pm.MRRNo IS NULL)  AND DATEDIFF(CURDATE(),m.`Date`)>5 ORDER BY `Date`;';
 $columnnames=array('Date','MRRorPR','SupplierName','SuppInvNo','TxnID');    
     include('../backendphp/layout/displayastableonlynoheaders.php');
 if($_SESSION['(ak0)']==1002) { echo 'As of '.date('Y-m-d h:i:s l').'<br><br>';}    
