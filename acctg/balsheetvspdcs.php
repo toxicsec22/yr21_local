@@ -5,7 +5,7 @@ $showbranches=false; include_once('../switchboard/contents.php');
 ?>
 <html>
 <head>
-<title>Data Errors</title>
+<title>BS vs Unpaid Inv</title>
 </head>
 <body>
 <h3>Data Errors</h3><br>
