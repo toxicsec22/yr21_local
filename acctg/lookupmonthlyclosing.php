@@ -107,12 +107,40 @@ $title='Auto Post as of Date';
 Post all as of:  <input type="date" size=5 name="asofdate" value="<?php echo date('Y-m-d'); ?>"></input>&nbsp &nbsp &nbsp 
 <input type="submit" name="lookup" value="Lookup"> </form>
 <?php
-if (!isset($_REQUEST['asofdate'])){    goto noformmonthlyclosing;} 
+if (!isset($_REQUEST['asofdate'])){    
+
+?>
+<div style='background-color: #e6e6e6;
+  width: 300px; border: 2px solid grey;
+  padding: 25px; margin: 25px; 
+  font-size: 14px; font-style: Arial;'>
+The following will be posted in accounting data:<br><br>
+<ul>
+   <li>Deposits</li>
+   <li>Collection Receipts</li>
+   <li>Purchases</li>
+   <li>Sales</li>
+   <li>Interbranch Transfers</li>
+   <li>Journal Vouchers</li>
+   <li>Check Vouchers</li>
+   <li>Future Check Vouchers</li>
+   <li>Assets and Depreciation</li>
+   <li>Prepaid Expenses & Amortization</li>
+</ul>
+</div>
+
+<?php
+
+   goto noformmonthlyclosing;
+} 
 else {
 include_once ('../backendphp/functions/postperdate.php');
    $date=$_REQUEST['asofdate'];
-   $posttables=array('acctg_2depositmain','acctg_2collectmain','acctg_2purchasemain','acctg_2salemain','acctg_2txfrmain','acctg_2cvmain');
+
+   $posttables=array('acctg_2depositmain','acctg_2collectmain','acctg_2purchasemain','acctg_2salemain','acctg_2txfrmain');
    foreach ($posttables as $table){ postperdate($link,$table,$date,false);   }
+   postperdate($link,'acctg_2cvmain',$date,'CV');
+   postperdate($link,'acctg_4futurecvmain',$date,'FCV');
    postperdate($link,'acctg_2jvmain',$date,'JV');
    postperdate($link,'acctg_1assets',$date,'Assets');
    postperdate($link,'acctg_2prepaid',$date,'Prepaid');
