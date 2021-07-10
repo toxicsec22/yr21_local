@@ -125,10 +125,11 @@ switch ($w){
         
         if (isset($_REQUEST['Month']) and $_REQUEST['Month']==0){
                 $sql='SELECT \''.$lastyr.'-12-31\' AS `Date`, `CVNo`, `DateofCheck`,
-                `CheckNo`, FromAccount AS `CreditAccount`, `PayeeNo`, `Payee`, "Last Yr" AS PaymentMode,
+                `CheckNo`, ca.ShortAcctID AS `CreditAccount`, `PayeeNo`, `Payee`, "Last Yr" AS PaymentMode,
                 FORMAT(AmountofCheck,2) AS `Amount`, "From Last Yr" AS `Remarks`, ReleaseDate, CheckReceivedBy, `Cleared`
               FROM 
-                `acctg_3unclearedchecksfromlastperiod` ';
+                `acctg_3unclearedchecksfromlastperiod` m JOIN acctg_1chartofaccounts ca ON ca.AccountID=m.FromAccount  ';
+                if(allowedToOpen($treasury,'1rtc')) { $sql.=' JOIN banktxns_1maintaining bm ON m.FromAccount=bm.AccountID ';}
              //   $columnnames=array('Date','CVNo','DateofCheck','CreditAccount','PayeeNo','Payee','Amount','Remarks','Cleared'); 
               
         } else {
@@ -136,8 +137,9 @@ switch ($w){
       FROM 
         acctg_2cvmain as m 
         JOIN acctg_1chartofaccounts ca ON ca.AccountID=m.CreditAccountID 
-        JOIN acctg_0paymentmodes pm ON m.PaymentModeID=pm.PaymentModeID
-        LEFT JOIN acctg_2cvsub s on m.CVNo=s.CVNo WHERE '.$txndate.' GROUP BY m.CVNo  
+        JOIN acctg_0paymentmodes pm ON m.PaymentModeID=pm.PaymentModeID '.
+        ((allowedToOpen($treasury,'1rtc'))?'  JOIN banktxns_1maintaining bm ON m.CreditAccountID=bm.AccountID OR m.CreditAccountID=403 ':'').
+        ' LEFT JOIN acctg_2cvsub s on m.CVNo=s.CVNo WHERE '.$txndate.' GROUP BY m.CVNo  
         ORDER BY Date, m.CVNo';
         
         $editprocess=$file.'?w='.$form.'&'.$txnidname.'=';
@@ -392,12 +394,11 @@ switch ($w){
                         if (!allowedToOpen($assignbank,'1rtc')) { echo 'No permission'; exit;}
                         $title='AP Vouchers for Assignment';
                         $skipmainswitch=true;
-                        $columnnames=array('Date','CVNo','DateofCheck','CheckNo','CreditAccountID','Bank','PayeeNo','Payee','Total','Remarks');
+                        $columnnames=array('Date','CVNo','DateofCheck','CheckNo','CreditAccountID','Bank','PayeeNo','Payee','Total','Remarks','Posted');
                         $columnsub=$columnnames; $columnsub[]='TotalValue';
                         $sortfield=(isset($_POST['sortfield'])?$_POST['sortfield']:'CVNo');
-                        $columnstoedit=array('DateofCheck','CheckNo','CreditAccountID');
-                        $sql='SELECT m.CVNo, m.Date, m.DateofCheck,m.CheckNo, CreditAccountID,ca.ShortAcctID AS Bank, m.PayeeNo, m.Payee, FORMAT(SUM(s.Amount),2) AS Total, ROUND(SUM(s.Amount),2) AS TotalValue, m.Remarks FROM acctg_2cvmain AS m JOIN acctg_1chartofaccounts ca ON ca.AccountID=m.CreditAccountID JOIN acctg_2cvsub s ON m.CVNo=s.CVNo WHERE m.APVPosted=1 AND (m.CreditAccountID=403 OR m.Posted=0) GROUP BY m.CVNo  ORDER BY '.$sortfield;
-                        $txnidname='CVNo';
+                        $columnstoedit=array('DateofCheck','CheckNo','CreditAccountID','Posted');
+                        $sql='SELECT m.CVNo, m.Date, m.DateofCheck,m.CheckNo, CreditAccountID,ca.ShortAcctID AS Bank, m.PayeeNo, m.Payee, FORMAT(SUM(s.Amount),2) AS Total, ROUND(SUM(s.Amount),2) AS TotalValue, m.Remarks, m.Posted FROM acctg_2cvmain AS m JOIN acctg_1chartofaccounts ca ON ca.AccountID=m.CreditAccountID JOIN acctg_2cvsub s ON m.CVNo=s.CVNo WHERE m.APVPosted=1 AND (m.CreditAccountID=403 OR m.Posted=0) GROUP BY m.CVNo  ORDER BY '.$sortfield;
                         $editprocess='formcv.php?w=AssignBankProcess&CVNo=';
                         $editprocesslabel='Change!'; $coltototal='TotalValue'; $showgrandtotal=true;
                         $addlprocess='formcv.php?w=CV&CVNo=';$addlprocesslabel='Lookup';
@@ -408,8 +409,11 @@ switch ($w){
                                 if (!allowedToOpen(601,'1rtc')) { echo 'No permission'; exit;}
                                 $txnid=intval($_GET['CVNo']);
                                 //to check if editable
-                                if (editOk('acctg_2cvmain',$txnid,$link,$whichqry)){
-                                $sqlupdate='UPDATE `acctg_2cvmain` SET ';
+                                if (editOk('acctg_2cvmain',$txnid,$link,'acctg_2cvmain')){
+                                        $postvalue=(empty($_POST['Posted']) or $_POST['Posted']==0)?0:1;
+                                        
+                        
+                                $sqlupdate='UPDATE `acctg_2cvmain` SET Posted='.$postvalue.', ';
                                 $sql='';
                                 $columnstoedit=array('DateofCheck','CheckNo','CreditAccountID');
                                
@@ -417,22 +421,13 @@ switch ($w){
                                         $sql=$sql.' `' . $field. '`=\''.$_POST[$field].'\', '; 
                                 }
                                 $sql=$sqlupdate.$sql.' EncodedByNo=\''.$_SESSION['(ak0)'].'\', PostedByNo=\''.$_SESSION['(ak0)'].'\',TimeStamp=Now() WHERE APVPosted=1 AND Posted=0 and CVNo='.$txnid; 
-                                echo $sql; exit();
+                                
                                 $stmt=$link->prepare($sql);
                                 $stmt->execute();
                                 } 
                                 header("Location:formcv.php?w=AssignBank");
                                 break;
-     case 'Budget':
-                                if (!allowedToOpen(601,'1rtc')) { echo 'No permission'; exit;}
-                                $txnid=intval($_GET['TxnID']);
-                                $sql='UPDATE `budgetforcalc` SET Budget='.$_POST['Budget'].', TS=Now() where AccountID='.$_REQUEST['AccountID'];
-                                //echo $sql; break;
-                                $stmt=$link->prepare($sql);
-                                $stmt->execute();
-                                
-                                header("Location:txnsperday.php?perday=1&w=CVBudget&Date=".$_GET['Date']);
-                                break;
+     
                         
 }
 $link=null; $linkacctg=null;
