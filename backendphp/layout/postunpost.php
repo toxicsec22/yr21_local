@@ -60,10 +60,10 @@ $datefield=$_REQUEST['DateField'];
     // additional for check vouchers
     if (in_array($table,array('acctg_2cvmain', 'acctg_4futurecvmain'))){
         if($postfield=='APVPosted'){
-            $sql='SELECT CVNo FROM acctg_2cvmain WHERE CreditAccountID<>403 AND (CreditAccountID NOT IN (SELECT AccountID FROM banktxns_1maintaining) AND `'.$txnidname.'`='.$txnid;
+            $sql='SELECT CVNo FROM acctg_2cvmain WHERE CreditAccountID<>403 AND (CreditAccountID NOT IN (SELECT AccountID FROM banktxns_1maintaining)) AND `'.$txnidname.'`='.$txnid;
             $stmt=$link->query($sql); $result=$stmt->fetch();
             if($stmt->rowCount()==0) { goto nopermission;}
-            $sql='UPDATE acctg_2cvmain SET Posted=1 WHERE CreditAccountID<>403 AND (CreditAccountID NOT IN (SELECT AccountID FROM banktxns_1maintaining) AND `'.$txnidname.'`='.$txnid;  
+            $sql='UPDATE acctg_2cvmain SET Posted=1 WHERE CreditAccountID<>403 AND (CreditAccountID NOT IN (SELECT AccountID FROM banktxns_1maintaining)) AND `'.$txnidname.'`='.$txnid;  
             $stmt=$link->prepare($sql); $stmt->execute();
     }
     }
@@ -185,10 +185,10 @@ $datefield=$_REQUEST['DateField'];
         case 'acctg_2cvmain':   
             if($postfield=='APVPosted'){
                 if (!allowedToOpen(413,'1rtc')){ goto nopermission;}
-                $sql='SELECT CVNo FROM acctg_2cvmain WHERE CreditAccountID<>403 AND (CreditAccountID NOT IN (SELECT AccountID FROM banktxns_1maintaining) AND `'.$txnidname.'`='.$txnid;
+                $sql='SELECT CVNo FROM acctg_2cvmain WHERE  (CreditAccountID NOT IN (SELECT AccountID FROM banktxns_1maintaining)) AND `'.$txnidname.'`='.$txnid;
                 $stmt=$link->query($sql); $result=$stmt->fetch();
                 if($stmt->rowCount()==0) { goto nopermission;}
-                $sql='UPDATE acctg_2cvmain SET Posted='.$postvalue.' WHERE CreditAccountID<>403 AND (CreditAccountID NOT IN (SELECT AccountID FROM banktxns_1maintaining) AND `'.$txnidname.'`='.$txnid;  
+                $sql='UPDATE acctg_2cvmain SET Posted='.$postvalue.' WHERE  (CreditAccountID NOT IN (SELECT AccountID FROM banktxns_1maintaining)) AND `'.$txnidname.'`='.$txnid;  
                 $stmt=$link->prepare($sql); $stmt->execute();
             } else {
                 if (!allowedToOpen(414,'1rtc')){ goto nopermission;}
