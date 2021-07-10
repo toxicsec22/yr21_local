@@ -71,12 +71,12 @@ switch ($whichqry){
    $tovch=$_REQUEST['ToVch'];
    $title='CV';
    
-   $sqlmain='SELECT m.*,PaymentMode, date_format(Date,\'%b %d, %Y\') AS Date, date_format(DateofCheck,\'%b %d, %Y\') AS DateofCheck, ca.ShortAcctID as CreditAccount, e.Nickname as EncodedBy, Sum(s.Amount) as Total FROM `acctg_'.$table.'cvmain` m
+   $sqlmain='SELECT m.*,PaymentMode, date_format(Date,\'%b %d, %Y\') AS Date, date_format(DateofCheck,\'%b %d, %Y\') AS DateofCheck, m.CreditAccountID, ca.ShortAcctID as CreditAccount, e.Nickname as EncodedBy, Sum(s.Amount) as Total, IF(m.CreditAccountID IN (SELECT AccountID FROM banktxns_1maintaining),"treas","acctg") AS Approvers FROM `acctg_'.$table.'cvmain` m
 join acctg_1chartofaccounts ca on ca.AccountID=m.CreditAccountID
 join acctg_0paymentmodes pm on m.PaymentModeID=pm.PaymentModeID
 join `acctg_'.$table.'cvsub` s on m.CVNo=s.CVNo
 left join `1employees` as e on e.IDNo=m.EncodedByNo
-WHERE m.CVNo>='.$fromvch.' and m.CVNo<='.$tovch.' AND m.Posted=1 group by m.CVNo';
+WHERE m.CVNo>='.$fromvch.' and m.CVNo<='.$tovch.' AND m.CreditAccountID<>403 AND m.Posted=1 group by m.CVNo';
 // echo $sqlmain;break;
 $stmt=$link->query($sqlmain);
 $result=$stmt->fetchAll();
@@ -127,22 +127,45 @@ $sub=$sublabels.$sub.'</table><center>------   NOTHING FOLLOWS  ------</center><
 
     
     $total='<div style="float:right">Total:  '.number_format($mainrow['Total'],2).str_repeat('&nbsp',7) .'</div><br>' ;
-	$sqlf='SELECT  CONCAT(left(FirstName,1),left(MiddleName,1),left(SurName,1)) as FinanceHeadNickName FROM attend_30currentpositions cp join 1employees e on e.IDNo=cp.IDNo WHERE PositionID=150;';
-	// echo $sqlf; exit();
-	$stmtf=$link->query($sqlf); $resultf=$stmtf->fetch();
-	
-	if($stmtf->rowCount()>0){
-		$approvedby=$resultf['FinanceHeadNickName'].'/JYE';
+
+$positionid=150;
+include('../backendphp/functions/namefromposition.php');
+if($stmtpos->rowCount()>0){
+		$approvedby=$resfrompos['Initials'].'/JYE';
 	} else {
-		$approvedby='';
+		$approvedby='JYE';
 	}
-//$positionid=10; //get controller name
-//include_once('../backendphp/functions/namefromposition.php');
-$controllername='';//$resfrompos['Nickname']; TEMPORARILY BLANK
+
+if ($mainrow['Approvers']=='treas'){ //bank
+   $sign1label='Acctg Checked By';
+   $sign2label='Treasury Verified By';
+   $positionid='10,171';
+   include('../backendphp/functions/namefromposition.php');
+   if($stmtpos->rowCount()>0){
+		$sign1=($resfrompos['PositionID']==10)?$resfrompos['Initials']:($resfrompos['Nickname'].' '.$resfrompos['Surname']);
+	} else {
+		$sign1='Accounting';
+	}
+   $positionid='15';
+   include('../backendphp/functions/namefromposition.php');
+   if($stmtpos->rowCount()>0){
+		$sign2=$resfrompos['Nickname'].' '.$resfrompos['Surname'];
+	} else {
+		$sign2='Treasury';
+	}
+   
+} else { //non-bank
+   $sign1label='Prepared By';
+   $sign2label='Checked By';
+   $sign1=$mainrow['EncodedBy'];
+   $sign2='';
+}
+
+
 $voucher=$main.$sub.'<br>'.$total.'<br><br>
 <table width="100%">
-<tr><td width=20%">Prepared By:<br><br></td><td width="20%">Checked By:</td><td width="20%">Approved By:</td><td width="40%" align="right">Received By:__________________________</td>
-</tr><tr><td>'. $mainrow['EncodedBy'].'</td><td>'. $controllername.'</td><td>'.$approvedby.'</td><td align="right"><font size="1">Signature above printed name</font></td></tr>
+<tr><td width=20%">'.$sign1label.':<br><br></td><td width="20%">'.$sign2label.':</td><td width="20%">Approved By:</td><td width="40%" align="right">Received By:__________________________</td>
+</tr><tr><td>'. $sign1.'</td><td>'. $sign2.'</td><td>'.$approvedby.'</td><td align="right"><font size="1">Signature above printed name</font></td></tr>
 </table>
 <br><div style="font-size: smaller;">Printed on '.date('m/d/y h:i:s l').' by '.$user.'</div><br><hr>
 <br><br><br>';
@@ -165,7 +188,7 @@ include_once($path.'/acrossyrs/commonfunctions/numtowords.php');
    $sql='SELECT date_format(DateofCheck,\'%m-%d-%Y\') as DateofCheck, date_format(DateofCheck,\'%m/%d/%y\') as ShortDateofCheck,ifnull(NameonCheck,Payee) as Payee, round(Sum(s.Amount),2) as Total FROM `acctg_'.$table.'cvmain` m
 join `acctg_'.$table.'cvsub` s on m.CVNo=s.CVNo
 left join `1suppliers` s2 on s2.SupplierNo=m.PayeeNo
-WHERE m.CheckNo=\''.$checkno.'\' '.$condition.' AND m.Posted=1 AND m.APVPosted=1 group by m.CVNo;';
+WHERE m.CheckNo=\''.$checkno.'\' '.$condition.' AND m.CreditAccountID<>403 AND m.Posted=1 AND m.APVPosted=1 group by m.CVNo;';
    // echo $sql;
 $stmt=$link->query($sql);
 $result=$stmt->fetch();
@@ -321,22 +344,22 @@ foreach ($result as $mainrow){
 
 
       $total='<div style="float:right">Total:  '.number_format($mainrow['Total'],2).str_repeat('&nbsp',7) .'</div><br>' ;
-      $sqlf='SELECT  CONCAT(left(FirstName,1),left(MiddleName,1),left(SurName,1)) as FinanceHeadNickName FROM attend_30currentpositions cp join 1employees e on e.IDNo=cp.IDNo WHERE PositionID=150;';
-      // echo $sqlf; exit();
-      $stmtf=$link->query($sqlf); $resultf=$stmtf->fetch();
-
-      if($stmtf->rowCount()>0){
-      $approvedby=$resultf['FinanceHeadNickName'].'/JYE';
-      } else {
-      $approvedby='';
-      }
-
       
-      $controllername='';//$resfrompos['Nickname']; TEMPORARILY BLANK
+      $positionid=150;
+include('../backendphp/functions/namefromposition.php');
+if($stmtpos->rowCount()>0){
+		$approvedby=$resfrompos['Initials'].'/JYE';
+	} else {
+		$approvedby='JYE';
+	}
+
+      $sign1=$mainrow['EncodedBy'];
+      $sign2='';
+
       $voucher=$main.$sub.'<br>'.$total.'<br><br>
       <table width="100%">
       <tr><td width=20%">Prepared By:<br><br></td><td width="20%">Checked By:</td><td width="20%">Approved By:</td><td width="40%" align="right">Received By:__________________________</td>
-      </tr><tr><td>'. $mainrow['EncodedBy'].'</td><td>'. $controllername.'</td><td>'.$approvedby.'</td><td align="right"><font size="1">Signature above printed name</font></td></tr>
+      </tr><tr><td>'. $sign1.'</td><td>'. $sign2.'</td><td>'.$approvedby.'</td><td align="right"><font size="1">Signature above printed name</font></td></tr>
       </table>
       <br><div style="font-size: smaller;">Printed on '.date('m/d/y h:i:s l').' by '.$user.'</div><br><hr>
       <br><br><br>';
