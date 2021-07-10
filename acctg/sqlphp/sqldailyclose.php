@@ -14,7 +14,7 @@ $sql0='CREATE TABLE `acctg_dailyclose_1uniforendapar'.$_SESSION['(ak0)'].'` AS
         (((`uni`.`AccountID` >= 200)
             AND (`uni`.`AccountID` <= 202))
             OR ((`uni`.`AccountID` >= 400)
-            AND (`uni`.`AccountID` <= 403)))
+            AND (`uni`.`AccountID` <= 402)))
     GROUP BY `uni`.`BranchNo` , `uni`.`AccountID` 
     UNION ALL SELECT 
         `acctg_23balperinv`.`BranchNo` AS `BranchNo`,
