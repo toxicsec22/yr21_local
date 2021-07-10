@@ -165,7 +165,7 @@ include_once($path.'/acrossyrs/commonfunctions/numtowords.php');
    $sql='SELECT date_format(DateofCheck,\'%m-%d-%Y\') as DateofCheck, date_format(DateofCheck,\'%m/%d/%y\') as ShortDateofCheck,ifnull(NameonCheck,Payee) as Payee, round(Sum(s.Amount),2) as Total FROM `acctg_'.$table.'cvmain` m
 join `acctg_'.$table.'cvsub` s on m.CVNo=s.CVNo
 left join `1suppliers` s2 on s2.SupplierNo=m.PayeeNo
-WHERE m.CheckNo=\''.$checkno.'\' '.$condition.' AND m.Posted=1 group by m.CVNo;';
+WHERE m.CheckNo=\''.$checkno.'\' '.$condition.' AND m.Posted=1 AND m.APVPosted=1 group by m.CVNo;';
    // echo $sql;
 $stmt=$link->query($sql);
 $result=$stmt->fetch();

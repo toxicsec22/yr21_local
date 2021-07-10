@@ -251,8 +251,10 @@ switch ($w){
             $editprocesssublabel='Edit'; $editprocesssub='formcv.php?w=Edit'.$form.'Sub&'.$txnidname.'='.$txnid.'&TxnSubId=';
             
             $delprocesssub='..\backendphp\functions\delrecordssub.php?TxnID='.$txnid.'&w='.$subtable.'&l=acctg'.'&TxnSubId=';
+            if($result['APVPosted']==1 and $result['Posted']==1){
             $postedprocess='printvoucher.php?w=CV&FromVch='.$txnid.'&ToVch='.$txnid.'">Print CV</a>&nbsp; &nbsp;<a href="printvoucher.php?w=Check&CheckNo='.$result['CheckNo'].'&CVNo='.$txnid.'"';
             $postedprocesslabel='Print Check (mm-dd-yyyy)';
+            }
 
             
     // start of unpaid inv list
