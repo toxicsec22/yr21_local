@@ -60,30 +60,30 @@ $showbranches=true;
     $reqno=$result['ForRequestNo']; $reqtxnid=$result['ReqTxnID'];
     if ($result['BranchNo']==$result['ToBranchNo']) {
         $txntype='Repack'; $editsubtable='TxfrSubEdit'; $editprocesslabel='Enter';
-        $postedfield='Posted'; $datefield='DateOUT';
+        $postfield='Posted'; $datefield='DateOUT';
         $deloreditmain='<a href=..\backendphp\functions\delrecords.php?TxnID='.$txnid.'&action_token='.$_SESSION['action_token'].'&w=invty_2transfer&l=invty OnClick="return confirm(\'Really delete this?\');">Delete</a>';
         } elseif ($result['BranchNo']==$_SESSION['bnum']) {
         $txntype='Out'; $editsubtable='TxfrSubEdit'; $editprocesslabel='Enter';
-        $postedfield='Posted'; $datefield='DateOUT';
+        $postfield='Posted'; $datefield='DateOUT';
         $deloreditmain='<a href=..\backendphp\functions\delrecords.php?TxnID='.$txnid.'&action_token='.$_SESSION['action_token'].'&w=invty_2transfer&l=invty OnClick="return confirm(\'Really delete this?\');">Delete</a>';
         
     } elseif ($result['ToBranchNo']==$_SESSION['bnum']) {
          $txntype='In';$editsubtable='TxfrSubAccept'; $editprocesslabel='Accept';
          $datefield='DateIN';
-         $postedfield='PostedIn';
+         $postfield='PostedIn';
          $deloreditmain='';
          
          
     } else {
          $txntype='';
-         $postedfield='';
+         $postfield='';
          $deloreditmain='';
     }
     $main='';
     $sortfield=(isset($_POST['sortfield'])?$_POST['sortfield']:'s.FROMTimeStamp');
     $delsubtable='TxfrSubDel';
     
-    /*if ($result[$postedfield]==0){
+    /*if ($result[$postfield]==0){
         $columnnamesmain=array('DateOUT','DateIN','TransferNo','ForRequestNo','FROMBranch','TOBranch','Remarks','Waybill');
         $columnsub=array('ItemCode','Category','ItemDesc','Unit','QtySent','UnitPrice', 'AmountSent','QtyReceived','UnitCost', 'AmountReceived','SerialNo','Defective');
     } else {*/
