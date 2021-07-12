@@ -19,7 +19,7 @@ echo '<title>'.$title.'</title>';
 // MAIN FORM  
 $stmt=$link->query($sqlmain); $result=$stmt->fetch();
 if (!isset($nopost)){
-    $postvalue=($result['Posted']==1?0:1); $postfield='Posted'; $txnid=!isset($txnidname)?$txnid:$txnidname;
+    $postvalue=($result['Posted']==1?0:1); $postfield='Posted'; //$txnid=!isset($txnidname)?$txnid:$txnidname;
     include('../backendphp/layout/postunpostform.php');
 }
 
