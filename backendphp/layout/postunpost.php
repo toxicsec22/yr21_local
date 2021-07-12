@@ -212,6 +212,10 @@ $datefield=$_REQUEST['DateField'];
             if (!allowedToOpen(410,'1rtc')){ goto nopermission; }
             else {$datecondition=allowedToOpen(411,'1rtc')?true:'`EncodedByNo`='.$_SESSION['(ak0)'].' AND DATE_ADD(QuoteDate, INTERVAL 7 DAY)>=CURDATE() AND DATE_ADD(`TimeStamp`, INTERVAL 7 DAY)>=CURDATE()';}
             break;
+        case 'hr_2trainsched':
+            if (!allowedToOpen(68911,'1rtc')){ goto nopermission;} 
+            $datecondition=' DATEDIFF(CURDATE(),ENDDATE)<2 ';
+            break;
         default:
             goto nopermission;
         }
