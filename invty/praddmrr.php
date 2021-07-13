@@ -169,11 +169,11 @@ case 'MRRSubEdit':
 		/*if ($txntype==8){ // Purch Return
 			if (!allowedToOpen(6924,'1rtc')){ echo 'No permission'; exit;} else { $columnstoedit=array('ItemCode','SerialNo');}
 		} else {*/ 
-            $columnstoedit=array('ItemCode','SerialNo');//}
+            $columnstoedit=array('SerialNo');//}
 		//added this condition
-		if (allowedToOpen(69241,'1rtc')){
-			array_push($columnstoedit,'UnitCost');
-		}
+		// if (allowedToOpen(69241,'1rtc')){
+		// 	array_push($columnstoedit,'UnitCost');
+		// }
 		
 	} else { $columnstoedit=array();  }
 		
