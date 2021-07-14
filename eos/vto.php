@@ -983,7 +983,7 @@ case 'Traction':
 	
 	foreach($result as $ress){
 		
-		$sqlw='SELECT RockOrIssues FROM eos_2vtoqtrsub WHERE '.$mancomordeptcondi.' IsRock='.$isrock.' AND (RIGHT(RIStatPerWeek,1)=0 OR RIGHT(RIStatPerWeek,1) IS NULL) AND Who="'.$ress['IDNo'].'" AND Stat=0 ORDER BY TimeStamp DESC';
+		$sqlw='SELECT RockOrIssues,RemarksOrResolution FROM eos_2vtoqtrsub WHERE '.$mancomordeptcondi.' IsRock='.$isrock.' AND (RIGHT(RIStatPerWeek,1)=0 OR RIGHT(RIStatPerWeek,1) IS NULL) AND Who="'.$ress['IDNo'].'" AND Stat=0 ORDER BY TimeStamp DESC';
 		// echo $sqlw;
 		
 		if ($cnttr % 2 == 1){
@@ -996,7 +996,7 @@ case 'Traction':
 				<table border="1px solid black;" style="background-color:#FFFACD;width:570px;margin-left:5%;border-collapse:collapse;"><tr><th align="left" style="padding:3px;">'.$ress['FullName'].'</th></tr><tr>';
 		$stmtw=$link->query($sqlw); $resultw=$stmtw->fetchAll();
 		foreach($resultw as $res){
-			echo '<td style="width:100%;padding:3px;">'.$res['RockOrIssues'].'</td></tr>';
+			echo '<td style="width:100%;padding:3px;">'.$res['RockOrIssues'].''.($res['RemarksOrResolution']<>''?' (<font style="font-size:9pt;" color="'.(''.date('Y-m-d').''>''.$res['RemarksOrResolution'].''?'red':'').'">DueDate: '.$res['RemarksOrResolution'].'</font>)':'').'</td></tr>';
 		}
 		echo '</table><br><br>
 			</td>';
@@ -1346,6 +1346,7 @@ case 'Traction':
 	echo '<form method="post" action="vto.php?w=EncodeProcessQtr&IsRock=2" autocomplete="off">
 		<input type="hidden" name="Quarter" value="0">
 		<b>To-Do:</b> <input type="text" name="Rocks" size="50">
+		<b>DueDate:</b> <input type="date" name="DueDate">
 		<b>Who:</b> <input type="text" name="Fullname" list="employees" value="'.$defaultwho.'">
 		<input type="hidden" name="action_token" value="'.($_SESSION['action_token']).'">
 		<input type="submit" name="submit">
@@ -1384,9 +1385,9 @@ case 'Traction':
 	$stmt=$link->query($sql); $result=$stmt->fetchAll();
 	
 	echo '<table border="1px solid black" style="border-collapse:collapse;">';
-	echo '<tr style="background-color:skyblue;"><th>Department</th><th>'.$subtitle.' - Pending/UnDone</th><th></th></tr>';
+	echo '<tr style="background-color:skyblue;"><th>Department</th><th>'.$subtitle.' - Pending/UnDone</th><th>DueDate</th><th></th></tr>';
 		foreach($result as $ress){
-			echo'<tr><td style="padding:3px;">'.$ress['Dept'].'</td><td style="padding:3px;">'.$ress['RockOrIssues'].'</td><td style="padding:3px;">'.(($idno==$_SESSION['(ak0)'] or allowedToOpen(1614,'1rtc'))?'<a href="vto.php?subtitle='.$subtitle.'&w=EditQtr&VTOQtrSubId='.$ress['VTOQtrSubId'].'">'.$imgedit.'</a> <a href="vto.php?go='.$isrock.'&w=DeleteQtr&VTOQtrSubId='.$ress['VTOQtrSubId'].'" OnClick="return confirm(\'Are you sure you want to Delete?\');">'.$imgdel.'</a> <a href="vto.php?go='.$isrock.'&w=CancelQtr&VTOQtrSubId='.$ress['VTOQtrSubId'].'" OnClick="return confirm(\'Are you sure you want to Cancel?\');">'.$imgcancel.'</a>':'').'</td></tr>';
+			echo'<tr><td style="padding:3px;">'.$ress['Dept'].'</td><td style="padding:3px;">'.$ress['RockOrIssues'].'</td><td>'.$ress['RemarksOrResolution'].'</td><td style="padding:3px;">'.(($idno==$_SESSION['(ak0)'] or allowedToOpen(1614,'1rtc'))?'<a href="vto.php?subtitle='.$subtitle.'&w=EditQtr&VTOQtrSubId='.$ress['VTOQtrSubId'].'">'.$imgedit.'</a> <a href="vto.php?go='.$isrock.'&w=DeleteQtr&VTOQtrSubId='.$ress['VTOQtrSubId'].'" OnClick="return confirm(\'Are you sure you want to Delete?\');">'.$imgdel.'</a> <a href="vto.php?go='.$isrock.'&w=CancelQtr&VTOQtrSubId='.$ress['VTOQtrSubId'].'" OnClick="return confirm(\'Are you sure you want to Cancel?\');">'.$imgcancel.'</a>':'').'</td></tr>';
 		}
 		
 	echo'</table>';
@@ -1694,9 +1695,13 @@ END),EncodedByNo='.$_SESSION['(ak0)'].',TimeStamp=NOW() WHERE VTOQtrSubId='.$_GE
 	
 	case'EncodeProcessQtr':
 	require_once $path.'/acrossyrs/logincodes/confirmtoken.php';
-	$prioritysql='';
+	$prioritysql=''; $duedatesql='';
 	if($_GET['IsRock']==0){
 		$prioritysql='Priority='.$_POST['Priority'].',';
+		
+	}
+	if($_GET['IsRock']==2){
+		$duedatesql='RemarksOrResolution="'.$_POST['DueDate'].'",';
 		
 	}
 	if(isset($_SESSION['deptonly'])){
@@ -1706,7 +1711,7 @@ END),EncodedByNo='.$_SESSION['(ak0)'].',TimeStamp=NOW() WHERE VTOQtrSubId='.$_GE
 	}
 	
 	$employee=comboBoxValue($link, '1employees', 'CONCAT(Nickname,\' \',SurName)', $_REQUEST['Fullname'], 'IDNo');	
-		$sql='Insert into eos_2vtoqtrsub set '.$prioritysql.'IsRock='.$_GET['IsRock'].',RockOrIssues=\''.addslashes($_POST['Rocks']).'\',VTOQtrId=\''.$_POST['Quarter'].'\',Who=\''.$employee.'\',ManComOrdept="'.$mod.'",EncodedByNo='.$_SESSION['(ak0)'].',TimeStamp=NOW();';
+		$sql='Insert into eos_2vtoqtrsub set '.$duedatesql.''.$prioritysql.'IsRock='.$_GET['IsRock'].',RockOrIssues=\''.addslashes($_POST['Rocks']).'\',VTOQtrId=\''.$_POST['Quarter'].'\',Who=\''.$employee.'\',ManComOrdept="'.$mod.'",EncodedByNo='.$_SESSION['(ak0)'].',TimeStamp=NOW();';
 		// echo $sql; exit();
 		$stmt=$link->prepare($sql); $stmt->execute();
 		if($_GET['IsRock']==1){
@@ -2000,15 +2005,16 @@ $stmt0=$link->prepare($sql0);$stmt0->execute();
 	
 	echo '<br><b>To-Do</b>';
 	
-	$sql=$sqlmain.' AND IsRock=2 '.$adq.' ORDER BY `Status`,`Who?`';
+	$sql=$sqlmain.' AND IsRock=2 '.$adq.' ORDER BY `Stat`,`RemarksOrResolution`,`Who?`';
+	// echo $sql;
 	$stmt=$link->query($sql); $result=$stmt->fetchAll();
 	
 	
 	
 	echo '<table border="1px solid black" style="border-collapse:collapse;background-color:white;">';
-	echo '<tr><th>To-Do</th><th>Status</th><th>Who</th></tr>';
+	echo '<tr><th>To-Do</th><th>DueDate</th><th>Status</th><th>Who</th></tr>';
 		foreach($result as $ress){
-			echo'<tr style="'.(($weekno==$ress['WeekNo'] AND $ress['Status']==1)?'':(($weekno==$ress['WeekNo'] AND $ress['Status']==0)?'font-weight:bold;':'font-weight:bold;')).'"><td style="padding:5px;">'.$ress['RockOrIssues'].'</td><td style="padding:5px;'.(($weekno==$ress['WeekNo'] AND $ress['Status']==0)?'color:red;':'').'">'.(($weekno==$ress['WeekNo'] AND $ress['Status']==1)?'Done':(($weekno==$ress['WeekNo'] AND $ress['Status']==0)?'Not Done':'')).'</td><td style="padding:5px;">'.$ress['Who?'].'</td></tr>';
+			echo'<tr style="'.(($weekno==$ress['WeekNo'] AND $ress['Status']==1)?'':(($weekno==$ress['WeekNo'] AND $ress['Status']==0)?'font-weight:bold;':'font-weight:bold;')).'"><td style="padding:5px;">'.$ress['RockOrIssues'].'</td><td style="padding:5px;">'.$ress['RemarksOrResolution'].'</td><td style="padding:5px;'.(($weekno==$ress['WeekNo'] AND $ress['Status']==0)?'color:red;':'').'">'.(($weekno==$ress['WeekNo'] AND $ress['Status']==1)?'Done':(($weekno==$ress['WeekNo'] AND $ress['Status']==0)?'Not Done':'')).'</td><td style="padding:5px;">'.$ress['Who?'].'</td></tr>';
 		}
 	echo'</table>';
 	
@@ -2145,6 +2151,9 @@ $stmt0=$link->prepare($sql0);$stmt0->execute();
 		 if($_GET['subtitle']=='Issues'){
 			 echo ' <b>Priority:</b> <input type="number" min="1" max="3" name="Priority" value="'.$result['Priority'].'">';
 		 }
+		 if($_GET['subtitle']=='ToDo'){
+			echo ' <b>DueDate:</b> <input type="date" min="1" max="3" name="DueDate" value="'.$result['RemarksOrResolution'].'">';
+		}
 		 
 		 if(isset($sqlsm)){
 			 echo ' <b>DeptOrMancom:</b> <select name="DeptOrMancom">'.$deptlist.'</select>';
@@ -2153,7 +2162,7 @@ $stmt0=$link->prepare($sql0);$stmt0->execute();
 		 }
 		 echo '
 		 <input type="hidden" name="action_token" value="'.($_SESSION['action_token']).'">
-		 <input type="submit" name="submit">
+		 <input type="submit" name="submit"></form>
 	';
 	break;
 	
@@ -2161,7 +2170,7 @@ $stmt0=$link->prepare($sql0);$stmt0->execute();
 		require_once $path.'/acrossyrs/logincodes/confirmtoken.php';
 		$vtoqtrsubid = intval($_GET['VTOQtrSubId']);
 		$employee=comboBoxValue($link, '1employees', 'CONCAT(Nickname,\' \',SurName)', $_REQUEST['Fullname'], 'IDNo');
-		$priosql=''; $qtrsql='';
+		$priosql=''; $qtrsql=''; $duesql='';
 		if($_GET['subtitle']=='Rocks'){
 			$qtrsql='VTOQtrId='.$_POST['Quarter'].',';
 		}
@@ -2169,8 +2178,11 @@ $stmt0=$link->prepare($sql0);$stmt0->execute();
 		if(isset($_POST['Priority'])){
 			$priosql=',Priority='.$_POST['Priority'].'';
 		}
+		if(isset($_POST['DueDate'])){
+			$duesql=',RemarksOrResolution="'.$_POST['DueDate'].'"';
+		}
 		// print_r($_POST);
-		$sql='update eos_2vtoqtrsub set '.$qtrsql.'RockOrIssues=\''.$_POST['Rocks'].'\''.$priosql.',EncodedByNo=\''.$_SESSION['(ak0)'].'\',TimeStamp=NOW(),Who=\''.$employee.'\',ManComOrdept='.$_POST['DeptOrMancom'].' where VTOQtrSubId=\''.$vtoqtrsubid.'\'';
+		$sql='update eos_2vtoqtrsub set '.$qtrsql.'RockOrIssues=\''.$_POST['Rocks'].'\''.$priosql.$duesql.',EncodedByNo=\''.$_SESSION['(ak0)'].'\',TimeStamp=NOW(),Who=\''.$employee.'\',ManComOrdept='.$_POST['DeptOrMancom'].' where VTOQtrSubId=\''.$vtoqtrsubid.'\'';
 		// echo $sql; exit();
 		$stmt=$link->prepare($sql); $stmt->execute();
 		if($_GET['subtitle']=='Rocks'){
