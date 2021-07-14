@@ -307,15 +307,29 @@ FROM 1employees e LEFT JOIN '.$lastyr.'_1rtc.`attend_61silbal` b ON b.IDNo=e.IDN
            $title='Days Assigned Per Person';
            $showtitle=(!isset($_POST['submit'])?true:false);
            $pagetouse='lookupperteam.php?w=DaysAssigned';
+            if(allowedToOpen(array(608,6121),'1rtc')){
+                $checkboxinputname='ResignedCB'; $checkboxinputlabel='Show Resigned Only?';
+            }
            include('../backendphp/layout/fromtodate.php'); 
             if (!isset($_POST['submit'])){ goto noform;  }
-            
+           
            $formdesc='From '.$fromdate.' To '.$todate;
+
+           
            $columnnames=array('IDNo', 'Branch', 'FullName','CountOfDate');
-           $sql='SELECT b.Branch, e.IDNo, concat(FirstName,\' \',SurName,IF(Resigned<>0," - RESIGNED","")) as `FullName`, Count(DateToday) AS CountOfDate FROM `1branches` as b INNER JOIN (1employees e INNER JOIN `attend_2attendance` as a ON e.IDNo = a.IDNo) ON b.BranchNo = a.BranchNo JOIN attend_30currentpositions p On e.IDNo=p.IDNo WHERE '.$deptcondition.' AND ((TimeIn) Is Not Null) and DateToday>=\''. $_POST['FromDate']  . '\' and DateToday<=\''. $_POST['ToDate']  . '\'  GROUP BY e.IDNo,a.BranchNo ORDER BY Branch, FullName'; //JOIN attend_30currentpositions p ON e.IDNo=p.IDNo  JOIN attend_30currentpositions p ON e.IDNo=p.IDNo 
-           // '.(allowedToOpen(6121,'1rtc')?'UNION ALL SELECT b.Branch, e.IDNo, concat(FirstName,\' \',SurName) as `FullName`, Count(DateToday) AS CountOfDate FROM `1branches` as b INNER JOIN (1employees e INNER JOIN `attend_2attendance` as a ON e.IDNo = a.IDNo) ON b.BranchNo = a.BranchNo WHERE ((TimeIn) Is Not Null) and DateToday>=\''. $_POST['FromDate']  . '\' and DateToday<=\''. $_POST['ToDate']  . '\' AND (PseudoBranch=0 OR PseudoBranch=2) GROUP BY e.IDNo ORDER BY Branch, FullName':'
-        //    echo $sql;
+           
            $width='30%';
+           if(isset($_POST[$checkboxinputname])){
+                $sql='SELECT b.Branch,DateResigned, e.IDNo, concat(e.FirstName,\' \',e.SurName,IF(e.Resigned<>0," - RESIGNED","")) as `FullName`, Count(DateToday) AS CountOfDate FROM `1branches` as b INNER JOIN (1employees e INNER JOIN `attend_2attendance` as a ON e.IDNo = a.IDNo) ON b.BranchNo = a.BranchNo JOIN 1_gamit.0idinfo id ON e.IDNo=id.IDNo WHERE '.$deptcondition.' AND e.Resigned=1 AND ((TimeIn) Is Not Null) and DateToday>=\''. $_POST['FromDate']  . '\' and DateToday<=\''. $_POST['ToDate']  . '\'  GROUP BY e.IDNo,a.BranchNo ORDER BY Branch, FullName'; 
+                array_push($columnnames,'DateResigned');
+                
+           $width='40%';
+           } else {
+                $sql='SELECT b.Branch, e.IDNo, concat(FirstName,\' \',SurName,IF(Resigned<>0," - RESIGNED","")) as `FullName`, Count(DateToday) AS CountOfDate FROM `1branches` as b INNER JOIN (1employees e INNER JOIN `attend_2attendance` as a ON e.IDNo = a.IDNo) ON b.BranchNo = a.BranchNo JOIN attend_30currentpositions p On e.IDNo=p.IDNo WHERE '.$deptcondition.' AND ((TimeIn) Is Not Null) and DateToday>=\''. $_POST['FromDate']  . '\' and DateToday<=\''. $_POST['ToDate']  . '\'  GROUP BY e.IDNo,a.BranchNo ORDER BY Branch, FullName'; 
+           }
+           
+      
+           
      include('../backendphp/layout/displayastable.php');
        } else { echo 'No permission'; exit; }
        break;
