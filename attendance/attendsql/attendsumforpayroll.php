@@ -68,7 +68,9 @@ SELECT
             0) + COUNT(IF(`a`.`OTTypeNo` IN (13,24), 1, NULL)) AS `RegDaysActual`,
             
     SUM(IF(`a`.`LeaveNo` = 12 AND `a`.`OTApproval` <> 0, -- Legal/Regular Holiday
-            ShiftHours(`a`.`TimeIn`, IF(`ot`.`EndOfOT` IS NULL, `a`.`TimeOut`,
+            ShiftHours(
+                IF(`ot`.`StartOfOT` IS NULL, `a`.`TimeIn`,
+                    IF(`ot`.`StartOfOT` > `a`.`TimeIn`, `ot`.`StartOfOT`, `a`.`TimeIn`)), IF(`ot`.`EndOfOT` IS NULL, `a`.`TimeOut`,
                     IF(`ot`.`EndOfOT` < `a`.`TimeOut`, `ot`.`EndOfOT`, `a`.`TimeOut`)), `e`.`JobLevelID`, `a`.`Shift`),
         0)) AS `LegalShiftHrsOT`,
         
@@ -78,7 +80,9 @@ SELECT
                     IF(`ot`.`EndOfOT` < `a`.`TimeOut`, `ot`.`EndOfOT`, `a`.`TimeOut`)), `e`.`JobLevelID`, `a`.`Shift`,`d`.`TypeOfDayNo`, `a`.`OTTypeNo`),0)) AS `LegalExShiftHrsOT`,
     
     SUM(IF(`a`.`LeaveNo` = 13 AND `a`.`OTApproval` <> 0, -- Special Non-Working Holiday
-            ShiftHours(`a`.`TimeIn`, IF(`ot`.`EndOfOT` IS NULL, `a`.`TimeOut`,
+            ShiftHours(
+                IF(`ot`.`StartOfOT` IS NULL, `a`.`TimeIn`,
+                    IF(`ot`.`StartOfOT` > `a`.`TimeIn`, `ot`.`StartOfOT`, `a`.`TimeIn`)), IF(`ot`.`EndOfOT` IS NULL, `a`.`TimeOut`,
                     IF(`ot`.`EndOfOT` < `a`.`TimeOut`, `ot`.`EndOfOT`, `a`.`TimeOut`)), `e`.`JobLevelID`, `a`.`Shift`),
         0)) AS `SpecShiftHrsOT`,
         
@@ -88,7 +92,9 @@ SELECT
                     IF(`ot`.`EndOfOT` < `a`.`TimeOut`, `ot`.`EndOfOT`, `a`.`TimeOut`)), `e`.`JobLevelID`, `a`.`Shift`,`d`.`TypeOfDayNo`, `a`.`OTTypeNo`),0)) AS `SpecExShiftHrsOT`,
     
     SUM(IF(`a`.`LeaveNo` = 15 AND `a`.`OTApproval` <> 0, -- Restday
-            ShiftHours(`a`.`TimeIn`, IF(`ot`.`EndOfOT` IS NULL, `a`.`TimeOut`,
+            ShiftHours(
+                IF(`ot`.`StartOfOT` IS NULL, `a`.`TimeIn`,
+                    IF(`ot`.`StartOfOT` > `a`.`TimeIn`, `ot`.`StartOfOT`, `a`.`TimeIn`)), IF(`ot`.`EndOfOT` IS NULL, `a`.`TimeOut`,
                     IF(`ot`.`EndOfOT` < `a`.`TimeOut`, `ot`.`EndOfOT`, `a`.`TimeOut`)), `e`.`JobLevelID`, `a`.`Shift`)*(CASE WHEN `d`.`TypeOfDayNo`=2 THEN (2.3/1.3) WHEN `d`.`TypeOfDayNo`=3 THEN (1.5/1.3) ELSE 1 END),
         0)) AS `RestShiftHrsOT`,
         
