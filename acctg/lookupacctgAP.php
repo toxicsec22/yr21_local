@@ -1,14 +1,10 @@
 <?php
 $path=$_SERVER['DOCUMENT_ROOT']; include_once $path.'/acrossyrs/logincodes/checkifloggedon.php';
 // check if allowed
-$allowed=array(540,5401,541,542,543,544,545,5431); $allow=0;
-foreach ($allowed as $ok) { if (allowedToOpen($ok,'1rtc')) { $allow=($allow+1); goto allowed; } else { $allow=$allow; }}
-if ($allow==0) { echo 'No permission'; exit;}
-allowed:
+$allowed=array(540,5401,541,542,543,544,545,5431); 
+if (!allowedToOpen($allowed,'1rtc')) { echo 'No permission'; exit;}
 // end of check
 $showbranches=false; include_once('../switchboard/contents.php');
- 
-
 
 //to make alternating rows have different colors
         $colorcount=0;
@@ -16,33 +12,25 @@ $showbranches=false; include_once('../switchboard/contents.php');
         $rcolor[1]="FFFFFF"; 
 
 
-$whichqry=$_GET['w'];
+$w=$_GET['w'];
 
-switch ($whichqry){
+if(in_array($w,array('All','Details','APPerBranch','DetailsPerBranch'))){
+   ?>
+   <form style="display:inline" method="get" action="#"><input type=hidden name="w" value='All'><input type="submit" value="Totals Per Supplier"/></form>&nbsp &nbsp
+   <form style="display:inline" method="get" action="#"><input type=hidden name="w" value='Details'><input type="submit" value="Details Per Supplier"/></form>&nbsp &nbsp
+   <form style="display:inline" method="get" action="#"><input type=hidden name="w" value='APPerBranch'><input type="submit" value="Totals Per Branch"/></form>&nbsp &nbsp
+   <form style="display:inline" method="get" action="#"><input type=hidden name="w" value='DetailsPerBranch'><input type="submit" value="Details Per Branch"/></form>
+   <?php
+         
+}
+
+
+switch ($w){
 case 'All':
 if (!allowedToOpen(541,'1rtc')) { echo 'No permission'; exit; }
-$title='Unpaid Supplier Invoices';
-$method='GET';
-$show=!isset($_POST['show'])?0:$_POST['show'];
-?><form style="display:inline" method="post" action="#">
-   <input type=hidden name="show" value="<?php echo ($show==0?1:0); ?>">
-    <input type="submit" name="submit" value="<?php echo ($show==0?'Show Details':'Totals Only'); ?>">
-</form>&nbsp &nbsp
-<?php
-if ($show==1){
-    $sql1='SELECT SupplierNo, SupplierName,concat("Terms: ",PayTerms," days") as Terms FROM `acctg_23balperinv` where PayBalance<>0 GROUP BY SupplierNo ORDER BY SupplierName ';
-    $sql2='SELECT date_format(`Date`,\'%Y-%m-%d\') as `Date`,`SupplierInv`,`PurchaseAmt`,`PaidAmt`,`PayBalance`, b.Branch, DateDiff(Now(),ap.Date) as Age FROM acctg_23balperinv ap join `1branches` b on b.BranchNo=ap.BranchNo ';
+$title='Unpaid Per Supplier';
 
-    $coltototal='PayBalance';
-    $groupby='SupplierNo';
-    $orderby=' having PayBalance<>0 ORDER BY Date, SupplierInv';
-    $columnnames1=array('SupplierName','Terms');
-    $columnnames2=array('Date','SupplierInv','PurchaseAmt','PaidAmt','PayBalance','Age','Branch');
-    $showtotals=true; $runtotal=true;
-    $showgrandtotal=true;
-    include('../backendphp/layout/displayastablewithsub.php');
-} else {
-   $sql0='CREATE TEMPORARY TABLE APDue AS SELECT SupplierNo, SupplierName,concat(PayTerms," days") as Terms,ROUND(Sum(`PayBalance`),0) as TotalAP, 
+         $sql0='CREATE TEMPORARY TABLE APDue AS SELECT SupplierNo, SupplierName,concat(PayTerms," days") as Terms,ROUND(Sum(`PayBalance`),0) as TotalAP, 
 ROUND(sum(case when (`DateDue` <= (now() + interval (((6 - dayofweek(now())) + 7) % 7)-7 day)) then `PayBalance` end),0) as `PastDue`,
 ROUND(sum(case when (`DateDue` <= (now() + interval (((6 - dayofweek(now())) + 7) % 7) day) and `DateDue` > (now() + interval (((6 - dayofweek(now())) + 7) % 7)-7 day)) then `PayBalance` end),0) as `DueThisFri`,
 ROUND(sum(case when (`DateDue` > (now() + interval (((6 - dayofweek(now())) + 7) % 7) day) and  (`DateDue` <= (now() + interval (((6 - dayofweek(now())) + 7) % 7)+7 day))) then `PayBalance` end),0) as `DueNextWk`,
@@ -62,8 +50,54 @@ ROUND(sum(case when (`DateDue` > (now() + interval (((6 - dayofweek(now())) + 7)
    $columnnames=array_diff($columnnames, array('SupplierName','Terms'));
    unset($coltototal,$showgrandtotal,$sortfield); $hidecount=true;
    include('../backendphp/layout/displayastableonlynoheaders.php');
-}
+         break;
+
+case 'Details':
+      if (!allowedToOpen(541,'1rtc')) { echo 'No permission'; exit; }
+      $title='Inv Details Per Supplier';
+         $sql1='SELECT SupplierNo, SupplierName,concat("Terms: ",PayTerms," days") as Terms FROM `acctg_23balperinv` where PayBalance<>0 GROUP BY SupplierNo ORDER BY SupplierName ';
+    $sql2='SELECT date_format(`Date`,\'%Y-%m-%d\') as `Date`,`SupplierInv`,`PurchaseAmt`,`PaidAmt`,`PayBalance`, b.Branch, DateDiff(Now(),ap.Date) as Age FROM acctg_23balperinv ap join `1branches` b on b.BranchNo=ap.BranchNo ';
+
+    $coltototal='PayBalance';
+    $groupby='SupplierNo';
+    $orderby=' having PayBalance<>0 ORDER BY Date, SupplierInv';
+    $columnnames1=array('SupplierName','Terms');
+    $columnnames2=array('Date','SupplierInv','PurchaseAmt','PaidAmt','PayBalance','Age','Branch');
+    $showtotals=true; $runtotal=true;
+    $showgrandtotal=true;
+    include('../backendphp/layout/displayastablewithsub.php');
+         break;
+
+case 'APPerBranch':
+     if (!allowedToOpen(541,'1rtc')) { echo 'No permission'; exit; }
+      $title='Unpaid Supplier Invoices Per Branch';
+         
+   $columnnames=array('Branch','TotalAP');
+   $sortfield=(isset($_POST['sortfield'])?$_POST['sortfield']:' TotalAPValue '); 
+   $columnsub=array('Branch','TotalAP');
+   $sql='SELECT ap.BranchNo, Branch, FORMAT(Sum(`PayBalance`),2) as TotalAP, ROUND(Sum(`PayBalance`),0) as TotalAPValue FROM acctg_23balperinv ap JOIN 1branches b ON b.BranchNo=ap.BranchNo WHERE PayBalance<>0 GROUP BY ap.BranchNo ORDER BY '.$sortfield.(isset($_POST['sortarrange'])?' '.$_POST['sortarrange']:' DESC');
+   $coltototal='TotalAPValue';
+   $showgrandtotal=true; 
+   include('../backendphp/layout/displayastablenosort.php');
+   
    break;
+
+case 'DetailsPerBranch':
+      if (!allowedToOpen(541,'1rtc')) { echo 'No permission'; exit; }
+      $title='Inv Details Per Branch';
+         $sql1='SELECT ap.BranchNo, Branch FROM `acctg_23balperinv` ap JOIN 1branches b on b.BranchNo=ap.BranchNo where PayBalance<>0 GROUP BY ap.BranchNo ORDER BY Branch ';
+    $sql2='SELECT date_format(`Date`,\'%Y-%m-%d\') as `Date`, `SupplierName`,`SupplierInv`,`PurchaseAmt`,`PaidAmt`,`PayBalance`, DateDiff(Now(),ap.Date) as Age FROM acctg_23balperinv ap ';
+
+    $coltototal='PayBalance';
+    $groupby='BranchNo';
+    $orderby=' having PayBalance<>0 ORDER BY Date, SupplierInv';
+    $columnnames1=array('Branch');
+    $columnnames2=array('Date','SupplierName','SupplierInv','PurchaseAmt','PaidAmt','PayBalance','Age');
+    $showtotals=true; $runtotal=true;
+    $showgrandtotal=true;
+    include('../backendphp/layout/displayastablewithsub.php');
+         break;
+
 
 case 'InvDue':
 if (!allowedToOpen(543,'1rtc')) { echo 'No permission'; exit; }

@@ -47,10 +47,18 @@ $whichqry=$_GET['w'];
     $sortfield=(isset($_POST['sortfield'])?$_POST['sortfield']:'Category, ItemDesc');
     $listcondition=$result['ForPONo'];
     if (editOk('invty_2mrr',$txnid,$link,$txntype)){
-        if ($txntype<>9){
+        if ($txntype<>9){ // not store used
         $editmain='<td><a href="editmrrspecifics.php?edit=2&w=MRRMainEdit&txntype='.$txntype.'&TxnID='.$txnid.'">Edit</a>'.str_repeat('&nbsp',8).'<a href=..\backendphp\functions\delrecords.php?TxnID='.$txnid.'&action_token='.$_SESSION['action_token'].'&w=invty_2mrr&l=invty OnClick="return confirm(\'Really delete this?\');">Delete</a></td>';
         $editsub=true;
-        $columnstoedit=$txntype<>8?array('ItemCode','Qty','SerialNo'):array('ItemCode','Qty','SerialNo','UnitCost');
+        switch ($txntype){
+            case 8: // purchase return
+                $columnstoedit=array('ItemCode','Qty','SerialNo','UnitCost');
+                break;
+            default: //mrr
+                $columnstoedit=array('Qty','SerialNo');
+                break;
+        }
+       // $columnstoedit=$txntype<>8?array('ItemCode','Qty','SerialNo'):array('ItemCode','Qty','SerialNo','UnitCost');
         } else {
         $editmain='<td>'.((allowedToOpen(6924,'1rtc'))?'<a href="editmrrspecifics.php?edit=2&w=MRRMainEdit&txntype='.$txntype.'&TxnID='.$txnid.'">Edit</a>'.str_repeat('&nbsp',8).'<a href=..\backendphp\functions\delrecords.php?TxnID='.$txnid.'&action_token='.$_SESSION['action_token'].'&w=invty_2mrr&l=invty OnClick="return confirm(\'Really delete this?\');">Delete</a></td>':'</td>');
         $editsub=(allowedToOpen(6924,'1rtc'))?true:false;
@@ -155,7 +163,7 @@ $liststoshow=array();*/
 //}
     
      
-     if ($editok and (allowedToOpen(69251,'1rtc'))){$columnstoedit[]='UnitCost';$columnsub[]='UnitCost';};
+ //   if ($editok and (allowedToOpen(69251,'1rtc'))){$columnstoedit[]='UnitCost';$columnsub[]='UnitCost';};
      $editprocess='praddmrr.php?txntype='.$txntype.'&w=MRRSubEdit&TxnID='.$txnid.'&TxnSubId='; $editprocesslabel='Enter';
     $delprocess='..\backendphp\functions\delrecordssub.php?TxnID='.$txnid.'&action_token='.$_SESSION['action_token'].'&w=invty_2mrrSub&l=invty&TxnSubId=';
     $txnsubid='TxnSubId'; $showgrandtotal=true; $coltototal='Amount';
