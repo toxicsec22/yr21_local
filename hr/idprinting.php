@@ -1,5 +1,5 @@
 <?php
-$path=$_SERVER['DOCUMENT_ROOT']; include_once $path.'/acrossyrs/logincodes/checkifloggedon.php'; 
+$path=$_SERVER['DOCUMENT_ROOT']; include_once $path.'/acrossyrs/logincodes/checkifloggedon.php';
 if (!allowedToOpen(6489,'1rtc')) { echo 'No permission'; exit; }
 
 $which=(!isset($_GET['w'])?'IDPrint':$_GET['w']);
@@ -16,11 +16,11 @@ if($which<>'Print'){
     #printPageButton {
       display: none;
     }
-    @page { size: landscape; 
+    @page { size: landscape;
       margin: 0;
     }
 
-    
+
 
   }
 
@@ -30,7 +30,10 @@ if($which<>'Print'){
     include_once('../backendphp/layout/linkstyle.php');
 ?>
 <br><div id="section" style="display: block;">
-
+<a id='link' href="idprinting.php" >Print ID for Probationary</a>
+<a id='link' href="idprinting.php?w=UploadPicAndSignature" >Upload Picture and Signature for Regular Employees</a> 
+<a id='link' href="idprinting.php?w=ReloadAppData" >Reload App Data</a>
+<br>
 <?php
 
 
@@ -39,13 +42,13 @@ if($which<>'Print'){
 switch ($which)
 {
 		case 'IDPrint':
-			
+
 			$title='Print ID for Probationary';
 
-            $sql='SELECT e.IDNo AS TxnID,e.IDNo,FullName, cp.Position, 
-            
+            $sql='SELECT e.IDNo AS TxnID,e.IDNo,FullName, cp.Position,
+
             IF(cp.deptid NOT IN (1,2,3,10),cp.Department,Branch) AS `Dept`,
-            
+
             (CASE
                 WHEN cp.deptid IN (0,2,10) THEN Department
                 WHEN cp.deptid=1 THEN "Supply Chain Department"
@@ -54,8 +57,8 @@ switch ($which)
                 ELSE CONCAT(Department," Department")
 
             END) AS `DeptName`
-            
-            
+
+
              FROM `1employees` e LEFT JOIN `1companies` c on e.RCompanyNo=c.CompanyNo JOIN `1_gamit`.`0idinfo` i ON i.IDNo=e.IDNo JOIN attend_30currentpositions cp ON cp.IDNo=e.IDNo WHERE e.IDNo NOT IN (1001,1002) AND EmpStatus=0 AND Resigned<>1 ';
             $columnnameslist=array('IDNo','FullName','DeptName');
 
@@ -67,7 +70,7 @@ switch ($which)
 			include('../backendphp/layout/displayastable.php');
 
 		break;
-		
+
 
 
 case 'Print':
@@ -112,10 +115,10 @@ echo '<style>
 #bg {
   width: 1000px;
   height: 450px;
- 
+
   margin:60px;
- 	float: left; 
- 		
+ 	float: left;
+
 }
 
 #id {
@@ -146,13 +149,13 @@ font-family: sans-serif;
             <div id="id">
             	 <table>
         <tr> <td>
-        	
+
         	</td>
         <td></td>
-       </tr>        
+       </tr>
     </table><center>
-        <?php  
-      
+        <?php
+
       $IDNo=$resinfo['IDNo'];
       $FullName=$resinfo['FullName'];
       $Nickname=$resinfo['Nickname'];
@@ -175,12 +178,12 @@ font-family: sans-serif;
   position: absolute;
   width: 100%;
   height: 100%;
-  background: url('pics/<?php echo $frontid;?>.jpg');   
+  background: url('pics/<?php echo $frontid;?>.jpg');
   background-repeat:repeat-x;
   background-size: 204.48px 324.4px;
   z-index: -1;
   text-align:center;
- 
+
 }
  .container{
 			  margin-left:31px;
@@ -189,47 +192,47 @@ font-family: sans-serif;
 		  	transition: 0.4s;
 		  	width:204.48px;
 		  	height:324.4px;
-		  	background: url('pics/<?php echo $backid;?>.jpg'); 
+		  	background: url('pics/<?php echo $backid;?>.jpg');
 		  	text-align:center;
             background-repeat:repeat-x;
             background-size: 204.48px 324.4px;
 		  	float: left;
-		  	margin:auto;		  	
+		  	margin:auto;
 		  	margin-left:250px;
             border: 1px solid gray;
 
-		  	
+
 		  }
       </style>
 
 
       <?php
-      
+
 
              	 	echo '<div style="transform: rotate(-90deg);position:fixed;color:white;font-size:'.$fontsize.';"><font class="fontsemibold"></font></div>';
-									echo"<div style='margin-top:90px;margin-left:33px;'><img src='../generalinfo/employeepics/$IDNo.jpg' height='90px' width='90px' alt=''></div>";	   
-														     	
-									
+									echo"<div style='margin-top:90px;margin-left:33px;'><img src='../generalinfo/employeepics/$IDNo.jpg' height='90px' width='90px' alt=''></div>";
+
+
              	 	 ?>   </center>              <div class="container" align="center">
-      
+
       	<p style="margin-top:45px;font-size:12pt;" class="fontbold"><?php echo $Nickname;?><br><font style="font-size:10pt;"><?php echo $FullName;?></font></p>
 		  <p style="margin-top:30px;font-size:6.5pt;" class="fontbold">Employee ID No. <?php echo $IDNo;?><br><font class="fontreg">Valid until: <?php echo $IDValidity;?></font></p>
       </div>
             </div>
             <div class="id-1">
     	<?php
-        
-        
-        
+
+
+
         echo '<br>
         <font class="fontreg" style="font-size:6pt;">
         TIN No.: '.$TIN.'<hr style="margin-top:-1px;visibility:hidden;" />
         PHILHEALTH No.: '.$PHICNo.'
         <hr width="80%" size="1px">Person to notify in case of emergency:
-            <hr style="margin-top:-1px;visibility:hidden;" />'.$ICEPerson.'<hr style="margin-top:-1px;visibility:hidden;" />Contact No.: '.$ICEContactInfo.'<hr style="margin-top:-1px;visibility:hidden;" />'.$ICEAddress.'</font>';	   
-        
+            <hr style="margin-top:-1px;visibility:hidden;" />'.$ICEPerson.'<hr style="margin-top:-1px;visibility:hidden;" />Contact No.: '.$ICEContactInfo.'<hr style="margin-top:-1px;visibility:hidden;" />'.$ICEAddress.'</font>';
+
         ?>
-                
+
      </div>
 </div>
 
@@ -238,9 +241,85 @@ font-family: sans-serif;
 
           <?php
     echo '<button id="printPageButton" style="background-color:green;color:white;font-size:18pt;" onclick="window.print()">Print / Save as PDF</button>';
-    
+
 break;
 
+
+
+case 'UploadPicAndSignature':
+  	$title='Upload Picture and Signature for Regular Employees';
+    $formdesc='</i>'.(isset($_GET['done'])?'<br><font color="green">DONE. Pls check smart id app.</font>':'').'<i><br><br>- In uploading images, make sure that the ID Picture you are going to upload is a png file and has a size of 900px X 900px for good quality <br>
+    - For the signature, it must be a png file with a size of 647px X 371px for good quality<br><br><br><form action="idprinting.php?w=uploadprocess" method="POST" enctype="multipart/form-data">Insert ID Number<i style=color:"red">*</i> <input type="text" name="IDNum" size=4 autocomplete="off" list="employees" required> ID Picture<i style color:"red">*</i> <input type="file" name="userfile" required> Signature<i style color:"red">*</i> <input type="file" name="usersign" required>
+                 <input type="submit" name="submit" value="Submit"> </form>';
+              // $sql='SELECT *,CONCAT(id.Nickname," ",id.MiddleName," ",id.SurName) AS FullName,dept AS DeptName FROM 1_gamit.foridprinting WHERE Picture IS NOT NULL AND `Signature` IS NOT NULL';
+              $sql='SELECT `id`.`IDNo` AS `IDNo`,CONCAT(id.Nickname," ",id.MiddleName," ",id.SurName) AS FullName,case when `d`.`deptid` in (0,2,10) then `d`.`department` when `d`.`deptid` = 1 then "Supply Chain Department" when `d`.`deptid` = 11 then "Sales Department" when `d`.`deptid` in (30,50,55) then concat(`d`.`department`," Dept.") else concat(`d`.`department`," Department") end AS `DeptName` from (((((`1_gamit`.`0idinfo` `id` join `attend_30latestpositionsinclresigned` `lpir` on(`id`.`IDNo` = `lpir`.`IDNo`)) join `1employees` `e` on(`lpir`.`IDNo` = `e`.`IDNo`)) join `attend_1positions` `p` on(`lpir`.`PositionID` = `p`.`PositionID`)) join `1departments` `d` on(`p`.`deptid` = `d`.`deptid`)) join `1_gamit`.`1idpicsign` `idpic` on(`id`.`IDNo` = `idpic`.`IDNo`)) where `lpir`.`Resigned` <> 1';
+              $columnnameslist=array('IDNo','FullName','DeptName');
+
+  	 $sql.=' ';
+
+  	 $columnnames=$columnnameslist;
+  			$width='70%';
+        $txnidname='IDNo';
+        $delcommand='Delete';
+  			$delprocess='idprinting.php?w=DeletePicAndSignature&IDNo=';
+  			include('../backendphp/layout/displayastable.php');
+
+        include_once $path.'/acrossyrs/commonfunctions/listoptions.php';
+        echo comboBox($link,'SELECT CONCAT(Nickname, " - ", FirstName, " ", SurName) AS Name, IDNo FROM `1employees` WHERE Resigned=0','Name','IDNo','employees');
+
+  break;
+
+case 'ReloadAppData':
+
+  $sql2='DELETE FROM 1_gamit.foridprintingdata';
+  $stmt=$link->prepare($sql2); $stmt->execute();
+
+  $sql2='INSERT INTO 1_gamit.foridprintingdata SELECT `id`.`IDNo` AS `IDNo`,`id`.`Nickname` AS `Nickname`,concat(`id`.`FirstName`," ",LEFT(`id`.`MiddleName`,1),". ",`id`.`SurName`) AS `FullName`,concat("Valid until ",monthname(curdate())," ",year(curdate()) + 2) AS `ValidUntil`,`id`.`ICEPerson` AS `ICEPerson`,`id`.`ICEContactInfo` AS `ICEContactInfo`,`id`.`ResTel` AS `ICETel`,`id`.`ICEAddress` AS `ICEAddress`,`id`.`PHICNo` AS `PHICNO`,"" AS `SMART_PRTMARK`,"" AS `SMART_PRTINFO`,`idpic`.`Picture` AS `Picture`,`idpic`.`PictureConf` AS `PictureConf`,`idpic`.`Sign` AS `Signature`,case when `d`.`deptid` in (0,2,10) then `d`.`department` when `d`.`deptid` = 1 then "Supply Chain Department" when `d`.`deptid` = 11 then "Sales Department" when `d`.`deptid` in (30,50,55) then concat(`d`.`department`," Dept.") else concat(`d`.`department`," Department") end AS `dept` from (((((`1_gamit`.`0idinfo` `id` join `attend_30latestpositionsinclresigned` `lpir` on(`id`.`IDNo` = `lpir`.`IDNo`)) join `1employees` `e` on(`lpir`.`IDNo` = `e`.`IDNo`)) join `attend_1positions` `p` on(`lpir`.`PositionID` = `p`.`PositionID`)) join `1departments` `d` on(`p`.`deptid` = `d`.`deptid`)) join `1_gamit`.`1idpicsign` `idpic` on(`id`.`IDNo` = `idpic`.`IDNo`)) where `lpir`.`Resigned` <> 1';
+  // echo $sql2;
+  $stmt=$link->prepare($sql2); $stmt->execute();
+
+  header("Location:idprinting.php?w=UploadPicAndSignature&done=1");
+
+break;
+
+case 'uploadprocess':
+    $imgData = addslashes(file_get_contents($_FILES['userfile']['tmp_name']));
+
+    $imgDataSign = addslashes(file_get_contents($_FILES['usersign']['tmp_name']));
+
+    // $imagePic = getimageSize($_FILES['userfile']['tmp_name']);
+    // $maxsize = 307200; //300KB
+    $photo_filename=$_FILES['userfile']['name'];
+
+    // $imageSign = getimageSize($_FILES['usersign']['tmp_name']);
+    $maxsize = 307200; //300KB
+    $photo_filename2=$_FILES['usersign']['name'];
+
+    $ext=pathinfo($photo_filename, PATHINFO_EXTENSION);
+    if($ext!== 'png' AND $ext !=='PNG'){echo 'Error! Invalid File Type.'; exit(); }
+    if(($_FILES['userfile']['size'] >= $maxsize)){echo 'Error! Invalid File Size (MAX 300KB).'; exit(); }
+
+    $ext2=pathinfo($photo_filename2, PATHINFO_EXTENSION);
+    if($ext2!== 'png' AND $ext2 !=='PNG'){echo 'Error! Invalid File Type.'; exit(); }
+    if(($_FILES['usersign']['size'] >= $maxsize)){echo 'Error! Invalid File Size (MAX 300KB).'; exit(); }
+
+    $sql2='DELETE FROM 1_gamit.1idpicsign WHERE IDNo='.$_POST['IDNum'].'';
+    $stmt=$link->prepare($sql2); $stmt->execute();
+
+    $sql2='INSERT INTO 1_gamit.1idpicsign SET Picture="'.$imgData.'", Sign="'.$imgDataSign.'",IDNo="'.$_POST['IDNum'].'",TimeStamp=NOW()';
+    $stmt=$link->prepare($sql2); $stmt->execute();
+
+    header("Location:idprinting.php?w=UploadPicAndSignature");
+
+  break;
+
+case 'DeletePicAndSignature':
+    $sql2='DELETE FROM 1_gamit.1idpicsign WHERE IDNo='.$_GET['IDNo'].'';
+    $stmt=$link->prepare($sql2); $stmt->execute();
+
+    header("Location:idprinting.php?w=UploadPicAndSignature");
+
+  break;
 
 
 }
