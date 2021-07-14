@@ -14,11 +14,12 @@ $showbranches=false; include_once('../switchboard/contents.php');
 
 $w=$_GET['w'];
 
-if(in_array($w,array('All','Details','APPerBranch'))){
+if(in_array($w,array('All','Details','APPerBranch','DetailsPerBranch'))){
    ?>
    <form style="display:inline" method="get" action="#"><input type=hidden name="w" value='All'><input type="submit" value="Totals Per Supplier"/></form>&nbsp &nbsp
    <form style="display:inline" method="get" action="#"><input type=hidden name="w" value='Details'><input type="submit" value="Details Per Supplier"/></form>&nbsp &nbsp
-   <form style="display:inline" method="get" action="#"><input type=hidden name="w" value='APPerBranch'><input type="submit" value="Totals Per Branch"/></form>
+   <form style="display:inline" method="get" action="#"><input type=hidden name="w" value='APPerBranch'><input type="submit" value="Totals Per Branch"/></form>&nbsp &nbsp
+   <form style="display:inline" method="get" action="#"><input type=hidden name="w" value='DetailsPerBranch'><input type="submit" value="Details Per Branch"/></form>
    <?php
          
 }
@@ -80,6 +81,23 @@ case 'APPerBranch':
    include('../backendphp/layout/displayastablenosort.php');
    
    break;
+
+case 'DetailsPerBranch':
+      if (!allowedToOpen(541,'1rtc')) { echo 'No permission'; exit; }
+      $title='Inv Details Per Branch';
+         $sql1='SELECT ap.BranchNo, Branch FROM `acctg_23balperinv` ap JOIN 1branches b on b.BranchNo=ap.BranchNo where PayBalance<>0 GROUP BY ap.BranchNo ORDER BY Branch ';
+    $sql2='SELECT date_format(`Date`,\'%Y-%m-%d\') as `Date`, `SupplierName`,`SupplierInv`,`PurchaseAmt`,`PaidAmt`,`PayBalance`, DateDiff(Now(),ap.Date) as Age FROM acctg_23balperinv ap ';
+
+    $coltototal='PayBalance';
+    $groupby='BranchNo';
+    $orderby=' having PayBalance<>0 ORDER BY Date, SupplierInv';
+    $columnnames1=array('Branch');
+    $columnnames2=array('Date','SupplierName','SupplierInv','PurchaseAmt','PaidAmt','PayBalance','Age');
+    $showtotals=true; $runtotal=true;
+    $showgrandtotal=true;
+    include('../backendphp/layout/displayastablewithsub.php');
+         break;
+
 
 case 'InvDue':
 if (!allowedToOpen(543,'1rtc')) { echo 'No permission'; exit; }
