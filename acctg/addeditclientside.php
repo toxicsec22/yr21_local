@@ -479,7 +479,7 @@ WHERE m.TxnID='.$txnid;
     
     $sqlsub='Select s.*, if(isnull(DatePaid),"",PaidViaAcctID) as PaidVia, b.Branch as ToBranch, ca.ShortAcctID as DebitAccount, e.Nickname as OUTEncodedBy, e2.Nickname as INEncodedBy  from acctg_2txfrsub s join acctg_1chartofaccounts ca on ca.AccountID=s.DebitAccountID left join `1employees` as e on s.OUTEncodedByNo=e.IDNo
     left join `1employees` as e2 on s.INEncodedByNo=e2.IDNo
-    join `1branches` b on b.BranchNo=s.ClientBranchNo
+    LEFT join `1branches` b on b.BranchNo=s.ClientBranchNo
     join acctg_2txfrmain m on m.TxnID=s.TxnID WHERE m.TxnID='.$txnid.' Order By '.$sortfield;
     
     $stmt=$link->query($sqlsub);
