@@ -3,7 +3,7 @@ $path=$_SERVER['DOCUMENT_ROOT']; include_once $path.'/acrossyrs/logincodes/check
 $showbranches=false; include_once('../switchboard/contents.php');
 
 include_once('../switchboard/contents.php');
- 
+ include_once $path.'/acrossyrs/commonfunctions/listoptions.php';
 $which=(!isset($_GET['w'])?'RequestOT':$_GET['w']);
 include_once('../backendphp/layout/linkstyle.php');
 		echo '<br/><br/><div>';
@@ -16,9 +16,12 @@ include_once('../backendphp/layout/linkstyle.php');
 				if (allowedToOpen(62121,'1rtc')) {
 					echo '<a id=\'link\' href="otrequest.php?w=OverrideTimeOut">Override Time Out</a> ';
 				}
+				if(allowedToOpen(6213,'1rtc')){
+					echo '<a id=\'link\' href="otrequest.php?w=CancelApprovedOT">Cancel Pre-Approved OT</a> ';
+				}
 		echo '</div><br/>';
 if (in_array($which,array('RequestOT','Submit','OTPerPersonPerPayrollID','TotalOTReport'))){
-	include_once $path.'/acrossyrs/commonfunctions/listoptions.php';
+	
 	$listsql='SELECT PayrollID, concat(PayrollID, " : ", FromDate, " - ", ToDate) as PayPeriod FROM payroll_1paydates;';
 	$_POST['payrollid']=(isset($_POST['payrollid'])?$_POST['payrollid']:((date('m')*2)+(date('d')<15?-1:0)));
     echo comboBox($link,$listsql,'PayPeriod','PayrollID','payperiods');
@@ -42,7 +45,8 @@ switch ($which){
 	&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; for APPROVER: can approve until 18:00 [06:00 PM] (Otherwise, request status will tag automatically as "No Response").
 	</font><br>
 &nbsp; &nbsp; &nbsp; &nbsp; 6. There is a possible demerit if OT has not been requested.<br>
-&nbsp; &nbsp; &nbsp; &nbsp; 7. ONLY HR can override all OT on rare occasions.</div><br>
+&nbsp; &nbsp; &nbsp; &nbsp; 7. ONLY HR can override all OT on rare occasions.<br>
+&nbsp; &nbsp; &nbsp; &nbsp; 8. Dept Heads can cancel pre-approved OT. (Cancellation allowed for unposted attendance only.)</div><br>
 <div style="float:right; width:15%;"><font size="1">Overtime Types<br>0 - No Overtime<br>10 - Full Shift<br>11 - Pre Shift<br>12 - Post Shift<br>13 - After Midnight<br>23 - Pre and Post Shift<br>24 - Pre and Post Shift after Midnight<br><br></font></div>
 
 ';
@@ -174,10 +178,15 @@ switch ($which){
 		
 		unset($editprocess);
 		$sql=str_replace($showprocesslabel,'',$sqlmain).'Approved=3';
-		// echo $sql.'<br><br>';
         $title='"No Response" OT Request'; 
 		$columnnames=array('FullName','Position','Branch','OTType','DateOfOT','EndOfOT','Reason','RequestedBy','RequestedTS');
-		// $columnnames=array('FullName','Position','Branch','OTType','DateOfOT','TypeofDay','EndOfOT','Reason','RequestedBy','RequestedTS');
+        include('../backendphp/layout/displayastable.php');
+
+		
+		$sql=str_replace($showprocesslabel,'',$sqlmain).'Approved=4';
+		// echo $sql;
+        $title='Cancelled'; 
+		$columnnames=array('FullName','Position','Branch','OTType','DateOfOT','EndOfOT','Reason','RequestedBy','RequestedTS');
         include('../backendphp/layout/displayastable.php');
 		
     break;
@@ -416,7 +425,68 @@ $formdesc='<br>Notes: <br>&nbsp; &nbsp; &nbsp; WH Supervisor can override time o
 			$stmt=$link->prepare($sql); $stmt->execute();
 			header("Location:otrequest.php?AttendDate=".$_GET['AttendDate']."&w=OverrideTimeOut");
 	break;
-	
+
+
+
+	case 'CancelApprovedOT':
+		if (!allowedToOpen(6213,'1rtc')) { echo 'No Permission'; exit(); }
+		echo comboBox($link,'SELECT IDNo,FullName FROM attend_30currentpositions WHERE deptheadpositionid='.$_SESSION['&pos'].'','FullName','IDNo','employees');
+		echo isset($_GET['done'])?'<font color="green"><b>DONE</b></font><br>':'';
+
+		
+		$title='Cancel Pre-Approved Overtime';
+
+		$forminput='<form action="otrequest.php?w=CancelApprovedOT" method="POST">IDNo: <input type="text" name="IDNo" list="employees" size="15" value="'.(isset($_POST['IDNo'])?$_POST['IDNo']:'').'"> Date: <input type="date" name="DateToday" value="'.(isset($_POST['DateToday'])?$_POST['DateToday']:'').'"> <input type="hidden" value="'.$_SESSION['action_token'].'" name="action_token"><input type="submit" value="Cancel Pre-Approved OT" name="btnCancel"></form>';
+
+		if(isset($_POST['btnCancel'])){
+			echo $forminput;
+			$sql='SELECT ot.TxnID,OTType,StartOfOT,EndOfOT,Reason FROM approvals_5ot ot JOIN attend_0ottype ott ON ot.OtTypeNo=ott.OTTypeNo WHERE IDNo='.$_POST['IDNo'].' AND DateToday="'.$_POST['DateToday'].'" AND Approved=1';
+
+			$employee=comboBoxValue($link,'`attend_30currentpositions`','IDNo',addslashes($_POST['IDNo']),'FullName');
+			$delprocess='otrequest.php?w=CancelOTProcess&DateToday='.$_POST['DateToday'].'&IDNo='.$_POST['IDNo'].'&TxnID=';
+			$txnidname='TxnID';
+			$formdesc='<br></i><b>Employee:</b> '.$employee.'<br><b>DateOfOT:</b> '.$_POST['DateToday'].'<i>';
+			$columnnames=array('OTType','StartOfOT','EndOfOT','Reason');
+			include('../backendphp/layout/displayastablenosort.php');
+		} else {
+			echo '<title>'.$title.'</title>';
+			echo '<h3>'.$title.'</h3>';
+			echo $forminput;
+		}
+
+
+	break;
+
+	case 'CancelOTProcess':
+		if (!allowedToOpen(6213,'1rtc')) { echo 'No Permission'; exit(); }
+		require_once $path.'/acrossyrs/logincodes/confirmtoken.php';
+
+		$sqlc='SELECT IDNo FROM attend_30currentpositions WHERE IDNo='.$_GET['IDNo'].' AND deptheadpositionid='.$_SESSION['&pos'].'';
+		$stmtc=$link->query($sqlc);
+
+		if($stmtc->rowCount()>0){
+			goto here;
+		} else {
+			echo '<br><br>Not allowed to cancel.'; exit();
+		}
+		here:
+		$sqlf='SELECT ad.DateToday FROM attend_2attendancedates ad JOIN payroll_1paydates pd ON ad.PayrollID=pd.PayrollID WHERE ad.DateToday="'.$_GET['DateToday'].'" AND ad.Posted=0 AND pd.Posted=0';
+		$stmtf=$link->query($sqlf);
+
+		if($stmtf->rowCount()>0){
+			$sqlupdateattendance='UPDATE attend_2attendance a JOIN attend_2attendancedates ad ON a.DateToday=ad.DateToday JOIN payroll_1paydates pd ON ad.PayrollID=pd.PayrollID SET OTApproval=0, OTTypeNo=0, HREncby='.$_SESSION['(ak0)'].', HRTS=Now() WHERE IDNo='.$_GET['IDNo'].' AND a.DateToday="'.$_GET['DateToday'].'" AND ad.Posted=0 AND pd.Posted=0';
+			$stmtupdateattendance=$link->prepare($sqlupdateattendance); $stmtupdateattendance->execute();
+
+			//cancelled 4
+			$sqldeleteot='UPDATE approvals_5ot ot JOIN attend_2attendancedates ad ON ot.DateToday=ad.DateToday JOIN payroll_1paydates pd ON ad.PayrollID=pd.PayrollID SET ot.Approved=4 WHERE IDNo='.$_GET['IDNo'].' AND ot.DateToday="'.$_GET['DateToday'].'" AND ad.Posted=0 AND pd.Posted=0';
+			$stmtdeleteot=$link->prepare($sqldeleteot); $stmtdeleteot->execute();
+
+			header("Location:otrequest.php?w=CancelApprovedOT&done=1");
+
+		} else {
+			echo '<br>ERROR! cant cancel approved OT bec attendance/payroll ID was posted already. Request to HR to unpost first then try again.';
+		}
+	break;
 	
 }
  $link=null; $stmt=null; 
