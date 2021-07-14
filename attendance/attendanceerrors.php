@@ -39,18 +39,24 @@ switch ($which){
         include('../backendphp/layout/displayastable.php'); 
 		
 		
-		$title='Wrong Time Out'; ;
+		$title='Wrong Time Out';
 		$sql=$sqlmain.' WHERE (a.OTTypeNo NOT IN (13,24) AND TimeOut<"10:00") OR (a.OTTypeNo IN (13,24) AND TimeOut>"08:00") ORDER BY DateToday DESC, Branch, FullName ASC';
         $columnnames=array('DateToday', 'IDNo', 'FullName','TimeIn','TimeOut','RemarksDept','RemarksHR', 'Branch'); $width='70%';
         include('../backendphp/layout/displayastable.php'); 
 		
 		
-		$title='Wrong Time In'; ;
+		$title='Wrong Time In';
 		$sql=$sqlmain.' WHERE TimeIn>="17:00" ORDER BY DateToday DESC, Branch, FullName ASC';
 		// echo $sql;
         $columnnames=array('DateToday', 'IDNo', 'FullName','TimeIn','TimeOut','RemarksDept','RemarksHR', 'Branch'); $width='70%';
         include('../backendphp/layout/displayastable.php'); 
 		
+
+        $title='Undertime with Pre-Approved OT (Pls Check OT Calculation)';
+		$sql='SELECT a.IDNo,a.DateToday,Shift,TimeIn,StartOfOT,TimeOut,EndOfOT,a.RemarksDept, a.RemarksHR,CONCAT(e.Nickname," ",e.SurName) AS FullName,Position FROM attend_2attendance a JOIN approvals_5ot ot ON a.IDNo=ot.IDNo AND a.DateToday=ot.DateToday JOIN attend_2attendancedates ad ON a.DateToday=ad.DateToday JOIN attend_30latestpositionsinclresigned lpir ON a.IDNo=lpir.IDNo JOIN 1employees e ON a.IDNo=e.IDNo JOIN attend_1positions p ON lpir.PositionID=p.PositionID JOIN 1departments d ON p.deptid=d.deptid WHERE OTApproval=2 AND Approved=1 AND LeaveNo=30 ORDER BY a.DateToday DESC';
+		// echo $sql;
+        $columnnames=array('IDNo','DateToday','FullName','Position','TimeIn','StartOfOT','EndOfOT','TimeOut','Branch/Dept','RemarksDept','RemarksHR'); $width='100%';
+        include('../backendphp/layout/displayastable.php'); 
 		
       break;
     default:
